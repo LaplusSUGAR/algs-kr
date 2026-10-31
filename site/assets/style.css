@@ -9,6 +9,8 @@
   --ring-soft: rgba(196, 18, 47, .09);
   --brass: #9A7A2C;
   --ok: #2F6B4F;
+  --coach: #1F6FB2;
+  --coach-soft: rgba(31, 111, 178, .10);
   --display: 'Big Shoulders Display', 'Pretendard Variable', Pretendard, system-ui, sans-serif;
   --body: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   --r-lg: 14px;
@@ -26,6 +28,8 @@
   --ring-soft: rgba(255, 77, 99, .12);
   --brass: #D2B062;
   --ok: #6FC09A;
+  --coach: #5AA9F0;
+  --coach-soft: rgba(90, 169, 240, .13);
   color-scheme: dark;
 }
 
@@ -158,8 +162,8 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
 .search { width: 100%; padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid var(--rule); background: var(--card); font: inherit; color: inherit; }
 .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
 .team-tile { background: var(--card); border-radius: var(--r-sm); padding: 12px; text-decoration: none; display: block; }
-.team-tile b { display: block; font: 800 22px/1 var(--display); }
-.team-tile span { font-size: 12.5px; color: var(--steel); }
+.team-tile > b { display: block; font: 800 22px/1 var(--display); }
+.team-tile > span { font-size: 12.5px; color: var(--steel); }
 .team-tile.kr { box-shadow: inset 3px 0 0 var(--ring); }
 .roster-list { list-style: none; padding: 0; margin: 0; }
 .roster-list li { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--rule); }
@@ -227,6 +231,80 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
 
 /* ---------- 반응형: 태블릿·데스크톱 ---------- */
 .frame { max-width: 640px; }
+
+/* 한국 코치가 있는 팀 = 파랑 */
+.krdot.kc { background: var(--coach); }
+.krdot.m.kc { background: transparent; border-color: var(--coach); }
+.tbl tr.kr.kc td { background: var(--coach-soft); }
+.tbl tr.kr.kc td:first-child { box-shadow: inset 3px 0 0 var(--coach); }
+.tag.kr.kc { border-color: var(--coach); color: var(--coach); }
+.team-tile.kr.kc { box-shadow: inset 3px 0 0 var(--coach); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--steel); margin: 10px 0 0; }
+.legend > span { display: inline-flex; align-items: center; }
+.krn { font-weight: 700; color: var(--ink); }
+sup.mix { font-size: 10px; font-weight: 700; color: var(--ring); margin-left: 2px; }
+.olink { color: inherit; text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.olink:hover { text-decoration-color: currentColor; }
+.olink::after { content: '↗'; font-size: .78em; margin-left: 2px; color: var(--steel); }
+.chip.find { border-style: dashed; font-weight: 500; color: var(--steel); }
+.tile-roster { display: block; font-size: 12px; color: var(--steel); margin-top: 6px; line-height: 1.45; }
+.kr-hero .kr-where { margin: 12px 0 0; font-size: 13.5px; opacity: .85; }
+.meta.lineup { margin-top: 4px; }
+
+/* 진출 구조 그림 */
+.flow-sec { margin-top: 16px; }
+.flow-grid { display: grid; gap: 12px; }
+.bf-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; background: var(--card); border-radius: var(--r-lg); padding: 10px 8px 6px; }
+.bf { display: block; width: 100%; min-width: 620px; height: auto; font-family: var(--body); }
+.bf-box { fill: var(--paper); stroke: var(--rule); stroke-width: 1.2; }
+.bf-node:hover .bf-box, .bf-node:focus-visible .bf-box { stroke: var(--ink); }
+.bf-node.done .bf-box { fill: var(--card); stroke-dasharray: 3 3; }
+.bf-node.next .bf-box { stroke: var(--brass); stroke-width: 2; }
+.bf-node.live .bf-box { stroke: var(--ring); stroke-width: 2.4; }
+.bf-title { font-size: 14px; font-weight: 800; fill: var(--ink); }
+.bf-state { font-size: 11.5px; font-weight: 700; fill: var(--steel); }
+.bf-node.live .bf-state { fill: var(--ring); }
+.bf-node.next .bf-state { fill: var(--brass); }
+.bf-sub { font-size: 11.5px; fill: var(--steel); }
+.bf-sub2 { font-size: 10.5px; fill: var(--steel); }
+.bf-edge { fill: none; stroke: var(--steel); stroke-width: 1.3; opacity: .7; }
+.bf-arrow { fill: var(--steel); }
+.bf-elab { font-size: 10.5px; fill: var(--steel); font-weight: 600; paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+.bf-chip rect { fill: var(--ring); }
+.bf-chip text { font-size: 11px; font-weight: 700; fill: #fff; }
+.bf-chip.kc rect { fill: var(--coach); }
+.bf-chip.out { opacity: .38; }
+.bf-chip.up rect { stroke: var(--ink); stroke-width: 1.5; }
+.bf-more { font-size: 11px; fill: var(--steel); }
+.up-list .match:first-child { margin-top: 0; }
+
+/* 브래킷 순위 */
+.tl-row { margin-top: 4px; }
+.bk-h { display: flex; align-items: center; gap: 8px; }
+.bk-badge { font: 800 13px/1 var(--body); padding: 6px 10px; border-radius: 999px; }
+.bk-badge.up { background: var(--ink); color: var(--paper); }
+.bk-badge.low { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.bk-final .bk-h::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--brass); }
+.bk-stage { background: var(--card); border-radius: var(--r-lg); padding: 12px 12px 10px; margin-top: 10px; }
+.bk-stage.live { box-shadow: inset 0 0 0 2px var(--ring); }
+.bk-stage .tbl-wrap { margin-top: 6px; }
+.bk-stage-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.bk-stage-h .h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.bk-stage-h .when { margin-left: auto; font-size: 12.5px; color: var(--steel); }
+.bk-rule { margin: 4px 0 0; font-size: 12.5px; color: var(--steel); }
+.bk-lower .bk-cols { display: grid; gap: 0 14px; }
+.adv { font-size: 12px; font-weight: 700; }
+.adv.up { color: var(--ok); } .adv.down { color: var(--brass); } .adv.out { color: var(--steel); font-weight: 500; }
+.lineup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+.lu { display: flex; align-items: center; gap: 2px; padding: 7px 9px; border-radius: var(--r-sm); background: var(--paper); font-size: 13.5px; font-weight: 600; }
+.lu small { margin-left: auto; color: var(--steel); font-weight: 500; font-size: 11.5px; }
+.lu.kr { background: var(--ring-soft); box-shadow: inset 3px 0 0 var(--ring); }
+.lu.kr.kc { background: var(--coach-soft); box-shadow: inset 3px 0 0 var(--coach); }
+details.past { background: var(--card); border-radius: var(--r-lg); padding: 12px; }
+details.past > summary { cursor: pointer; color: var(--steel); font-size: 13px; }
+details.past > summary .h2 { display: inline; margin-right: 8px; color: var(--ink); }
+.h3 { font-size: 15px; font-weight: 800; margin: 18px 0 4px; }
+
 @media (min-width: 768px) {
   body { font-size: 15.5px; }
   .frame { max-width: 1040px; padding-bottom: 24px; }
@@ -243,7 +321,9 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
   .home-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 36px; align-items: start; }
   .home-grid .col-b > .sec:first-child { margin-top: 16px; }
   .kr-hero h1 { font-size: 58px; }
-  .team-grid { grid-template-columns: repeat(4, 1fr); }
+  .team-grid { grid-template-columns: repeat(3, 1fr); }
+  .bk-lower .bk-cols { grid-template-columns: 1fr 1fr; }
+  .lineup-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .mv { grid-template-columns: 1.15fr 1fr; align-items: center; gap: 24px; }
   .stream-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; align-items: start; }
   .pl-row { grid-template-columns: minmax(180px, 1fr) 2fr; align-items: center; }
@@ -251,8 +331,13 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
 }
 @media (min-width: 1200px) {
   .frame { max-width: 1240px; }
-  .team-grid { grid-template-columns: repeat(5, 1fr); }
+  .team-grid { grid-template-columns: repeat(4, 1fr); }
+  .flow-grid { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); align-items: start; }
   .days { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; align-items: start; }
   .kr-stats b { font-size: 36px; }
 }
 main:focus, main:focus-visible { outline: none; }
+.bk-cols .lineup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.flow-grid > * { min-width: 0; }
+.team-tile .tile-roster .krn { display: inline; font: 700 12.5px/1.45 var(--body); color: var(--ink); }
+.team-tile > span:not(.tile-roster) { display: block; }

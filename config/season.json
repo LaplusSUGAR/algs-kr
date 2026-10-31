@@ -8,49 +8,56 @@
       "name": "Online Open",
       "start": "2026-02-28",
       "end": "2026-03-23",
-      "where": "온라인"
+      "where": "온라인",
+      "url": "https://liquipedia.net/apexlegends/ALGS/2026-27"
     },
     {
       "key": "s1pl",
       "name": "Split 1 Pro League",
       "start": "2026-04-04",
       "end": "2026-06-07",
-      "where": "온라인 · 지역별 30팀"
+      "where": "온라인 · 지역별 30팀",
+      "url": "https://algs.ea.com/en/year-6/split-1-pro-league-apac-north"
     },
     {
       "key": "s1po",
       "name": "Split 1 Playoffs",
       "start": "2026-07-07",
       "end": "2026-07-11",
-      "where": "EWC LAN · 40팀"
+      "where": "EWC LAN · 40팀",
+      "url": "https://algs.ea.com/en/year-6/split-1-playoffs-ewc"
     },
     {
       "key": "s2pl",
       "name": "Split 2 Pro League",
       "start": "2026-08-21",
       "end": "2026-09-13",
-      "where": "온라인 · 지역별 30팀"
+      "where": "온라인 · 지역별 30팀",
+      "url": "https://algs.ea.com/en/year-6/split-2-pro-league-apac-north"
     },
     {
       "key": "s2po",
       "name": "Split 2 Playoffs",
       "start": "2026-10-29",
       "end": "2026-11-01",
-      "where": "라스베이거스 LAN · 40팀"
+      "where": "라스베이거스 LAN · 40팀",
+      "url": "https://algs.ea.com/en/year-6/split-2-playoffs"
     },
     {
       "key": "lcq",
       "name": "Last Chance Qualifier",
       "start": "2026-11-20",
       "end": "2026-11-22",
-      "where": "온라인 · 지역별 2자리"
+      "where": "온라인 · 지역별 2자리",
+      "url": "https://liquipedia.net/apexlegends/ALGS/2026-27"
     },
     {
       "key": "champs",
       "name": "Championship",
       "start": "2027-01-28",
       "end": "2027-01-31",
-      "where": "삿포로 LAN · 40팀"
+      "where": "삿포로 LAN · 40팀",
+      "url": "https://liquipedia.net/apexlegends/ALGS/2026-27"
     }
   ],
   "scoring": {
@@ -249,5 +256,6 @@
     "buildMinutes": 5,
     "liveSeconds": 10,
     "note": "GitHub Actions 예약 실행은 지연될 수 있음"
-  }
+  },
+  "_timelineUrls": "공식 페이지가 있는 일정은 algs.ea.com, 없는 일정(Online Open, LCQ, 챔피언십)은 Liquipedia 시즌 페이지. 공식 페이지가 생기면 url만 바꾸면 된다."
 }

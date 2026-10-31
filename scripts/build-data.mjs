@@ -55,11 +55,26 @@ for (const key of Object.keys(algs.pl).sort().reverse()) {
 }
 
 // 로스터와 한국 판별
+// config/players.json: 선수별 수동 보정. role(coach/player)로 역할을 고치고, heritage: "KR"로 한국계(혼혈·이중국적 등)를 표시한다.
+const playerCfg = readJson('config/players.json', { players: {} }).players || {};
+const pcfg = (name) => Object.entries(playerCfg).find(([k]) => nameKey(k) === nameKey(name))?.[1] || {};
+const ROLE_CODE = { player: 'p', captain: 'c', coach: 'k' };
 for (const [id, s] of Object.entries(algs.rosters)) {
   const t = teams[id];
   if (!t) continue;
-  t.roster = s.split(';').map((x) => { const [n, c, r] = x.split('|'); return { n, c, r }; });
+  t.roster = s.split(';').map((x) => {
+    const [n, c, r, rep] = x.split('|');
+    const o = pcfg(n);
+    const p = { n, c, r: ROLE_CODE[o.role] || r };
+    // 한국계: 국적·대표 국가 중 하나만 KR이거나, 운영자가 heritage로 지정한 경우
+    const krRep = rep === 'KR';
+    if (rep) p.rep = rep;
+    if ((krRep && c !== 'KR') || (c === 'KR' && rep && rep !== 'KR') || o.heritage === 'KR') p.mix = 1;
+    if (o.note) p.note = o.note;
+    return p;
+  });
 }
+const isKrP = (p) => p.c === 'KR' || p.rep === 'KR' || p.mix;
 for (const key of Object.keys(algs.pl).sort()) { // s1 → s2 순서로 최신 값이 남게
   for (const r of algs.pl[key]) if (teams[r[3]] && r[10]) teams[r[3]].krPlayers = r[10].split(',');
 }
@@ -70,10 +85,13 @@ const currentIds = new Set([...algs.cp.map((r) => r[1]), ...algs.poGroup.map((r)
 for (const t of Object.values(teams)) {
   t.current = currentIds.has(t.id);
   if (!t.current) { t.krPlayers = []; }
-  else if (t.roster.length) t.krPlayers = t.roster.filter((p) => p.c === 'KR' && p.r !== 'k').map((p) => p.n);
-  // 3인 라인업 기준: 한국 선수 2명 이상 = 한국 팀, 1명 = 한국 선수 소속 팀 (config/season.json에서 바꾸려면 여기 기준 수정)
+  else if (t.roster.length) t.krPlayers = t.roster.filter((p) => isKrP(p) && p.r !== 'k').map((p) => p.n);
+  t.krCoaches = t.current ? t.roster.filter((p) => isKrP(p) && p.r === 'k').map((p) => p.n) : [];
+  // 3인 라인업 기준: 한국 선수 2명 이상 = 한국 팀, 1명 = 한국 선수 소속 팀, 선수는 없고 한국 코치만 = 한국 코치 팀
+  // kc: 한국 코치가 있는 팀 (화면에서 파란색으로 따로 구별)
   const kr = t.krPlayers.length;
-  t.krLevel = kr >= 2 ? 'team' : kr === 1 ? 'member' : 'none';
+  t.krLevel = kr >= 2 ? 'team' : kr === 1 ? 'member' : t.krCoaches.length ? 'coach' : 'none';
+  t.kc = t.krCoaches.length > 0;
   const o = ov.teams?.[t.short];
   if (o) Object.assign(t, o);
 }
@@ -124,8 +142,9 @@ const evById = Object.fromEntries(algs.events.map(([id, slug, name, region, star
 const series = algs.series.map(([id, eventId, phase, name, status, start, regionName, mp, matches, res]) => {
   const ev = evById[eventId] || { name: '', slug: '' };
   const region = normRegion(regionName) || ev.region;
-  const results = res ? res.map(([pos, short, pts, kills]) => ({ pos, short, pts, kills, kr: teams[shortToId[short]]?.krLevel || 'none' })).sort((a, b) => a.pos - b.pos) : null;
-  return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results,
+  const results = res ? res.map(([pos, short, pts, kills, m]) => ({ pos, short, pts, kills, kr: teams[shortToId[short]]?.krLevel || 'none', ...(m === 2 ? { won: true, mpe: true } : m === 1 ? { mpe: true } : {}) })).sort((a, b) => a.pos - b.pos) : null;
+  const lineup = algs.lineups?.[id] || null;
+  return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
 }).sort((a, b) => a.start.localeCompare(b.start));
 
@@ -148,14 +167,14 @@ const kr = Object.values(teams).filter((t) => t.krLevel !== 'none' && (t.cp || p
     const next = ir ? series.find((s) => s.eventId === intl.eventId && s.status !== 'completed' && s.name === ir.next) : null;
     const cpr = cpRows.find((r) => r.id === t.id);
     return {
-      short: t.short, name: t.name, level: t.krLevel, krPlayers: t.krPlayers,
+      short: t.short, name: t.name, level: t.krLevel, kc: t.kc, krPlayers: t.krPlayers, krCoaches: t.krCoaches,
       cp: cpr ? { rank: cpr.rank, total: cpr.total, gap: cpr.gap, status: cpr.status } : null,
       pl: s2 ? { pos: s2.pos, rs: s2.rs, kills: s2.kills, qualified: s2.qualified } : null,
       intl: ir ? { pos: ir.pos, pts: ir.pts, of: intl.rows.length, next: ir.next } : null,
       nextSeries: next ? { id: next.id, name: next.name, start: next.start, event: next.event } : null,
     };
   })
-  .sort((a, b) => (a.level === 'team' ? 0 : 1) - (b.level === 'team' ? 0 : 1) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
+  .sort((a, b) => ({ team: 0, member: 1, coach: 2 }[a.level] - { team: 0, member: 1, coach: 2 }[b.level]) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
 
 // ---------- 방송 ----------
 // 선수 채널 우선순위: 수동 입력(config/players.json) > Liquipedia 선수 링크 > 공식 API(선수당 1개)
@@ -172,11 +191,13 @@ const lpLinks = (name) => {
 };
 const manual = (name) => Object.entries(manualPlayers).find(([k]) => nameKey(k) === nameKey(name))?.[1] || {};
 const playerStreams = algs.krStreams.map(([team, name, role, provider, ch]) => {
+  if (ROLE_CODE[pcfg(name).role]) role = pcfg(name).role;
+  const rp = teams[shortToId[team]]?.roster?.find((p) => p.n === name);
   const links = Object.fromEntries(PLATFORMS.map((p) => [p, null]));
   if (provider && PLATFORMS.includes(provider)) links[provider] = streamUrl(provider, ch);
   for (const src of [lpLinks(name), manual(name)]) for (const p of PLATFORMS) if (src[p]) links[p] = src[p];
-  return { team, name, role, links };
-}).sort((a, b) => (a.role === 'coach') - (b.role === 'coach'));
+  return { team, name, role, links, mix: rp?.mix ? 1 : 0 };
+}).filter((p) => teams[shortToId[p.team]]?.current !== false).sort((a, b) => (a.role === 'coach') - (b.role === 'coach'));
 const streams = {
   official: algs.officialStreams.map(([name, provider, ch]) => ({ name, provider, ch, url: streamUrl(provider, ch) })),
   broadcasts: season.broadcasts || [],
@@ -195,6 +216,11 @@ const data = {
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
   teams: Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])),
   cp: cpRows, pl, series, intl, kr, streams, cc, conflicts,
+  // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
+  api: {
+    cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
+    groupPhaseId: intlEv ? algs.events.find((e) => e[0] === intlEv.id)?.[6]?.[0]?.[0] || null : null,
+  },
 };
 
 const v = hash(JSON.stringify({ ...data, generated: null }));
