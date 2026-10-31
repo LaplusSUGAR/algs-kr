@@ -1,0 +1,19 @@
+{
+  "name": "algs-kr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ALGS 한국 팀 결과 비공식 팬 사이트",
+  "type": "module",
+  "scripts": {
+    "fetch:lp": "node scripts/fetch-liquipedia.mjs",
+    "fetch:algs": "node scripts/fetch-algs.mjs",
+    "fetch:battlefy": "node scripts/fetch-battlefy.mjs",
+    "fetch": "npm run fetch:lp && npm run fetch:algs && npm run fetch:battlefy",
+    "build": "node scripts/build-data.mjs",
+    "all": "npm run fetch && npm run build",
+    "serve": "npx --yes serve site -l 5173",
+    "worker:dev": "cd worker && npx --yes wrangler dev",
+    "worker:deploy": "cd worker && npx --yes wrangler deploy"
+  },
+  "engines": { "node": ">=20" }
+}

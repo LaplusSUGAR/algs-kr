@@ -1,0 +1,19 @@
+name = "algs-kr-live"
+main = "live-worker.js"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+SEASON_ID = "01KEAJYDXP9CBK44PPW7XWDNB3"   # ALGS Year 6. 시즌이 바뀌면 /v1/seasons/structure 에서 새 ID 확인
+LIVE_INTERVAL_MS = "12000"
+ALLOWED_ORIGIN = "https://laplussugar.github.io"   # 배포한 사이트 주소로 바꾸기
+
+[[durable_objects.bindings]]
+name = "LIVE"
+class_name = "LiveScores"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LiveScores"]

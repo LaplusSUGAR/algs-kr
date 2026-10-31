@@ -1,0 +1,5 @@
+{
+  "_comment": "운영자 수동 보정. teams 키는 팀 약칭(short)이며 출처 데이터보다 우선 적용된다. 예: \"E36\": { \"ko\": \"한글 팀명\", \"color\": \"#RRGGBB\", \"krLevel\": \"team\" }",
+  "teams": {},
+  "streams": []
+}

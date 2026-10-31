@@ -1,0 +1,54 @@
+name: build-data
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # 평상시 30분마다 (경기 중 실시간은 Worker 담당)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['site/**', 'scripts/**', 'config/**']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build-data
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Liquipedia (1순위)
+        env:
+          LIQUIPEDIA_API_KEY: ${{ secrets.LIQUIPEDIA_API_KEY }}
+        run: node scripts/fetch-liquipedia.mjs
+      - name: ALGS 공식 API
+        run: node scripts/fetch-algs.mjs
+      - name: Battlefy
+        run: node scripts/fetch-battlefy.mjs
+      - name: 병합·빌드
+        run: node scripts/build-data.mjs
+      - name: 바뀐 데이터만 커밋
+        run: |
+          git config user.name "algs-kr-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add raw site/data
+          git diff --cached --quiet || git commit -m "data: $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4

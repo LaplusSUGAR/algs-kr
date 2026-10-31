@@ -1,0 +1,24 @@
+{
+  "name": "ALGS Year 6",
+  "cpDirectSlots": 32,
+  "lcqSlots": 8,
+  "timeline": [
+    { "key": "open", "name": "Online Open", "start": "2026-02-28", "end": "2026-03-23", "where": "온라인" },
+    { "key": "s1pl", "name": "Split 1 Pro League", "start": "2026-04-04", "end": "2026-06-07", "where": "온라인 · 지역별 30팀" },
+    { "key": "s1po", "name": "Split 1 Playoffs", "start": "2026-07-07", "end": "2026-07-11", "where": "EWC LAN · 40팀" },
+    { "key": "s2pl", "name": "Split 2 Pro League", "start": "2026-08-21", "end": "2026-09-13", "where": "온라인 · 지역별 30팀" },
+    { "key": "s2po", "name": "Split 2 Playoffs", "start": "2026-10-29", "end": "2026-11-01", "where": "라스베이거스 LAN · 40팀" },
+    { "key": "lcq", "name": "Last Chance Qualifier", "start": "2026-11-20", "end": "2026-11-22", "where": "온라인 · 지역별 2자리" },
+    { "key": "champs", "name": "Championship", "start": "2027-01-28", "end": "2027-01-31", "where": "삿포로 LAN · 40팀" }
+  ],
+  "scoring": {
+    "game": [[1,12],[2,9],[3,7],[4,5],[5,4],[6,3],[7,3],[8,2],[9,2],[10,2],[11,1],[12,1],[13,1],[14,1],[15,1]],
+    "plRegular": [25,21,18,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0],
+    "plFinals": [35,29,25,22,21,20,18,17,15,14,13,11,10,8,7,6,4,3,1,0],
+    "cpProLeague": [580,450,370,290,250,210,170,130,96,80,64,48,32,30,28,26,24,22,20,18,16,14,12,11,10,9,8,7,6,5],
+    "cpPlayoffs": [1000,900,840,780,720,680,640,600,560,520,480,460,440,420]
+  },
+  "koreanStreams": [
+    { "name": "한국어 중계·코스트리밍", "note": "운영자가 config/season.json에 채널을 추가하세요", "url": null }
+  ]
+}

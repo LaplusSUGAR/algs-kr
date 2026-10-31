@@ -1,0 +1,12 @@
+{
+  "name": "ALGS 코리아 트래커",
+  "short_name": "ALGS KR",
+  "description": "ALGS 한국 팀 순위, 경기, 포인트",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "ko",
+  "background_color": "#ECEBE7",
+  "theme_color": "#ECEBE7",
+  "icons": [{ "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
