@@ -5,7 +5,8 @@
 //   events : [eventId, slug, tournamentName, region, startISO, endISO, phases[[phaseId, name, method, qualificationThreshold]]]
 //   cp     : [rank, teamId, teamName, short, region, totalCP, players[[name, cp]]]           (팀 CP = 상위 3인 합, 공식 계산값)
 //   pl     : { "s1:apac-north": [[pos, short, name, teamId, cpPerPlayer, qualified, rsPoints, group, kills, seriesPlayed, krPlayers]] }
-//   rosters: { teamId: "name|country|role;..." }  role: p 선수, c 주장, k 코치, ? 불명
+//   rosters: { teamId: "name|country|role|rep;..." }  role: p 선수, c 주장, k 코치, ? 불명 / rep: 대표 국가(countryOfRepresentation, 국적과 다를 때만)
+//   lineups: { seriesId: [short...] }  (진행 중 국제전에서 아직 끝나지 않은 시리즈의 확정 출전 팀)
 //   series : [seriesId, eventId, phaseName, seriesName, status, startsAtISO, regionName, isMatchPoint, matchCount, results[[pos, short, pts, kills]] | null]
 //   poGroup: [pos, short, name, teamId, group, pts, kills, region]   (진행 중/최근 Playoffs 조별 리그 누적)
 //   krStreams: [short, player, role, provider, channel]
@@ -45,7 +46,7 @@ async function main() {
       const q = pm[s.teamId] || {};
       const players = s.players || [];
       const kr = players.filter((x) => x.country === KR && x.role !== 'coach').map((x) => x.name.trim()).join(',');
-      if (kr || region === 'apac-north') rosters[s.teamId] = players.map((x) => `${x.name.trim()}|${x.country || ''}|${roleCode(x.role)}`).join(';');
+      if (!rosters[s.teamId]) rosters[s.teamId] = players.map((x) => `${x.name.trim()}|${x.country || ''}|${roleCode(x.role)}`).join(';');
       return [s.position, q.shortName || '', s.name, s.teamId, s.points, s.qualified ? 1 : 0, q.points ?? null, q.group || '', q.kills ?? null, q.matchSeriesPlayed ?? null, kr];
     });
   }
@@ -65,9 +66,11 @@ async function main() {
   for (const s of allSeries.filter(isWanted)) {
     let res = null;
     if (s.status === 'completed' || s.status === 'live') {
-      const st = await get(`/stats/series/${s.id}`);
+      let st = {};
+      try { st = await get(`/stats/series/${s.id}`); } catch { /* 막 시작해 통계가 아직 없음 */ }
       const intl = !(s.event?.slug || '').includes('pro-league');
-      res = (st.teams || []).filter((t) => intl || t.position <= 3 || krShorts.has(t.shortName)).map((t) => [t.position, t.shortName, t.points, t.kills]);
+      // 5번째 값: 1 = 매치 포인트 도달, 2 = 매치 포인트 우승
+      res = (st.teams || []).filter((t) => intl || t.position <= 3 || krShorts.has(t.shortName)).map((t) => [t.position, t.shortName, t.points, t.kills, t.wonMatchPoint ? 2 : t.matchPointEligible ? 1 : 0]);
     }
     series.push([s.id, s.event?.id, s.phase?.name, s.name, s.status, s.startsAt, s.region?.name || '', s.isMatchPointFormat ? 1 : 0, (s.matches || []).length, res]);
   }
@@ -81,10 +84,33 @@ async function main() {
     poGroup = (gs.standings || []).map((s) => [s.position, s.shortName, s.name, s.teamId, s.group, s.points, s.kills, s.region]);
   }
 
-  // 한국 선수 방송 채널 (최근 APAC North Pro League 단계)
-  const apn = plEvents.find(({ e }) => e.slug === 'split-2-pro-league-apac-north') || plEvents.at(-1);
-  const teams = (await get(`/phases/${apn.e.phases[0].id}/teams`)).teams || [];
-  const krStreams = teams.flatMap((tm) => tm.players.filter((p) => p.country === KR).map((p) => [tm.shortName, p.name.trim(), p.role, p.streamProvider, p.channelName]));
+  // 최신 Split Pro League 4개 지역 로스터 (전 팀). 대표 국가가 국적과 다르면 함께 저장 (한국계 선수 표시용)
+  const latestSplit = Math.max(...plEvents.map(({ e }) => +e.slug.match(/^split-(\d)/)[1]));
+  const latestPl = plEvents.filter(({ e }) => e.slug.startsWith(`split-${latestSplit}-`));
+  const krStreams = [];
+  const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
+  for (const { e } of latestPl) {
+    const teams = (await get(`/phases/${e.phases[0].id}/teams`)).teams || [];
+    for (const tm of teams) {
+      rosters[tm.teamId] = tm.players.map((p) => {
+        const rep = p.countryOfRepresentation && p.countryOfRepresentation !== p.country ? p.countryOfRepresentation : '';
+        return `${p.name.trim()}|${p.country || ''}|${roleCode(p.role)}${rep ? '|' + rep : ''}`;
+      }).join(';');
+      for (const p of tm.players.filter(isKr)) krStreams.push([tm.shortName, p.name.trim(), p.role, p.streamProvider, p.channelName]);
+    }
+  }
+
+  // 진행 중 국제전의 남은 시리즈 출전 팀 (브래킷 표시용)
+  const lineups = {};
+  if (intlEvent) {
+    for (const s of allSeries.filter((x) => x.event?.id === intlEvent.id && x.status !== 'completed')) {
+      try {
+        const r = await get(`/series/${s.id}/teams`);
+        const shorts = (r.teams || []).map((t) => t.shortName).filter(Boolean);
+        if (shorts.length) lineups[s.id] = shorts;
+      } catch {}
+    }
+  }
 
   // 공식 파트너 워치 파티 (경기가 있을 때만 /streams/live에 나오므로 이전 목록과 합쳐 유지)
   const prev = readJson('raw/algs/snapshot.json', {});
@@ -96,7 +122,7 @@ async function main() {
     for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
   } catch {}
 
-  const next = { seasonId: season.id, events, cp, pl, rosters, series, poGroup, krStreams, partnerStreams,
+  const next = { seasonId: season.id, events, cp, pl, rosters, lineups, series, poGroup, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
   // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
   const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
