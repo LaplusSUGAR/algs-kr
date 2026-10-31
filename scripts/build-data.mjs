@@ -74,7 +74,8 @@ for (const [id, s] of Object.entries(algs.rosters)) {
     return p;
   });
 }
-const isKrP = (p) => p.c === 'KR' || p.rep === 'KR' || p.mix;
+// 한국 선수·코치 판정은 국적 KR만. 한국계(혼혈·이중국적, mix)는 표시만 하고 한국 관련 팀으로 묶지 않는다.
+const isKrP = (p) => p.c === 'KR';
 for (const key of Object.keys(algs.pl).sort()) { // s1 → s2 순서로 최신 값이 남게
   for (const r of algs.pl[key]) if (teams[r[3]] && r[10]) teams[r[3]].krPlayers = r[10].split(',');
 }

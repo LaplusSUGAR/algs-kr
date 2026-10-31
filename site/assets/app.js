@@ -164,8 +164,7 @@ function bracketFlow(B) {
   };
   return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
     <defs><marker id="bfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
-    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div>
-    <p class="caption">단계를 누르면 공식 경기 페이지로 이동합니다. 칩 색은 빨강 한국 팀, 주황 한국 선수 소속, 파랑 한국 코치 팀입니다. 흐린 칩은 그 단계에서 아래로 내려간 팀입니다.</p>`;
+    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div>`;
 }
 
 /* ---------- 홈 ---------- */
@@ -507,7 +506,7 @@ function plView(q) {
 }
 
 /* ---------- 팀 ---------- */
-const isKrP = (p) => p.c === 'KR' || p.rep === 'KR' || p.mix;
+const isKrP = (p) => p.c === 'KR';
 const pName = (p) => `${isKrP(p) ? `<b class="krn">${esc(p.n)}</b>` : esc(p.n)}${p.mix ? '<sup class="mix" title="한국계 (국적과 대표 국가가 다르거나 운영자 확인)">계</sup>' : ''}`;
 function teams(parts) {
   if (parts[1]) return teamDetail(decodeURIComponent(parts[1]));
