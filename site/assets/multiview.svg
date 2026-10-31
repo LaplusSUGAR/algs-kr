@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="멀티뷰 화면 구성: 메인 중계, 여러 팀 시점, 맵, 실시간 순위를 한 화면에">
+  <defs>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A2E37"/><stop offset="1" stop-color="#1A1C21"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="18" fill="#1A1C21"/>
+  <!-- 창 상단 -->
+  <rect x="16" y="14" width="608" height="22" rx="6" fill="#2A2E37"/>
+  <circle cx="30" cy="25" r="4" fill="#C4122F"/><circle cx="44" cy="25" r="4" fill="#5D6372"/><circle cx="58" cy="25" r="4" fill="#5D6372"/>
+  <rect x="78" y="20" width="180" height="10" rx="5" fill="#3A3F4A"/>
+  <!-- 메인 중계 -->
+  <rect x="16" y="46" width="300" height="168" rx="8" fill="url(#screen)" stroke="#3A3F4A"/>
+  <circle cx="166" cy="130" r="44" fill="none" stroke="#ECEBE7" stroke-opacity=".25" stroke-width="10" stroke-dasharray="190 86"/>
+  <polygon points="156,112 184,130 156,148" fill="#ECEBE7" fill-opacity=".9"/>
+  <rect x="26" y="56" width="58" height="16" rx="4" fill="#C4122F"/><text x="55" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#fff">LIVE</text>
+  <text x="26" y="204" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#ECEBE7">메인 중계</text>
+  <!-- 팀 시점 4개 -->
+  <g font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#ECEBE7">
+    <rect x="326" y="46" width="146" height="80" rx="8" fill="url(#screen)" stroke="#C4122F" stroke-width="2"/><text x="336" y="118">팀 시점 1</text>
+    <rect x="478" y="46" width="146" height="80" rx="8" fill="url(#screen)" stroke="#3A3F4A"/><text x="488" y="118">팀 시점 2</text>
+    <rect x="326" y="134" width="146" height="80" rx="8" fill="url(#screen)" stroke="#3A3F4A"/><text x="336" y="206">팀 시점 3</text>
+    <rect x="478" y="134" width="146" height="80" rx="8" fill="url(#screen)" stroke="#3A3F4A"/><text x="488" y="206">팀 시점 4</text>
+  </g>
+  <!-- 음성 아이콘 (팀 무전) -->
+  <g fill="#C4122F"><rect x="448" y="56" width="3" height="10" rx="1.5"/><rect x="454" y="53" width="3" height="16" rx="1.5"/><rect x="460" y="57" width="3" height="8" rx="1.5"/></g>
+  <!-- 맵 -->
+  <rect x="16" y="224" width="300" height="122" rx="8" fill="#23262D" stroke="#3A3F4A"/>
+  <path d="M60 300 C 90 250, 150 240, 190 262 S 270 300, 280 260" fill="none" stroke="#5D6372" stroke-width="2"/>
+  <circle cx="190" cy="280" r="46" fill="none" stroke="#ECEBE7" stroke-opacity=".7" stroke-width="2" stroke-dasharray="6 5"/>
+  <circle cx="198" cy="286" r="22" fill="none" stroke="#C4122F" stroke-width="2"/>
+  <g fill="#ECEBE7"><circle cx="150" cy="262" r="3.5"/><circle cx="214" cy="300" r="3.5"/><circle cx="236" cy="268" r="3.5"/><circle cx="96" cy="292" r="3.5"/></g>
+  <circle cx="196" cy="284" r="4.5" fill="#C4122F"/>
+  <text x="26" y="338" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#ECEBE7">맵 시점</text>
+  <!-- 실시간 순위 -->
+  <rect x="326" y="224" width="298" height="122" rx="8" fill="#23262D" stroke="#3A3F4A"/>
+  <text x="338" y="244" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#ECEBE7">실시간 순위</text>
+  <g font-family="system-ui, sans-serif" font-size="11" fill="#9BA1AE">
+    <text x="338" y="266">1</text><rect x="354" y="258" width="150" height="9" rx="4" fill="#3A3F4A"/><text x="610" y="266" text-anchor="end">42</text>
+    <text x="338" y="286">2</text><rect x="354" y="278" width="122" height="9" rx="4" fill="#C4122F"/><text x="610" y="286" text-anchor="end" fill="#ECEBE7">37</text>
+    <text x="338" y="306">3</text><rect x="354" y="298" width="104" height="9" rx="4" fill="#3A3F4A"/><text x="610" y="306" text-anchor="end">31</text>
+    <text x="338" y="326">4</text><rect x="354" y="318" width="88" height="9" rx="4" fill="#3A3F4A"/><text x="610" y="326" text-anchor="end">26</text>
+  </g>
+</svg>

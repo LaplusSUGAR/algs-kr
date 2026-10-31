@@ -22,17 +22,13 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" class="brand-mark"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="44 16"/><circle cx="12" cy="12" r="3.4" fill="var(--ring)"/></svg>
         <span>ALGS KR</span>
       </a>
+      <div class="top-right">
+      <button class="pill" id="refreshPill" type="button" aria-label="갱신 주기 보기"><span class="pill-dot"></span><span id="refreshText">정기 갱신</span></button>
       <button class="icon-btn" id="settingsBtn" aria-label="설정 열기" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
       </button>
+      </div>
     </header>
-
-    <main id="app" tabindex="-1" aria-live="polite"></main>
-
-    <footer class="foot">
-      <p>비공식 팬 사이트입니다. EA·Respawn과 관련이 없습니다.</p>
-      <p id="sourceLine"></p>
-    </footer>
 
     <nav class="tabbar" aria-label="주 메뉴">
       <a href="#/" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8h-5v-5H9v5H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>홈</a>
@@ -42,6 +38,14 @@
       <a href="#/teams" data-tab="teams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15 15c2.5-.4 4.6.7 5.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>팀</a>
       <a href="#/streams" data-tab="streams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M8 8a5.6 5.6 0 000 8M16 8a5.6 5.6 0 010 8M5.2 5.2a9.6 9.6 0 000 13.6M18.8 5.2a9.6 9.6 0 010 13.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>방송</a>
     </nav>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="foot">
+      <p>비공식 팬 사이트입니다. EA·Respawn과 관련이 없습니다.</p>
+      <p id="sourceLine"></p>
+    </footer>
+
   </div>
 
   <dialog id="settings" aria-labelledby="settingsTitle">
@@ -50,6 +54,9 @@
       <label class="switch"><input type="checkbox" id="optDark"> <span>다크 모드</span></label>
       <label class="switch"><input type="checkbox" id="optSpoiler"> <span>결과 가리기 (스포일러 방지)</span></label>
       <label class="switch"><input type="checkbox" id="optKrOnly"> <span>표에서 한국 팀만 보기</span></label>
+      <h3 class="dlg-h">갱신 주기</h3>
+      <div class="dlg-note" id="refreshInfo"></div>
+      <h3 class="dlg-h">데이터 출처</h3>
       <div class="dlg-note" id="dataInfo"></div>
       <button class="btn" value="close">닫기</button>
     </form>

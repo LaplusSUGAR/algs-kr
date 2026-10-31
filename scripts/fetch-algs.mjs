@@ -86,11 +86,22 @@ async function main() {
   const teams = (await get(`/phases/${apn.e.phases[0].id}/teams`)).teams || [];
   const krStreams = teams.flatMap((tm) => tm.players.filter((p) => p.country === KR).map((p) => [tm.shortName, p.name.trim(), p.role, p.streamProvider, p.channelName]));
 
+  // 공식 파트너 워치 파티 (경기가 있을 때만 /streams/live에 나오므로 이전 목록과 합쳐 유지)
   const prev = readJson('raw/algs/snapshot.json', {});
-  writeJson('raw/algs/snapshot.json', {
-    fetchedAt: new Date().toISOString(), seasonId: season.id, events, cp, pl, rosters, series, poGroup, krStreams,
-    officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']],
-  });
+  let partnerStreams = prev.partnerStreams || [];
+  try {
+    const live = await get('/streams/live');
+    const found = (live.series || []).flatMap((s) => (s.streams || []).filter((x) => x.streamType === 'partner').map((x) => [x.name, x.streamProvider, x.channelName]));
+    const seen = new Set(partnerStreams.map((p) => p[2].toLowerCase()));
+    for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
+  } catch {}
+
+  const next = { seasonId: season.id, events, cp, pl, rosters, series, poGroup, krStreams, partnerStreams,
+    officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
+  // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
+  const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
+  if (JSON.stringify(prevBody) === JSON.stringify(next)) { console.log('[algs] 변경 없음'); return; }
+  writeJson('raw/algs/snapshot.json', { fetchedAt: new Date().toISOString(), ...next });
   console.log(`[algs] events ${events.length}, cp ${cp.length}, pl ${Object.keys(pl).length}, series ${series.length}, poGroup ${poGroup.length}`);
 }
 

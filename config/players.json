@@ -1,0 +1,13 @@
+{
+  "_comment": "선수 개인 방송 수동 입력. 공식 API는 선수당 채널 1개만 주므로 CHZZK·YouTube·SOOP은 Liquipedia 선수 페이지(API 키 필요) 또는 여기에 직접 넣는다. 값은 전체 URL. 키는 선수 이름(대소문자 무시).",
+  "players": {
+    "Jusna": { "chzzk": null, "youtube": null, "soop": null },
+    "Cinap": { "chzzk": null, "youtube": null, "soop": null },
+    "obly": { "chzzk": null, "youtube": null, "soop": null },
+    "Aimbot": { "chzzk": null, "youtube": null, "soop": null },
+    "ILY": { "chzzk": null, "youtube": null, "soop": null },
+    "egoist": { "chzzk": null, "youtube": null, "soop": null },
+    "Dogma": { "chzzk": null, "youtube": null, "soop": null },
+    "Re9zq": { "chzzk": null, "youtube": null, "soop": null }
+  }
+}

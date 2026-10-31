@@ -65,13 +65,14 @@ function home() {
   const lead = krs.find((k) => k.level === 'team') || krs[0];
   const others = krs.filter((k) => k !== lead);
   const upcoming = A.series.filter((s) => s.status !== 'completed').sort((a, b) => a.start.localeCompare(b.start));
-  return `
+  return `<div class="home-grid"><div class="col-a">
     ${lead ? heroCard(lead) : '<p class="empty">현재 시즌에 한국 팀 데이터가 없습니다.</p>'}
     ${ringLine(krs)}
     ${others.length ? `<section class="sec" aria-labelledby="h-kr2">
       <div class="sec-head"><h2 class="h2" id="h-kr2">한국 선수가 뛰는 팀</h2></div>
       <div class="kr-list">${others.map(krRow).join('')}</div>
     </section>` : ''}
+    </div><div class="col-b">
     ${A.intl ? `<section class="sec" aria-labelledby="h-now">
       <div class="sec-head"><h2 class="h2" id="h-now">${esc(ko(A.intl.name, EVENT_KO))}</h2><a class="more" href="#/standings">전체 순위</a></div>
       ${intlMini()}
@@ -83,7 +84,7 @@ function home() {
     <section class="sec" aria-labelledby="h-season">
       <div class="sec-head"><h2 class="h2" id="h-season">${esc(A.season.name)} 일정</h2></div>
       ${seasonTimeline()}
-    </section>`;
+    </section></div></div>`;
 }
 
 function heroCard(k) {
@@ -113,7 +114,7 @@ function ringLine(krs) {
   let lastX = -99, lane = 0;
   const marks = pts.map((k) => {
     const px = x(k.cp.rank);
-    lane = px - lastX < 34 ? (lane + 1) % 3 : 0; lastX = px;
+    lane = px - lastX < 46 ? (lane + 1) % 3 : 0; lastX = px;
     const ly = y - 14 - lane * 13;
     const filled = k.level === 'team';
     return `<g class="marker"><line x1="${px}" y1="${ly + 3}" x2="${px}" y2="${y - 6}" stroke="var(--ring)" stroke-width="1"/>
@@ -174,12 +175,13 @@ function isKrSeries(s) {
 
 function matchItem(s) {
   const state = seriesState(s);
-  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? '<span class="tag live">LIVE · 비공식</span>' : '', isKrSeries(s) ? '<span class="tag kr">한국</span>' : ''].join(' ');
+  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE${s.games ? ` ${s.games}/${s.matches || '?'}게임` : ''}</span>` : '', s.liveFinal ? '<span class="tag">비공식 집계</span>' : '', isKrSeries(s) ? '<span class="tag kr">한국</span>' : ''].join(' ');
   let res = '';
   if (s.results?.length) {
     const top = s.results[0];
     const krs = s.results.filter((r) => r.kr !== 'none');
-    const inner = `<span><b>1위 ${teamLink(top.short)}</b> ${top.pts}점</span>${krs.filter((r) => r !== top).map((r) => `<span>${krDot(r.kr)}${teamLink(r.short)} ${r.pos}위 ${r.pts}점 (${r.kills}킬)</span>`).join('')}`;
+    const mpTag = (r) => (r.won ? ' <span class="tag mpe">우승</span>' : r.mpe ? ' <span class="tag mpe">MP</span>' : '');
+    const inner = `<span><b>1위 ${teamLink(top.short)}</b> ${top.pts}점${mpTag(top)}</span>${krs.filter((r) => r !== top).map((r) => `<span>${krDot(r.kr)}${teamLink(r.short)} ${r.pos}위 ${r.pts}점 (${r.kills}킬)${mpTag(r)}</span>`).join('')}${s.liveAt ? `<span class="upd">${ago(s.liveAt)} 공식 API 확인</span>` : ''}`;
     const full = s.results.length > 5 ? `<details><summary>${s.eventSlug.includes('pro-league') ? '상위 3팀과 한국 관련 팀 표' : `전체 ${s.results.length}팀 결과`}</summary>${resultTable(s.results)}</details>` : '';
     res = `<div class="res ${opt.spoiler ? 'spoiler' : ''}" ${opt.spoiler ? 'tabindex="0" role="button" aria-label="결과 보기"' : ''}>${inner}</div>${opt.spoiler ? '' : full}`;
   }
@@ -202,11 +204,12 @@ function schedule(parts, q) {
   const days = {};
   for (const s of list) (days[dayKey(s.start)] ||= []).push(s);
   return `<h1 class="title">경기</h1><p class="lead">모든 시간은 한국 시간(KST)입니다. 한 시리즈는 보통 6게임입니다.</p>
+    ${refreshNote()}
     <div class="controls">
       <div class="seg" role="group" aria-label="보기"><a href="${qsLink('/schedule', q, { view: 'upcoming' })}" aria-current="${view === 'upcoming'}">예정</a><a href="${qsLink('/schedule', q, { view: 'results' })}" aria-current="${view === 'results'}">결과</a></div>
       <div class="seg"><a href="${qsLink('/schedule', q, { kr: kronly ? '0' : '1' })}" aria-current="${kronly}">한국 팀 경기만</a></div>
     </div>
-    ${Object.entries(days).map(([d, ss]) => `<section class="day"><h2 class="day-h">${dayLabel(d)}<small>${ss.length}시리즈</small></h2>${ss.map(matchItem).join('')}</section>`).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}`;
+    <div class="days">${Object.entries(days).map(([d, ss]) => `<section class="day"><h2 class="day-h">${dayLabel(d)}<small>${ss.length}시리즈</small></h2>${ss.map(matchItem).join('')}</section>`).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}</div>`;
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */
@@ -338,12 +341,38 @@ function teamDetail(short) {
 }
 
 /* ---------- 방송 ---------- */
+const PLAT = { twitch: 'Twitch', chzzk: 'CHZZK', youtube: 'YouTube', soop: 'SOOP' };
 function streams() {
-  const S = A.streams;
-  return `<h1 class="title">방송</h1><p class="lead">APAC North 공식 중계는 일본어, 국제전 공식 중계는 영어입니다.</p>
-    <section class="sec"><h2 class="h2">공식 중계</h2>${S.official.map((s) => `<div class="stream"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.ch)}</a><span class="muted small">${esc(s.name)}, ${esc(s.provider)}</span></div>`).join('')}</section>
-    <section class="sec"><h2 class="h2">한국어 중계</h2>${S.korean.filter((s) => s.url).map((s) => `<div class="stream"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>`).join('') || '<p class="empty">등록된 한국어 중계가 없습니다.</p>'}</section>
-    <section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>${S.players.map((p) => `<div class="stream"><span>${krDot('team')}${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : esc(p.name)} <span class="muted small">${teamLink(p.team)}</span></span><span class="muted small">${p.url ? esc(p.provider) : '채널 정보 없음'}</span></div>`).join('')}</section>`;
+  const S = A.streams, MV = A.season.multiview || {};
+  const order = (A.kr || []).map((k) => k.short);
+  const players = S.players.slice().sort((a, b) => (order.indexOf(a.team) + 99 * (order.indexOf(a.team) < 0)) - (order.indexOf(b.team) + 99 * (order.indexOf(b.team) < 0)) || (a.role === 'coach') - (b.role === 'coach'));
+  const chip = (p, url) => url ? `<a class="chip ${p}" href="${esc(url)}" target="_blank" rel="noopener"><i></i>${PLAT[p]}</a>` : '';
+  return `<h1 class="title">방송</h1>
+    <section class="sec mv" aria-labelledby="h-mv">
+      <figure><img src="assets/multiview.svg" alt="멀티뷰 화면 예시: 메인 중계, 팀 시점 4개, 맵 시점, 실시간 순위가 한 화면에 배치된 모습" width="640" height="360"><figcaption>화면 구성을 설명하는 예시 그림입니다. 실제 화면과 다를 수 있습니다.</figcaption></figure>
+      <div>
+        <h2 class="h2" id="h-mv">ALGS 멀티뷰</h2>
+        <p>ALGS 공식 사이트의 관전 도구입니다. 메인 중계와 함께 원하는 팀의 화면을 골라 동시에 볼 수 있습니다.</p>
+        <ul>
+          <li>한 번에 최대 ${MV.maxPov || 12}개 시점을 띄우고, 로비 20팀 누구든 고를 수 있습니다.</li>
+          <li>팀 무전을 그대로 들을 수 있습니다.</li>
+          <li>맵 시점, 게임 중 실시간 순위와 스탯이 함께 나옵니다.</li>
+          <li>경기가 끝난 뒤에도 다시보기로 모든 시점을 볼 수 있습니다.</li>
+          <li>Twitch 계정으로 로그인하면 시청 보상(드롭)도 받을 수 있습니다.</li>
+        </ul>
+        <a class="btn-link" href="${esc(MV.url || 'https://algs.ea.com/en/multiview')}" target="_blank" rel="noopener">멀티뷰 열기 (algs.ea.com)</a>
+      </div>
+    </section>
+    <div class="stream-cols">
+      <section class="sec"><h2 class="h2">공식 중계</h2>
+        ${S.broadcasts.map((b) => `<div class="bc"><h3>${esc(b.label)}</h3><p>${esc(b.note)}</p><div class="chips">${b.links.length ? b.links.map(([n, u]) => `<a class="chip ${n.toLowerCase()}" href="${esc(u)}" target="_blank" rel="noopener"><i></i>${esc(n)}</a>`).join('') : '<span class="chip off">등록된 채널 없음</span>'}</div></div>`).join('')}
+        ${S.partners.length ? `<div class="bc"><h3>공식 파트너 워치 파티</h3><p>공식 일정에 파트너로 등록된 채널입니다.</p><div class="chips">${S.partners.filter((p) => p.url).map((p) => `<a class="chip ${p.provider}" href="${esc(p.url)}" target="_blank" rel="noopener"><i></i>${esc(p.name)}</a>`).join('')}</div></div>` : ''}
+      </section>
+      <section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>
+        ${players.map((p) => { const has = Object.values(p.links).some(Boolean); return `<div class="pl-row"><span class="nm">${krDot('team')}${esc(p.name)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${has ? Object.keys(PLAT).map((k) => chip(k, p.links[k])).join('') : '<span class="chip off">등록된 채널 없음</span>'}</span></div>`; }).join('')}
+        <p class="lead">선수 채널은 공식 API(선수당 1개), Liquipedia 선수 페이지, 운영자 입력을 합친 것입니다. 선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>
+      </section>
+    </div>`;
 }
 
 /* ---------- 이벤트 연결 ---------- */
@@ -373,8 +402,10 @@ function setupSettings() {
     dark.checked = document.documentElement.dataset.theme === 'dark';
     sp.checked = opt.spoiler; kr.checked = opt.krOnly;
     document.getElementById('dataInfo').innerHTML = dataInfo();
+    document.getElementById('refreshInfo').innerHTML = refreshInfo();
     dlg.showModal();
   });
+  document.getElementById('refreshPill').addEventListener('click', () => document.getElementById('settingsBtn').click());
   dark.addEventListener('change', () => { const t = dark.checked ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('algskr.theme', t); } catch {} });
   sp.addEventListener('change', () => { opt.spoiler = sp.checked; store.set('spoiler', sp.checked); render(); });
   kr.addEventListener('change', () => { opt.krOnly = kr.checked; store.set('krOnly', kr.checked); render(); });
@@ -388,6 +419,55 @@ const dataInfo = () => {
 const footer = () => { document.getElementById('sourceLine').innerHTML = `데이터: <a href="https://liquipedia.net/apexlegends/" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA 3.0), <a href="https://algs.ea.com/" target="_blank" rel="noopener">ALGS 공식</a>, Battlefy. 갱신 ${dateTime(A.generated)} KST`; };
 
 /* ---------- 데이터 갱신: 버전 확인 + 경기 중 실시간 ---------- */
+const R = A.season.refresh || { buildMinutes: 5, liveSeconds: 10 };
+const LIVE = { mode: C.liveMode || (C.liveUrl ? 'worker' : 'direct'), api: C.officialApi || 'https://prod-api.algstools.com/v1', lastAt: 0, active: [] };
+const ago = (t) => { const s = Math.max(0, Math.round((Date.now() - t) / 1000)); return s < 60 ? `${s}초 전` : `${Math.floor(s / 60)}분 전`; };
+function refreshNote() {
+  return `<div class="refresh-note"><b>갱신 주기</b> 경기 중에는 진행 중인 시리즈 점수를 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다 확인해 바로 반영합니다(비공식 실시간). 평상시에는 ${R.buildMinutes}분마다 Liquipedia·공식 API를 다시 모아 확정값으로 바꿉니다. 마지막 확정 갱신 ${dateTime(A.generated)} KST.</div>`;
+}
+function refreshInfo() {
+  return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>평상시: ${R.buildMinutes}분마다 자동 빌드 (GitHub 예약 실행이라 몇 분 늦어질 수 있음). 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
+}
+function updatePill() {
+  const pill = document.getElementById('refreshPill'), txt = document.getElementById('refreshText');
+  if (!pill) return;
+  const on = LIVE.active.length > 0 && A.series.some((s) => s.live);
+  pill.classList.toggle('is-live', on);
+  txt.textContent = on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`;
+}
+// 진행 중이거나 5분 안에 시작하는 시리즈 (시작 후 10시간까지)
+const liveCandidates = () => A.series.filter((s) => s.status !== 'completed' && new Date(s.start) - now() < 5 * 60e3 && now() - new Date(s.start) < 10 * 3600e3);
+let liveTimer = null;
+async function pollDirect() {
+  clearTimeout(liveTimer);
+  const cands = liveCandidates();
+  LIVE.active = cands.map((s) => s.id);
+  if (!cands.length || document.hidden) { updatePill(); liveTimer = setTimeout(pollDirect, 60000); return; }
+  let changed = false;
+  for (const s of cands) {
+    try {
+      const r = await fetch(`${LIVE.api}/stats/series/${s.id}`, { cache: 'no-store' });
+      if (r.status === 404) { s.live = false; continue; } // 아직 시작 전
+      if (!r.ok) continue;
+      const st = await r.json();
+      const results = (st.teams || []).map((t) => ({ pos: t.position, short: t.shortName, pts: t.points, kills: t.kills, kr: krOf(t.shortName), mpe: !!t.matchPointEligible, won: !!t.wonMatchPoint })).sort((a, b) => a.pos - b.pos);
+      const games = Math.max(0, ...(st.teams || []).flatMap((t) => (t.players || []).map((p) => p.latestMatchNumber || 0)));
+      const sig = JSON.stringify([st.seriesStatus, results.map((x) => [x.short, x.pts, x.pos])]);
+      if (sig !== s._sig) { changed = true; s._sig = sig; }
+      s.results = results.length ? results : s.results; s.games = games;
+      s.kr = (s.results || []).filter((x) => x.kr !== 'none').map((x) => x.short);
+      s.live = st.seriesStatus === 'live';
+      s.liveAt = Date.now();
+      if (st.seriesStatus === 'completed') { s.status = 'completed'; s.live = false; s.liveFinal = true; }
+    } catch {}
+  }
+  LIVE.lastAt = Date.now();
+  if (changed) render();
+  updatePill();
+  const base = C.livePollMs || R.liveSeconds * 1000;
+  liveTimer = setTimeout(pollDirect, base + Math.random() * 3000); // 요청이 몰리지 않게 무작위 지연
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.mode === 'direct') pollDirect(); });
 let curVer = null;
 async function pollVer() {
   try {
@@ -402,7 +482,7 @@ function reloadData(v) {
   return new Promise((res) => {
     const s = document.createElement('script');
     s.src = `data/algs-data.js?v=${v}`;
-    s.onload = () => { s.remove(); A = window.ALGS; applyLive(); footer(); render(); res(); };
+    s.onload = () => { s.remove(); A = window.ALGS; applyLive(); footer(); render(); updatePill(); if (LIVE.mode === 'direct') pollDirect(); res(); };
     s.onerror = () => { s.remove(); res(); };
     document.head.appendChild(s);
   });
@@ -424,7 +504,9 @@ function applyLive() {
     const l = live.series[s.id];
     if (!l) continue;
     s.live = l.status === 'live';
-    if (l.results) s.results = l.results.map((r) => ({ ...r, kr: krOf(r.short) }));
+    if (l.results) s.results = l.results.map((r) => ({ ...r, kr: krOf(r.short), mpe: !!r.mp }));
+    s.liveAt = l.checkedAt ? Date.parse(l.checkedAt) : Date.now(); LIVE.lastAt = s.liveAt;
+    if (l.status === 'completed') { s.status = 'completed'; s.liveFinal = true; }
     s.kr = (s.results || []).filter((r) => r.kr !== 'none').map((r) => r.short);
   }
 }
@@ -435,6 +517,9 @@ setupSettings();
 footer();
 render();
 pollVer();
-setInterval(pollVer, C.verPollMs || 60000);
-if (C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
+setInterval(pollVer, C.verPollMs || 30000);
+if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
+else if (LIVE.mode === 'direct') pollDirect();
+updatePill();
+setInterval(updatePill, 1000);
 setInterval(() => { if (!parseHash().parts[0]) render(); }, 60000); // 홈 카운트다운 갱신

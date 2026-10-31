@@ -190,3 +190,69 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
 @media (prefers-reduced-motion: no-preference) {
   .ringline .marker { transition: transform .5s ease; }
 }
+
+/* ---------- 갱신 상태 표시 ---------- */
+.top-right { display: flex; align-items: center; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 5px 10px; font-size: 12px; color: var(--steel); cursor: pointer; white-space: nowrap; }
+.pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--steel); }
+.pill.is-live { color: var(--ring); border-color: var(--ring); }
+.pill.is-live .pill-dot { background: var(--ring); }
+@media (prefers-reduced-motion: no-preference) { .pill.is-live .pill-dot { animation: blink 1.6s ease-in-out infinite; } }
+@keyframes blink { 50% { opacity: .25; } }
+.dlg-h { font: 800 18px/1 var(--display); margin: 16px 0 4px; }
+.refresh-note { font-size: 12.5px; color: var(--steel); background: var(--card); border-radius: var(--r-sm); padding: 10px 12px; margin-top: 10px; }
+.refresh-note b { color: var(--ink); }
+.tag.mpe { border-color: var(--brass); color: var(--brass); }
+.res .upd { color: var(--steel); font-size: 11.5px; }
+
+/* ---------- 방송 ---------- */
+.mv { display: grid; gap: 14px; }
+.mv figure { margin: 0; }
+.mv img { width: 100%; height: auto; display: block; border-radius: var(--r-lg); }
+.mv figcaption { font-size: 12px; color: var(--steel); margin-top: 6px; }
+.mv ul { margin: 8px 0 0; padding-left: 18px; }
+.mv li { margin: 3px 0; }
+.btn-link { display: inline-block; background: var(--ink); color: var(--paper); text-decoration: none; padding: 10px 16px; border-radius: 10px; font-weight: 650; margin-top: 12px; }
+.bc { padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.bc h3 { margin: 0; font-size: 16px; }
+.bc p { margin: 2px 0 8px; font-size: 13px; color: var(--steel); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--rule); background: var(--card); text-decoration: none; font-size: 13px; font-weight: 600; }
+.chip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.chip.twitch i { background: #9146FF; } .chip.youtube i { background: #FF0033; } .chip.chzzk i { background: #00D564; } .chip.soop i { background: #0545B1; }
+.chip.off { color: var(--steel); border-style: dashed; cursor: default; font-weight: 500; }
+.pl-row { display: grid; grid-template-columns: 1fr; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.pl-row .nm { font-weight: 700; }
+.pl-row .nm small { color: var(--steel); font-weight: 500; margin-left: 6px; }
+
+/* ---------- 반응형: 태블릿·데스크톱 ---------- */
+.frame { max-width: 640px; }
+@media (min-width: 768px) {
+  body { font-size: 15.5px; }
+  .frame { max-width: 1040px; padding-bottom: 24px; }
+  .top { padding: 14px 28px; }
+  .tabbar { position: sticky; top: 67px; left: auto; transform: none; max-width: none; height: auto; display: flex; gap: 4px; padding: 8px 24px; border-top: 0; border-bottom: 1px solid var(--rule); background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(8px); }
+  .tabbar a { flex-direction: row; gap: 7px; font-size: 14px; padding: 8px 14px; border-radius: 999px; }
+  .tabbar svg { width: 18px; height: 18px; }
+  .tabbar a[aria-current='page'] { background: var(--card); }
+  main { padding: 6px 28px 8px; }
+  .foot { padding: 32px 28px 12px; }
+  .title { font-size: 56px; margin-top: 24px; }
+  .h2 { font-size: 30px; }
+  .tbl-wrap { margin: 0; padding: 0; }
+  .home-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 36px; align-items: start; }
+  .home-grid .col-b > .sec:first-child { margin-top: 16px; }
+  .kr-hero h1 { font-size: 58px; }
+  .team-grid { grid-template-columns: repeat(4, 1fr); }
+  .mv { grid-template-columns: 1.15fr 1fr; align-items: center; gap: 24px; }
+  .stream-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; align-items: start; }
+  .pl-row { grid-template-columns: minmax(180px, 1fr) 2fr; align-items: center; }
+  .split-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 36px; align-items: start; }
+}
+@media (min-width: 1200px) {
+  .frame { max-width: 1240px; }
+  .team-grid { grid-template-columns: repeat(5, 1fr); }
+  .days { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; align-items: start; }
+  .kr-stats b { font-size: 36px; }
+}
+main:focus, main:focus-visible { outline: none; }

@@ -49,6 +49,11 @@ async function main() {
       .map((m) => ({ id: m.match2id, date: m.date, finished: m.finished, opponents: (m.match2opponents || []).map((o) => ({ name: o.name, place: o.placement, score: o.score })), games: (m.match2games || []).length }));
     await sleep(500);
   }
+  // 한국 국적 선수의 방송·SNS 링크 (twitch, youtube, chzzk, afreeca/soop 등). 방송 탭의 다중 플랫폼 링크에 쓴다.
+  const players = (await lpdb('player', { conditions: '[[nationality::South Korea]]', query: 'pagename,id,nationality,links,teampagename,status' }))
+    .map((p) => ({ id: p.id, page: p.pagename, team: p.teampagename, status: p.status, links: p.links || {} }));
+  writeJson('raw/lp/players.json', { fetchedAt: new Date().toISOString(), players });
+
   writeJson('raw/lp/placements.json', { fetchedAt: new Date().toISOString(), placements });
   writeJson('raw/lp/matches.json', { fetchedAt: new Date().toISOString(), matches });
   console.log(`[lp] pages ${PAGES.length} 저장`);
