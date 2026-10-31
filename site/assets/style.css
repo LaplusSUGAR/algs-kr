@@ -59,13 +59,14 @@ button { font: inherit; color: inherit; }
 
 /* 상단 */
 .top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
-.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; font: 800 22px/1 var(--display); letter-spacing: .02em; }
+.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; font: 800 22px/1 var(--display); letter-spacing: .02em; white-space: nowrap; }
+@media (max-width: 420px) { .brand { font-size: 19px; gap: 6px; } .brand-mark { width: 20px; height: 20px; } }
 .brand-mark { width: 24px; height: 24px; }
 .icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 10px; cursor: pointer; }
 .icon-btn svg { width: 22px; height: 22px; }
 
 /* 하단 탭 */
-.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--tab-h); display: grid; grid-template-columns: repeat(6, 1fr); background: var(--card); border-top: 1px solid var(--rule); z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
+.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--tab-h); display: grid; grid-template-columns: repeat(7, 1fr); background: var(--card); border-top: 1px solid var(--rule); z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
 .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 11.5px; color: var(--steel); }
 .tabbar svg { width: 22px; height: 22px; }
 .tabbar a[aria-current='page'] { color: var(--ink); font-weight: 700; }
@@ -401,7 +402,7 @@ main:focus, main:focus-visible { outline: none; }
 
 /* ---------- 한국 관련 3분류 색 ----------
    빨강 = 한국 팀(선수 2명 이상), 주황 = 한국 선수 소속(1명), 파랑 = 한국 코치 팀(코치만)
-   한국 코치가 함께 있는 팀(.kc)은 자기 색 위에 파란 링·C 배지를 덧붙인다 */
+   한국 선수와 한국 코치가 모두 있으면 한국 선수 기준 색으로 표시 */
 .k-team { --kc-col: var(--kr-team); --kc-soft: var(--kr-team-soft); }
 .k-member { --kc-col: var(--kr-member); --kc-soft: var(--kr-member-soft); }
 .k-coach { --kc-col: var(--coach); --kc-soft: var(--coach-soft); }
@@ -412,12 +413,9 @@ main:focus, main:focus-visible { outline: none; }
 .legend .cbadge { margin-left: 0; }
 .tbl tr.kr.k-team td, .tbl tr.kr.k-member td, .tbl tr.kr.k-coach td { background: var(--kc-soft); }
 .tbl tr.kr.k-team td:first-child, .tbl tr.kr.k-member td:first-child, .tbl tr.kr.k-coach td:first-child { box-shadow: inset 4px 0 0 var(--kc-col); }
-.tbl tr.kr.kc td:first-child { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
 .tag.kr.k-team, .tag.kr.k-member, .tag.kr.k-coach { border-color: var(--kc-col); color: var(--kc-col); }
 .team-tile.kr.k-team, .team-tile.kr.k-member, .team-tile.kr.k-coach { box-shadow: inset 4px 0 0 var(--kc-col); background: linear-gradient(90deg, var(--kc-soft), transparent 70%), var(--card); }
-.team-tile.kr.kc { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
 .lu.kr.k-team, .lu.kr.k-member, .lu.kr.k-coach { background: var(--kc-soft); box-shadow: inset 4px 0 0 var(--kc-col); }
-.lu.kr.kc { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
 .bf-chip.k-team rect { fill: var(--kr-team); }
 .bf-chip.k-member rect { fill: var(--kr-member); }
 .bf-chip.k-coach rect { fill: var(--coach); }
@@ -426,3 +424,23 @@ main:focus, main:focus-visible { outline: none; }
 .bf-chip.up rect { stroke: var(--ink); stroke-width: 1.5; }
 .kr-hero .flag.k-member::before { background: var(--kr-member); border-radius: 2px; transform: rotate(45deg); }
 .kr-hero .flag.k-coach::before { background: var(--coach); border-radius: 2px; }
+
+/* ---------- 규칙 탭 ---------- */
+.vid-grid { display: grid; gap: 14px; margin-top: 12px; }
+.vid { margin: 0; background: var(--card); border-radius: var(--r-lg); overflow: hidden; }
+.yt, .yt-frame { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; padding: 0; background: #000; position: relative; cursor: pointer; }
+.yt img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .92; }
+.yt:hover img { opacity: 1; }
+.yt-play { position: absolute; left: 50%; top: 50%; width: 64px; height: 44px; transform: translate(-50%, -50%); background: var(--ring); border-radius: 12px; }
+.yt-play::after { content: ''; position: absolute; left: 26px; top: 13px; border-left: 16px solid #fff; border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
+.vid figcaption { padding: 10px 12px 12px; display: grid; gap: 3px; }
+.vid figcaption b { font-size: 14.5px; }
+.vid figcaption span { font-size: 12.5px; color: var(--steel); }
+.rules-grid { display: grid; gap: 0 32px; align-items: start; }
+.rule-card p, .rule-card ul { margin: 8px 0 0; }
+.rule-card ul { padding-left: 18px; }
+.rule-card li { margin: 3px 0; }
+.tbl.compact th, .tbl.compact td { padding: 6px 4px; font-size: 12.5px; }
+@media (min-width: 768px) { .vid-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rules-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1680px) { .rules-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .tabbar a { font-size: 10.5px; } }

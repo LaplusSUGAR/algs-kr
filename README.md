@@ -1,4 +1,4 @@
-# ALGS 코리아 트래커
+# EASY ALGS KR
 
 배포 주소(Pages 활성화 후): https://laplussugar.github.io/algs-kr/
 

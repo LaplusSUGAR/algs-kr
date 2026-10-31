@@ -257,5 +257,39 @@
     "liveSeconds": 10,
     "note": "GitHub Actions 예약 실행은 지연될 수 있음"
   },
-  "_timelineUrls": "공식 페이지가 있는 일정은 algs.ea.com, 없는 일정(Online Open, LCQ, 챔피언십)은 Liquipedia 시즌 페이지. 공식 페이지가 생기면 url만 바꾸면 된다."
+  "_timelineUrls": "공식 페이지가 있는 일정은 algs.ea.com, 없는 일정(Online Open, LCQ, 챔피언십)은 Liquipedia 시즌 페이지. 공식 페이지가 생기면 url만 바꾸면 된다.",
+  "rulesVideos": [
+    {
+      "id": "u_8oTFzPJ_I",
+      "title": "ALGS YEAR6 스플릿2 플레이오프에 대해 알아보자",
+      "channel": "LaplusSUGAR",
+      "topic": "playoffs"
+    },
+    {
+      "id": "IOvFNR2m0Bc",
+      "title": "1분 만에 ALGS 룰 알아보기: 레전드 밴 시스템",
+      "channel": "LaplusSUGAR",
+      "topic": "ban"
+    },
+    {
+      "id": "39NA9-oOOqg",
+      "title": "1분 만에 ALGS 룰 알아보기: POI 드래프트",
+      "channel": "LaplusSUGAR",
+      "topic": "poi"
+    }
+  ],
+  "rulesLinks": [
+    [
+      "ALGS Year 6 공식 규정 (Battlefy)",
+      "https://battlefy.com/apex-legends-global-series-year-6/official-rules"
+    ],
+    [
+      "ALGS 대회 구성 안내 (algs.ea.com)",
+      "https://algs.ea.com/en/competition-overview"
+    ],
+    [
+      "Liquipedia ALGS 2026-27",
+      "https://liquipedia.net/apexlegends/ALGS/2026-27"
+    ]
+  ]
 }

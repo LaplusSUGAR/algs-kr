@@ -13,5 +13,5 @@ window.ALGS_CONFIG = {
   liveUrl: '',
   livePollMs: 10_000, // 여기에 무작위 0~3초를 더해 요청이 한꺼번에 몰리지 않게 한다
 
-  siteName: 'ALGS 코리아 트래커',
+  siteName: 'EASY ALGS KR',
 };
