@@ -230,7 +230,8 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
 .pl-row .nm small { color: var(--steel); font-weight: 500; margin-left: 6px; }
 
 /* ---------- 반응형: 태블릿·데스크톱 ---------- */
-.frame { max-width: 640px; }
+.frame { max-width: 480px; }
+@media (min-width: 560px) { .frame { max-width: 640px; } .tabbar { max-width: 640px; } .team-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* 한국 코치가 있는 팀 = 파랑 */
 .krdot.kc { background: var(--coach); }
@@ -341,3 +342,60 @@ main:focus, main:focus-visible { outline: none; }
 .flow-grid > * { min-width: 0; }
 .team-tile .tile-roster .krn { display: inline; font: 700 12.5px/1.45 var(--body); color: var(--ink); }
 .team-tile > span:not(.tile-roster) { display: block; }
+
+/* ---------- 넓은 화면 단계 (1024 / 1440 / 1680 / 1920 / 2560) ----------
+   폭이 늘어나면 본문 폭, 글자 크기, 열 수를 함께 늘려 빈 여백만 커지지 않게 한다. */
+@media (min-width: 1024px) {
+  .frame { max-width: 1120px; }
+  .home-grid { gap: 0 40px; }
+  .lineup-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1200px) {
+  .frame { max-width: 1240px; }
+}
+@media (min-width: 1440px) {
+  body { font-size: 16px; }
+  .frame { max-width: 1400px; }
+  .top { padding: 16px 36px; }
+  .tabbar { padding: 8px 32px; }
+  main { padding: 8px 36px 12px; }
+  .foot { padding: 36px 36px 14px; }
+  .title { font-size: 60px; }
+  .home-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 48px; }
+  .team-grid { grid-template-columns: repeat(5, 1fr); }
+  .lineup-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .flow-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; }
+  .pts-cols { display: grid; grid-template-columns: minmax(400px, 1fr) minmax(0, 1.9fr); gap: 0 40px; align-items: start; }
+  .pts-side .tbl td { white-space: normal; }
+  .pts-cols > .pts-side { position: sticky; top: 130px; }
+  .stream-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 0 48px; }
+  .bk-stage { padding: 14px 16px 12px; }
+}
+@media (min-width: 1680px) {
+  body { font-size: 16.5px; }
+  .frame { max-width: 1600px; }
+  .title { font-size: 66px; }
+  .h2 { font-size: 32px; }
+  .team-grid { grid-template-columns: repeat(6, 1fr); }
+  .days { grid-template-columns: repeat(3, 1fr); gap: 0 36px; }
+  .kr-hero { padding: 24px 26px 20px; }
+  .kr-hero h1 { font-size: 68px; }
+  .kr-stats b { font-size: 40px; }
+  .flow-grid { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); }
+  .lineup-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+@media (min-width: 1920px) {
+  /* 고정 px 요소(표, 칩, 그림)까지 함께 커지도록 화면 전체를 비율로 키운다 (1.1배, 실제 폭 약 1840px) */
+  .frame { zoom: 1.1; max-width: 1672px; }
+  .home-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0 52px; }
+  .team-grid { grid-template-columns: repeat(6, 1fr); }
+  .pts-cols { grid-template-columns: minmax(420px, 1fr) minmax(0, 2fr); gap: 0 48px; }
+}
+@media (min-width: 2560px) {
+  /* 1.35배, 실제 폭 약 2360px */
+  .frame { zoom: 1.35; max-width: 1748px; }
+  .team-grid { grid-template-columns: repeat(7, 1fr); }
+}
+@media (min-width: 3400px) {
+  .frame { zoom: 1.8; max-width: 1750px; }
+}
