@@ -33,13 +33,16 @@ const team = (short) => A.teams[short];
 const krOf = (short) => team(short)?.krLevel || 'none';
 const KR_LABEL = { team: '한국 팀', member: '한국 선수 소속', coach: '한국 코치 팀' };
 const kcOf = (short) => !!team(short)?.kc;
-// 빨강 = 한국 선수가 뛰는 팀(채움: 2명 이상, 테두리: 1명), 파랑 = 한국 코치가 있는 팀
+// 색 구분: 빨강 = 한국 팀(한국 선수 2명 이상), 주황 = 한국 선수 소속(1명), 파랑 = 한국 코치 팀(선수 없이 코치만)
+// 한국 선수가 있으면서 한국 코치도 있는 팀은 자기 색에 파란 '코치' 표시(테두리 링·C 배지)를 덧붙인다.
+const CAT = { team: 'k-team', member: 'k-member', coach: 'k-coach' };
 const krDot = (lvl, short) => {
   if (!lvl || lvl === 'none') return '';
-  const kc = lvl === 'coach' || (short && kcOf(short));
-  return `<span class="krdot${lvl === 'team' ? '' : ' m'}${kc ? ' kc' : ''}" title="${KR_LABEL[lvl]}${kc && lvl !== 'coach' ? ', 한국 코치' : ''}"></span>`;
+  const kc = lvl !== 'coach' && short && kcOf(short);
+  return `<span class="krdot ${CAT[lvl]}${kc ? ' kc' : ''}" title="${KR_LABEL[lvl]}${kc ? ' + 한국 코치' : ''}"></span>`;
 };
-const rowCls = (r) => (r.kr && r.kr !== 'none' ? 'kr' + (r.kr === 'coach' || kcOf(r.short) ? ' kc' : '') : '');
+const rowCls = (r) => (r.kr && r.kr !== 'none' ? `kr ${CAT[r.kr]}${r.kr !== 'coach' && kcOf(r.short) ? ' kc' : ''}` : '');
+const coachBadge = (lvl, short) => (lvl && lvl !== 'none' && lvl !== 'coach' && kcOf(short) ? '<span class="cbadge" title="한국 코치">C</span>' : '');
 const LP_SEASON = 'https://liquipedia.net/apexlegends/ALGS/2026-27';
 // 공식 경기 페이지가 있는 이벤트(슬러그가 사람이 읽는 이름)는 algs.ea.com, 없으면(LCQ 등) Liquipedia 시즌 페이지
 const officialUrl = (s) => (/^[a-z][a-z0-9-]+$/.test(s.eventSlug || '') && s.eventSlug !== 'last-chance-qualifier' ? `https://algs.ea.com/en/year-6/${s.eventSlug}/match/${s.id}` : LP_SEASON);
@@ -144,9 +147,9 @@ function bracketFlow(B) {
     const ks = krIn(st.teams || []);
     let cx = x + 12;
     const chips = ks.slice(0, 4).map((sh) => {
-      const w = sh.length * 7.4 + 12, adv = advanced(st, sh);
-      const k = krOf(sh) === 'coach' || kcOf(sh) ? 'kc' : 'kr';
-      const out = `<g class="bf-chip ${k} ${adv === false ? 'out' : adv ? 'up' : ''}"><rect x="${cx}" y="${y + 66}" width="${w}" height="18" rx="9"/><text x="${cx + w / 2}" y="${y + 79}" text-anchor="middle">${esc(sh)}</text></g>`;
+      const lvl = krOf(sh), kc = lvl !== 'coach' && kcOf(sh);
+      const tw = sh.length * 7.4 + 12, w = tw + (kc ? 16 : 0), adv = advanced(st, sh);
+      const out = `<g class="bf-chip ${CAT[lvl]} ${adv === false ? 'out' : adv ? 'up' : ''}"><rect x="${cx}" y="${y + 66}" width="${w}" height="18" rx="9"/><text x="${cx + tw / 2}" y="${y + 79}" text-anchor="middle">${esc(sh)}</text>${kc ? `<circle cx="${cx + w - 9}" cy="${y + 75}" r="6.5" class="bf-c"/><text x="${cx + w - 9}" y="${y + 78.5}" text-anchor="middle" class="bf-ct">C</text>` : ''}</g>`;
       cx += w + 4; return out;
     }).join('') + (ks.length > 4 ? `<text x="${cx}" y="${y + 77}" class="bf-more" dy="2">+${ks.length - 4}</text>` : '');
     const when = st.start ? `${dayLabel(dayKey(st.start)).slice(0, 5)} ${hhmm(st.start)}` : '';
@@ -163,7 +166,7 @@ function bracketFlow(B) {
   return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
     <defs><marker id="bfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
     ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div>
-    <p class="caption">단계를 누르면 공식 경기 페이지로 이동합니다. 빨간 칩은 한국 선수가 뛰는 팀, 파란 칩은 한국 코치가 있는 팀이며, 흐린 칩은 그 단계에서 아래로 내려간 팀입니다.</p>`;
+    <p class="caption">단계를 누르면 공식 경기 페이지로 이동합니다. 칩 색은 빨강 한국 팀, 주황 한국 선수 소속, 파랑 한국 코치 팀이고, 파란 C 배지는 한국 코치도 있다는 뜻입니다. 흐린 칩은 그 단계에서 아래로 내려간 팀입니다.</p>`;
 }
 
 /* ---------- 홈 ---------- */
@@ -201,7 +204,7 @@ function home() {
       ${seasonTimeline()}
     </section></div></div>`;
 }
-const krLegend = () => `<p class="legend"><span><span class="krdot"></span>한국 팀 (한국 선수 2명 이상)</span><span><span class="krdot m"></span>한국 선수 소속</span><span><span class="krdot kc"></span>한국 코치가 있는 팀</span></p>`;
+const krLegend = () => `<p class="legend"><span><span class="krdot k-team"></span>한국 팀 (한국 선수 2명 이상)</span><span><span class="krdot k-member"></span>한국 선수 소속 (1명)</span><span><span class="krdot k-coach"></span>한국 코치 팀 (코치만)</span><span><span class="cbadge">C</span>한국 코치도 있음</span></p>`;
 
 // 팀의 국제전 현재 위치 (text) 와 다음 경기(next)
 function krStageInfo(short) {
@@ -226,7 +229,7 @@ const krStage = (short) => krStageInfo(short).text;
 function lineupLine(s) {
   if (!s.lineup?.length) return '';
   const ks = krIn(s.lineup);
-  return `<div class="meta lineup">출전 ${s.lineup.length}팀 확정${ks.length ? ` · 한국 관련 ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}`).join(' ')}` : ''}</div>`;
+  return `<div class="meta lineup">출전 ${s.lineup.length}팀 확정${ks.length ? ` · 한국 관련 ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}${coachBadge(krOf(sh), sh)}`).join(' ')}` : ''}</div>`;
 }
 
 // 홈: 지금(또는 가장 최근) 브래킷 단계 요약
@@ -237,7 +240,7 @@ function stageMini(B) {
   const rows = res ? res.filter((r, i) => i < 5 || r.kr !== 'none') : (st.teams || []).map((sh) => ({ short: sh, kr: krOf(sh), seed: A.intl.rows.find((r) => r.short === sh)?.pos })).filter((r, i) => i < 5 || r.kr !== 'none');
   return `<p class="lead" style="margin-top:4px"><b>${esc(st.ko)}</b> · ${esc(stageState(st))}${st.s?.games ? ` · ${st.s.games}게임째` : ''}</p>
   <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">${res ? '점수' : '조별 순위'}</th>${res && st.cut ? `<th class="r">${st.status === 'completed' ? '결과' : '현재 기준'}</th>` : ''}</tr></thead><tbody>
-  ${rows.map((r, i) => `<tr class="${rowCls(r)}"><td class="rank">${res ? r.pos : i + 1}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}</td><td class="r num">${res ? r.pts : r.seed ?? '–'}</td>${res && st.cut ? `<td class="r small muted">${r.pos <= st.cut ? esc(st.up) : esc(st.down)}</td>` : ''}</tr>`).join('')}
+  ${rows.map((r, i) => `<tr class="${rowCls(r)}"><td class="rank">${res ? r.pos : i + 1}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${res ? r.pts : r.seed ?? '–'}</td>${res && st.cut ? `<td class="r small muted">${r.pos <= st.cut ? esc(st.up) : esc(st.down)}</td>` : ''}</tr>`).join('')}
   </tbody></table></div>`;
 }
 
@@ -247,7 +250,7 @@ function heroCard(k) {
   const next = A.intl && si.text ? si.next : k.nextSeries;
   const roster = (t?.roster?.filter((p) => p.r !== 'k').map((p) => p.n).join(', ') || k.krPlayers.join(', ')) + (t?.roster?.some((p) => p.r === 'k') ? ' · 코치 ' + t.roster.filter((p) => p.r === 'k').map((p) => p.n).join(', ') : '');
   return `<section class="kr-hero" aria-labelledby="h-hero">
-    <span class="flag">${KR_LABEL[k.level] || ''}${k.kc && k.level !== 'coach' ? ' · 한국 코치' : ''}</span>
+    <span class="flag ${CAT[k.level] || ''}">${KR_LABEL[k.level] || ''}${k.kc && k.level !== 'coach' ? ' + 한국 코치' : ''}</span>
     <h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1>
     <p class="roster">${esc(roster)}</p>
     <div class="kr-stats">
@@ -275,9 +278,9 @@ function ringLine(krs) {
     lanesEnd[lane] = px + half;
     const ly = y - 14 - lane * 15;
     const filled = k.level === 'team';
-    const col = k.kc ? 'var(--coach)' : 'var(--ring)';
+    const col = { team: 'var(--kr-team)', member: 'var(--kr-member)', coach: 'var(--coach)' }[k.level];
     return `<g class="marker"><line x1="${px}" y1="${ly + 3}" x2="${px}" y2="${y - 6}" stroke="${col}" stroke-width="1"/>
-      <circle cx="${px}" cy="${y}" r="${filled ? 5.5 : 4.5}" fill="${filled ? col : 'var(--paper)'}" stroke="${col}" stroke-width="2"/>
+      ${k.kc && k.level !== 'coach' ? `<circle cx="${px}" cy="${y}" r="8.5" fill="none" stroke="var(--coach)" stroke-width="2"/>` : ''}<circle cx="${px}" cy="${y}" r="5.5" fill="${col}" stroke="var(--paper)" stroke-width="1"/>
       <text x="${px}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">${esc(k.short)} ${k.cp.rank}</text></g>`;
   }).join('');
   const ticks = [1, 32, 60, 90, N].map((r) => `<text x="${x(r)}" y="${y + 22}" text-anchor="middle" font-size="10.5" fill="var(--steel)">${r}위</text>`).join('');
@@ -297,7 +300,7 @@ function krRow(k) {
   if (k.intl) bits.push(`${ko(A.intl.name, EVENT_KO)} ${krStage(k.short)}`);
   if (k.pl) bits.push(`Split 2 프로리그 ${k.pl.pos}위`);
   return `<a class="kr-row" href="#/teams/${encodeURIComponent(k.short)}">
-    <span class="who">${krDot(k.level, k.short)}${esc(k.name)}<small>${esc([k.krPlayers.join(', '), k.krCoaches?.length ? '코치 ' + k.krCoaches.join(', ') : ''].filter(Boolean).join(' · '))}</small></span>
+    <span class="who">${krDot(k.level, k.short)}${esc(k.name)}${coachBadge(k.level, k.short)}<small>${esc([k.krPlayers.join(', '), k.krCoaches?.length ? '코치 ' + k.krCoaches.join(', ') : ''].filter(Boolean).join(' · '))}</small></span>
     <span class="val">${k.cp ? 'CP ' + k.cp.rank + '위' : ''}</span>
     <span class="sub">${esc(bits.join(' / '))}${k.cp && k.cp.status !== 'direct' ? ` / 직행권까지 ${fmt(k.cp.gap)} CP 부족` : ''}</span>
   </a>`;
@@ -307,7 +310,7 @@ function intlMini() {
   const rows = A.intl.rows;
   const show = rows.filter((r, i) => i < 5 || r.kr !== 'none');
   return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">다음 단계</th></tr></thead><tbody>
-    ${show.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}</td><td class="r num">${r.pts}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>`).join('')}
+    ${show.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>`).join('')}
   </tbody></table></div>
   <p class="lead">조별 리그 누적 기준. 상위 ${A.intl.winnersCut}팀은 승자 라운드, 나머지는 패자부활 라운드로 갑니다.</p>`;
 }
@@ -340,7 +343,7 @@ function matchItem(s) {
     const top = s.results[0];
     const krs = s.results.filter((r) => r.kr !== 'none');
     const mpTag = (r) => (r.won ? ' <span class="tag mpe">우승</span>' : r.mpe ? ' <span class="tag mpe">MP</span>' : '');
-    const inner = `<span><b>1위 ${teamLink(top.short)}</b> ${top.pts}점${mpTag(top)}</span>${krs.filter((r) => r !== top).map((r) => `<span>${krDot(r.kr, r.short)}${teamLink(r.short)} ${r.pos}위 ${r.pts}점 (${r.kills}킬)${mpTag(r)}</span>`).join('')}${s.liveAt ? `<span class="upd">${ago(s.liveAt)} 공식 API 확인</span>` : ''}`;
+    const inner = `<span><b>1위 ${teamLink(top.short)}</b> ${top.pts}점${mpTag(top)}</span>${krs.filter((r) => r !== top).map((r) => `<span>${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)} ${r.pos}위 ${r.pts}점 (${r.kills}킬)${mpTag(r)}</span>`).join('')}${s.liveAt ? `<span class="upd">${ago(s.liveAt)} 공식 API 확인</span>` : ''}`;
     const full = s.results.length > 5 ? `<details><summary>${s.eventSlug.includes('pro-league') ? '상위 3팀과 한국 관련 팀 표' : `전체 ${s.results.length}팀 결과`}</summary>${resultTable(s.results)}</details>` : '';
     res = `<div class="res ${opt.spoiler ? 'spoiler' : ''}" ${opt.spoiler ? 'tabindex="0" role="button" aria-label="결과 보기"' : ''}>${inner}</div>${opt.spoiler ? '' : full}`;
   }
@@ -352,7 +355,7 @@ function matchItem(s) {
   </article>`;
 }
 
-const resultTable = (rows) => `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">킬</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td></tr>`).join('')}</tbody></table></div>`;
+const resultTable = (rows) => `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">킬</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td></tr>`).join('')}</tbody></table></div>`;
 
 function schedule(parts, q) {
   const view = q.get('view') === 'results' ? 'results' : 'upcoming';
@@ -399,7 +402,7 @@ function groupTable(ev) {
   let rows = ev.rows;
   if (opt.krOnly) rows = rows.filter((r) => r.kr !== 'none');
   return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c">조</th><th class="r">점수</th><th class="r">킬</th><th class="r">다음 단계</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && r.pos === ev.winnersCut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}<small>${esc(REGION[r.region] || '')}</small></td><td class="c">${esc(r.group)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>${!opt.krOnly && r.pos === ev.winnersCut ? `<tr class="cut-label"><td colspan="6">여기까지 승자 라운드, 아래는 패자부활 1라운드</td></tr>` : ''}`).join('')}
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && r.pos === ev.winnersCut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small></td><td class="c">${esc(r.group)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>${!opt.krOnly && r.pos === ev.winnersCut ? `<tr class="cut-label"><td colspan="6">여기까지 승자 라운드, 아래는 패자부활 1라운드</td></tr>` : ''}`).join('')}
     </tbody></table></div>`;
 }
 
@@ -415,14 +418,14 @@ function stageTable(st) {
     if (opt.krOnly) rows = rows.filter((r) => r.kr !== 'none');
     const out = (r) => (st.cut ? (r.pos <= st.cut ? `<span class="adv up">${esc(st.up)}</span>` : `<span class="adv ${st.down === '탈락' ? 'out' : 'down'}">${esc(st.down)}</span>`) : r.won ? '<span class="tag mpe">우승</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '');
     body = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">킬</th><th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="5">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="5">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
     </tbody></table></div>${x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : ''}`;
   } else if (st.teams?.length) {
     let ts = st.teams.map((sh) => ({ short: sh, kr: krOf(sh), g: A.intl.rows.find((r) => r.short === sh) }));
     ts.sort((a, b) => (a.g?.pos ?? 99) - (b.g?.pos ?? 99));
     if (opt.krOnly) ts = ts.filter((r) => r.kr !== 'none');
     body = `<p class="caption">${st.src === 'official' ? '공식 출전 명단' : '앞 단계 결과로 계산한 예상 명단'} ${st.teams.length}팀. 경기가 시작되면 점수표로 바뀝니다.</p>
-      <div class="lineup-grid">${ts.map((r) => `<span class="lu ${rowCls(r)}">${krDot(r.kr, r.short)}${teamLink(r.short)}<small>${r.g ? `조별 ${r.g.pos}위` : ''}</small></span>`).join('')}</div>`;
+      <div class="lineup-grid">${ts.map((r) => `<span class="lu ${rowCls(r)}">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}<small>${r.g ? `조별 ${r.g.pos}위` : ''}</small></span>`).join('')}</div>`;
   } else body = '<p class="empty">앞 단계가 끝나면 출전 팀이 정해집니다.</p>';
   const rule = st.cut ? `<p class="bk-rule">상위 ${st.cut}팀 ${esc(st.up)} · 하위 ${st.n - st.cut}팀 ${esc(st.down)}</p>` : st.key === 'f' ? `<p class="bk-rule">매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승</p>` : '';
   return `<div class="bk-stage ${st.status}">${top}${rule}${body}</div>`;
@@ -443,7 +446,7 @@ function cpView(q) {
   const krNames = new Set(Object.values(A.teams).flatMap((t) => t.krPlayers || []));
   const regionSeg = `<div class="seg" role="group" aria-label="지역">${['all', 'apac-n', 'apac-s', 'emea', 'americas'].map((r) => `<a href="${qsLink('/points/cp', q, { r })}" aria-current="${region === r}">${r === 'all' ? '전체' : REGION[r]}</a>`).join('')}</div>`;
   const modeSeg = `<div class="seg" role="group" aria-label="단위"><a href="${qsLink('/points/cp', q, { m: 'teams' })}" aria-current="${mode === 'teams'}">팀</a><a href="${qsLink('/points/cp', q, { m: 'players' })}" aria-current="${mode === 'players'}">선수</a></div>`;
-  const krSummary = (A.kr || []).filter((k) => k.cp).map((k) => `<tr class="kr${k.kc ? ' kc' : ''}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}</td><td class="r num">${fmt(k.cp.total)}</td><td class="r small">${k.cp.status === 'direct' ? `<span class="tag ok">직행권</span> 33위와 +${fmt(k.cp.gap)}` : `32위까지 −${fmt(k.cp.gap)}`}</td></tr>`).join('');
+  const krSummary = (A.kr || []).filter((k) => k.cp).map((k) => `<tr class="${rowCls({ kr: k.level, short: k.short })}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}${coachBadge(k.level, k.short)}</td><td class="r num">${fmt(k.cp.total)}</td><td class="r small">${k.cp.status === 'direct' ? `<span class="tag ok">직행권</span> 33위와 +${fmt(k.cp.gap)}` : `32위까지 −${fmt(k.cp.gap)}`}</td></tr>`).join('');
 
   let table;
   if (mode === 'teams') {
@@ -452,7 +455,7 @@ function cpView(q) {
     table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r">상태</th></tr></thead><tbody>
       ${rows.map((r, i) => {
         const isCut = region === 'all' && !opt.krOnly && r.rank === cut;
-        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}<small>${esc(REGION[r.region] || '')}</small></td><td class="r num">${fmt(r.total)}</td><td class="r">${r.status === 'direct' ? '<span class="tag ok">직행권</span>' : '<span class="tag">LCQ 대상</span>'}</td></tr>
+        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small></td><td class="r num">${fmt(r.total)}</td><td class="r">${r.status === 'direct' ? '<span class="tag ok">직행권</span>' : '<span class="tag">LCQ 대상</span>'}</td></tr>
         <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="3">합산 선수: ${r.players.map(([n, p]) => `${esc(n)} ${fmt(p)}`).join(', ')}</td></tr>
         ${isCut ? `<tr class="cut-label"><td colspan="4">여기까지 챔피언십 직행 (현재 기준)</td></tr>` : ''}`;
       }).join('')}
@@ -496,7 +499,7 @@ function plView(q) {
     <p class="lead">${esc(P.label)}. 시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다. 최종 순위는 리전 결승까지 반영한 값입니다.</p>
     ${krHere.length && !opt.krOnly ? `<div class="kr-list" style="margin-top:12px">${krHere.map((r) => `<a class="kr-row" href="#/teams/${encodeURIComponent(r.short)}"><span class="who">${krDot(r.kr, r.short)}${esc(r.name)}</span><span class="val">${r.pos}위</span><span class="sub">정규 시즌 ${r.rs ?? '–'}점, ${r.kills ?? '–'}킬${r.qualified ? ', 플레이오프 진출' : ''}</span></a>`).join('')}</div>` : ''}
     <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c">조</th><th class="r">정규 점수</th><th class="r">킬</th><th class="r">CP/인</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok">PO</span>' : ''}</td><td class="c">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r">${r.kills ?? '–'}</td><td class="r">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="6">${lines[r._rk]}</td></tr>` : ''}`).join('')}
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}${r.qualified ? ' <span class="tag ok">PO</span>' : ''}</td><td class="c">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r">${r.kills ?? '–'}</td><td class="r">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="6">${lines[r._rk]}</td></tr>` : ''}`).join('')}
     </tbody></table></div></section>
     <div class="explain"><b>점수 계산</b>
       <table><tr><td>게임</td><td>순위 점수 + 킬당 1점 (1위 12, 2위 9, 3위 7, 4위 5, 5위 4 …)</td></tr>
@@ -512,9 +515,9 @@ function teams(parts) {
   const all = Object.values(A.teams);
   const tile = (t) => {
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
-    const cls = t.krLevel !== 'none' ? 'kr' + (t.kc ? ' kc' : '') : '';
+    const cls = rowCls({ kr: t.krLevel, short: t.short });
     return `<a class="team-tile ${cls}" href="#/teams/${encodeURIComponent(t.short)}" data-name="${esc((t.short + ' ' + t.name + ' ' + (t.roster || []).map((p) => p.n).join(' ')).toLowerCase())}">
-      <b>${krDot(t.krLevel, t.short)}${esc(t.short)}</b><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
+      <b>${krDot(t.krLevel, t.short)}${esc(t.short)}${coachBadge(t.krLevel, t.short)}</b><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
       <span class="tile-roster">${ps.map(pName).join(', ') || '로스터 정보 없음'}${cs.length ? `<br><span class="muted">코치 ${cs.map(pName).join(', ')}</span>` : ''}</span></a>`;
   };
   const byCp = (a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999);
@@ -539,8 +542,8 @@ function teamDetail(short) {
   const si = ir ? krStageInfo(short) : null;
   return `<p style="margin:14px 0 0"><a class="more" href="#/teams">팀 목록</a></p>
     <h1 class="title">${esc(t.name)}</h1>
-    <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr${t.kc ? ' kc' : ''}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.kc && t.krLevel !== 'coach' ? ' <span class="tag kr kc">한국 코치</span>' : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}${si?.text ? `<br>${esc(ko(A.intl.name, EVENT_KO))}: ${esc(si.text)}` : ''}</p>
-    ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot${p.r === 'k' ? ' kc' : ''}"></span>` : ''}${pName(p)}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + roleKo[p.r] : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
+    <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr ${CAT[t.krLevel]}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.kc && t.krLevel !== 'coach' ? ' <span class="tag kr k-coach">+ 한국 코치</span>' : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}${si?.text ? `<br>${esc(ko(A.intl.name, EVENT_KO))}: ${esc(si.text)}` : ''}</p>
+    ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${pName(p)}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + roleKo[p.r] : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
     <section class="sec"><h2 class="h2">시즌 성적</h2><div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th class="r">순위</th><th class="r">점수</th></tr></thead><tbody>
       ${ir ? `<tr><td>${esc(ko(A.intl.name, EVENT_KO))} 조별 리그</td><td class="r num">${ir.pos}</td><td class="r">${ir.pts}점</td></tr>` : ''}
       ${plRows.sort((a, b) => b[0].split - a[0].split).map(([P, r]) => `<tr><td>${esc(P.label)}</td><td class="r num">${r.pos}</td><td class="r">정규 ${r.rs ?? '–'}점</td></tr>`).join('')}
@@ -559,7 +562,7 @@ const FIND = {
   youtube: (n) => `https://www.youtube.com/results?search_query=${encodeURIComponent(n + ' 에이펙스')}`,
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
-const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot${p.role === 'coach' ? ' kc' : ''}"></span>${esc(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
+const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${esc(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
 function streams() {
   const S = A.streams, MV = A.season.multiview || {};
   const order = (A.kr || []).map((k) => k.short);

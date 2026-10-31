@@ -10,6 +10,10 @@
   --brass: #9A7A2C;
   --ok: #2F6B4F;
   --coach: #1F6FB2;
+  --kr-team: #C4122F;
+  --kr-team-soft: rgba(196, 18, 47, .10);
+  --kr-member: #D46A00;
+  --kr-member-soft: rgba(212, 106, 0, .12);
   --coach-soft: rgba(31, 111, 178, .10);
   --display: 'Big Shoulders Display', 'Pretendard Variable', Pretendard, system-ui, sans-serif;
   --body: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
@@ -29,6 +33,10 @@
   --brass: #D2B062;
   --ok: #6FC09A;
   --coach: #5AA9F0;
+  --kr-team: #FF4D63;
+  --kr-team-soft: rgba(255, 77, 99, .14);
+  --kr-member: #FF9F43;
+  --kr-member-soft: rgba(255, 159, 67, .14);
   --coach-soft: rgba(90, 169, 240, .13);
   color-scheme: dark;
 }
@@ -127,7 +135,6 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
 .tag.mp { border-color: var(--brass); color: var(--brass); }
 .tag.live { background: var(--ring); color: #fff; border-color: var(--ring); }
 .krdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ring); margin-right: 6px; vertical-align: 2px; }
-.krdot.m { background: transparent; border: 1.5px solid var(--ring); }
 
 /* 세그먼트 */
 .seg { display: inline-flex; background: var(--card); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
@@ -234,12 +241,6 @@ dialog h2 { font: 800 28px/1 var(--display); margin: 0 0 12px; }
 @media (min-width: 560px) { .frame { max-width: 640px; } .tabbar { max-width: 640px; } .team-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* 한국 코치가 있는 팀 = 파랑 */
-.krdot.kc { background: var(--coach); }
-.krdot.m.kc { background: transparent; border-color: var(--coach); }
-.tbl tr.kr.kc td { background: var(--coach-soft); }
-.tbl tr.kr.kc td:first-child { box-shadow: inset 3px 0 0 var(--coach); }
-.tag.kr.kc { border-color: var(--coach); color: var(--coach); }
-.team-tile.kr.kc { box-shadow: inset 3px 0 0 var(--coach); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--steel); margin: 10px 0 0; }
 .legend > span { display: inline-flex; align-items: center; }
 .krn { font-weight: 700; color: var(--ink); }
@@ -273,7 +274,6 @@ sup.mix { font-size: 10px; font-weight: 700; color: var(--ring); margin-left: 2p
 .bf-elab { font-size: 10.5px; fill: var(--steel); font-weight: 600; paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
 .bf-chip rect { fill: var(--ring); }
 .bf-chip text { font-size: 11px; font-weight: 700; fill: #fff; }
-.bf-chip.kc rect { fill: var(--coach); }
 .bf-chip.out { opacity: .38; }
 .bf-chip.up rect { stroke: var(--ink); stroke-width: 1.5; }
 .bf-more { font-size: 11px; fill: var(--steel); }
@@ -300,7 +300,6 @@ sup.mix { font-size: 10px; font-weight: 700; color: var(--ring); margin-left: 2p
 .lu { display: flex; align-items: center; gap: 2px; padding: 7px 9px; border-radius: var(--r-sm); background: var(--paper); font-size: 13.5px; font-weight: 600; }
 .lu small { margin-left: auto; color: var(--steel); font-weight: 500; font-size: 11.5px; }
 .lu.kr { background: var(--ring-soft); box-shadow: inset 3px 0 0 var(--ring); }
-.lu.kr.kc { background: var(--coach-soft); box-shadow: inset 3px 0 0 var(--coach); }
 details.past { background: var(--card); border-radius: var(--r-lg); padding: 12px; }
 details.past > summary { cursor: pointer; color: var(--steel); font-size: 13px; }
 details.past > summary .h2 { display: inline; margin-right: 8px; color: var(--ink); }
@@ -399,3 +398,31 @@ main:focus, main:focus-visible { outline: none; }
 @media (min-width: 3400px) {
   .frame { zoom: 1.8; max-width: 1750px; }
 }
+
+/* ---------- 한국 관련 3분류 색 ----------
+   빨강 = 한국 팀(선수 2명 이상), 주황 = 한국 선수 소속(1명), 파랑 = 한국 코치 팀(코치만)
+   한국 코치가 함께 있는 팀(.kc)은 자기 색 위에 파란 링·C 배지를 덧붙인다 */
+.k-team { --kc-col: var(--kr-team); --kc-soft: var(--kr-team-soft); }
+.k-member { --kc-col: var(--kr-member); --kc-soft: var(--kr-member-soft); }
+.k-coach { --kc-col: var(--coach); --kc-soft: var(--coach-soft); }
+.krdot.k-team, .krdot.k-member, .krdot.k-coach { background: var(--kc-col); border: 0; width: 9px; height: 9px; vertical-align: 1px; }
+.krdot.k-member { border-radius: 2px; transform: rotate(45deg) scale(.9); }
+.krdot.k-coach { border-radius: 2px; }
+.cbadge { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--coach); color: #fff; font: 800 9.5px/1 var(--body); margin: 0 4px 0 5px; vertical-align: 1px; text-decoration: none; }
+.legend .cbadge { margin-left: 0; }
+.tbl tr.kr.k-team td, .tbl tr.kr.k-member td, .tbl tr.kr.k-coach td { background: var(--kc-soft); }
+.tbl tr.kr.k-team td:first-child, .tbl tr.kr.k-member td:first-child, .tbl tr.kr.k-coach td:first-child { box-shadow: inset 4px 0 0 var(--kc-col); }
+.tbl tr.kr.kc td:first-child { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
+.tag.kr.k-team, .tag.kr.k-member, .tag.kr.k-coach { border-color: var(--kc-col); color: var(--kc-col); }
+.team-tile.kr.k-team, .team-tile.kr.k-member, .team-tile.kr.k-coach { box-shadow: inset 4px 0 0 var(--kc-col); background: linear-gradient(90deg, var(--kc-soft), transparent 70%), var(--card); }
+.team-tile.kr.kc { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
+.lu.kr.k-team, .lu.kr.k-member, .lu.kr.k-coach { background: var(--kc-soft); box-shadow: inset 4px 0 0 var(--kc-col); }
+.lu.kr.kc { box-shadow: inset 4px 0 0 var(--kc-col), inset 7px 0 0 var(--coach); }
+.bf-chip.k-team rect { fill: var(--kr-team); }
+.bf-chip.k-member rect { fill: var(--kr-member); }
+.bf-chip.k-coach rect { fill: var(--coach); }
+.bf-chip .bf-c { fill: #fff; }
+.bf-chip .bf-ct { fill: var(--coach); font-size: 9.5px; font-weight: 800; }
+.bf-chip.up rect { stroke: var(--ink); stroke-width: 1.5; }
+.kr-hero .flag.k-member::before { background: var(--kr-member); border-radius: 2px; transform: rotate(45deg); }
+.kr-hero .flag.k-coach::before { background: var(--coach); border-radius: 2px; }
