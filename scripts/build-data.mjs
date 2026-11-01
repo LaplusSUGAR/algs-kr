@@ -56,7 +56,9 @@ for (const key of Object.keys(algs.pl).sort().reverse()) {
 }
 
 // 팀 로고 (공식 API, [logoLight 흰 로고, logoDark 어두운 로고])
-for (const [id, lg] of Object.entries(algs.logos || {})) if (teams[id]) teams[id].logo = lg;
+// 줄인 로고(site/logos/<해시>.png)가 있으면 그 파일을, 없으면 원본 주소를 쓴다
+const localLogo = (u) => (u && fs.existsSync(path.join(ROOT, 'site/logos', `${hash(u)}.png`)) ? `logos/${hash(u)}.png` : u || null);
+for (const [id, lg] of Object.entries(algs.logos || {})) if (teams[id]) teams[id].logo = [localLogo(lg[0]), localLogo(lg[1])];
 
 // 로스터와 한국 판별
 // config/players.json: 선수별 수동 보정. role(coach/player)로 역할을 고치고, heritage: "KR"로 한국계(혼혈·이중국적 등)를 표시한다.

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['site/**', 'scripts/**', 'config/**']
+    paths: ['site/**', 'scripts/**', 'config/**', '.github/workflows/**']
 
 permissions:
   contents: write
@@ -33,6 +33,8 @@ jobs:
         run: node scripts/fetch-liquipedia.mjs
       - name: ALGS 공식 API
         run: node scripts/fetch-algs.mjs
+      - name: 팀 로고 줄이기 (새 로고가 있을 때만)
+        run: node scripts/fetch-logos.mjs --check || (npm i --no-save --no-package-lock sharp@0.33 && node scripts/fetch-logos.mjs)
       - name: Battlefy
         run: node scripts/fetch-battlefy.mjs
       - name: 병합·빌드
@@ -42,7 +44,7 @@ jobs:
         run: |
           git config user.name "algs-kr-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add raw site/data site/index.html
+          git add raw site/data site/index.html site/logos
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else

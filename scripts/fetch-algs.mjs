@@ -59,10 +59,12 @@ async function main() {
   // 챔피언십 포인트를 주는 대회별 결과: 누가 어느 대회에서 몇 CP를 받았는지
   //   cpEvents: [[eventId, slug, rows[[순위, 1인당CP, teamId, 팀이름, "선수ID|이름;..."(코치 제외)]]]]  아직 정해지지 않은 순위는 teamId null
   const cpEvents = [];
+  const logoSources = [];
   for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /^split-\d-(pro-league-|playoffs)/.test(x.slug))) {
     if (new Date(e.startDate) > new Date()) continue;
     try {
       const st = await get(`/events/${e.id}/standings`);
+      logoSources.push(st.standings || []);
       const rows = (st.standings || []).filter((r) => r.points != null).map((r) => [r.position, r.points, r.teamId || null, r.name || null,
         (r.players || []).filter((p) => p.role !== 'coach').map((p) => `${p.id}|${p.name.trim()}`).join(';')]);
       if (rows.length) cpEvents.push([e.id, e.slug, rows]);
@@ -109,12 +111,12 @@ async function main() {
   const latestSplit = Math.max(...plEvents.map(({ e }) => +e.slug.match(/^split-(\d)/)[1]));
   const latestPl = plEvents.filter(({ e }) => e.slug.startsWith(`split-${latestSplit}-`));
   const krStreams = [];
-  const logos = {}; // teamId: [밝은 배경용, 어두운 배경용] 공식 팀 로고 URL
+  const logos = {}; // teamId: [logoLight(흰 로고, 어두운 배경용), logoDark(어두운 로고, 밝은 배경용)] 공식 팀 로고 URL. 없는 쪽은 null
   const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
   for (const { e } of latestPl) {
     const teams = (await get(`/phases/${e.phases[0].id}/teams`)).teams || [];
     for (const tm of teams) {
-      if (tm.logoLight || tm.logoDark) logos[tm.teamId] = [tm.logoLight || tm.logoDark, tm.logoDark || tm.logoLight];
+      if (tm.logoLight || tm.logoDark) logos[tm.teamId] = [tm.logoLight || null, tm.logoDark || null];
       rosters[tm.teamId] = tm.players.map((p) => {
         const rep = p.countryOfRepresentation && p.countryOfRepresentation !== p.country ? p.countryOfRepresentation : '';
         return `${p.name.trim()}|${p.country || ''}|${roleCode(p.role)}${rep ? '|' + rep : ''}`;
@@ -172,6 +174,15 @@ async function main() {
     const seen = new Set(partnerStreams.map((p) => p[2].toLowerCase()));
     for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
   } catch {}
+
+  // 로고 보충: 프로리그 로스터에 로고가 없는 팀은 CP 순위표·대회 순위표·팀 버전 기록에서 찾는다
+  const addLogo = (id, l, d) => { if (!id || (!l && !d)) return; const cur = logos[id] || [null, null]; logos[id] = [cur[0] || l || null, cur[1] || d || null]; };
+  for (const t of cpRes.standings || []) addLogo(t.teamId, t.logoLight, t.logoDark);
+  for (const st of logoSources) for (const r of st) addLogo(r.teamId, r.logoLight, r.logoDark);
+  const needIds = new Set([...cp.map((r) => r[1]), ...Object.values(pl).flat().map((r) => r[3])].filter((id) => !logos[id]));
+  for (const id of needIds) {
+    try { const tv = await get(`/teams/${id}`); for (const v of tv.versions || []) addLogo(id, v.logoLight, v.logoDark); } catch {}
+  }
 
   const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };

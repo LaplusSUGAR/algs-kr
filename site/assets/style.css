@@ -734,3 +734,10 @@ html, body { overflow-x: clip; }
 @media (max-width: 440px) { .top #refreshText { display: none; } .top .pill { padding: 8px; } .top .icon-btn { width: 34px; } }
 .sub-note { display: block; margin-top: 3px; color: var(--kr-member); font-size: 11.5px; line-height: 1.35; }
 .st-parts { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-size: 12.5px; } .st-parts small { color: var(--apex); }
+
+/* 팀 로고: 맞는 색 로고가 없을 때 반대색 판, 로고가 없을 때 약칭 배지 */
+.tlogo.plate-dark { background: var(--bar); border-radius: 4px; padding: 2px; }
+.tlogo.plate-light { background: #F2F1EC; border-radius: 4px; padding: 2px; }
+.tlogo.ph { display: inline-grid; place-items: center; background: var(--bar); color: #fff; font: 800 7px/1 var(--display); letter-spacing: .02em; border-radius: 4px; box-shadow: inset 0 -2px 0 var(--apex); overflow: hidden; text-transform: uppercase; }
+.tlogo.ph.lg { font-size: 10px; } .tlogo.ph.xl { font-size: 17px; }
+:root[data-theme='dark'] .tlogo.ph { background: #2A2D35; }

@@ -81,10 +81,13 @@ const olink = (url, label) => `<a class="olink" href="${esc(url)}" target="_blan
 // 공식 팀 로고 (없으면 약칭 두 글자 상자). dark: 어두운 배경 위에 놓일 때
 const logo = (short, cls = '', dark) => {
   const lg = team(short)?.logo;
-  if (!lg) return `<span class="tlogo ph ${cls}" aria-hidden="true">${esc(String(short || '?').slice(0, 2))}</span>`;
   const d = dark ?? document.documentElement.dataset.theme === 'dark';
-  // 공식 API의 logoLight = 밝은(흰) 로고 → 어두운 배경용, logoDark = 어두운 로고 → 밝은 배경용
-  return `<img class="tlogo ${cls}" src="${esc(d ? lg[0] : lg[1])}" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
+  // 공식 로고: [0] logoLight = 흰 로고(어두운 배경용), [1] logoDark = 어두운 로고(밝은 배경용).
+  // 배경에 맞는 쪽이 없으면 다른 쪽을 반대색 판 위에 올려 보이게 한다. 둘 다 없으면 약칭 배지
+  if (!lg || (!lg[0] && !lg[1])) return `<span class="tlogo ph ${cls}" aria-hidden="true">${esc(String(short || '?').slice(0, 4))}</span>`;
+  const src = d ? lg[0] || lg[1] : lg[1] || lg[0];
+  const plate = d ? (lg[0] ? '' : ' plate-light') : (lg[1] ? '' : ' plate-dark');
+  return `<img class="tlogo ${cls}${plate}" src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span class=&quot;tlogo ph ${cls}&quot;>${esc(String(short || '?').slice(0, 4))}</span>'">`;
 };
 const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>` : esc(label || short));
 const now = () => Date.now();
