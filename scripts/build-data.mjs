@@ -54,7 +54,7 @@ for (const key of Object.keys(algs.pl).sort().reverse()) {
   for (const r of algs.pl[key]) ensureTeam(r[3], r[1], r[2], region);
 }
 
-// 팀 로고 (공식 API, [밝은 배경용, 어두운 배경용])
+// 팀 로고 (공식 API, [logoLight 흰 로고, logoDark 어두운 로고])
 for (const [id, lg] of Object.entries(algs.logos || {})) if (teams[id]) teams[id].logo = lg;
 
 // 로스터와 한국 판별

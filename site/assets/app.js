@@ -51,7 +51,8 @@ const logo = (short, cls = '', dark) => {
   const lg = team(short)?.logo;
   if (!lg) return `<span class="tlogo ph ${cls}" aria-hidden="true">${esc(String(short || '?').slice(0, 2))}</span>`;
   const d = dark ?? document.documentElement.dataset.theme === 'dark';
-  return `<img class="tlogo ${cls}" src="${esc(d ? lg[1] : lg[0])}" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
+  // 공식 API의 logoLight = 밝은(흰) 로고 → 어두운 배경용, logoDark = 어두운 로고 → 밝은 배경용
+  return `<img class="tlogo ${cls}" src="${esc(d ? lg[0] : lg[1])}" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
 };
 const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>` : esc(label || short));
 const now = () => Date.now();
