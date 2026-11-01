@@ -646,3 +646,19 @@ html, body { overflow-x: clip; }
 @media (min-width: 1500px) {
   body { background: radial-gradient(ellipse 70% 120% at 50% 0%, var(--paper) 60%, color-mix(in srgb, var(--paper) 82%, var(--bar)) 100%) fixed; }
 }
+
+/* CP 내역 */
+.cpb { display: grid; gap: 4px; padding: 6px 0; border-bottom: 1px dashed var(--rule); }
+.cpb:last-child { border-bottom: 0; }
+.cpb-n { font-weight: 700; }
+.cpb-n b { margin-left: 6px; }
+.cpb-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.cpb-i { font-size: 12px; padding: 2px 8px; background: var(--paper); border-radius: 3px; white-space: nowrap; }
+.cpb-i i { font-style: normal; color: var(--steel); margin-right: 2px; }
+.cpb-i.po { box-shadow: inset 2px 0 0 var(--apex); }
+.cpb-i.etc { opacity: .8; }
+.rank .mv { display: block; font: 600 10px/1 var(--body); color: var(--steel); }
+.ev-controls { flex-direction: column; align-items: flex-start; }
+.ev-seg a { font-size: 12.5px; }
+.cpb-i.pend { box-shadow: inset 2px 0 0 var(--apex), 0 0 0 1px var(--apex); } .cpb-i small { color: var(--apex); font-weight: 600; }
+.ringline svg { max-width: 680px; display: block; }

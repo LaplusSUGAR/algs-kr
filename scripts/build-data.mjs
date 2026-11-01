@@ -31,6 +31,7 @@ const ov = readJson('config/overrides.json', {});
 const season = readJson('config/season.json');
 
 const conflicts = [];
+const evByIdEarly = Object.fromEntries(algs.events.map(([id, , , , start]) => [id, { start }]));
 const CP_DIRECT = season.cpDirectSlots; // 32
 
 // ---------- 팀 ----------
@@ -110,6 +111,22 @@ for (const r of cpRows) {
   if (teams[r.id]) teams[r.id].cp = { rank: r.rank, total: r.total };
   r.kr = teams[r.id]?.krLevel || 'none';
 }
+
+// ---------- 대회별 챔피언십 포인트 ----------
+// 프로리그 4지역 × 2 Split + 플레이오프 2회. 순위가 아직 안 정해진 자리(진행 중 대회)는 id 없이 CP만 남긴다.
+const cpEvents = (algs.cpEvents || []).map(([id, slug, rows]) => {
+  const ev = evByIdEarly[id] || {};
+  const m = /^split-(\d)-(pro-league-(.+)|playoffs.*)$/.exec(slug) || [];
+  const split = Number(m[1]), isPl = !!m[3];
+  const region = isPl ? normRegion(m[3]) : 'global';
+  const short = isPl ? `S${split} PL ${({ 'apac-n': 'APAC-N', 'apac-s': 'APAC-S', emea: 'EMEA', americas: 'AMER' })[region] || ''}` : `S${split} PO`;
+  return {
+    id, slug, split, kind: isPl ? 'pl' : 'po', region, start: ev.start || '', short,
+    label: isPl ? `Split ${split} 프로리그 · ${REGION_LABEL[region]}` : `Split ${split} 플레이오프`,
+    rows: rows.map(([pos, cp, teamId, name, ps]) => ({ pos, cp, id: teamId, short: teamId ? teams[teamId]?.short || '' : '', name,
+      players: ps ? ps.split(';').map((x) => x.split('|')) : [], kr: teamId ? teams[teamId]?.krLevel || 'none' : 'none' })),
+  };
+}).sort((a, b) => a.start.localeCompare(b.start) || a.slug.localeCompare(b.slug));
 
 // ---------- Pro League 포인트 ----------
 const phaseQ = {};
@@ -219,10 +236,11 @@ const data = {
   season,
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
   teams: Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])),
-  cp: cpRows, pl, series, intl, kr, streams, cc, conflicts,
+  cp: cpRows, cpEvents, pl, series, intl, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
     cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
+    intlEventId: intlEv?.id || null,
     groupPhaseId: intlEv ? algs.events.find((e) => e[0] === intlEv.id)?.[6]?.[0]?.[0] || null : null,
   },
 };
