@@ -662,10 +662,10 @@ function cpBreak(pid, name, total, curShort) {
   const counted = countedEvents(base, total);
   const sum = base.reduce((a, x) => a + x.r.cp, 0);
   const items = h.map((x) => {
-    const { e, r } = x, pend = x === pendItem, excl = counted && !pend && !counted.has(x);
+    const { e, r } = x, pend = x === pendItem, nPlayed = played(e.id, pid), excl = nPlayed != null ? nPlayed < MIN_MATCHES : counted && !pend && !counted.has(x);
     const other = curShort && r.short && r.short !== curShort;
-    const tip = `${e.label} · ${r.name || r.short} ${r.pos}위${pend ? ' · 공식 합계에 아직 반영 안 됨' : ''}${excl ? ' · 팀 합계 제외 (그 대회에서 이 팀과 12경기 미만 출전 등)' : ''}${other ? ' · 다른 팀 소속 때 받은 CP (선수에게 귀속)' : ''}`;
-    return `<span class="cpb-i ${e.kind}${pend ? ' pend' : ''}${excl ? ' excl' : ''}" title="${esc(tip)}"><i>${esc(e.short)}${other ? ` · ${esc(r.short)}` : ''}</i> ${r.pos}위 <b>${pend ? '+' : ''}${fmt(r.cp)}</b>${pend ? ' <small>반영 대기</small>' : excl ? ' <small>합산 제외</small>' : ''}</span>`;
+    const tip = `${e.label} · ${r.name || r.short} ${r.pos}위${nPlayed != null ? ` · ${nPlayed}경기 출전` : ''}${pend ? ' · 공식 합계에 아직 반영 안 됨' : ''}${excl ? ` · CP 없음 (${MIN_MATCHES}경기 미만 출전)` : ''}${other ? ' · 다른 팀 소속 때 받은 CP (선수에게 귀속)' : ''}`;
+    return `<span class="cpb-i ${e.kind}${pend ? ' pend' : ''}${excl ? ' excl' : ''}" title="${esc(tip)}"><i>${esc(e.short)}${other ? ` · ${esc(r.short)}` : ''}</i> ${r.pos}위 <b>${pend ? '+' : ''}${fmt(r.cp)}</b>${pend ? ' <small>반영 대기</small>' : excl ? ` <small>${nPlayed != null ? nPlayed + '경기 · 제외' : '합산 제외'}</small>` : ''}</span>`;
   });
   if (total != null && !counted && total - sum > 0) items.push(`<span class="cpb-i etc" title="이 사이트가 모으지 않은 대회"><i>기타</i> <b>${fmt(total - sum)}</b></span>`);
   if (total != null && !counted && total - sum < 0) items.push(`<span class="cpb-i etc" title="일부 대회 CP가 팀 합계에서 빠졌지만 어느 대회인지 하나로 정할 수 없음"><i>합산 제외</i> <b>${fmt(total - sum)}</b></span>`);
@@ -683,7 +683,12 @@ function settle() {
 
 // 기본으로 보여줄 챔피언십 포인트 순위: 진행 중 국제전을 최소 보장으로 정산한 값.
 // state: live(대회 진행 중) · pending(대회 끝, 공식 합계 반영 대기) · confirmed(공식 합계와 대조 일치 → 공식 값으로 확정)
-// 선수 단위 정산. CP는 선수에게 귀속된다:
+// 그 대회에서 선수가 뛴 경기 수 (공식 게임 기록에서 셈). 기록이 없으면 null
+const MIN_MATCHES = 12;
+const played = (eventId, pid) => { const t = A.mc?.[eventId]; return t ? t[pid] || 0 : null; };
+const eligible = (eventId, pid) => { const n = played(eventId, pid); return n == null || n >= MIN_MATCHES; };
+
+// 선수 단위 정산. CP는 선수에게 귀속된다 (그 대회에서 12경기 이상 뛴 선수만 받음):
 //  - 이번 대회에 실제로 뛴 선수(공식 출전 로스터, 대체 선수 포함)만 그 팀 순위의 CP를 받는다
 //  - 비자 문제 등으로 빠진 선수(config cpSubs.out)는 받지 않는다
 //  - 대체 선수(cpSubs.in)는 출전 팀 순위의 CP를 받아 원래 소속팀(home) 합계에 들어간다
@@ -699,10 +704,11 @@ function settleRows(ST) {
   const credit = new Map(); // 선수ID → { min, max, team, pos }
   const give = (pid, c) => { if (pid) credit.set(pid, c); };
   const rosterOf = (short) => (A.poRosters?.[short] || []);
-  for (const r of ST.e.rows) if (r.id) for (const [pid, n] of r.players) if (!outOf.get(r.short)?.has(nk(n))) give(pid, { min: r.cp, max: r.cp, team: r.short, pos: r.pos });
+  for (const r of ST.e.rows) if (r.id) for (const [pid, n] of r.players) if (!outOf.get(r.short)?.has(nk(n)) && eligible(ST.e.id, pid)) give(pid, { min: r.cp, max: r.cp, team: r.short, pos: r.pos });
   for (const ir of A.intl?.rows || []) {
     if (!ST.alive(ir.id)) continue;
-    for (const [pid, n, role] of rosterOf(ir.short)) if (role !== 'k' && !outOf.get(ir.short)?.has(nk(n))) give(pid, { min: ST.minCp, max: ST.maxCp, team: ir.short });
+    // 결승이 남은 팀: 이미 12경기를 채운 선수는 최소 보장, 아직 못 채운 선수는 남은 경기를 다 뛰었을 때만(최대값) 받음
+    for (const [pid, n, role] of rosterOf(ir.short)) if (role !== 'k' && !outOf.get(ir.short)?.has(nk(n))) give(pid, { min: eligible(ST.e.id, pid) ? ST.minCp : 0, max: ST.maxCp, team: ir.short, short12: !eligible(ST.e.id, pid) });
   }
   // 대체 선수: 공식 로스터에서 코치 등으로 잘못 들어가 있어도 운영자 명단대로 CP를 준다
   const homeExtra = new Map();
@@ -714,8 +720,8 @@ function settleRows(ST) {
       const pid = rosterOf(sb.team).find(([, n]) => nk(n) === nk(x.name))?.[0] || pidOf(x.name);
       if (!pid) continue;
       subIn.add(pid);
-      if (placed) give(pid, { min: placed.cp, max: placed.cp, team: sb.team, pos: placed.pos });
-      else if (alive) give(pid, { min: ST.minCp, max: ST.maxCp, team: sb.team });
+      if (placed) { if (eligible(ST.e.id, pid)) give(pid, { min: placed.cp, max: placed.cp, team: sb.team, pos: placed.pos }); }
+      else if (alive) give(pid, { min: eligible(ST.e.id, pid) ? ST.minCp : 0, max: ST.maxCp, team: sb.team, short12: !eligible(ST.e.id, pid) });
       if (x.home) { if (!homeExtra.has(x.home)) homeExtra.set(x.home, []); homeExtra.get(x.home).push({ pid, name: x.name, team: sb.team }); }
     }
     for (const n of sb.out || []) { const pid = pidOf(n); if (pid && credit.get(pid)?.team === sb.team) credit.delete(pid); }
@@ -723,7 +729,7 @@ function settleRows(ST) {
   // 선수의 이번 대회 전 CP: 공식 값이 있으면 그 값(이번 대회가 이미 들어갔으면 뺌), 없으면 대회 기록 합
   const base = (pid, official) => {
     const h = cpHistory(pid), live = h.find((x) => x.e.id === ST.e.id);
-    if (official == null) return h.filter((x) => x !== live).reduce((a, x) => a + x.r.cp, 0);
+    if (official == null) return h.filter((x) => x !== live && eligible(x.e.id, pid)).reduce((a, x) => a + x.r.cp, 0);
     const ic = intlCounted(pid, official);
     return official - (live && ic.counted ? live.r.cp : 0);
   };
@@ -815,7 +821,7 @@ function cpView(q) {
     let rows = BD.rows.filter((r) => (region === 'all' || r.region === region) && (!opt.krOnly || r.kr !== 'none'));
     table = `    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r opt">대회 전</th><th class="r opt2">${esc(ST.e.short)}</th><th class="r">${BD.state === 'live' ? '정산 (최소 보장)' : '정산'}</th><th class="r opt">최대</th></tr></thead><tbody>
       ${rows.map((r, ri) => { const isCut = region === 'all' && !opt.krOnly && r.prank === cut; return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="st-${ri}" tabindex="0" aria-expanded="false"><td class="rank">${r.prank}<small class="mv">${r.prank < r.rank ? '▲' + (r.rank - r.prank) : r.prank > r.rank ? '▼' + (r.prank - r.rank) : ''}</small></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}<small class="sm-only">${r.alive ? `${esc(ST.e.short)} 진행 중 · 최소 +${fmt(r.gain)}` : r.donePos ? `${esc(ST.e.short)} ${r.donePos}위${r.gain > 0 ? ` +${fmt(r.gain)}` : ''}` : r.gain ? `대체 출전 +${fmt(r.gain)}` : ''}${r.notes.length ? `<br>${r.notes.map(esc).join('<br>')}` : ''}</small></td><td class="r opt num">${fmt(r.total)}</td><td class="r small opt2">${r.alive ? `<span class="tag live">진행 중</span> 최소 +${fmt(r.gain)}` : r.donePos ? `${r.donePos}위${r.gain > 0 ? ` <span class="muted">+${fmt(r.gain)}</span>` : ''}` : r.gain ? `<span class="muted">+${fmt(r.gain)}</span>` : '<span class="muted">미출전</span>'}${r.notes.length ? `<small class="sub-note">${r.notes.map(esc).join('<br>')}</small>` : ''}</td><td class="r num"><b>${fmt(r.min)}</b></td><td class="r opt num muted">${fmt(r.max)}</td></tr>
-        <tr class="detail" id="st-${ri}" hidden><td></td><td colspan="5"><div class="st-parts"><b>합산 선수 (상위 3인)</b> ${(r.parts || []).map((v) => `<span class="cpb-i"><i>${esc(v.n)}</i> <b>${fmt(v.min)}</b>${v.got ? ` <small>이번 ${v.got.pos ? v.got.pos + '위' : '최소'} +${fmt(v.got.min)}</small>` : ''}</span>`).join('')}${r.others?.length ? `<br><span class="muted">그 밖: ${r.others.map((v) => `${esc(v.n)} ${fmt(v.min)}`).join(', ')}</span>` : ''}</div></td></tr>${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 최소 보장 기준 챔피언십 직행권</td></tr>` : ''}`; }).join('')}
+        <tr class="detail" id="st-${ri}" hidden><td></td><td colspan="5"><div class="st-parts"><b>합산 선수 (상위 3인)</b> ${(r.parts || []).map((v) => `<span class="cpb-i"><i>${esc(v.n)}</i> <b>${fmt(v.min)}</b>${v.got ? ` <small>이번 ${v.got.pos ? v.got.pos + '위' : '최소'} +${fmt(v.got.min)}${v.got.short12 ? ' (12경기 미달)' : ''}</small>` : ''}</span>`).join('')}${r.others?.length ? `<br><span class="muted">그 밖: ${r.others.map((v) => `${esc(v.n)} ${fmt(v.min)}`).join(', ')}</span>` : ''}</div></td></tr>${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 최소 보장 기준 챔피언십 직행권</td></tr>` : ''}`; }).join('')}
     </tbody></table></div>
     <p class="lead">팀 CP는 상위 3인 합이라, 결승 진출 팀은 '1인 최저 CP × 3'을 더했습니다. '최대'는 우승했을 때입니다.</p>`;
   } else if (mode === 'teams') {
