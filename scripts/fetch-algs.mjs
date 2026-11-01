@@ -54,7 +54,20 @@ async function main() {
   // 챔피언십 포인트 (공식 페이지와 같은 파라미터: 현재 Split Pro League 이벤트, 최소 12경기)
   const lastPl = plEvents.filter(({ e }) => e.slug.startsWith('split-2-')).map(({ e }) => e.id);
   const cpRes = await get(`/seasons/${season.id}/standings/teams?eventIds=${encodeURIComponent(lastPl.join(','))}&minAmountOfMatches=12`);
-  const cp = cpRes.standings.map((s) => [s.rank, s.teamId, s.teamName, s.shortName, s.region, s.totalPoints, s.players.map((p) => [p.name.trim(), p.points])]);
+  const cp = cpRes.standings.map((s) => [s.rank, s.teamId, s.teamName, s.shortName, s.region, s.totalPoints, s.players.map((p) => [p.name.trim(), p.points, p.id])]);
+
+  // 챔피언십 포인트를 주는 대회별 결과: 누가 어느 대회에서 몇 CP를 받았는지
+  //   cpEvents: [[eventId, slug, rows[[순위, 1인당CP, teamId, 팀이름, "선수ID|이름;..."(코치 제외)]]]]  아직 정해지지 않은 순위는 teamId null
+  const cpEvents = [];
+  for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /^split-\d-(pro-league-|playoffs)/.test(x.slug))) {
+    if (new Date(e.startDate) > new Date()) continue;
+    try {
+      const st = await get(`/events/${e.id}/standings`);
+      const rows = (st.standings || []).filter((r) => r.points != null).map((r) => [r.position, r.points, r.teamId || null, r.name || null,
+        (r.players || []).filter((p) => p.role !== 'coach').map((p) => `${p.id}|${p.name.trim()}`).join(';')]);
+      if (rows.length) cpEvents.push([e.id, e.slug, rows]);
+    } catch {}
+  }
 
   // 시리즈: Playoffs, LCQ, 최근 APAC North Pro League
   const allSeries = (await get(`/series/seasons/${season.id}`)).series || [];
@@ -124,7 +137,7 @@ async function main() {
     for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
   } catch {}
 
-  const next = { seasonId: season.id, events, cp, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
+  const next = { seasonId: season.id, events, cp, cpEvents, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
   // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
   const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
