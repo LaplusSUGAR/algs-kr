@@ -688,6 +688,14 @@ const MIN_MATCHES = 12;
 const played = (eventId, pid) => { const t = A.mc?.[eventId]; return t ? t[pid] || 0 : null; };
 const eligible = (eventId, pid) => { const n = played(eventId, pid); return n == null || n >= MIN_MATCHES; };
 
+// 이번 스플릿 프로리그에서 그 팀으로 뛴 경기 수
+function splitGames(pid, short) {
+  const sp = Math.max(...(A.cpEvents || []).filter((e) => e.kind === 'pl').map((e) => e.split));
+  let n = 0;
+  for (const e of A.cpEvents || []) if (e.kind === 'pl' && e.split === sp) for (const r of e.rows) if (r.short === short && r.players.some(([id]) => id === pid)) n += played(e.id, pid) ?? MIN_MATCHES;
+  return n;
+}
+
 // 선수 단위 정산. CP는 선수에게 귀속된다 (그 대회에서 12경기 이상 뛴 선수만 받음):
 //  - 이번 대회에 실제로 뛴 선수(공식 출전 로스터, 대체 선수 포함)만 그 팀 순위의 CP를 받는다
 //  - 비자 문제 등으로 빠진 선수(config cpSubs.out)는 받지 않는다
@@ -743,6 +751,8 @@ function settleRows(ST) {
     if (subTeams.has(r.short)) for (const p of team(r.short)?.roster || []) {
       if (p.r === 'k') continue;
       const pid = pidOf(p.n);
+      // 공식 팀 CP 규정: 이번 스플릿 프로리그에서 이 팀으로 12경기 이상 뛴 선수만 팀 CP에 들어감 (결장 선수도 같은 기준)
+      if (pid && splitGames(pid, r.short) < MIN_MATCHES) continue;
       if (pid && !cands.has(pid) && !subIn.has(pid)) cands.set(pid, { n: p.n, off: null, hist: true });
     }
     // 이 팀 소속으로 이번 대회 CP를 받은 선수(정규 로스터가 그대로 출전) + 다른 팀에 대체로 나간 소속 선수
