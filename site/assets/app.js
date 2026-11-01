@@ -771,8 +771,31 @@ function settleRows(ST) {
   });
 }
 
+// 운영자 로스터 보정 (config cpRosterAdd): 공식 현재 로스터에서 빠진 선수를 팀 CP에 넣고 순위를 다시 매김.
+// 공식 값이 60초마다 새로 들어오면 다시 적용된다
+function applyCpRoster() {
+  const add = A.cpRosterAdd || {};
+  if (A.cp.__adj || !Object.keys(add).length) return;
+  for (const [short, names] of Object.entries(add)) {
+    const r = A.cp.find((x) => x.short === short);
+    if (!r) continue;
+    for (const n of names) {
+      const pid = pidOf(n);
+      if (!pid || r.players.some((p) => p[2] === pid)) continue;
+      const v = cpHistory(pid).filter((x) => eligible(x.e.id, pid)).reduce((a, x) => a + x.r.cp, 0);
+      r.players.push([n, v, pid, 'add']);
+    }
+    r.total = r.players.map((p) => p[1]).sort((a, b) => b - a).slice(0, 3).reduce((a, x) => a + x, 0);
+    r.added = true;
+  }
+  A.cp.sort((a, b) => b.total - a.total);
+  A.cp.forEach((r, i) => (r.rank = i + 1));
+  A.cp.__adj = true;
+}
+
 let BOARD = null;
 function board() {
+  applyCpRoster();
   if (BOARD && BOARD.cp === A.cp && BOARD.ev === A.cpEvents && BOARD.subs === A.cpSubs) return BOARD;
   const ST = settle();
   const cut = A.season.cpDirectSlots;
