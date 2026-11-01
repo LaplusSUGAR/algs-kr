@@ -76,6 +76,7 @@ function render() {
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
   document.querySelectorAll('.tabbar a').forEach((a) => { if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  board();
   const view = { home, schedule, standings, points, teams, streams, rules }[tab] || home;
   app.innerHTML = subtabs(tab, parts, q) + view(parts, q);
   bind();
@@ -338,7 +339,7 @@ function ringLine(krs) {
       <line x1="${x(cut) + 0.5}" y1="${y - 10}" x2="${x(cut) + 0.5}" y2="${y + 10}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 2"/>
       ${ticks}${marks}
     </svg>
-    <p class="caption">챔피언십 포인트 ${N}팀 중 위치. 굵은 선 안쪽(${cut}위까지)이 챔피언십 직행이며, 지금 진행 중인 대회 결과가 들어가기 전 값입니다.</p>
+    <p class="caption">챔피언십 포인트 ${N}팀 중 위치 (${board().state === 'live' ? '실시간 정산' : board().state === 'pending' ? '최종 순위 정산' : '공식'} 기준). 굵은 선 안쪽(${cut}위까지)이 챔피언십 직행입니다.</p>
   </section>`;
 }
 
@@ -514,11 +515,45 @@ function settle() {
   const e = (A.cpEvents || []).find((x) => x.id === A.api?.intlEventId);
   if (!e) return null;
   const open = e.rows.filter((r) => !r.id);
-  if (!open.length) return null;
   const placed = new Map(e.rows.filter((r) => r.id).map((r) => [r.id, r]));
   const field = new Set((A.intl?.rows || []).map((r) => r.id));
-  return { e, open: open.length, minCp: Math.min(...open.map((r) => r.cp)), maxCp: Math.max(...open.map((r) => r.cp)), placed, alive: (id) => field.has(id) && !placed.has(id) };
+  return { e, open: open.length, minCp: open.length ? Math.min(...open.map((r) => r.cp)) : 0, maxCp: open.length ? Math.max(...open.map((r) => r.cp)) : 0, placed, alive: (id) => open.length > 0 && field.has(id) && !placed.has(id) };
 }
+
+// 기본으로 보여줄 챔피언십 포인트 순위: 진행 중 국제전을 최소 보장으로 정산한 값.
+// state: live(대회 진행 중) · pending(대회 끝, 공식 합계 반영 대기) · confirmed(공식 합계와 대조 일치 → 공식 값으로 확정)
+let BOARD = null;
+function board() {
+  if (BOARD && BOARD.cp === A.cp && BOARD.ev === A.cpEvents) return BOARD;
+  const ST = settle();
+  const cut = A.season.cpDirectSlots;
+  const rows = A.cp.map((r) => {
+    if (!ST) return { ...r, alive: false, pend: false, done: 0, min: r.total, max: r.total };
+    const alive = ST.alive(r.id), pl = ST.placed.get(r.id);
+    // 선수별: 순위가 정해졌는데 공식 합계에 아직 없으면 그 CP를 더하고, 진행 중이면 남은 순위의 최저·최고 CP를 더한다 (팀 CP = 상위 3인 합)
+    let add = 0, pend = false;
+    for (const [, p, id] of r.players) {
+      const ic = intlCounted(id, p);
+      if (pl && ic.live && !ic.counted) { add += ic.live.r.cp; pend = true; }
+    }
+    return { ...r, alive, pend, done: pl ? pl.cp * 3 : 0, donePos: pl?.pos, min: r.total + add + (alive ? ST.minCp * 3 : 0), max: r.total + add + (alive ? ST.maxCp * 3 : 0) };
+  }).sort((a, b) => b.min - a.min || b.total - a.total);
+  rows.forEach((r, i) => (r.prank = i + 1));
+  const c32 = rows.at(cut - 1)?.min ?? 0, c33 = rows.at(cut)?.min ?? 0;
+  for (const r of rows) { r.pstatus = r.prank <= cut ? 'direct' : 'lcq'; r.pgap = r.prank <= cut ? r.min - c33 : c32 - r.min; }
+  const state = !ST ? 'none' : ST.open ? 'live' : rows.some((r) => r.pend) ? 'pending' : 'confirmed';
+  BOARD = { cp: A.cp, ev: A.cpEvents, ST, rows, state, pendTeams: rows.filter((r) => r.pend).length };
+  // 화면 곳곳(홈 카드, 한국 팀 카드, 팀 목록, 위치 그림)의 CP 순위도 이 값으로 맞춘다
+  for (const k of A.kr || []) { const x = rows.find((y) => y.short === k.short); if (x) k.cp = { rank: x.prank, total: x.min, gap: x.pgap, status: x.pstatus, off: { rank: x.rank, total: x.total } }; }
+  for (const t of Object.values(A.teams)) { const x = rows.find((y) => y.id === t.id); if (x) t.cp = { rank: x.prank, total: x.min }; }
+  return BOARD;
+}
+const BOARD_NOTE = {
+  live: (b) => `<b>실시간 정산</b> ${esc(b.ST.e.label)} 진행 중 · 순위가 정해진 팀은 그 CP를, 결승 진출 팀은 최소 보장 CP(1인 ${fmt(b.ST.minCp)})를 더한 값입니다. 대회가 끝나고 공식 합계가 반영되면 한 번 대조해 확정합니다.`,
+  pending: (b) => `<b>공식 반영 대기</b> ${esc(b.ST.e.label)} 종료 · 최종 순위로 정산한 값입니다. 공식 합계에 아직 반영되지 않은 팀이 ${b.pendTeams}팀 있으며, 반영되면 대조해 확정합니다.`,
+  confirmed: (b) => `<b>공식 확정</b> ${esc(b.ST.e.label)} 결과가 공식 합계와 대조해 일치합니다. 지금 보이는 값이 공식 값입니다.`,
+};
+const boardNote = () => { const b = board(); return BOARD_NOTE[b.state] ? `<p class="board-note ${b.state}">${BOARD_NOTE[b.state](b)}</p>` : ''; };
 
 function cpView(q) {
   const mode = q.get('m') === 'players' ? 'players' : 'teams';
@@ -527,32 +562,20 @@ function cpView(q) {
   const krNames = new Set(Object.values(A.teams).flatMap((t) => t.krPlayers || []));
   const regionSeg = `<div class="seg" role="group" aria-label="지역">${['all', 'apac-n', 'apac-s', 'emea', 'americas'].map((r) => `<a href="${qsLink('/points/cp', q, { r })}" aria-current="${region === r}">${r === 'all' ? '전체' : REGION[r]}</a>`).join('')}</div>`;
   const modeSeg = `<div class="seg" role="group" aria-label="단위"><a href="${qsLink('/points/cp', q, { m: 'teams' })}" aria-current="${mode === 'teams'}">팀</a><a href="${qsLink('/points/cp', q, { m: 'players' })}" aria-current="${mode === 'players'}">선수</a></div>`;
-  const krSummary = (A.kr || []).filter((k) => k.cp).map((k) => `<tr class="${rowCls({ kr: k.level, short: k.short })}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}${coachBadge(k.level, k.short)}</td><td class="r num">${fmt(k.cp.total)}</td><td class="r small">${k.cp.status === 'direct' ? `<span class="tag ok">직행권</span> 33위와 +${fmt(k.cp.gap)}` : `32위까지 −${fmt(k.cp.gap)}`}</td></tr>`).join('');
+  const krSummary = (A.kr || []).filter((k) => k.cp).map((k0) => ({ ...k0, cp: q.get('v') === 'now' && k0.cp.off ? { ...k0.cp, ...k0.cp.off } : k0.cp })).sort((a, b) => a.cp.rank - b.cp.rank).map((k) => `<tr class="${rowCls({ kr: k.level, short: k.short })}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}${coachBadge(k.level, k.short)}</td><td class="r num">${fmt(k.cp.total)}</td><td class="r small opt">${k.cp.status === 'direct' ? `<span class="tag ok">직행권</span> 33위와 +${fmt(k.cp.gap)}` : `32위까지 −${fmt(k.cp.gap)}`}</td></tr>`).join('');
 
-  const ST = settle();
-  const view = ST && q.get('v') === 'min' ? 'min' : 'now';
-  const viewSeg = ST ? `<div class="seg" role="group" aria-label="기준"><a href="${qsLink('/points/cp', q, { v: 'now' })}" aria-current="${view === 'now'}">공식 현재</a><a href="${qsLink('/points/cp', q, { v: 'min', m: 'teams' })}" aria-current="${view === 'min'}">${esc(ST.e.short)} 최소 보장 정산</a></div>` : '';
+  const BD = board(), ST = BD.ST;
+  const settling = BD.state === 'live' || BD.state === 'pending';
+  // 기본은 정산값. 대회가 끝나 공식 합계와 대조가 끝나면(confirmed) 공식 값을 그대로 보여 줌
+  const view = settling && q.get('v') !== 'now' ? 'min' : 'now';
+  const viewSeg = settling ? `<div class="seg" role="group" aria-label="기준"><a href="${qsLink('/points/cp', q, { v: 'min', m: 'teams' })}" aria-current="${view === 'min'}">실시간 정산</a><a href="${qsLink('/points/cp', q, { v: 'now' })}" aria-current="${view === 'now'}">공식 현재 (대조용)</a></div>` : '';
   let table;
   if (view === 'min') {
-    // 남은 팀: 상위 3인이 모두 최소 CP를 받는다고 보고 3배를 더함 (팀 CP = 상위 3인 합)
-    let rows = A.cp.map((r) => {
-      const alive = ST.alive(r.id), pl = ST.placed.get(r.id);
-      // 선수별: 공식 합계에 이번 대회가 아직 없으면 확정 CP를 더하고, 진행 중이면 최저·최고 CP를 더한다
-      let add = 0, pend = false;
-      for (const [, p, id] of r.players) {
-        const ic = intlCounted(id, p);
-        if (pl && ic.live && !ic.counted) { add += ic.live.r.cp; pend = true; }
-      }
-      const done = pl ? pl.cp * 3 : 0;
-      return { ...r, alive, pend, done, donePos: pl?.pos, min: r.total + add + (alive ? ST.minCp * 3 : 0), max: r.total + add + (alive ? ST.maxCp * 3 : 0) };
-    }).sort((a, b) => b.min - a.min || b.total - a.total);
-    rows.forEach((r, i) => (r.prank = i + 1));
-    rows = rows.filter((r) => (region === 'all' || r.region === region) && (!opt.krOnly || r.kr !== 'none'));
-    table = `<p class="lead">${esc(ST.e.label)}: ${40 - ST.open}팀 순위 확정, ${ST.open}팀 진행 중. 순위가 정해졌는데 공식 합계에 아직 안 들어간 팀은 그 CP를 더했고, 진행 중인 팀은 남은 순위의 최저 CP(1인 ${fmt(ST.minCp)})를 받는 것으로 계산했습니다. 우승하면 1인 ${fmt(ST.maxCp)}입니다.</p>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r opt">공식 현재</th><th class="r">${esc(ST.e.short)}</th><th class="r">최소 보장</th><th class="r opt">최대</th></tr></thead><tbody>
-      ${rows.map((r) => { const isCut = region === 'all' && !opt.krOnly && r.prank === cut; return `<tr class="${rowCls(r)} ${isCut ? 'cut' : ''}"><td class="rank">${r.prank}<small class="mv">${r.prank < r.rank ? '▲' + (r.rank - r.prank) : r.prank > r.rank ? '▼' + (r.prank - r.rank) : ''}</small></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}</td><td class="r opt num">${fmt(r.total)}</td><td class="r small">${r.alive ? `<span class="tag live">진행 중</span> +${fmt(ST.minCp * 3)}~` : r.donePos ? `${r.donePos}위 확정 <span class="muted">+${fmt(r.done)}${r.pend ? ' 정산' : ' 반영됨'}</span>` : '<span class="muted">미출전</span>'}</td><td class="r num"><b>${fmt(r.min)}</b></td><td class="r opt num muted">${fmt(r.max)}</td></tr>${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 최소 보장 기준 챔피언십 직행권</td></tr>` : ''}`; }).join('')}
+    let rows = BD.rows.filter((r) => (region === 'all' || r.region === region) && (!opt.krOnly || r.kr !== 'none'));
+    table = `    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r opt">공식 현재</th><th class="r opt2">${esc(ST.e.short)}</th><th class="r">${BD.state === 'live' ? '정산 (최소 보장)' : '정산'}</th><th class="r opt">최대</th></tr></thead><tbody>
+      ${rows.map((r) => { const isCut = region === 'all' && !opt.krOnly && r.prank === cut; return `<tr class="${rowCls(r)} ${isCut ? 'cut' : ''}"><td class="rank">${r.prank}<small class="mv">${r.prank < r.rank ? '▲' + (r.rank - r.prank) : r.prank > r.rank ? '▼' + (r.prank - r.rank) : ''}</small></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}<small class="sm-only">${r.alive ? `${esc(ST.e.short)} 진행 중 · 최소 +${fmt(ST.minCp * 3)}` : r.donePos ? `${esc(ST.e.short)} ${r.donePos}위 +${fmt(r.done)}` : ''}</small></td><td class="r opt num">${fmt(r.total)}</td><td class="r small opt2">${r.alive ? `<span class="tag live">진행 중</span> +${fmt(ST.minCp * 3)}~` : r.donePos ? `${r.donePos}위 확정 <span class="muted">+${fmt(r.done)}${r.pend ? ' 정산' : ' 반영됨'}</span>` : '<span class="muted">미출전</span>'}</td><td class="r num"><b>${fmt(r.min)}</b></td><td class="r opt num muted">${fmt(r.max)}</td></tr>${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 최소 보장 기준 챔피언십 직행권</td></tr>` : ''}`; }).join('')}
     </tbody></table></div>
-    <p class="lead">팀 CP는 상위 3인 합이라, 결승 진출 팀은 '1인 최저 CP × 3'을 더했습니다. 공식 값은 대회가 끝나면 '공식 현재'에 반영됩니다.</p>`;
+    <p class="lead">팀 CP는 상위 3인 합이라, 결승 진출 팀은 '1인 최저 CP × 3'을 더했습니다. '최대'는 우승했을 때입니다. 공식 값은 '공식 현재 (대조용)'에서 볼 수 있습니다.</p>`;
   } else if (mode === 'teams') {
     let rows = A.cp.filter((r) => region === 'all' || r.region === region);
     if (opt.krOnly) rows = rows.filter((r) => r.kr !== 'none');
@@ -572,7 +595,7 @@ function cpView(q) {
         <tr class="detail" id="cpp-${i}" hidden><td></td><td colspan="3">${cpBreak(x.id, x.n, x.p)}</td></tr>`).join('')}
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
-  return `${ringLine(A.kr || [])}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
+  return `${boardNote()}${view === 'now' && settling ? '<p class="board-note now">공식 현재 값입니다. 진행 중이거나 막 끝난 대회 결과가 일부 빠져 있을 수 있어, 순위 판단은 실시간 정산을 기준으로 하세요.</p>' : ''}${ringLine(A.kr || [])}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
     <div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">한국 관련 팀</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
