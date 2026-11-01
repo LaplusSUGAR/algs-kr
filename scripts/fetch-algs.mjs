@@ -92,6 +92,14 @@ async function main() {
   const intlEvent = season.tournaments.flatMap((t) => t.events).filter((e) => /playoffs|champs/.test(e.slug) && e.phases.length)
     .sort((a, b) => b.startDate.localeCompare(a.startDate)).find((e) => new Date(e.startDate) <= new Date());
   let poGroup = [];
+  // 국제전 출전 로스터 (대체 선수 포함, 비자 문제 등으로 바뀐 실제 명단): { teamId: [[선수ID, 이름, 역할]] }
+  const poRosters = {};
+  if (intlEvent) {
+    try {
+      const pt = await get(`/phases/${intlEvent.phases[0].id}/teams`);
+      for (const tm of pt.teams || []) poRosters[tm.teamId] = tm.players.map((p) => [p.id, p.name.trim(), roleCode(p.role)]);
+    } catch {}
+  }
   if (intlEvent) {
     const gs = await get(`/stats/phases/${intlEvent.phases[0].id}/standings`);
     poGroup = (gs.standings || []).map((s) => [s.position, s.shortName, s.name, s.teamId, s.group, s.points, s.kills, s.region]);
@@ -137,7 +145,7 @@ async function main() {
     for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
   } catch {}
 
-  const next = { seasonId: season.id, events, cp, cpEvents, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
+  const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
   // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
   const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
