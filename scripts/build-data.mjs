@@ -54,6 +54,9 @@ for (const key of Object.keys(algs.pl).sort().reverse()) {
   for (const r of algs.pl[key]) ensureTeam(r[3], r[1], r[2], region);
 }
 
+// 팀 로고 (공식 API, [밝은 배경용, 어두운 배경용])
+for (const [id, lg] of Object.entries(algs.logos || {})) if (teams[id]) teams[id].logo = lg;
+
 // 로스터와 한국 판별
 // config/players.json: 선수별 수동 보정. role(coach/player)로 역할을 고치고, heritage: "KR"로 한국계(혼혈·이중국적 등)를 표시한다.
 const playerCfg = readJson('config/players.json', { players: {} }).players || {};

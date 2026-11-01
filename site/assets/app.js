@@ -46,7 +46,14 @@ const LP_SEASON = 'https://liquipedia.net/apexlegends/ALGS/2026-27';
 // 공식 경기 페이지가 있는 이벤트(슬러그가 사람이 읽는 이름)는 algs.ea.com, 없으면(LCQ 등) Liquipedia 시즌 페이지
 const officialUrl = (s) => (/^[a-z][a-z0-9-]+$/.test(s.eventSlug || '') && s.eventSlug !== 'last-chance-qualifier' ? `https://algs.ea.com/en/year-6/${s.eventSlug}/match/${s.id}` : LP_SEASON);
 const olink = (url, label) => `<a class="olink" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
-const teamLink = (short, label) => (team(short) ? `<a href="#/teams/${encodeURIComponent(short)}">${esc(label || short)}</a>` : esc(label || short));
+// 공식 팀 로고 (없으면 약칭 두 글자 상자). dark: 어두운 배경 위에 놓일 때
+const logo = (short, cls = '', dark) => {
+  const lg = team(short)?.logo;
+  if (!lg) return `<span class="tlogo ph ${cls}" aria-hidden="true">${esc(String(short || '?').slice(0, 2))}</span>`;
+  const d = dark ?? document.documentElement.dataset.theme === 'dark';
+  return `<img class="tlogo ${cls}" src="${esc(d ? lg[1] : lg[0])}" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
+};
+const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>` : esc(label || short));
 const now = () => Date.now();
 function until(iso) {
   const ms = new Date(iso) - now();
@@ -69,8 +76,24 @@ function render() {
   const tab = parts[0] || 'home';
   document.querySelectorAll('.tabbar a').forEach((a) => { if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   const view = { home, schedule, standings, points, teams, streams, rules }[tab] || home;
-  app.innerHTML = view(parts, q);
+  app.innerHTML = subtabs(tab, parts, q) + view(parts, q);
   bind();
+}
+
+/* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
+// [이름, 주소, 지금 보고 있는지]
+function subtabs(tab, parts, q) {
+  const g = q.get('g') || 'all', sv = q.get('s') || 'all';
+  const SUB = {
+    schedule: [['예정 경기', qsLink('/schedule', q, { view: 'upcoming' }), q.get('view') !== 'results'], ['지난 결과', qsLink('/schedule', q, { view: 'results' }), q.get('view') === 'results']],
+    standings: A.intl ? [['브래킷', '#/standings', parts[1] !== 'group'], ['조별 리그', '#/standings/group', parts[1] === 'group']] : null,
+    points: [['챔피언십 포인트', '#/points/cp', parts[1] !== 'pl'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
+    teams: [['전체', '#/teams', !parts[1] && g === 'all'], ['한국 관련', '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r])],
+    streams: [['전체', '#/streams', sv === 'all'], ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
+    rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
+  }[tab];
+  if (!SUB) return '';
+  return `<nav class="subtabs" aria-label="세부 메뉴"><div class="subtabs-in">${SUB.map(([n, h, on]) => `<a href="${h}"${on ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('')}</div></nav>`;
 }
 
 /* ---------- 국제전 브래킷 (Playoffs·Championship 공통 형식) ---------- */
@@ -159,7 +182,7 @@ function bracketFlow(B) {
       <text x="${x + 12}" y="${y + 21}" class="bf-title">${esc(st.ko)}</text>
       <text x="${x + 12}" y="${y + 38}" class="bf-state">${esc(stageState(st))}</text>
       <text x="${x + 12}" y="${y + 53}" class="bf-sub">${st.n}팀${when ? ' · ' + when : ''}</text>
-      <text x="${x + W - 12}" y="${y + 21}" text-anchor="end" class="bf-sub2">${ks.length ? '' : st.teams?.length ? '한국 관련 없음' : '팀 미정'}</text>
+      ${ks.length ? '' : `<text x="${x + 12}" y="${y + 79}" class="bf-sub2">${st.teams?.length ? '한국 관련 팀 없음' : '출전 팀 미정'}</text>`}
       ${chips}</a>`;
   };
   return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
@@ -175,32 +198,57 @@ function home() {
   const upcoming = A.series.filter((s) => s.status !== 'completed').sort((a, b) => a.start.localeCompare(b.start));
   const B = bracket();
   const showFlow = B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
-  const upList = `<div class="up-list">${upcoming.slice(0, showFlow ? 3 : 4).map(matchItem).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
+  const upList = `<div class="up-list">${upcoming.slice(0, 3).map(matchItem).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   return `${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
-      <div class="sec-head"><h2 class="h2" id="h-up">다가오는 경기 · ${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/schedule">경기 전체</a></div>
-      <div class="flow-grid"><div>${bracketFlow(B)}</div>${upList}</div>
+      <div class="sec-head"><h2 class="h2" id="h-up">${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/standings">전체 순위</a></div>
+      <div class="flow-grid"><div>${bracketFlow(B)}</div><div><h3 class="h3 up-h">다가오는 경기</h3>${upList}<a class="more" href="#/schedule">경기 전체</a></div></div>
     </section>` : ''}
     <div class="home-grid"><div class="col-a">
     ${lead ? heroCard(lead) : '<p class="empty">현재 시즌에 한국 팀 데이터가 없습니다.</p>'}
-    ${ringLine(krs)}
-    ${others.length ? `<section class="sec" aria-labelledby="h-kr2">
-      <div class="sec-head"><h2 class="h2" id="h-kr2">한국 선수·코치가 있는 팀</h2></div>
-      <div class="kr-list">${others.map(krRow).join('')}</div>
-      ${krLegend()}
-    </section>` : ''}
+    ${others.length ? krStrip(others) : ''}
     </div><div class="col-b">
     ${A.intl ? `<section class="sec" aria-labelledby="h-now">
-      <div class="sec-head"><h2 class="h2" id="h-now">${esc(ko(A.intl.name, EVENT_KO))}</h2><a class="more" href="#/standings">전체 순위</a></div>
+      <div class="sec-head"><h2 class="h2" id="h-now">지금 순위</h2><a class="more" href="#/standings">자세히 보기</a></div>
       ${B?.started ? stageMini(B) : intlMini()}
     </section>` : ''}
     ${showFlow ? '' : `<section class="sec" aria-labelledby="h-up">
       <div class="sec-head"><h2 class="h2" id="h-up">다가오는 경기</h2><a class="more" href="#/schedule">경기 전체</a></div>
       ${upList}
     </section>`}
-    <section class="sec" aria-labelledby="h-season">
-      <div class="sec-head"><h2 class="h2" id="h-season">${esc(A.season.name)} 일정</h2></div>
-      ${seasonTimeline()}
-    </section></div></div>`;
+    ${seasonNext()}
+    </div></div>`;
+}
+
+// 한국 선수·코치 팀: 홈에서는 작은 칩으로만, 자세한 내용은 팀 탭 '한국 관련'
+const STAGE_SHORT = { gs: '조별', wr: '승자R', er1: '패자1R', er2: '패자2R', f: '결승' };
+function stageShort(short) {
+  const B = A.intl ? bracket() : null;
+  const cp = (A.kr || []).find((k) => k.short === short)?.cp;
+  if (!B) return cp ? `CP ${cp.rank}위` : '';
+  let last = null;
+  for (const st of B.list.slice(1)) if (st.teams?.includes(short)) last = st;
+  if (!last) { const g = A.intl.rows.find((r) => r.short === short); return g ? `조별 ${g.pos}위` : cp ? `CP ${cp.rank}위` : '미출전'; }
+  const r = last.s?.results?.find((x) => x.short === short);
+  if (last.status === 'completed' && r) return `${STAGE_SHORT[last.key]} ${r.pos}위${last.key === 'f' ? (r.won ? ' 우승' : '') : r.pos <= last.cut ? ' ↑' : last.down === '탈락' ? ' 탈락' : ' ↓'}`;
+  if (last.status === 'live') return `${STAGE_SHORT[last.key]} LIVE${r ? ` ${r.pos}위` : ''}`;
+  return `${STAGE_SHORT[last.key]} 대기`;
+}
+function krStrip(list) {
+  return `<section class="sec" aria-labelledby="h-kr2">
+    <div class="sec-head"><h2 class="h2" id="h-kr2">한국 선수·코치 팀</h2><a class="more" href="#/teams?g=kr">자세히 보기</a></div>
+    <div class="kr-strip">${list.map((k) => `<a class="kchip ${CAT[k.level]}" href="#/teams/${encodeURIComponent(k.short)}" title="${esc(k.name)}">${logo(k.short)}<span><b>${esc(k.short)}</b><small>${esc(stageShort(k.short))}</small></span></a>`).join('')}</div>
+    ${krLegend()}
+  </section>`;
+}
+// 홈: 시즌 일정은 지금·다음 일정 한 줄만
+function seasonNext() {
+  const t = now();
+  const tl = A.season.timeline;
+  const cur = tl.find((e) => t >= new Date(e.start + 'T00:00:00+09:00') && t <= new Date(e.end + 'T23:59:59+09:00'));
+  const nx = tl.find((e) => new Date(e.start + 'T00:00:00+09:00') > t);
+  const row = (e, tag) => e ? `<li><span class="tag ${tag === '진행 중' ? 'live' : ''}">${tag}</span> ${e.url ? olink(e.url, esc(e.name)) : esc(e.name)} <span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')} · ${esc(e.where)}</span></li>` : '';
+  return `<section class="sec" aria-labelledby="h-season"><div class="sec-head"><h2 class="h2" id="h-season">${esc(A.season.name)} 일정</h2><a class="more" href="#/rules?s=format">전체 일정</a></div>
+    <ul class="season-next">${row(cur, '진행 중')}${row(nx, '다음')}</ul></section>`;
 }
 const krLegend = () => `<p class="legend"><span><span class="krdot k-team"></span>한국 팀 (한국 선수 2명 이상)</span><span><span class="krdot k-member"></span>한국 선수 소속 (1명)</span><span><span class="krdot k-coach"></span>한국 코치 팀 (선수 없이 코치만)</span></p>`;
 
@@ -249,7 +297,7 @@ function heroCard(k) {
   const roster = (t?.roster?.filter((p) => p.r !== 'k').map((p) => p.n).join(', ') || k.krPlayers.join(', ')) + (t?.roster?.some((p) => p.r === 'k') ? ' · 코치 ' + t.roster.filter((p) => p.r === 'k').map((p) => p.n).join(', ') : '');
   return `<section class="kr-hero" aria-labelledby="h-hero">
     <span class="flag ${CAT[k.level] || ''}">${KR_LABEL[k.level] || ''}</span>
-    <h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1>
+    <div class="hero-id">${logo(k.short, 'xl', true)}<h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1></div>
     <p class="roster">${esc(roster)}</p>
     <div class="kr-stats">
       <div><b>${k.cp ? k.cp.rank + '위' : '–'}</b><span>챔피언십 포인트<br>${k.cp ? fmt(k.cp.total) + ' CP' : ''}</span></div>
@@ -353,7 +401,7 @@ function matchItem(s) {
   </article>`;
 }
 
-const resultTable = (rows) => `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">킬</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td></tr>`).join('')}</tbody></table></div>`;
+const resultTable = (rows) => `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r opt">킬</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r opt">${r.kills}</td></tr>`).join('')}</tbody></table></div>`;
 
 function schedule(parts, q) {
   const view = q.get('view') === 'results' ? 'results' : 'upcoming';
@@ -364,24 +412,23 @@ function schedule(parts, q) {
   const days = {};
   for (const s of list) (days[dayKey(s.start)] ||= []).push(s);
   return `<h1 class="title">경기</h1><p class="lead">모든 시간은 한국 시간(KST)입니다. 한 시리즈는 보통 6게임입니다.</p>
-    ${refreshNote()}
+    ${refreshNote(true)}
     <div class="controls">
-      <div class="seg" role="group" aria-label="보기"><a href="${qsLink('/schedule', q, { view: 'upcoming' })}" aria-current="${view === 'upcoming'}">예정</a><a href="${qsLink('/schedule', q, { view: 'results' })}" aria-current="${view === 'results'}">결과</a></div>
       <div class="seg"><a href="${qsLink('/schedule', q, { kr: kronly ? '0' : '1' })}" aria-current="${kronly}">한국 팀 경기만</a></div>
     </div>
     <div class="days">${Object.entries(days).map(([d, ss]) => `<section class="day"><h2 class="day-h">${dayLabel(d)}<small>${ss.length}시리즈</small></h2>${ss.map(matchItem).join('')}</section>`).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}</div>`;
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */
-function standings() {
+function standings(parts) {
   if (!A.intl) return '<h1 class="title">순위</h1><p class="empty">진행 중인 국제전이 없습니다. 프로리그 순위는 포인트 탭에서 볼 수 있습니다.</p>';
   const ev = A.intl, B = bracket();
   const phases = B.list.map((st) => `<li class="${st.status === 'completed' ? 'done' : st.status === 'live' ? 'now' : ''}"><span>${st.s ? olink(officialUrl(st.s), esc(st.ko)) : esc(st.ko)}</span><span class="when">${st.start ? dateTime(st.start) : ''}</span></li>`).join('');
   const head = `<h1 class="title">순위</h1>
-    <p class="lead">${esc(ko(ev.name, EVENT_KO))}. ${B.started ? '브래킷 진행 중: 위는 승자조, 아래는 패자조입니다. 끝난 조별 리그는 맨 아래 지난 결과에 있습니다.' : '조별 리그 누적 점수입니다.'}</p>
+    <p class="lead">${esc(ko(ev.name, EVENT_KO))}. ${B.started && parts[1] !== 'group' ? '위는 승자조, 아래는 패자조입니다.' : '조별 리그 누적 점수입니다.'}</p>
     ${refreshNote()}
     <section class="sec"><ol class="timeline tl-row">${phases}</ol></section>`;
-  if (!B.started) return head + `<section class="sec">${groupTable(ev)}</section>`;
+  if (!B.started || parts[1] === 'group') return head + `<section class="sec">${groupTable(ev)}</section>${B.started ? `<section class="sec"><h2 class="h2">조별 리그 시리즈</h2>${B.gs.series.slice().reverse().map(matchItem).join('')}</section>` : ''}`;
   const f = B.f;
   const finalsFirst = f.status === 'live' || f.status === 'completed';
   const finals = f.s ? `<section class="sec bk bk-final" aria-labelledby="h-f"><h2 class="h2 bk-h" id="h-f">결승</h2>${stageTable(f)}</section>` : '';
@@ -390,17 +437,14 @@ function standings() {
     <section class="sec bk bk-lower" aria-labelledby="h-lo"><h2 class="h2 bk-h" id="h-lo"><span class="bk-badge low">패자조</span></h2>
       <div class="bk-cols">${stageTable(B.er1)}${stageTable(B.er2)}</div></section>
     ${finalsFirst ? '' : finals}
-    <details class="sec past"><summary><span class="h2">지난 결과</span> 조별 리그 최종 순위와 시리즈별 결과</summary>
-      ${groupTable(ev)}
-      <h3 class="h3">조별 리그 시리즈</h3>${B.gs.series.slice().reverse().map(matchItem).join('')}
-    </details>`;
+    <section class="sec past-link"><a class="btn-link ghost" href="#/standings/group">지난 결과: 조별 리그 순위와 시리즈 결과 보기</a></section>`;
 }
 
 function groupTable(ev) {
   let rows = ev.rows;
   if (opt.krOnly) rows = rows.filter((r) => r.kr !== 'none');
-  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c">조</th><th class="r">점수</th><th class="r">킬</th><th class="r">다음 단계</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && r.pos === ev.winnersCut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small></td><td class="c">${esc(r.group)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>${!opt.krOnly && r.pos === ev.winnersCut ? `<tr class="cut-label"><td colspan="6">여기까지 승자 라운드, 아래는 패자부활 1라운드</td></tr>` : ''}`).join('')}
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c opt">조</th><th class="r">점수</th><th class="r opt">킬</th><th class="r">다음 단계</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && r.pos === ev.winnersCut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small></td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.pts}</td><td class="r opt">${r.kills}</td><td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>${!opt.krOnly && r.pos === ev.winnersCut ? `<tr class="cut-label"><td colspan="6">여기까지 승자 라운드, 아래는 패자부활 1라운드</td></tr>` : ''}`).join('')}
     </tbody></table></div>`;
 }
 
@@ -415,8 +459,8 @@ function stageTable(st) {
     let rows = res;
     if (opt.krOnly) rows = rows.filter((r) => r.kr !== 'none');
     const out = (r) => (st.cut ? (r.pos <= st.cut ? `<span class="adv up">${esc(st.up)}</span>` : `<span class="adv ${st.down === '탈락' ? 'out' : 'down'}">${esc(st.down)}</span>`) : r.won ? '<span class="tag mpe">우승</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '');
-    body = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r">킬</th><th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r">${r.kills}</td><td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="5">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
+    body = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">점수</th><th class="r opt">킬</th><th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td><td class="r num">${r.pts}</td><td class="r opt">${r.kills}</td><td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="5">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
     </tbody></table></div>${x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : ''}`;
   } else if (st.teams?.length) {
     let ts = st.teams.map((sh) => ({ short: sh, kr: krOf(sh), g: A.intl.rows.find((r) => r.short === sh) }));
@@ -433,7 +477,6 @@ function stageTable(st) {
 function points(parts, q) {
   const sub = parts[1] === 'pl' ? 'pl' : 'cp';
   return `<h1 class="title">포인트</h1>
-    <div class="controls"><div class="seg" role="group" aria-label="포인트 종류"><a href="#/points/cp" aria-current="${sub === 'cp'}">챔피언십 포인트</a><a href="#/points/pl" aria-current="${sub === 'pl'}">프로리그 포인트</a></div></div>
     ${sub === 'cp' ? cpView(q) : plView(q)}`;
 }
 
@@ -465,7 +508,7 @@ function cpView(q) {
       ${ps.map((x, i) => `<tr class="${x.kr ? 'kr' : ''}"><td class="rank">${i + 1}</td><td class="team">${x.kr ? krDot('team') : ''}${esc(x.n)}</td><td>${teamLink(x.short)}</td><td class="r num">${fmt(x.p)}</td></tr>`).join('')}
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
-  return `<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
+  return `${ringLine(A.kr || [])}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
     <div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">한국 관련 팀</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${modeSeg}${regionSeg}</div>${table}</section></div>
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
@@ -496,8 +539,8 @@ function plView(q) {
   return `${controls}
     <p class="lead">${esc(P.label)}. 시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다. 최종 순위는 리전 결승까지 반영한 값입니다.</p>
     ${krHere.length && !opt.krOnly ? `<div class="kr-list" style="margin-top:12px">${krHere.map((r) => `<a class="kr-row" href="#/teams/${encodeURIComponent(r.short)}"><span class="who">${krDot(r.kr, r.short)}${esc(r.name)}</span><span class="val">${r.pos}위</span><span class="sub">정규 시즌 ${r.rs ?? '–'}점, ${r.kills ?? '–'}킬${r.qualified ? ', 플레이오프 진출' : ''}</span></a>`).join('')}</div>` : ''}
-    <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c">조</th><th class="r">정규 점수</th><th class="r">킬</th><th class="r">CP/인</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}${r.qualified ? ' <span class="tag ok">PO</span>' : ''}</td><td class="c">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r">${r.kills ?? '–'}</td><td class="r">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="6">${lines[r._rk]}</td></tr>` : ''}`).join('')}
+    <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="c opt">조</th><th class="r">정규 점수</th><th class="r opt">킬</th><th class="r">CP/인</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}${r.qualified ? ' <span class="tag ok">PO</span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="6">${lines[r._rk]}</td></tr>` : ''}`).join('')}
     </tbody></table></div></section>
     <div class="explain"><b>점수 계산</b>
       <table><tr><td>게임</td><td>순위 점수 + 킬당 1점 (1위 12, 2위 9, 3위 7, 4위 5, 5위 4 …)</td></tr>
@@ -508,25 +551,46 @@ function plView(q) {
 /* ---------- 팀 ---------- */
 const isKrP = (p) => p.c === 'KR';
 const pName = (p) => `${isKrP(p) ? `<b class="krn">${esc(p.n)}</b>` : esc(p.n)}${p.mix ? '<sup class="mix" title="한국계 (국적과 대표 국가가 다르거나 운영자 확인)">계</sup>' : ''}`;
-function teams(parts) {
+function teams(parts, q) {
   if (parts[1]) return teamDetail(decodeURIComponent(parts[1]));
+  const g = q.get('g') || 'all';
+  if (g === 'kr') return krTeams();
   const all = Object.values(A.teams);
   const tile = (t) => {
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
     const cls = rowCls({ kr: t.krLevel, short: t.short });
     return `<a class="team-tile ${cls}" href="#/teams/${encodeURIComponent(t.short)}" data-name="${esc((t.short + ' ' + t.name + ' ' + (t.roster || []).map((p) => p.n).join(' ')).toLowerCase())}">
-      <b>${krDot(t.krLevel, t.short)}${esc(t.short)}${coachBadge(t.krLevel, t.short)}</b><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
+      <span class="tile-id">${logo(t.short, 'lg')}<b>${esc(t.short)}</b>${krDot(t.krLevel, t.short)}</span><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
       <span class="tile-roster">${ps.map(pName).join(', ') || '로스터 정보 없음'}${cs.length ? `<br><span class="muted">코치 ${cs.map(pName).join(', ')}</span>` : ''}</span></a>`;
   };
   const byCp = (a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999);
   const order = { team: 0, member: 1, coach: 2 };
-  const groups = [['한국 관련', all.filter((t) => t.krLevel !== 'none').sort((a, b) => order[a.krLevel] - order[b.krLevel] || byCp(a, b))], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && t.krLevel === 'none').sort(byCp)])];
+  let groups = [['한국 관련', all.filter((t) => t.krLevel !== 'none').sort((a, b) => order[a.krLevel] - order[b.krLevel] || byCp(a, b))], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && (g !== 'all' || t.krLevel === 'none')).sort(byCp)])];
+  if (g !== 'all') groups = groups.filter(([n]) => n === REGION[g]);
   return `<h1 class="title">팀</h1>
     <p class="lead">현재 시즌 팀과 로스터입니다. <b class="krn">굵은 이름</b>은 한국 선수, <sup class="mix">계</sup>는 한국계(혼혈·이중국적 등) 선수입니다.</p>
     ${krLegend()}
     <label class="visually-hidden" for="teamSearch">팀 또는 선수 검색</label>
     <input class="search" id="teamSearch" type="search" placeholder="팀이나 선수 이름으로 찾기" autocomplete="off">
     ${groups.map(([g, ts]) => ts.length ? `<section class="sec team-group"><h2 class="h2">${esc(g)} <small class="muted">${ts.length}팀</small></h2><div class="team-grid">${ts.map(tile).join('')}</div></section>` : '').join('')}`;
+}
+
+// 팀 탭 '한국 관련': 한국 팀·한국 선수 팀·한국 코치 팀의 자세한 카드
+function krTeams() {
+  const krs = A.kr || [];
+  const card = (k) => {
+    const t = team(k.short) || {};
+    const si = A.intl ? krStageInfo(k.short) : { text: '' };
+    const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
+    return `<a class="kcard ${CAT[k.level]}" href="#/teams/${encodeURIComponent(k.short)}">
+      <span class="kcard-id">${logo(k.short, 'lg')}<span><b>${esc(k.name)}</b><small>${esc(KR_LABEL[k.level])} · ${esc(REGION[t.region] || '')}</small></span></span>
+      <span class="kcard-stats"><span><b>${k.cp ? k.cp.rank + '위' : '–'}</b><small>CP</small></span><span><b>${k.pl ? k.pl.pos + '위' : '–'}</b><small>Split 2 PL</small></span><span><b>${k.intl ? k.intl.pos + '위' : '–'}</b><small>조별 리그</small></span></span>
+      ${si.text ? `<span class="kcard-now">지금 · ${esc(si.text)}</span>` : ''}
+      <span class="kcard-roster">${ps.map(pName).join(', ')}${cs.length ? ` · 코치 ${cs.map(pName).join(', ')}` : ''}</span>
+    </a>`;
+  };
+  return `<h1 class="title">한국 관련 팀</h1><p class="lead">한국 선수 또는 한국 코치가 있는 팀입니다. 카드를 누르면 팀 상세로 갑니다.</p>${krLegend()}
+    <div class="kcards">${krs.map(card).join('') || '<p class="empty">없음</p>'}</div>`;
 }
 
 function teamDetail(short) {
@@ -539,7 +603,7 @@ function teamDetail(short) {
   const roleKo = { p: '선수', c: '주장', k: '코치' };
   const si = ir ? krStageInfo(short) : null;
   return `<p style="margin:14px 0 0"><a class="more" href="#/teams">팀 목록</a></p>
-    <h1 class="title">${esc(t.name)}</h1>
+    <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1></div>
     <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr ${CAT[t.krLevel]}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}${si?.text ? `<br>${esc(ko(A.intl.name, EVENT_KO))}: ${esc(si.text)}` : ''}</p>
     ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${pName(p)}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + roleKo[p.r] : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
     <section class="sec"><h2 class="h2">시즌 성적</h2><div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th class="r">순위</th><th class="r">점수</th></tr></thead><tbody>
@@ -552,28 +616,29 @@ function teamDetail(short) {
 }
 
 /* ---------- 규칙 ---------- */
-function rules() {
+function rules(parts, q) {
+  const sv = q.get('s') || 'all';
   const S = A.season, sc = S.scoring;
   const vids = S.rulesVideos || [];
   const vid = (v) => `<figure class="vid"><button class="yt" type="button" data-yt="${esc(v.id)}" aria-label="${esc(v.title)} 재생">
       <img src="https://i.ytimg.com/vi/${esc(v.id)}/hqdefault.jpg" alt="" loading="lazy" width="480" height="360"><span class="yt-play" aria-hidden="true"></span></button>
       <figcaption><b>${esc(v.title)}</b><span>${esc(v.channel)} · <a href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener">YouTube에서 보기</a></span></figcaption></figure>`;
   const place = [12, 9, 7, 5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1];
-  return `<h1 class="title">규칙</h1>
+  const html = `<h1 class="title">규칙</h1>
     <p class="lead">ALGS를 처음 보는 사람도 경기를 따라갈 수 있도록 핵심 규칙만 모았습니다. 자세한 기준은 맨 아래 공식 규정이 우선합니다.</p>
-    ${vids.length ? `<section class="sec" aria-labelledby="h-vid"><h2 class="h2" id="h-vid">영상으로 보기</h2><div class="vid-grid">${vids.map(vid).join('')}</div></section>` : ''}
+    ${vids.length && (sv === 'all' || sv === 'video') ? `<section class="sec" aria-labelledby="h-vid"><h2 class="h2" id="h-vid">영상으로 보기</h2><div class="vid-grid">${vids.map(vid).join('')}</div></section>` : ''}
     <div class="rules-grid">
-    <section class="sec rule-card"><h2 class="h2">한 시즌의 흐름</h2>
+    <section class="sec rule-card" data-k="format"><h2 class="h2">한 시즌의 흐름</h2>
       <ol class="timeline">${S.timeline.map((e) => `<li><span>${e.url ? olink(e.url, esc(e.name)) : esc(e.name)}<br><span class="when">${esc(e.where)}</span></span><span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}</span></li>`).join('')}</ol>
       <p class="lead">지역별 프로리그에서 성적을 내 플레이오프(국제전)에 나가고, 시즌 내내 모은 챔피언십 포인트로 챔피언십 직행 여부가 정해집니다.</p></section>
-    <section class="sec rule-card"><h2 class="h2">게임 점수</h2>
+    <section class="sec rule-card" data-k="points"><h2 class="h2">게임 점수</h2>
       <p>한 게임 점수 = <b>순위 점수 + 킬 1점</b>. 보통 한 시리즈는 6게임이고, 점수를 모두 더해 시리즈 순위를 정합니다.</p>
       <div class="tbl-wrap"><table class="tbl compact"><thead><tr><th>순위</th>${place.slice(0, 10).map((_, i) => `<th class="c">${i + 1}</th>`).join('')}<th class="c">11–15</th><th class="c">16–20</th></tr></thead>
       <tbody><tr><td>점수</td>${place.slice(0, 10).map((p) => `<td class="c num">${p}</td>`).join('')}<td class="c num">1</td><td class="c num">0</td></tr></tbody></table></div></section>
-    <section class="sec rule-card"><h2 class="h2">프로리그</h2>
+    <section class="sec rule-card" data-k="format"><h2 class="h2">프로리그</h2>
       <p>지역마다 30팀이 A·B·C 세 조로 나뉘어 서로 돌아가며 붙습니다(시리즈 9번). 시리즈 순위마다 프로리그 포인트를 받고, 합계로 정규 시즌 순위를 냅니다.</p>
       <ul><li>시리즈 순위별 포인트: ${sc.plRegular.slice(0, 5).join(', ')} … 20위 0</li><li>상위 20팀이 리전 결승(매치 포인트 방식)에 나갑니다.</li><li>정규 시즌 상위 팀과 리전 결승 우승팀이 플레이오프에 갑니다.</li></ul></section>
-    <section class="sec rule-card"><h2 class="h2">플레이오프·챔피언십 진행</h2>
+    <section class="sec rule-card" data-k="format"><h2 class="h2">플레이오프·챔피언십 진행</h2>
       <p>40팀이 조별 리그를 치른 뒤 브래킷으로 갈립니다.</p>
       <ul><li>조별 리그 상위 20팀 → 승자 라운드, 하위 20팀 → 패자부활 1라운드</li>
       <li>승자 라운드 상위 10팀 → 결승, 하위 10팀 → 패자부활 2라운드</li>
@@ -581,18 +646,23 @@ function rules() {
       <li>패자부활 2라운드 상위 10팀 → 결승, 하위 10팀 탈락</li>
       <li>결승 20팀은 매치 포인트 방식으로 우승을 가립니다.</li></ul>
       <p class="lead"><a href="#/standings">순위 탭</a>에서 지금 진행 상황을 승자조·패자조로 볼 수 있습니다.</p></section>
-    <section class="sec rule-card"><h2 class="h2">매치 포인트</h2>
+    <section class="sec rule-card" data-k="format"><h2 class="h2">매치 포인트</h2>
       <p>정해진 점수(보통 50점)를 넘긴 팀은 <b>매치 포인트</b> 상태가 됩니다. 그 뒤 게임에서 <b>1위(챔피언)</b>를 하면 그 즉시 우승입니다. 매치 포인트 팀이 없거나 1위를 못 하면 게임을 계속합니다.</p>
       <p class="lead">경기 화면의 <span class="tag mpe">MP</span>는 매치 포인트 도달, <span class="tag mpe">우승</span>은 우승을 뜻합니다.</p></section>
-    <section class="sec rule-card"><h2 class="h2">챔피언십 포인트(CP)</h2>
+    <section class="sec rule-card" data-k="points"><h2 class="h2">챔피언십 포인트(CP)</h2>
       <p>CP는 <b>선수 개인</b>이 받습니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 선수가 팀을 옮기면 CP도 따라갑니다.</p>
       <ul><li>프로리그 최종 순위별(1인): ${sc.cpProLeague.slice(0, 6).join(', ')} …</li><li>플레이오프 최종 순위별(1인): ${sc.cpPlayoffs.slice(0, 6).join(', ')} …</li>
       <li>CP 상위 ${S.cpDirectSlots}팀은 챔피언십 직행, 나머지 ${S.lcqSlots}자리는 LCQ(지역별 2팀)에서 정합니다.</li></ul>
       <p class="lead"><a href="#/points/cp">포인트 탭</a>에서 현재 순위를 볼 수 있습니다.</p></section>
-    <section class="sec rule-card"><h2 class="h2">레전드 밴 · POI 드래프트</h2>
+    <section class="sec rule-card" data-k="format"><h2 class="h2">레전드 밴 · POI 드래프트</h2>
       <p>경기 전 일부 레전드를 쓸 수 없게 막는 <b>레전드 밴</b>과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 <b>POI 드래프트</b>가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p></section>
     </div>
-    <section class="sec"><h2 class="h2">공식 규정과 참고 자료</h2><div class="chips" style="margin-top:10px">${(S.rulesLinks || []).map(([n, u]) => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div></section>`;
+    <section class="sec"><h2 class="h2">공식 규정과 참고 자료</h2><div class="chips" style="margin-top:10px">${(S.rulesLinks || []).map(([n, u]) => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div></section>`;;
+  if (sv === 'all') return html;
+  const box = document.createElement('div'); box.innerHTML = html;
+  box.querySelectorAll('[data-k]').forEach((el) => { if (el.dataset.k !== sv) el.remove(); });
+  if (sv === 'video') box.querySelector('.rules-grid')?.remove();
+  return box.innerHTML;
 }
 
 /* ---------- 방송 ---------- */
@@ -605,12 +675,14 @@ const FIND = {
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
 const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${esc(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
-function streams() {
+function streams(parts, q) {
+  const sv = q.get('s') || 'all';
   const S = A.streams, MV = A.season.multiview || {};
   const order = (A.kr || []).map((k) => k.short);
   const players = S.players.slice().sort((a, b) => (order.indexOf(a.team) + 99 * (order.indexOf(a.team) < 0)) - (order.indexOf(b.team) + 99 * (order.indexOf(b.team) < 0)) || (a.role === 'coach') - (b.role === 'coach'));
+  const show = (k) => sv === 'all' || sv === k;
   return `<h1 class="title">방송</h1>
-    <section class="sec mv" aria-labelledby="h-mv">
+    ${show('mv') ? `<section class="sec mv" aria-labelledby="h-mv">
       <figure><img src="assets/multiview.svg" alt="멀티뷰 화면 예시: 메인 중계, 팀 시점 4개, 맵 시점, 실시간 순위가 한 화면에 배치된 모습" width="640" height="360"><figcaption>화면 구성을 설명하는 예시 그림입니다. 실제 화면과 다를 수 있습니다.</figcaption></figure>
       <div>
         <h2 class="h2" id="h-mv">ALGS 멀티뷰</h2>
@@ -624,16 +696,16 @@ function streams() {
         </ul>
         <a class="btn-link" href="${esc(MV.url || 'https://algs.ea.com/en/multiview')}" target="_blank" rel="noopener">멀티뷰 열기 (algs.ea.com)</a>
       </div>
-    </section>
-    <div class="stream-cols">
-      <section class="sec"><h2 class="h2">공식 중계</h2>
+    </section>` : ''}
+    <div class="stream-cols${sv === 'all' ? '' : ' one'}">
+      ${show('official') ? `<section class="sec"><h2 class="h2">공식 중계</h2>
         ${S.broadcasts.map((b) => `<div class="bc"><h3>${esc(b.label)}</h3><p>${esc(b.note)}</p><div class="chips">${b.links.length ? b.links.map(([n, u]) => `<a class="chip ${n.toLowerCase()}" href="${esc(u)}" target="_blank" rel="noopener"><i></i>${esc(n)}</a>`).join('') : '<span class="chip off">등록된 채널 없음</span>'}</div></div>`).join('')}
         ${S.partners.length ? `<div class="bc"><h3>공식 파트너 워치 파티</h3><p>공식 일정에 파트너로 등록된 채널입니다.</p><div class="chips">${S.partners.filter((p) => p.url).map((p) => `<a class="chip ${p.provider}" href="${esc(p.url)}" target="_blank" rel="noopener"><i></i>${esc(p.name)}</a>`).join('')}</div></div>` : ''}
-      </section>
-      <section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>
+      </section>` : ''}
+      ${show('players') ? `<section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>
         ${players.map(streamRow).join('')}
         <p class="lead">채움 칩은 확인된 채널(공식 API, Liquipedia 선수 페이지, 운영자 입력), 점선 칩은 확인된 채널이 없어 해당 플랫폼에서 이름으로 검색하는 링크입니다. 선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>
-      </section>
+      </section>` : ''}
     </div>`;
 }
 
@@ -691,7 +763,7 @@ const R = A.season.refresh || { buildMinutes: 5, liveSeconds: 10 };
 const LIVE = { mode: C.liveMode || (C.liveUrl ? 'worker' : 'direct'), api: C.officialApi || 'https://prod-api.algstools.com/v1', lastAt: 0, active: [] };
 const ago = (t) => { const s = Math.max(0, Math.round((Date.now() - t) / 1000)); return s < 60 ? `${s}초 전` : `${Math.floor(s / 60)}분 전`; };
 function refreshNote() {
-  return `<div class="refresh-note"><b>갱신 주기</b> 진행 중인 시리즈 점수는 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다, 순위·챔피언십 포인트·다음 단계 출전 명단은 ${Math.round(OFF.ms / 1000)}초마다(시리즈가 끝나는 순간에는 즉시) 공식 API에서 직접 받아 바꿉니다. Liquipedia 대조는 ${R.buildMinutes}분 주기 빌드에서 합니다. 마지막 빌드 ${dateTime(A.generated)} KST.</div>`;
+  return `<details class="refresh-note"><summary><b>갱신 주기</b> 점수 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초 · 순위·CP ${Math.round(OFF.ms / 1000)}초 <span class="more-hint">자세히</span></summary>진행 중인 시리즈 점수는 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다, 순위·챔피언십 포인트·다음 단계 출전 명단은 ${Math.round(OFF.ms / 1000)}초마다(시리즈가 끝나는 순간에는 즉시) 공식 API에서 직접 받아 바꿉니다. Liquipedia 대조는 ${R.buildMinutes}분 주기 빌드에서 합니다. 마지막 빌드 ${dateTime(A.generated)} KST.</details>`;
 }
 function refreshInfo() {
   return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>확정값: 챔피언십 포인트·조별 리그 순위·출전 명단을 공식 API에서 ${Math.round(OFF.ms / 1000)}초마다, 시리즈 종료 즉시 다시 받음${OFF.lastAt ? ` (마지막 ${ago(OFF.lastAt)})` : ''}.<br>평상시: ${R.buildMinutes}분마다 자동 빌드 (GitHub 예약 실행이라 몇 분 늦어질 수 있음). 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
@@ -823,6 +895,17 @@ function applyLive() {
 /* ---------- 시작 ---------- */
 window.addEventListener('hashchange', () => { render(); app.focus({ preventScroll: true }); window.scrollTo(0, 0); });
 setupSettings();
+// 세부 탭이 머리말(웹은 머리말+탭) 바로 아래에 붙도록 높이를 잰다
+function measureStick() {
+  const top = document.querySelector('.top'), bar = document.querySelector('.tabbar');
+  const desk = matchMedia('(min-width: 768px)').matches;
+  const z = parseFloat(getComputedStyle(document.querySelector('.frame')).zoom) || 1;
+  const h = (top?.offsetHeight || 0) + (desk ? bar?.offsetHeight || 0 : 0);
+  document.documentElement.style.setProperty('--top-h', `${top?.offsetHeight || 0}px`);
+  document.documentElement.style.setProperty('--stick', `${h}px`);
+}
+measureStick();
+addEventListener('resize', measureStick);
 footer();
 render();
 pollVer();
