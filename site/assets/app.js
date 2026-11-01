@@ -121,7 +121,7 @@ function subtabs(tab, parts, q) {
   const g = q.get('g') || 'all', sv = q.get('s') || 'all';
   const SUB = {
     schedule: [['예정 경기', '#/schedule', parts[1] !== 'replay' && q.get('view') !== 'results'], ['지난 결과', '#/schedule?view=results', parts[1] !== 'replay' && q.get('view') === 'results'], ['게임 다시보기', '#/schedule/replay', parts[1] === 'replay']],
-    standings: A.intl ? [['브래킷', '#/standings', parts[1] !== 'group'], ['조별 리그', '#/standings/group', parts[1] === 'group']] : null,
+    standings: A.intl ? [['결승', '#/standings/finals', parts[1] === 'finals'], ['브래킷', '#/standings/bracket', parts[1] === 'bracket' || (!parts[1] && !finalsFirstTab())], ['조별 리그', '#/standings/group', parts[1] === 'group']] : null,
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
     teams: [['전체', '#/teams', !parts[1] && g === 'all'], ['한국 관련', '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r])],
     streams: [['전체', '#/streams', sv === 'all'], ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
@@ -556,23 +556,26 @@ function schedule(parts, q) {
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */
+// 결승이 시작됐거나 끝났으면 순위 탭은 결승부터 보여 준다
+function finalsFirstTab() { const B = A.intl ? bracket() : null; return !!B?.f?.s && (B.f.status === 'live' || B.f.status === 'completed'); }
 function standings(parts) {
   if (!A.intl) return '<h1 class="title">순위</h1><p class="empty">진행 중인 국제전이 없습니다. 프로리그 순위는 포인트 탭에서 볼 수 있습니다.</p>';
   const ev = A.intl, B = bracket();
   const phases = B.list.map((st) => `<li class="${st.status === 'completed' ? 'done' : st.status === 'live' ? 'now' : ''}"><span>${st.s ? olink(officialUrl(st.s), esc(st.ko)) : esc(st.ko)}</span><span class="when">${st.start ? dateTime(st.start) : ''}</span></li>`).join('');
   const head = `<h1 class="title">순위</h1>
-    <p class="lead">${esc(ko(ev.name, EVENT_KO))}. ${B.started && parts[1] !== 'group' ? '위는 승자조, 아래는 패자조입니다.' : '조별 리그 누적 점수입니다.'}</p>
+    <p class="lead">${esc(ko(ev.name, EVENT_KO))}. ${parts[1] === 'finals' || (!parts[1] && finalsFirstTab()) ? '매치 포인트 결승 20팀의 점수입니다.' : B.started && parts[1] !== 'group' ? '위는 승자조, 아래는 패자조입니다.' : '조별 리그 누적 점수입니다.'}</p>
     ${refreshNote()}
     <section class="sec"><ol class="timeline tl-row">${phases}</ol></section>`;
   if (!B.started || parts[1] === 'group') return head + spoil(`<section class="sec">${groupTable(ev)}</section>${B.started ? `<section class="sec"><h2 class="h2">조별 리그 시리즈</h2>${B.gs.series.slice().reverse().map(matchItem).join('')}</section>` : ''}`, intlKey(), '조별 리그 순위');
   const f = B.f;
-  const finalsFirst = f.status === 'live' || f.status === 'completed';
-  const finals = f.s ? `<section class="sec bk bk-final" aria-labelledby="h-f"><h2 class="h2 bk-h" id="h-f">결승</h2>${stageTable(f)}</section>` : '';
-  return head + spoil(`${finalsFirst ? finals : ''}
+  const finals = f.s ? `<section class="sec bk bk-final" aria-labelledby="h-f"><h2 class="h2 bk-h" id="h-f">매치 포인트 결승</h2>${stageTable(f)}</section>` : '<p class="empty">결승 일정이 아직 없습니다.</p>';
+  // 결승 탭: 결승이 시작됐으면 순위 탭의 기본 화면
+  if (parts[1] === 'finals' || (!parts[1] && finalsFirstTab())) return head + spoil(finals + `<section class="sec past-link"><a class="btn-link ghost" href="#/standings/bracket">결승까지 온 길: 브래킷 보기</a></section>`, intlKey(), '결승 결과');
+  return head + spoil(`
     <section class="sec bk bk-upper" aria-labelledby="h-up2"><h2 class="h2 bk-h" id="h-up2"><span class="bk-badge up">승자조</span></h2>${stageTable(B.wr)}</section>
     <section class="sec bk bk-lower" aria-labelledby="h-lo"><h2 class="h2 bk-h" id="h-lo"><span class="bk-badge low">패자조</span></h2>
       <div class="bk-cols">${stageTable(B.er1)}${stageTable(B.er2)}</div></section>
-    ${finalsFirst ? '' : finals}
+    ${f.s ? `<section class="sec past-link"><a class="btn-link ghost" href="#/standings/finals">다음: 매치 포인트 결승 보기</a></section>` : ''}
     <section class="sec past-link"><a class="btn-link ghost" href="#/standings/group">지난 결과: 조별 리그 순위와 시리즈 결과 보기</a></section>`, intlKey(), '브래킷 결과');
 }
 
