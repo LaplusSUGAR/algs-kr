@@ -1,5 +1,91 @@
 {
   "_comment": "운영자 수동 보정. teams 키는 팀 약칭(short)이며 출처 데이터보다 우선 적용된다. 예: \"E36\": { \"ko\": \"한글 팀명\", \"color\": \"#RRGGBB\", \"krLevel\": \"team\" }",
   "teams": {},
-  "streams": []
+  "streams": [],
+  "_cpSubs": "국제전 대체 출전(비자 문제 등). 빠진 선수(out)는 그 대회 CP를 받지 않고, 대체 선수(in)가 출전 팀 순위의 CP를 받아 원래 소속팀(home) 합계에 반영된다. 이름은 공식 API 표기. 키는 이벤트 슬러그.",
+  "cpSubs": {
+    "split-2-playoffs": [
+      {
+        "team": "WOL",
+        "reason": "비자",
+        "out": [
+          "wenxx"
+        ],
+        "in": [
+          {
+            "name": "Floating",
+            "home": "DKF"
+          }
+        ]
+      },
+      {
+        "team": "VKG",
+        "reason": "비자",
+        "out": [
+          "NONAME"
+        ],
+        "in": [
+          {
+            "name": "BJJS012",
+            "home": "BH"
+          }
+        ]
+      },
+      {
+        "team": "PXX",
+        "reason": "비자",
+        "out": [
+          "Pite",
+          "Xzz"
+        ],
+        "in": [
+          {
+            "name": "N1ng",
+            "home": "ORG"
+          },
+          {
+            "name": "Xiaolin",
+            "home": "TECA"
+          }
+        ]
+      },
+      {
+        "team": "WAR",
+        "reason": "비자",
+        "out": [
+          "rename"
+        ],
+        "in": [
+          {
+            "name": "Albralelie",
+            "home": "STAL"
+          }
+        ]
+      },
+      {
+        "team": "ECL",
+        "reason": "비자",
+        "out": [
+          "1kxst"
+        ],
+        "in": [
+          {
+            "name": "Naughty",
+            "home": "JDG"
+          }
+        ]
+      },
+      {
+        "team": "GK",
+        "reason": "대체",
+        "out": [],
+        "in": [
+          {
+            "name": "DROPPED",
+            "home": "DKF"
+          }
+        ]
+      }
+    ]
+  }
 }

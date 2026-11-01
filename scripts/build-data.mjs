@@ -236,7 +236,10 @@ const data = {
   season,
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
   teams: Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])),
-  cp: cpRows, cpEvents, pl, series, intl, kr, streams, cc, conflicts,
+  cp: cpRows, cpEvents, pl,
+  // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
+  poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
+  cpSubs: ov.cpSubs || {}, series, intl, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
     cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
