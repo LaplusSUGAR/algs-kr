@@ -733,3 +733,4 @@ html, body { overflow-x: clip; }
 @media (max-width: 520px) { .lg-only { display: none; } .sm-inline { display: inline; } }
 @media (max-width: 440px) { .top #refreshText { display: none; } .top .pill { padding: 8px; } .top .icon-btn { width: 34px; } }
 .sub-note { display: block; margin-top: 3px; color: var(--kr-member); font-size: 11.5px; line-height: 1.35; }
+.st-parts { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-size: 12.5px; } .st-parts small { color: var(--apex); }
