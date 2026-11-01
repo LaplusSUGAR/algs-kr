@@ -123,6 +123,34 @@ async function main() {
     }
   }
 
+  // 선수별 출전 경기 수 (챔피언십 포인트는 그 대회에서 12경기 이상 뛴 선수만 받음)
+  //   raw/algs/matchcounts.json: { series: { seriesId: { e: eventId, c: { 선수ID: 경기 수 } } } }
+  //   끝난 시리즈는 한 번만 받고, 진행 중 시리즈는 매번 다시 센다
+  try {
+    const mcFile = readJson('raw/algs/matchcounts.json', { series: {} });
+    const cpEventIds = new Set(season.tournaments.flatMap((t) => t.events).filter((x) => /^split-\d-(pro-league-|playoffs)/.test(x.slug)).map((x) => x.id));
+    const todo = allSeries.filter((x) => cpEventIds.has(x.event?.id) && (x.status === 'live' || (x.status === 'completed' && !mcFile.series[x.id])));
+    const jobs = [];
+    for (const x of todo) for (const m of (x.matches || []).filter((mm) => mm.status === 'completed')) jobs.push([x, m.matchNumber]);
+    const acc = {};
+    let i = 0;
+    const worker = async () => {
+      while (i < jobs.length) {
+        const [x, n] = jobs[i++];
+        try {
+          const st = await fetchJson(`${API}/stats/series/${x.id}/match/number/${n}`, { retries: 1, delayMs: 150 });
+          const c = (acc[x.id] ||= { e: x.event.id, c: {} }).c;
+          for (const t of st.teams || []) for (const p of t.players || []) if (p.id) c[p.id] = (c[p.id] || 0) + 1;
+        } catch {}
+      }
+    };
+    await Promise.all(Array.from({ length: 6 }, worker));
+    let changed = false;
+    for (const x of todo) if (acc[x.id]) { mcFile.series[x.id] = acc[x.id]; changed = true; }
+    if (changed) writeJson('raw/algs/matchcounts.json', mcFile);
+    console.log(`[algs] 출전 경기 수: 시리즈 ${todo.length}개, 게임 ${jobs.length}개 확인`);
+  } catch (e) { console.error('[algs] 출전 경기 수 실패:', e.message); }
+
   // 진행 중 국제전의 남은 시리즈 출전 팀 (브래킷 표시용)
   const lineups = {};
   if (intlEvent) {

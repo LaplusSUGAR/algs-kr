@@ -239,7 +239,9 @@ const data = {
   cp: cpRows, cpEvents, pl,
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
-  cpSubs: ov.cpSubs || {}, series, intl, kr, streams, cc, conflicts,
+  cpSubs: ov.cpSubs || {},
+  // 대회별 선수 출전 경기 수 { eventId: { 선수ID: 경기 수 } } — 12경기 이상이어야 그 대회 CP를 받음
+  mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
     cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
