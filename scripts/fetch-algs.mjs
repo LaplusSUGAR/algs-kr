@@ -88,10 +88,12 @@ async function main() {
   const latestSplit = Math.max(...plEvents.map(({ e }) => +e.slug.match(/^split-(\d)/)[1]));
   const latestPl = plEvents.filter(({ e }) => e.slug.startsWith(`split-${latestSplit}-`));
   const krStreams = [];
+  const logos = {}; // teamId: [밝은 배경용, 어두운 배경용] 공식 팀 로고 URL
   const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
   for (const { e } of latestPl) {
     const teams = (await get(`/phases/${e.phases[0].id}/teams`)).teams || [];
     for (const tm of teams) {
+      if (tm.logoLight || tm.logoDark) logos[tm.teamId] = [tm.logoLight || tm.logoDark, tm.logoDark || tm.logoLight];
       rosters[tm.teamId] = tm.players.map((p) => {
         const rep = p.countryOfRepresentation && p.countryOfRepresentation !== p.country ? p.countryOfRepresentation : '';
         return `${p.name.trim()}|${p.country || ''}|${roleCode(p.role)}${rep ? '|' + rep : ''}`;
@@ -122,7 +124,7 @@ async function main() {
     for (const p of found) if (!seen.has(p[2].toLowerCase())) { partnerStreams.push(p); seen.add(p[2].toLowerCase()); }
   } catch {}
 
-  const next = { seasonId: season.id, events, cp, pl, rosters, lineups, series, poGroup, krStreams, partnerStreams,
+  const next = { seasonId: season.id, events, cp, pl, rosters, logos, lineups, series, poGroup, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
   // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
   const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
