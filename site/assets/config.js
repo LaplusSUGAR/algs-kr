@@ -14,4 +14,11 @@ window.ALGS_CONFIG = {
   livePollMs: 10_000, // 여기에 무작위 0~3초를 더해 요청이 한꺼번에 몰리지 않게 한다
 
   siteName: 'EASY ALGS KR',
+
+  // 문의·피드백을 받을 곳.
+  //   'github' : GitHub 이슈 작성 화면으로 보냄 (제목·내용 미리 채움, GitHub 계정 필요) — 기본값
+  //   구글 폼 주소를 넣으면 그 폼으로 보냄. 폼의 '미리 채운 링크'에서 얻은 항목 번호를 feedbackFormFields에 적으면 종류·페이지·내용을 미리 채움
+  feedback: 'github',
+  feedbackRepo: 'LaplusSUGAR/algs-kr',
+  feedbackFormFields: { kind: '', page: '', body: '' }, // 예: { kind: 'entry.123', page: 'entry.456', body: 'entry.789' }
 };

@@ -674,3 +674,61 @@ html, body { overflow-x: clip; }
 }
 @media (max-width: 400px) { .pts-side .tbl .opt { display: none; } }
 .cpb-i.excl { opacity: .55; text-decoration: line-through; text-decoration-color: var(--steel); } .cpb-i.excl small { color: var(--steel); text-decoration: none; }
+
+/* 스포일러 방지 */
+.spoil-box { position: relative; margin-top: 10px; }
+.spoil-hidden { filter: blur(9px) saturate(.4); opacity: .55; pointer-events: none; user-select: none; max-height: 220px; overflow: hidden; }
+.spoil-btn { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; gap: 2px; text-align: center; padding: 12px 20px; background: var(--bar); color: var(--bar-ink); border: 0; border-left: 4px solid var(--apex); cursor: pointer; max-width: 92%; }
+.spoil-btn b { font: 800 18px/1 var(--display); text-transform: uppercase; letter-spacing: .03em; }
+.spoil-btn span { font-size: 12px; color: var(--bar-steel); }
+.spoil-box:has(.spoil-hidden:empty) { min-height: 64px; }
+.sw-note { display: block; font-size: 11.5px; color: var(--steel); }
+
+/* 문의·피드백 */
+.link-btn { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font: inherit; }
+.fb-link { color: var(--steel); }
+.fb-kinds { display: grid; gap: 8px; margin: 12px 0 16px; }
+.fb-kind { display: grid; gap: 2px; text-align: left; padding: 12px 14px; background: var(--paper); border: 1px solid var(--rule); border-left: 4px solid var(--apex); cursor: pointer; border-radius: var(--r-sm); }
+.fb-kind span { font-size: 12.5px; color: var(--steel); }
+.fb-kind:hover { border-color: var(--apex); }
+.top .icon-btn + .icon-btn { margin-left: 2px; }
+
+/* 선수 링크 */
+.plink { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.plink:hover { text-decoration-color: currentColor; }
+
+/* 게임 다시보기 */
+.rp-pick select { font: inherit; padding: 8px 10px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); max-width: 100%; border-radius: var(--r-sm); }
+.rp-games { flex-wrap: wrap; }
+.rp-games small { color: inherit; opacity: .7; font-size: 11px; }
+.rp-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.rp-bans { font-size: 12.5px; color: var(--steel); }
+.rp-bar { display: flex; align-items: center; gap: 6px; margin: 12px 0; padding: 10px; background: var(--bar); color: var(--bar-ink); border-radius: var(--r-sm); position: sticky; top: calc(var(--stick) + 52px); z-index: 5; }
+.rp-bar input[type=range] { flex: 1; accent-color: var(--apex); min-width: 80px; }
+.rp-btn { width: 34px; height: 34px; border: 0; background: var(--bar-2); color: #fff; cursor: pointer; font-size: 15px; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+#rpPlay { background: var(--apex); }
+.rp-count { font: 700 13px/1 var(--body); min-width: 64px; text-align: right; }
+.rp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.rp-team { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 6px; align-items: center; padding: 8px; background: var(--card); border-radius: var(--r-sm); transition: opacity .25s, filter .25s; }
+.rp-team .tlogo { grid-row: span 2; }
+.rp-team b { font: 800 15px/1 var(--display); }
+.rp-team .rp-state { font-size: 11px; color: var(--ok); font-weight: 600; }
+.rp-team.out { opacity: .35; filter: grayscale(1); }
+.rp-team.out .rp-state { color: var(--steel); }
+.rp-team.win { box-shadow: 0 0 0 2px var(--apex); }
+.rp-team.win .rp-state { color: var(--apex); }
+.rp-team.kr { box-shadow: inset 4px 0 0 var(--kc-col); }
+.rp-team.kr.win { box-shadow: inset 4px 0 0 var(--kc-col), 0 0 0 2px var(--apex); }
+.rp-log { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 4px; max-height: 280px; overflow: auto; }
+.rp-ev { padding: 6px 10px; background: var(--card); font-size: 13.5px; border-radius: var(--r-sm); }
+.rp-ev.kr { background: var(--kc-soft); }
+.rp-place { font: 800 15px/1 var(--display); display: inline-block; min-width: 34px; }
+.rp-win { color: var(--apex); }
+.rp-detail summary { cursor: pointer; font-weight: 600; margin-top: 14px; }
+.rp-vods { margin-top: 14px; }
+.rp-link { display: inline-block; margin-top: 6px; font-size: 12.5px; }
+@media (min-width: 768px) { .rp-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 1200px) { .rp-grid { grid-template-columns: repeat(10, 1fr); } }
+.sm-inline { display: none; }
+@media (max-width: 520px) { .lg-only { display: none; } .sm-inline { display: inline; } }
+@media (max-width: 440px) { .top #refreshText { display: none; } .top .pill { padding: 8px; } .top .icon-btn { width: 34px; } }

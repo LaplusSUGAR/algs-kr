@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="assets/style.css?v=fd3c1ffb">
+  <link rel="stylesheet" href="assets/style.css?v=29fded4a">
   <script>try{var t=localStorage.getItem('algskr.theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
 <body>
@@ -24,6 +24,7 @@
       </a>
       <div class="top-right">
       <button class="pill" id="refreshPill" type="button" aria-label="갱신 주기 보기"><span class="pill-dot"></span><span id="refreshText">정기 갱신</span></button>
+      <button class="icon-btn" id="feedbackBtn" type="button" aria-label="문의·피드백" aria-haspopup="dialog" title="문의·피드백"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8 9.5h8M8 12.5h5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
       <button class="icon-btn" id="settingsBtn" aria-label="설정 열기" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
       </button>
@@ -45,15 +46,30 @@
     <footer class="foot">
       <p>비공식 팬 사이트입니다. EA·Respawn과 관련이 없습니다.</p>
       <p id="sourceLine"></p>
+      <p><button class="link-btn" type="button" data-feedback="기타">문의·피드백 보내기</button></p>
     </footer>
 
   </div>
+
+  <dialog id="feedback" aria-labelledby="feedbackTitle">
+    <form method="dialog">
+      <h2 id="feedbackTitle">문의·피드백</h2>
+      <p class="dlg-note">무엇에 대한 내용인가요? 고르면 작성 화면이 새 창으로 열리고, 지금 보던 화면 주소가 미리 채워집니다. 개인 정보는 넣지 마세요.</p>
+      <div class="fb-kinds">
+        <button type="button" class="fb-kind" data-kind="데이터 오류"><b>데이터 오류</b><span>순위·점수·로스터가 틀렸어요</span></button>
+        <button type="button" class="fb-kind" data-kind="채널 제보"><b>채널 제보</b><span>선수 CHZZK·YouTube 주소를 알려 줄게요</span></button>
+        <button type="button" class="fb-kind" data-kind="기능 제안"><b>기능 제안</b><span>이런 기능이 있으면 좋겠어요</span></button>
+        <button type="button" class="fb-kind" data-kind="기타"><b>기타 문의</b><span>그 밖의 이야기</span></button>
+      </div>
+      <button class="btn" value="close">닫기</button>
+    </form>
+  </dialog>
 
   <dialog id="settings" aria-labelledby="settingsTitle">
     <form method="dialog">
       <h2 id="settingsTitle">설정</h2>
       <label class="switch"><input type="checkbox" id="optDark"> <span>다크 모드</span></label>
-      <label class="switch"><input type="checkbox" id="optSpoiler"> <span>결과 가리기 (스포일러 방지)</span></label>
+      <label class="switch"><input type="checkbox" id="optSpoiler"> <span>결과 가리기 (스포일러 방지)<small class="sw-note">점수·순위·진출 결과를 가리고, 대회별로 눌러서 공개합니다</small></span></label>
       <label class="switch"><input type="checkbox" id="optKrOnly"> <span>표에서 한국 팀만 보기</span></label>
       <h3 class="dlg-h">갱신 주기</h3>
       <div class="dlg-note" id="refreshInfo"></div>
@@ -64,7 +80,7 @@
   </dialog>
 
   <script src="data/algs-data.js?v=f47787ef"></script>
-  <script src="assets/config.js?v=47fc18d0"></script>
-  <script type="module" src="assets/app.js?v=50db90ad"></script>
+  <script src="assets/config.js?v=79c5061b"></script>
+  <script type="module" src="assets/app.js?v=1ea9ebfe"></script>
 </body>
 </html>
