@@ -631,3 +631,18 @@ details.refresh-note[open] { padding-bottom: 10px; }
 .kr-hero { background: linear-gradient(112deg, var(--bar) 0 80%, var(--apex) 80% 81.6%, var(--bar) 81.6% 84%, #23262E 84%); }
 :root[data-theme='dark'] .kr-hero { background: linear-gradient(112deg, #17191E 0 80%, var(--apex) 80% 81.6%, #17191E 81.6% 84%, #23262E 84%); }
 .rule-card .tbl-wrap { margin: 8px 0 0 !important; padding: 0 !important; }
+
+/* 머리말·메뉴 막대를 화면 양옆 끝까지 채움 (본문 폭과 상관없이) */
+html, body { overflow-x: clip; }
+.top, .tabbar { background: transparent; border-bottom: 0; isolation: isolate; }
+.top::before, .tabbar::after { content: ''; position: absolute; top: 0; bottom: 0; left: -100vmax; right: -100vmax; background: var(--bar); z-index: -1; pointer-events: none; }
+.top::before { bottom: -3px; border-bottom: 3px solid var(--apex); }
+.top { margin-bottom: 3px; }
+/* 메뉴 막대 아래는 그림자로 본문 배경에 자연스럽게 이어지게 */
+@media (min-width: 768px) {
+  .tabbar::after { box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .55); }
+}
+/* 아주 넓은 화면: 본문 양옆도 가장자리로 갈수록 살짝 어두워지게 */
+@media (min-width: 1500px) {
+  body { background: radial-gradient(ellipse 70% 120% at 50% 0%, var(--paper) 60%, color-mix(in srgb, var(--paper) 82%, var(--bar)) 100%) fixed; }
+}
