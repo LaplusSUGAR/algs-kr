@@ -9,6 +9,9 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem('algskr.' + k); return v === null ? d : JSON.parse(v); } catch { return k in mem ? mem[k] : d; } },
   set(k, v) { mem[k] = v; try { localStorage.setItem('algskr.' + k, JSON.stringify(v)); } catch {} },
 };
+// 언어 (assets/i18n.js): 화면은 한국어로 그리고, 다른 언어면 그린 뒤 문구를 바꾼다
+const I = window.I18N || { lang: 'ko', info: { tz: 'KST' }, t: (x) => x, tree() {}, chrome() {}, setLang() {} };
+const TZL = I.info.tz;
 const opt = { spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []), main: store.get('main', null) };
 
 /* ---------- 보기 모드: 한국 팀 · APAC North · 내 응원 팀 ----------
@@ -90,7 +93,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const TZ = 'Asia/Seoul';
 const dayKey = (iso) => new Date(iso).toLocaleDateString('sv-SE', { timeZone: TZ });
 const hhmm = (iso) => new Date(iso).toLocaleTimeString('ko-KR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
-const WD = ['일', '월', '화', '수', '목', '금', '토'];
+const WD = { ja: ['日', '月', '火', '水', '木', '金', '土'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] }[I.lang] || ['일', '월', '화', '수', '목', '금', '토'];
 const dayLabel = (key) => { const [y, m, d] = key.split('-').map(Number); const wd = WD[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]; return `${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')} (${wd})`; };
 const dateTime = (iso) => `${dayLabel(dayKey(iso))} ${hhmm(iso)}`;
 const fmt = (n) => (n ?? '–').toLocaleString('ko-KR');
@@ -163,6 +166,7 @@ function render() {
   const view = { home, schedule, standings, points, teams, streams, rules, players: playerView }[tab] || home;
   app.innerHTML = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + view(parts, q);
   bind();
+  I.tree(app);
 }
 
 /* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
@@ -434,7 +438,7 @@ function heroCard(k) {
       <div><b>${k.pl ? k.pl.pos + '위' : '–'}</b><span>Split 2 프로리그<br>${REGION[t?.region] || ''}</span></div>
     </div>
     ${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, intlKey(), '성적')}
-    ${next ? `<div class="kr-next"><span>${next.live || next.status === 'live' ? '진행 중' : '다음 경기'} · ${esc(ko(next.name, PHASE_KO))}<br><span style="opacity:.7">${dateTime(next.start)} KST</span></span><b>${esc(until(next.start) || '진행 중')}</b></div>` : ''}
+    ${next ? `<div class="kr-next"><span>${next.live || next.status === 'live' ? '진행 중' : '다음 경기'} · ${esc(ko(next.name, PHASE_KO))}<br><span style="opacity:.7">${dateTime(next.start)} ${TZL}</span></span><b>${esc(until(next.start) || '진행 중')}</b></div>` : ''}
   </section>`;
 }
 
@@ -592,7 +596,7 @@ function replayView(q) {
     </tbody></table></div></details>`;
   return head + tabs + `
     <section class="sec rp">
-      <div class="rp-meta"><b>${esc(ko(s.name, PHASE_KO))} · 게임 ${m.matchNumber}</b> <span class="muted">${esc(m.map?.name || '')}${dur ? ` · ${dur}분` : ''}${m.playStartedAt ? ` · ${dateTime(m.playStartedAt)} KST` : ''}</span>${bans.length ? `<span class="rp-bans">밴: ${bans.map(esc).join(', ')}</span>` : ''}</div>
+      <div class="rp-meta"><b>${esc(ko(s.name, PHASE_KO))} · 게임 ${m.matchNumber}</b> <span class="muted">${esc(m.map?.name || '')}${dur ? ` · ${dur}분` : ''}${m.playStartedAt ? ` · ${dateTime(m.playStartedAt)} ${TZL}` : ''}</span>${bans.length ? `<span class="rp-bans">밴: ${bans.map(esc).join(', ')}</span>` : ''}</div>
       <div class="rp-bar"><button type="button" class="rp-btn" id="rpPlay" aria-label="재생">▶</button><button type="button" class="rp-btn" id="rpBack" aria-label="한 단계 뒤로">‹</button>
         <input type="range" id="rpSlider" min="0" max="${N - 1}" value="0" aria-label="탈락 순서 재생바"><button type="button" class="rp-btn" id="rpFwd" aria-label="한 단계 앞으로">›</button><button type="button" class="rp-btn" id="rpEnd" aria-label="끝으로">⏭</button>
         <span class="rp-count" id="rpCount">${N}팀 생존</span></div>
@@ -616,10 +620,10 @@ function bindReplay() {
       const i = pos.get(el.dataset.team);
       const out = i < step, win = step === N - 1 && i === N - 1;
       el.classList.toggle('out', out); el.classList.toggle('win', win);
-      el.querySelector('.rp-state').textContent = win ? '챔피언' : out ? `${N - i}위 탈락` : '생존';
+      el.querySelector('.rp-state').textContent = I.t(win ? '챔피언' : out ? `${N - i}위 탈락` : '생존');
     });
     app.querySelectorAll('.rp-ev').forEach((li) => { li.hidden = +li.dataset.step > step + (step === N - 1 ? 1 : 0); });
-    document.getElementById('rpCount').textContent = step === N - 1 ? '게임 종료' : `${N - step}팀 생존`;
+    document.getElementById('rpCount').textContent = I.t(step === N - 1 ? '게임 종료' : `${N - step}팀 생존`);
   };
   const stop = () => { clearInterval(timer); timer = null; document.getElementById('rpPlay').textContent = '▶'; };
   sl.addEventListener('input', () => { stop(); show(+sl.value); });
@@ -913,7 +917,7 @@ function groupTable(ev) {
 function stageTable(st) {
   const x = st.s;
   const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
-  const top = `<div class="bk-stage-h"><h3 class="h3">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h3> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? dateTime(st.start) + ' KST' : ''}</span></div>`;
+  const top = `<div class="bk-stage-h"><h3 class="h3">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h3> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? dateTime(st.start) + ' ' + TZL : ''}</span></div>`;
   const res = x?.results;
   let body;
   if (res?.length) {
@@ -1187,7 +1191,7 @@ const boardNote = () => {
   const b = board();
   if (!BOARD_NOTE[b.state]) return '';
   const subs = A.cpSubs?.[b.ST.e.slug] || [];
-  const subLine = subs.length ? `<br><b>대체 출전 반영</b> ${subs.map((x) => `${esc(x.team)}: ${esc((x.out || []).join('·') || '결장 선수')} → ${esc((x.in || []).map((y) => `${y.name}(${y.home})`).join('·'))}`).join(' / ')}. 빠진 선수는 이번 대회 CP를 받지 않고, 대체 선수의 CP는 원래 소속팀 합계에 들어갑니다.` : '';
+  const subLine = subs.length ? `<br><b>대체 출전 반영</b> ${subs.map((x) => `${esc(x.team)}: ${esc((x.out || []).join('·') || '결장 선수')} → ${esc((x.in || []).map((y) => `${y.name}(${y.home})`).join('·'))}`).join(' / ')}. <span>빠진 선수는 이번 대회 CP를 받지 않고, 대체 선수의 CP는 원래 소속팀 합계에 들어갑니다.</span>` : '';
   return `<p class="board-note ${b.state}">${BOARD_NOTE[b.state](b)}${subLine}</p>`;
 };
 
@@ -1600,27 +1604,31 @@ function setupSettings() {
     sp.checked = opt.spoiler; kr.checked = opt.krOnly;
     document.getElementById('dataInfo').innerHTML = dataInfo();
     document.getElementById('refreshInfo').innerHTML = refreshInfo();
+    I.tree(document.getElementById('dataInfo')); I.tree(document.getElementById('refreshInfo'));
     dlg.showModal();
   });
   document.getElementById('refreshPill').addEventListener('click', () => document.getElementById('settingsBtn').click());
   dark.addEventListener('change', () => { const t = dark.checked ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('algskr.theme', t); } catch {} });
   sp.addEventListener('change', () => { opt.spoiler = sp.checked; store.set('spoiler', sp.checked); render(); });
   kr.addEventListener('change', () => { opt.krOnly = kr.checked; store.set('krOnly', kr.checked); render(); });
+  // 언어: 고르면 저장하고 새로 불러온다 (고정 영역까지 처음부터 그 언어로)
+  dlg.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.lang !== I.lang) I.setLang(b.dataset.lang); }));
 }
 
 const dataInfo = () => {
   const s = A.sources;
   const f = (iso) => (iso ? dateTime(iso) : '수집 안 됨');
-  return `데이터 갱신: ${dateTime(A.generated)} KST<br>Liquipedia: ${f(s.lp)}<br>ALGS 공식: ${f(s.algs)}<br>Battlefy: ${f(s.battlefy)}${A.conflicts?.length ? `<br>출처 간 차이 ${A.conflicts.length}건 (Liquipedia 값 표시)` : ''}`;
+  return `데이터 갱신: ${dateTime(A.generated)} ${TZL}<br>Liquipedia: ${f(s.lp)}<br>ALGS 공식: ${f(s.algs)}<br>Battlefy: ${f(s.battlefy)}${A.conflicts?.length ? `<br>출처 간 차이 ${A.conflicts.length}건 (Liquipedia 값 표시)` : ''}`;
 };
-const footer = () => { document.getElementById('sourceLine').innerHTML = `데이터: <a href="https://liquipedia.net/apexlegends/" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA 3.0), <a href="https://algs.ea.com/" target="_blank" rel="noopener">ALGS 공식</a>, Battlefy. 갱신 ${dateTime(A.generated)} KST`; };
+const footer = () => { footer0(); I.tree(document.getElementById('sourceLine')); };
+const footer0 = () => { document.getElementById('sourceLine').innerHTML = `데이터: <a href="https://liquipedia.net/apexlegends/" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA 3.0), <a href="https://algs.ea.com/" target="_blank" rel="noopener">ALGS 공식</a>, Battlefy. 갱신 ${dateTime(A.generated)} ${TZL}`; };
 
 /* ---------- 데이터 갱신: 버전 확인 + 경기 중 실시간 ---------- */
 const R = A.season.refresh || { buildMinutes: 5, liveSeconds: 10 };
 const LIVE = { mode: C.liveMode || (C.liveUrl ? 'worker' : 'direct'), api: C.officialApi || 'https://prod-api.algstools.com/v1', lastAt: 0, active: [] };
 const ago = (t) => { const s = Math.max(0, Math.round((Date.now() - t) / 1000)); return s < 60 ? `${s}초 전` : `${Math.floor(s / 60)}분 전`; };
 function refreshNote() {
-  return `<details class="refresh-note"><summary><b>갱신 주기</b> 점수 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초 · 순위·CP ${Math.round(OFF.ms / 1000)}초 <span class="more-hint">자세히</span></summary>진행 중인 시리즈 점수는 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다, 순위·챔피언십 포인트·다음 단계 출전 명단은 ${Math.round(OFF.ms / 1000)}초마다(시리즈가 끝나는 순간에는 즉시) 공식 API에서 직접 받아 바꿉니다. Liquipedia 대조는 ${R.buildMinutes}분 주기 빌드에서 합니다. 마지막 빌드 ${dateTime(A.generated)} KST.</details>`;
+  return `<details class="refresh-note"><summary><b>갱신 주기</b> 점수 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초 · 순위·CP ${Math.round(OFF.ms / 1000)}초 <span class="more-hint">자세히</span></summary>진행 중인 시리즈 점수는 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다, 순위·챔피언십 포인트·다음 단계 출전 명단은 ${Math.round(OFF.ms / 1000)}초마다(시리즈가 끝나는 순간에는 즉시) 공식 API에서 직접 받아 바꿉니다. Liquipedia 대조는 ${R.buildMinutes}분 주기 빌드에서 합니다. 마지막 빌드 ${dateTime(A.generated)} ${TZL}.</details>`;
 }
 function refreshInfo() {
   return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>확정값: 챔피언십 포인트·조별 리그 순위·출전 명단을 공식 API에서 ${Math.round(OFF.ms / 1000)}초마다, 시리즈 종료 즉시 다시 받음${OFF.lastAt ? ` (마지막 ${ago(OFF.lastAt)})` : ''}.<br>평상시: ${R.buildMinutes}분마다 자동 빌드 (GitHub 예약 실행이라 몇 분 늦어질 수 있음). 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
@@ -1630,7 +1638,7 @@ function updatePill() {
   if (!pill) return;
   const on = LIVE.active.length > 0 && A.series.some((s) => s.live);
   pill.classList.toggle('is-live', on);
-  txt.textContent = on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`;
+  txt.textContent = I.t(on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`);
 }
 // 진행 중이거나 5분 안에 시작하는 시리즈 (시작 후 10시간까지)
 const liveCandidates = () => A.series.filter((s) => s.status !== 'completed' && new Date(s.start) - now() < 5 * 60e3 && now() - new Date(s.start) < 10 * 3600e3);
@@ -1760,6 +1768,7 @@ function applyLive() {
 }
 
 /* ---------- 시작 ---------- */
+I.chrome();
 window.addEventListener('hashchange', () => { render(); app.focus({ preventScroll: true }); window.scrollTo(0, 0); });
 setupSettings();
 setupFeedback();

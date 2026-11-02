@@ -15,7 +15,7 @@ function stampAssets() {
   const idx = path.join(ROOT, 'site/index.html');
   let html = fs.readFileSync(idx, 'utf8');
   const before = html;
-  for (const rel of ['assets/style.css', 'assets/app.js', 'assets/config.js']) {
+  for (const rel of ['assets/style.css', 'assets/app.js', 'assets/config.js', 'assets/i18n.js']) {
     const h = hash(fs.readFileSync(path.join(ROOT, 'site', rel), 'utf8'));
     html = html.replace(new RegExp(`${rel.replace('.', '\\.')}(\\?v=\\w+)?"`), `${rel}?v=${h}"`);
   }

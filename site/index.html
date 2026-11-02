@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="assets/style.css?v=09ec77ab">
+  <link rel="stylesheet" href="assets/style.css?v=0f380eb3">
   <script>try{var t=localStorage.getItem('algskr.theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
 <body>
@@ -71,6 +71,8 @@
       <label class="switch"><input type="checkbox" id="optDark"> <span>다크 모드</span></label>
       <label class="switch"><input type="checkbox" id="optSpoiler"> <span>결과 가리기 (스포일러 방지)<small class="sw-note">점수·순위·진출 결과를 가리고, 대회별로 눌러서 공개합니다</small></span></label>
       <label class="switch"><input type="checkbox" id="optKrOnly"> <span>표에서 관심 팀만 보기<small class="sw-note">보기 모드(한국 팀 · APAC North · 내 응원 팀)의 팀만</small></span></label>
+      <h3 class="dlg-h">언어 · Language</h3>
+      <div class="seg lang-seg" role="group" aria-label="Language" data-no-tr><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="ja">日本語</button><button type="button" data-lang="en">English</button></div>
       <h3 class="dlg-h">갱신 주기</h3>
       <div class="dlg-note" id="refreshInfo"></div>
       <h3 class="dlg-h">데이터 출처</h3>
@@ -81,6 +83,7 @@
 
   <script src="data/algs-data.js?v=19840b7e"></script>
   <script src="assets/config.js?v=79c5061b"></script>
-  <script type="module" src="assets/app.js?v=b329ca5c"></script>
+  <script src="assets/i18n.js?v=baacc94c"></script>
+  <script type="module" src="assets/app.js?v=4fdad00e"></script>
 </body>
 </html>
