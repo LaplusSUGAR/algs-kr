@@ -1,6 +1,7 @@
 // LCQ 지역별 출전 팀을 Liquipedia 대회 페이지에서 받는다 (공식 API가 명단을 공개하기 전까지의 출처).
 // API 키가 필요 없는 MediaWiki API(action=query)로 네 지역 페이지의 위키 원문을 한 번에 받는다.
 // 이용 규칙: 식별 가능한 User-Agent, 요청 간격 지키기. 5분 주기 빌드 중 매시 첫 회(LCQ 주간에는 15분마다)만 받는다.
+// 챌린저 서킷 종합 순위 페이지도 같은 요청으로 받는다 (LCQ 남은 자리는 이 순위대로 채워진다).
 // 결과(CC-BY-SA, 출처 표기): raw/lp/lcq.json
 //   { fetchedAt, pages: { region: { title, rev, text } } }
 import { UA, readJson, writeJson } from './lib.mjs';
@@ -11,6 +12,11 @@ const PAGES = {
   'apac-s': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_South',
   emea: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/EMEA',
   americas: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/Americas',
+  // 챌린저 서킷 종합 순위 (LCQ 남은 자리를 채우는 순서)
+  'cc:apac-n': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_North',
+  'cc:apac-s': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_South',
+  'cc:emea': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/EMEA',
+  'cc:americas': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/Americas',
 };
 const LCQ_START = new Date('2026-11-20T00:00:00Z');
 const LCQ_END = new Date('2026-11-23T00:00:00Z');
