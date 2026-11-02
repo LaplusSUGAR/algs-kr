@@ -53,7 +53,7 @@ async function ccStandings() {
   const cur = readJson('raw/lp/lcq.json', null);
   if (!cur) return;
   const cc = cur.cc || {};
-  const todo = Object.entries(PAGES).filter(([k]) => k.startsWith('cc:') && !cc[k.slice(3)]?.html);
+  const todo = Object.entries(PAGES).filter(([k]) => k.startsWith('cc:') && cc[k.slice(3)]?.v !== 2);
   if (!todo.length) return;
   for (const [i, [k, title]] of todo.entries()) {
     if (i) await new Promise((r) => setTimeout(r, 31000));
@@ -62,9 +62,10 @@ async function ccStandings() {
       const res = await fetch(`${API}?${qs}`, { headers: { 'User-Agent': UA, 'Accept-Encoding': 'gzip' } });
       if (!res.ok) { console.error(`[lp-lcq] ${k} parse ${res.status}`); continue; }
       const html = (await res.json()).parse?.text || '';
-      // 첫 번째 표만, 꾸밈 속성은 빼고 보관
-      const t = html.slice(html.indexOf('<table'), html.indexOf('</table>') + 8).replace(/\s(style|class|width|height|srcset|decoding|loading)="[^"]*"/g, '');
-      cc[k.slice(3)] = { at: new Date().toISOString(), html: t };
+      // 'Standings' 절만 (내비게이션 상자 제외), 이미지·꾸밈 속성은 빼고 보관
+      const a = html.indexOf('id="Standings"'), b = html.indexOf('id="References"');
+      const t = html.slice(a > 0 ? a : 0, b > a ? b : undefined).replace(/<img[^>]*>/g, '').replace(/\s(style|width|height|srcset|decoding|loading|data-[a-z-]+)="[^"]*"/g, '');
+      cc[k.slice(3)] = { v: 2, at: new Date().toISOString(), html: t };
       console.log(`[lp-lcq] ${k} 종합 순위 ${t.length}자`);
     } catch (e) { console.error(`[lp-lcq] ${k} 실패`, e.message); }
   }
