@@ -805,3 +805,26 @@ html, body { overflow-x: clip; }
 .past-ev { margin-top: 14px; padding: 14px 16px; background: var(--card); border-radius: var(--r-lg); border-left: 5px solid var(--apex); }
 .past-ev .h2 { margin: 0; }
 .past-ev .lead { margin: 4px 0 0; }
+
+/* ---------- 챔피언십 조 편성 ---------- */
+.cg-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.cg { background: var(--card); border-radius: var(--r-lg); padding: 12px 12px 8px; border-top: 4px solid var(--apex); min-width: 0; }
+.cg-h { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+.cg-h b { font-family: var(--display); font-size: 26px; line-height: 1; letter-spacing: .02em; }
+.cg-h small { font-size: 12px; color: var(--steel); font-weight: 600; }
+.cg-list { list-style: none; margin: 0; padding: 0; }
+.cg-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto 52px; align-items: center; gap: 6px; padding: 7px 6px; border-top: 1px solid var(--rule); font-size: 13.5px; }
+.cg-row:first-child { border-top: 0; }
+.cg-row.kr { background: var(--kc-soft, var(--kr-team-soft)); border-left: 4px solid var(--kc-col, var(--kr-team)); padding-left: 4px; border-radius: 4px; }
+.cg-row.tbd { color: var(--steel); }
+.cg-row.tbd .cg-team .tag { border-style: dashed; }
+.cg-seed { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--steel); text-align: right; }
+.cg-team { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.cg-reg { font-size: 10.5px; color: var(--steel); font-weight: 700; }
+.cg-cp { text-align: right; font-size: 12.5px; color: var(--steel); }
+.cq-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.cq { display: grid; gap: 6px; align-content: start; padding: 10px 12px; background: var(--card); border-radius: var(--r-sm); font-size: 13.5px; }
+.cq b { font-size: 12px; color: var(--steel); }
+@media (max-width: 1100px) { .cg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .cq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .cg-grid { grid-template-columns: minmax(0, 1fr); } }

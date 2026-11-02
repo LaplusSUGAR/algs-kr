@@ -183,15 +183,30 @@ const intl = intlEv && algs.poGroup.length ? {
 } : null;
 
 // ---------- 이전 결과: 시작한 국제전 전부 (최근 순). 조별 리그 누적은 대회별로 보관된 값 ----------
-const pgRow = (bracketFmt) => ([pos, short, name, id, group, pts, kills, region]) => ({ pos, short: teams[id]?.short || short, name, id, group, pts, kills, region: normRegion(region), kr: teams[id]?.krLevel || 'none',
-  ...(bracketFmt ? { next: pos <= 20 ? 'Winners Round' : 'Elimination Round 1' } : {}) });
+// format 'bracket' (Split 2·챔피언십): 조별 리그 → 승자 라운드/패자부활 1·2R → 결승
+// format 'stages'  (Split 1 EWC): 조별 리그 상위 N팀 결승 직행, 다음 M팀 서바이벌 스테이지(상위 K팀 결승), 나머지 탈락
+//   직행·서바이벌 인원은 실제 결과에서 계산하고, 결과가 없으면 공식 단계의 진출 기준(0부터 센 값)을 쓴다
 const latestIntlId = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt) && algs.events.find((x) => x[0] === e.id)?.[6]?.length)
   .sort((a, b) => b.start.localeCompare(a.start))[0]?.id;
 const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt))
   .sort((a, b) => b.start.localeCompare(a.start)).map((e) => {
-    const bracketFmt = series.some((x) => x.eventId === e.id && x.name === 'Winners Round');
+    const ss = series.filter((x) => x.eventId === e.id);
+    const bracketFmt = ss.some((x) => x.name === 'Winners Round');
+    let stages = null;
+    if (!bracketFmt) {
+      const ph = algs.events.find((x) => x[0] === e.id)?.[6] || [];
+      const mid = ss.find((x) => x.phase !== 'Group Stage' && x.phase !== 'Match Point Finals');
+      const f = ss.find((x) => x.phase === 'Match Point Finals');
+      const fT = new Set((f?.results || []).map((r) => r.short)), mT = new Set((mid?.results || []).map((r) => r.short));
+      const th = (name) => ph.find((p) => p[1] === name)?.[3];
+      const direct = fT.size && mT.size ? [...fT].filter((x) => !mT.has(x)).length : th('Group Stage') != null ? th('Group Stage') + 1 : null;
+      const midTop = fT.size && mT.size ? [...mT].filter((x) => fT.has(x)).length : mid && th(mid.phase) != null ? th(mid.phase) + 1 : null;
+      if (mid && direct) stages = { direct, midN: mid.results?.length || 20, midTop, midPhase: mid.phase };
+    }
+    const next = (pos) => (bracketFmt ? (pos <= 20 ? 'Winners Round' : 'Elimination Round 1') : stages ? (pos <= stages.direct ? 'Match Point Finals' : pos <= stages.direct + stages.midN ? stages.midPhase : 'Eliminated') : undefined);
     const raw = algs.poGroups?.[e.id] || (e.id === latestIntlId ? algs.poGroup : []);
-    return { eventId: e.id, slug: e.slug, name: e.name, start: e.start, end: e.end, format: bracketFmt ? 'bracket' : 'stages', winnersCut: bracketFmt ? 20 : null, rows: raw.map(pgRow(bracketFmt)) };
+    const rows = raw.map(([pos, short, name, id, group, pts, kills, region]) => ({ pos, short: teams[id]?.short || short, name, id, group, pts, kills, region: normRegion(region), kr: teams[id]?.krLevel || 'none', ...(next(pos) ? { next: next(pos) } : {}) }));
+    return { eventId: e.id, slug: e.slug, name: e.name, start: e.start, end: e.end, format: bracketFmt ? 'bracket' : 'stages', winnersCut: bracketFmt ? 20 : null, stages, rows };
   }).filter((e) => e.rows.length || series.some((x) => x.eventId === e.eventId && x.results));
 
 // ---------- LCQ (지역별) ----------
