@@ -105,6 +105,12 @@ for (const t of Object.values(teams)) {
 
 // ---------- 챔피언십 포인트 (공식 값) ----------
 const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => ({ rank, id, short, name, region: normRegion(region), total, players }));
+// CP 동률이면 Split 2 플레이오프 최종 순위가 좋은 팀이 위 (운영자 기준, 화면의 정산 순위와 같은 규칙). 미출전은 뒤, 그다음 공식 순위
+{
+  const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === 'split-2-playoffs')?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
+  cpRows.sort((a, b) => b.total - a.total || (po.get(a.id) ?? 999) - (po.get(b.id) ?? 999) || a.rank - b.rank);
+  cpRows.forEach((r, i) => (r.rank = i + 1));
+}
 const cp32 = cpRows.find((r) => r.rank === CP_DIRECT)?.total ?? 0;
 const cp33 = cpRows.find((r) => r.rank === CP_DIRECT + 1)?.total ?? 0;
 for (const r of cpRows) {
