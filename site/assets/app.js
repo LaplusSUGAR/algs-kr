@@ -134,7 +134,9 @@ const logo = (short, cls = '', dark) => {
   const plate = d ? (lg[0] ? '' : ' plate-light') : (lg[1] ? '' : ' plate-dark');
   return `<img class="tlogo ${cls}${plate}" src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span class=&quot;tlogo ph ${cls}&quot;>${esc(String(short || '?').slice(0, 4))}</span>'">`;
 };
-const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>` : A.xteams?.[short] ? `<span class="tl" title="${esc(A.xteams[short].name)}">${logo(short)}<span>${esc(label || short)}</span></span>` : esc(label || short));
+const D2 = '<span class="tag d2" title="2부 리그(챌린저 서킷) 팀">2부</span>';
+const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>`
+  : A.xteams?.[short] ? `<span class="tl" title="${esc(A.xteams[short].name)}">${logo(short)}<span>${esc(label || A.xteams[short].name)}</span></span>${A.xteams[short].d2 ? ' ' + D2 : ''}` : esc(label || short));
 const now = () => Date.now();
 function until(iso) {
   const ms = new Date(iso) - now();
@@ -714,12 +716,19 @@ function lcqEntrants(ev) {
       .sort((a, b) => (a.seed ?? 999) - (b.seed ?? 999) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
     return { src: 'official', list };
   }
-  return { src: 'projected', list: cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r })) };
+  const pl = cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r }));
+  // 남은 자리 = 40 − 프로리그 팀 수. 챌린저 서킷 우승팀부터, 그다음 종합 포인트 순 (Liquipedia)
+  const cc = ev.cc || [];
+  const n = Math.max(0, 40 - pl.length);
+  const pick = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)].slice(0, n);
+  const next = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)][n];
+  const tie = !!(next && pick.length && !pick.at(-1).win && pick.at(-1).pts === next.pts);
+  return { src: 'projected', pl: pl.length, ccN: pick.length, tie, list: [...pl, ...pick.map((c) => ({ id: null, short: c.short, name: c.name, pl: false, cc: c }))] };
 }
 function lcqBracket(ev) {
   const ss = A.series.filter((s) => s.eventId === ev.eventId);
   const E = lcqEntrants(ev);
-  const seed = (sh) => { const i = E.list.findIndex((t) => t.short === sh); const t = E.list[i]; return !t ? null : { n: t.seed ?? i + 1, label: t.seed ? `${t.seed}번 시드` : t.cp ? `CP ${t.cp.rank}위` : '챌린저' }; };
+  const seed = (sh) => { const i = E.list.findIndex((t) => t.short === sh); const t = E.list[i]; return !t ? null : { n: t.seed ?? i + 1, label: t.seed ? `${t.seed}번 시드` : t.cp ? `CP ${t.cp.rank}위` : t.cc ? ccLabel(t.cc) : '2부' }; };
   const B = { ev, E };
   for (const S of LCQ_STAGES) {
     const x = ss.find((y) => y.name === S.name || (S.key === 'f' && y.phase === 'Match Point Finals'));
@@ -740,6 +749,7 @@ function lcqBracket(ev) {
   B.done = B.f.status === 'completed';
   return B;
 }
+const ccLabel = (c) => (c.win > 0 ? `CC #${c.win} 우승` : c.win ? 'CC 우승' : `CC 종합 ${c.rank}위`);
 const lcqRegionDefault = () => {
   if (opt.mode === 'custom') { const t = Object.values(A.teams).find((x) => x.id === mainId()) || Object.values(A.teams).find((x) => opt.fav.includes(x.id)); if (t?.region) return t.region; }
   return 'apac-n';
@@ -759,13 +769,13 @@ function lcqBody(q, base) {
     { ko: '승자 2라운드', st: B.wr2 }, { ko: '패자부활 1라운드', st: B.er1 }, { ko: '패자부활 2라운드', st: B.er2 }, { ko: '매치 포인트 결승', st: B.f },
   ];
   const phases = rounds.map((r) => { const status = r.status || r.st.status; return `<li class="${status === 'completed' ? 'done' : status === 'live' ? 'now' : ''}"><span>${r.st.s ? olink(officialUrl(r.st.s), esc(r.ko)) : esc(r.ko)}</span><span class="when">${r.st.start ? dateTime(r.st.start) : ''}</span></li>`; }).join('');
-  const nPl = E.list.filter((t) => t.pl !== false).length;
+  const nPl = E.list.filter((t) => t.pl !== false).length, nCc = E.list.length - nPl;
   const focusLine = focusIn.length ? `<p class="lcq-focus"><b>${esc(ML().group)} ${focusIn.length}팀 출전</b> ${focusIn.map((t) => `<a class="lcq-chip ${CAT[lvlOf(t.short)] || ''}" href="${qsLink(base, q, { r: t.region })}">${logo(t.short)}<span>${esc(t.short)}</span><small>${esc(REGION[t.region])}</small></a>`).join('')}</p>` : '';
   const entrants = `<section class="sec" aria-labelledby="h-lcq-t"><h2 class="h2" id="h-lcq-t">${E.src === 'official' ? '공식 출전 명단' : '예상 출전 팀'} <small class="muted">${E.list.length}팀</small></h2>
-    <p class="caption">${E.src === 'official' ? '공식 API가 공개한 출전 팀입니다. 시드 순서대로 A·B로비에 지그재그로 나뉩니다.' : `챔피언십 포인트 직행권(${A.season.cpDirectSlots}위) 밖의 ${REGION[ev.region]} 프로리그 ${nPl}팀을 CP 순서(시드 순서)로 보여 줍니다. 나머지 ${Math.max(0, 40 - nPl)}자리는 Split 2 챌린저 서킷 상위 팀이 채웁니다. 공식 명단이 나오면 바뀝니다.`}</p>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r">CP 순위</th></tr></thead><tbody>
-    ${E.list.filter((t) => !opt.krOnly || isF(t.short)).map((t, i) => `<tr class="${rowCls(t)}"><td class="rank">${t.seed ?? i + 1}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.pl === false ? '<small>챌린저 서킷</small>' : ''}</td><td class="r num">${t.cp ? fmt(t.cp.total) : '–'}</td><td class="r small muted">${t.cp ? `${t.cp.rank}위` : ''}</td></tr>`).join('')}
-    </tbody></table></div></section>`;
+    <p class="caption">${E.src === 'official' ? '공식 API가 공개한 출전 팀입니다. 시드 순서대로 A·B로비에 지그재그로 나뉩니다.' : `프로리그 ${nPl}팀: 챔피언십 포인트 직행권(${A.season.cpDirectSlots}위) 밖의 ${REGION[ev.region]} 팀, CP 순서. <br>2부 ${nCc}팀: Split 2 챌린저 서킷 우승팀과 종합 포인트 상위 팀 (Liquipedia 순위표 기준). ${E.tie ? '마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다. ' : ''}공식 명단이 나오면 그 명단으로 바뀝니다.`}</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">포인트</th><th class="r">근거</th></tr></thead><tbody>
+    ${E.list.filter((t) => !opt.krOnly || isF(t.short)).map((t, i) => `${E.src !== 'official' && i === nPl && nPl ? `<tr class="cut-label"><td colspan="4">여기부터 2부 리그(챌린저 서킷) 팀</td></tr>` : ''}<tr class="${rowCls(t)}"><td class="rank">${t.seed ?? i + 1}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}</td><td class="r num">${t.cp ? fmt(t.cp.total) : t.cc ? `<span class="muted">${fmt(t.cc.pts)}</span>` : '–'}</td><td class="r small muted">${t.cp ? `CP ${t.cp.rank}위` : t.cc ? esc(ccLabel(t.cc)) : ''}</td></tr>`).join('')}
+    </tbody></table></div>${E.src !== 'official' && nCc ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : ''}</section>`;
   const lobbies = B.a.teams.length || B.b.teams.length;
   const bracketHtml = `
     <section class="sec bk bk-upper" aria-labelledby="h-lcq-up"><h2 class="h2 bk-h" id="h-lcq-up"><span class="bk-badge up">승자조</span></h2><div class="bk-cols">${stageTable(B.a)}${stageTable(B.b)}</div>${B.started ? stageTable(B.wr2) : ''}</section>
@@ -818,7 +828,7 @@ function champsView() {
   const basis = BD.state === 'live' ? '진행 중 대회 정산 순위' : BD.state === 'pending' ? '최종 순위 정산' : '현재 챔피언십 포인트 순위';
   const row = (t) => t.tbd
     ? `<li class="cg-row tbd"><span class="cg-seed">${t.seed}</span><span class="cg-team"><span class="tag lcq">LCQ</span></span><small class="cg-reg">미정</small><span class="cg-cp"></span></li>`
-    : `<li class="cg-row ${rowCls(t)}"><span class="cg-seed">${t.seed}</span><span class="cg-team">${krDot(null, t.short)}${teamLink(t.short, t.short)}${t.via === 'lcq' ? ' <span class="tag lcq">LCQ</span>' : ''}</span><small class="cg-reg">${esc(REGION_S[t.region] || '')}</small><span class="cg-cp num">${t.total ? fmt(t.total) : '–'}</span></li>`;
+    : `<li class="cg-row ${rowCls(t)}"><span class="cg-seed">${t.seed}</span><span class="cg-team">${krDot(null, t.short)}${teamLink(t.short, team(t.short) ? t.short : undefined)}${t.via === 'lcq' ? ' <span class="tag lcq">LCQ</span>' : ''}</span><small class="cg-reg">${esc(REGION_S[t.region] || '')}</small><span class="cg-cp num">${t.total ? fmt(t.total) : '–'}</span></li>`;
   const groupsHtml = `<div class="cg-grid">${GROUPS.map((g) => { const ts = seeds.filter((t) => t.group === g); const nF = ts.filter((t) => !t.tbd && isF(t.short)).length; return `<section class="cg" aria-label="${g}조"><h3 class="cg-h"><b>${g}조</b><small>${ts.filter((t) => !t.tbd).length}팀 확정${ts.some((t) => t.tbd) ? ` · LCQ ${ts.filter((t) => t.tbd).length}자리` : ''}${nF ? ` · ${esc(ML().tag)} ${nF}` : ''}</small></h3><ol class="cg-list">${ts.map(row).join('')}</ol></section>`; }).join('')}</div>`;
   const qBox = `<section class="sec" aria-labelledby="h-cq"><h2 class="h2" id="h-cq">LCQ 진출 팀 <small class="muted">지역별 2팀</small></h2>
     <div class="cq-grid">${Q.map((x) => `<div class="cq"><b>${esc(REGION[x.region])}</b>${x.done ? x.teams.map((sh) => `<span>${teamLink(sh)}</span>`).join('') : `<span class="muted">${lcqEvents().find((e) => e.region === x.region) && lcqBracket(lcqEvents().find((e) => e.region === x.region)).started ? 'LCQ 진행 중' : 'LCQ 전'}</span>`}</div>`).join('')}</div>

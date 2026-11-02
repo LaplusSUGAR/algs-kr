@@ -209,6 +209,27 @@ const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) 
     return { eventId: e.id, slug: e.slug, name: e.name, start: e.start, end: e.end, format: bracketFmt ? 'bracket' : 'stages', winnersCut: bracketFmt ? 20 : null, stages, rows };
   }).filter((e) => e.rows.length || series.some((x) => x.eventId === e.eventId && x.results));
 
+// ---------- LCQ 챌린저 서킷 팀 (Liquipedia) ----------
+// 공식 명단이 나오기 전 LCQ의 2부(챌린저 서킷) 자리를 채우는 순서: 서킷 우승팀(초록) → 종합 포인트 순.
+// 지역마다 '40 − 직행권 밖 프로리그 팀 수'만큼 화면이 위에서부터 잘라 쓴다 (직행 수는 정산 순위에 따라 바뀌므로)
+const lpLcq = readJson('raw/lp/lcq.json', null);
+const nk = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const unent = (x) => String(x).replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#160;/g, ' ');
+const ccOf = (region) => {
+  const html = lpLcq?.cc?.[region]?.html || '';
+  const rows = [...html.matchAll(/<tr><td class="([^"]*)">(\d+)<\/td><td[^>]*>[\s\S]*?team-template-text"><a[^>]*>([^<]+)<\/a>[\s\S]*?<\/td><td[^>]*><b>([\d,]+)<\/b>/g)]
+    .map((m) => ({ cls: m[1], rank: +m[2], name: unent(m[3]).trim(), pts: +m[4].replace(/,/g, '') }));
+  // LCQ 대회 페이지에서 서킷 몇 차 우승인지
+  const won = {};
+  for (const m of (lpLcq?.pages?.[region]?.text || '').matchAll(/\{\{Opponent\|([^\n|}]*)[\s\S]*?qualification=\{\{Qualification\|([^}]*)\}\}/g)) {
+    const c = m[2].match(/Challenger_Circuit_(\d)/);
+    if (c && !/Rankings/.test(m[2])) won[nk(m[1])] = +c[1];
+  }
+  const plNames = new Set(Object.values(teams).filter((t) => t.current && t.region === region).map((t) => nk(t.name)));
+  return rows.filter((r) => !plNames.has(nk(r.name))).slice(0, 32)
+    .map((r) => ({ name: r.name, rank: r.rank, pts: r.pts, win: won[nk(r.name)] || (/green/.test(r.cls) ? -1 : 0) }));
+};
+
 // ---------- LCQ (지역별) ----------
 // 공식 출전 명단이 나오면 그 팀들, 아직이면 빈 목록 (화면이 CP 순위로 예상 명단을 만든다)
 // 프로리그에 없는 팀(챌린저 서킷)은 xteams에 이름·로고만 둔다
@@ -219,11 +240,18 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
     const t = teams[id];
     if (!t?.current && short) {
       const lg = algs.logos?.[id];
-      xteams[short] = { id, short, name: name || short, region: e.region, logo: lg ? [localLogo(lg[0]), localLogo(lg[1])] : null };
+      xteams[short] = { id, short, name: name || short, region: e.region, logo: lg ? [localLogo(lg[0]), localLogo(lg[1])] : null, d2: 1 };
     }
     return { id, short: t?.current ? t.short : short, name: t?.current ? t.name : name || short, seed, pl: !!t?.current };
   });
-  return { eventId: e.id, slug: e.slug, name: e.name, region: e.region, start: e.start, end: e.end, teams: ts };
+  // 2부 팀 표시용: 이름을 그대로 키로 쓴다 (공식 약칭이 없으므로). 프로리그 약칭과 겹치면 뒤에 표시를 붙인다
+  const cc = ccOf(e.region).map((c) => {
+    let key = c.name;
+    if (teams[shortToId[key]]?.current) key = `${c.name} (CC)`;
+    if (!xteams[key]) xteams[key] = { id: null, short: key, name: c.name, region: e.region, logo: null, d2: 1 };
+    return { ...c, short: key };
+  });
+  return { eventId: e.id, slug: e.slug, name: e.name, region: e.region, start: e.start, end: e.end, teams: ts, cc };
 }).sort((a, b) => ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(a.region) - ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(b.region));
 
 // ---------- 한국 팀 요약 ----------
@@ -278,7 +306,7 @@ const cc = bf ? { fetchedAt: bf.fetchedAt, apacN: (bf.leaderboards['asia-pacific
 
 const data = {
   generated: new Date().toISOString(),
-  sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, battlefy: bf?.fetchedAt || null },
+  sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, battlefy: bf?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
   seasonId: algs.seasonId,
   season,
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
