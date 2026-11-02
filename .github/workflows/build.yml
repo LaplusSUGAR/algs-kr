@@ -33,6 +33,8 @@ jobs:
         run: node scripts/fetch-liquipedia.mjs
       - name: ALGS 공식 API
         run: node scripts/fetch-algs.mjs
+      - name: LCQ 출전 팀 (Liquipedia 위키 원문, 매시 1회)
+        run: node scripts/fetch-lcq-lp.mjs
       - name: 팀 로고 줄이기 (새 로고가 있을 때만)
         run: node scripts/fetch-logos.mjs --check || (npm i --no-save --no-package-lock sharp@0.33 && node scripts/fetch-logos.mjs)
       - name: Battlefy
