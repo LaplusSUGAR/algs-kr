@@ -667,12 +667,29 @@ html, body { overflow-x: clip; }
 .board-note.confirmed { border-left-color: var(--ok); }
 .board-note.now { border-left-color: var(--steel); color: var(--steel); }
 .board-note b { margin-right: 6px; }
+/* 지역별 챔피언십 직행권 팀 수 */
+.tag.lcq { border-color: var(--steel); color: var(--steel); }
+.qual { margin: 14px 0 0; padding: 12px; background: var(--card); border-radius: var(--r-lg); border-top: 3px solid var(--apex); }
+.qual-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 10px; }
+.qual-h b { font-family: var(--display); font-size: 20px; letter-spacing: .02em; }
+.qual-h span { font-size: 12.5px; color: var(--steel); }
+.qual-g { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.qual-c { display: grid; gap: 2px; min-width: 0; padding: 10px 12px; border-radius: var(--r-sm); background: var(--paper); color: inherit; text-decoration: none; border: 1px solid transparent; }
+.qual-c:hover { border-color: var(--rule); }
+.qual-c.on { border-color: var(--apex); box-shadow: inset 0 0 0 1px var(--apex); }
+.qual-r { font-size: 12px; font-weight: 700; color: var(--steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qual-c b { font-family: var(--display); font-size: 34px; line-height: 1.05; color: var(--ok); }
+.qual-c b small { margin-left: 2px; font-family: var(--body); font-size: 13px; font-weight: 600; color: var(--steel); }
+.qual-s { font-size: 11.5px; color: var(--steel); }
+@media (max-width: 560px) { .qual-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } .qual-c b { font-size: 28px; } }
 .sm-only { display: none; }
 @media (max-width: 520px) {
   .tbl .opt2 { display: none; }
   .sm-only { display: block; font-size: 11.5px; color: var(--steel); font-weight: 500; }
 }
-@media (max-width: 400px) { .pts-side .tbl .opt { display: none; } }
+@media (max-width: 400px) { .pts-side .tbl .opt { display: none; } .tbl td.team { white-space: normal; } }
+@media (max-width: 520px) { .tbl td.team .sm-only { white-space: normal; min-width: 140px; } }
+@media (max-width: 340px) { .tbl td.team .sm-only { min-width: 112px; } .qual-c { padding: 8px 10px; } }
 .cpb-i.excl { opacity: .55; text-decoration: line-through; text-decoration-color: var(--steel); } .cpb-i.excl small { color: var(--steel); text-decoration: none; }
 
 /* 스포일러 방지 */
