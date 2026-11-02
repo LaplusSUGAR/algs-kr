@@ -43,8 +43,32 @@ async function main() {
   const same = prev && sameSet && JSON.stringify(Object.fromEntries(Object.entries(prev.pages || {}).map(([k, v]) => [k, v.rev]))) === JSON.stringify(Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, v.rev])));
   // 내용이 그대로면 받은 시각만 기억하고(파일은 그대로) 넘어간다 → 불필요한 커밋 방지
   if (same) { console.log('[lp-lcq] 변경 없음'); return; }
-  writeJson('raw/lp/lcq.json', { fetchedAt: new Date().toISOString(), titles: Object.values(PAGES), pages });
+  writeJson('raw/lp/lcq.json', { ...(prev || {}), fetchedAt: new Date().toISOString(), titles: Object.values(PAGES), pages });
   console.log(`[lp-lcq] ${Object.keys(pages).length}개 지역 페이지 저장`);
 }
 
-main().catch((e) => { console.error('[lp-lcq] 실패:', e.message); process.exitCode = 0; });
+// 챌린저 서킷 종합 순위표: 위키 원문에는 없고(Lua 모듈이 그림) 그려진 HTML에만 있어서 action=parse로 받는다.
+// 10월 12일에 끝난 순위라 바뀌지 않으므로 지역마다 한 번만 받는다. parse 요청은 30초 간격 (Liquipedia 규칙)
+async function ccStandings() {
+  const cur = readJson('raw/lp/lcq.json', null);
+  if (!cur) return;
+  const cc = cur.cc || {};
+  const todo = Object.entries(PAGES).filter(([k]) => k.startsWith('cc:') && !cc[k.slice(3)]?.html);
+  if (!todo.length) return;
+  for (const [i, [k, title]] of todo.entries()) {
+    if (i) await new Promise((r) => setTimeout(r, 31000));
+    const qs = new URLSearchParams({ action: 'parse', page: title, prop: 'text', format: 'json', formatversion: '2', disablelimitreport: '1', disableeditsection: '1' });
+    try {
+      const res = await fetch(`${API}?${qs}`, { headers: { 'User-Agent': UA, 'Accept-Encoding': 'gzip' } });
+      if (!res.ok) { console.error(`[lp-lcq] ${k} parse ${res.status}`); continue; }
+      const html = (await res.json()).parse?.text || '';
+      // 첫 번째 표만, 꾸밈 속성은 빼고 보관
+      const t = html.slice(html.indexOf('<table'), html.indexOf('</table>') + 8).replace(/\s(style|class|width|height|srcset|decoding|loading)="[^"]*"/g, '');
+      cc[k.slice(3)] = { at: new Date().toISOString(), html: t };
+      console.log(`[lp-lcq] ${k} 종합 순위 ${t.length}자`);
+    } catch (e) { console.error(`[lp-lcq] ${k} 실패`, e.message); }
+  }
+  writeJson('raw/lp/lcq.json', { ...cur, cc });
+}
+
+main().then(ccStandings).catch((e) => { console.error('[lp-lcq] 실패:', e.message); process.exitCode = 0; });
