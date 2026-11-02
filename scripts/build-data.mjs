@@ -161,25 +161,55 @@ for (const [key, rows] of Object.entries(algs.pl)) {
 }
 
 // ---------- 이벤트·시리즈 ----------
+const lcqLineups = Object.assign({}, ...Object.values(algs.lcq || {}).map((x) => x.lineups || {}));
 const evById = Object.fromEntries(algs.events.map(([id, slug, name, region, start, end]) => [id, { id, slug, name, region: normRegion(region), start, end }]));
 const series = algs.series.map(([id, eventId, phase, name, status, start, regionName, mp, matches, res]) => {
   const ev = evById[eventId] || { name: '', slug: '' };
   const region = normRegion(regionName) || ev.region;
   const results = res ? res.map(([pos, short, pts, kills, m]) => ({ pos, short, pts, kills, kr: teams[shortToId[short]]?.krLevel || 'none', ...(m === 2 ? { won: true, mpe: true } : m === 1 ? { mpe: true } : {}) })).sort((a, b) => a.pos - b.pos) : null;
-  const lineup = algs.lineups?.[id] || null;
+  const lineup = algs.lineups?.[id] || lcqLineups[id] || null;
   return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
 }).sort((a, b) => a.start.localeCompare(b.start));
 
 // ---------- 진행 중 국제전 단계 순위 ----------
 const intlEv = Object.values(evById).find((e) => /playoffs|champs/.test(e.slug) && algs.poGroup.length && new Date(e.start) <= new Date(algs.fetchedAt) && new Date(e.end) >= new Date(new Date(algs.fetchedAt) - 3 * 864e5));
-const intl = algs.poGroup.length ? {
-  eventId: intlEv?.id, name: intlEv?.name || 'Playoffs', phase: 'Group Stage', winnersCut: 20,
+const intl = intlEv && algs.poGroup.length ? {
+  eventId: intlEv.id, name: intlEv.name, slug: intlEv.slug, start: intlEv.start, end: intlEv.end, phase: 'Group Stage', winnersCut: 20,
   rows: algs.poGroup.map(([pos, short, name, id, group, pts, kills, region]) => ({
     pos, short, name, id, group, pts, kills, region: normRegion(region), kr: teams[id]?.krLevel || 'none',
     next: pos <= 20 ? 'Winners Round' : 'Elimination Round 1',
   })),
 } : null;
+
+// ---------- 이전 결과: 시작한 국제전 전부 (최근 순). 조별 리그 누적은 대회별로 보관된 값 ----------
+const pgRow = (bracketFmt) => ([pos, short, name, id, group, pts, kills, region]) => ({ pos, short: teams[id]?.short || short, name, id, group, pts, kills, region: normRegion(region), kr: teams[id]?.krLevel || 'none',
+  ...(bracketFmt ? { next: pos <= 20 ? 'Winners Round' : 'Elimination Round 1' } : {}) });
+const latestIntlId = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt) && algs.events.find((x) => x[0] === e.id)?.[6]?.length)
+  .sort((a, b) => b.start.localeCompare(a.start))[0]?.id;
+const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt))
+  .sort((a, b) => b.start.localeCompare(a.start)).map((e) => {
+    const bracketFmt = series.some((x) => x.eventId === e.id && x.name === 'Winners Round');
+    const raw = algs.poGroups?.[e.id] || (e.id === latestIntlId ? algs.poGroup : []);
+    return { eventId: e.id, slug: e.slug, name: e.name, start: e.start, end: e.end, format: bracketFmt ? 'bracket' : 'stages', winnersCut: bracketFmt ? 20 : null, rows: raw.map(pgRow(bracketFmt)) };
+  }).filter((e) => e.rows.length || series.some((x) => x.eventId === e.eventId && x.results));
+
+// ---------- LCQ (지역별) ----------
+// 공식 출전 명단이 나오면 그 팀들, 아직이면 빈 목록 (화면이 CP 순위로 예상 명단을 만든다)
+// 프로리그에 없는 팀(챌린저 서킷)은 xteams에 이름·로고만 둔다
+const xteams = {};
+const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-qualifier')).map((e) => {
+  const raw = algs.lcq?.[e.id] || { teams: [] };
+  const ts = raw.teams.map(([id, short, name, seed]) => {
+    const t = teams[id];
+    if (!t?.current && short) {
+      const lg = algs.logos?.[id];
+      xteams[short] = { id, short, name: name || short, region: e.region, logo: lg ? [localLogo(lg[0]), localLogo(lg[1])] : null };
+    }
+    return { id, short: t?.current ? t.short : short, name: t?.current ? t.name : name || short, seed, pl: !!t?.current };
+  });
+  return { eventId: e.id, slug: e.slug, name: e.name, region: e.region, start: e.start, end: e.end, teams: ts };
+}).sort((a, b) => ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(a.region) - ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(b.region));
 
 // ---------- 한국 팀 요약 ----------
 const now = new Date(algs.fetchedAt);
@@ -244,7 +274,7 @@ const data = {
   cpSubs: ov.cpSubs || {},
   cpRosterAdd: ov.cpRosterAdd || {},
   // 대회별 선수 출전 경기 수 { eventId: { 선수ID: 경기 수 } } — 12경기 이상이어야 그 대회 CP를 받음
-  mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, kr, streams, cc, conflicts,
+  mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
     cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),

@@ -179,11 +179,12 @@ async function main() {
     } catch {}
   }
 
-  // LCQ (지역별 40팀): 공식 출전 명단과 시리즈별 출전 팀(승자 1R 로비 배정). 명단이 나오기 전에는 비어 있다
+  // LCQ (지역별 40팀): 공식 출전 명단과 시리즈별 출전 팀(승자 1R 로비 배정). 명단이 나오기 전에는 404라서 재시도 없이 한 번만 확인한다
+  //   대회 2일 전부터는 모든 라운드, 그 전에는 승자 1R 로비 A·B만 (나머지 라운드는 앞 라운드 결과로 화면이 계산)
+  const peek = async (p) => { try { const r = await fetch(API + p, { headers: { Accept: 'application/json' } }); return r.ok ? await r.json() : null; } catch { return null; } };
   const lcq = {};
   const lcqLogos = [];
   const nm = (t) => String(t.name || t.teamName || t.displayName || '').trim();
-  const lcqProbe = {}; // 임시: 응답 필드 확인용
   for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /^last-chance-qualifier/.test(x.slug))) {
     const out = { teams: [], lineups: { ...(prev.lcq?.[e.id]?.lineups || {}) } };
     const seen = new Set();
@@ -193,19 +194,14 @@ async function main() {
       out.teams.push([t.teamId, String(t.shortName || '').trim(), nm(t), seed]);
       lcqLogos.push([t.teamId, t.logoLight, t.logoDark]);
     };
-    for (const ph of e.phases) {
-      try { const pt = await get(`/phases/${ph.id}/teams`); lcqProbe[ph.id] = [Object.keys(pt).join(','), (pt.teams || []).length, Object.keys(pt.teams?.[0] || {}).join(',')]; for (const t of pt.teams || []) add(t, t.seed ?? t.seeding ?? null); } catch (er) { lcqProbe[ph.id] = String(er.message).slice(0, 80); }
-    }
-    if (new Date(e.startDate) - Date.now() < 21 * 864e5) {
-      for (const s of allSeries.filter((x) => x.event?.id === e.id && x.status !== 'completed')) {
-        try {
-          const sr = await get(`/series/${s.id}/teams`);
-          if (!lcqProbe.series) lcqProbe.series = [Object.keys(sr).join(','), (sr.teams || []).length, Object.keys(sr.teams?.[0] || {}).join(',')];
-          const ts = (sr.teams || []).filter((t) => t.shortName);
-          if (ts.length) { out.lineups[s.id] = ts.map((t) => t.shortName.trim()); for (const t of ts) add(t); }
-        } catch {}
+    if (new Date(e.endDate) > Date.now() - 864e5) {
+      for (const ph of e.phases) for (const t of (await peek(`/phases/${ph.id}/teams`))?.teams || []) add(t, t.seed ?? t.seeding ?? null);
+      const close = new Date(e.startDate) - Date.now() < 2 * 864e5;
+      for (const s of allSeries.filter((x) => x.event?.id === e.id && x.status !== 'completed' && (close || /Lobby/.test(x.name || '')))) {
+        const ts = ((await peek(`/series/${s.id}/teams`))?.teams || []).filter((t) => t.shortName);
+        if (ts.length) { out.lineups[s.id] = ts.map((t) => t.shortName.trim()); for (const t of ts) add(t); }
       }
-    }
+    } else out.teams = prev.lcq?.[e.id]?.teams || [];
     lcq[e.id] = out;
   }
 
@@ -228,7 +224,7 @@ async function main() {
     try { const tv = await get(`/teams/${id}`); for (const v of tv.versions || []) addLogo(id, v.logoLight, v.logoDark); } catch {}
   }
 
-  const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, lcqProbe, krStreams, partnerStreams,
+  const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
   // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
   const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
