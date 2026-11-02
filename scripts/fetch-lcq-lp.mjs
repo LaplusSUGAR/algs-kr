@@ -25,7 +25,8 @@ async function main() {
   const prev = readJson('raw/lp/lcq.json', null);
   const near = Date.now() > LCQ_START - 3 * 864e5 && Date.now() < LCQ_END;
   const m = new Date().getUTCMinutes();
-  if (prev && !process.argv.includes('--force') && (near ? m % 15 : m) >= 5) { console.log('[lp-lcq] 이번 회차는 건너뜀'); return; }
+  const sameSet = JSON.stringify(prev?.titles || []) === JSON.stringify(Object.values(PAGES)); // 받을 페이지 목록이 바뀌면 바로 받는다
+  if (prev && sameSet && !process.argv.includes('--force') && (near ? m % 15 : m) >= 5) { console.log('[lp-lcq] 이번 회차는 건너뜀'); return; }
   if (Date.now() > LCQ_END.getTime() + 7 * 864e5) { console.log('[lp-lcq] LCQ 종료 후 → 건너뜀'); return; }
   const qs = new URLSearchParams({ action: 'query', prop: 'revisions', rvprop: 'content|ids|timestamp', rvslots: 'main', format: 'json', formatversion: '2', titles: Object.values(PAGES).join('|') });
   const res = await fetch(`${API}?${qs}`, { headers: { 'User-Agent': UA, 'Accept-Encoding': 'gzip' } });
@@ -39,10 +40,10 @@ async function main() {
     const rev = p.revisions?.[0];
     if (region && rev) pages[region] = { title: p.title, rev: rev.revid, at: rev.timestamp, text: rev.slots?.main?.content || '' };
   }
-  const same = prev && JSON.stringify(Object.fromEntries(Object.entries(prev.pages || {}).map(([k, v]) => [k, v.rev]))) === JSON.stringify(Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, v.rev])));
+  const same = prev && sameSet && JSON.stringify(Object.fromEntries(Object.entries(prev.pages || {}).map(([k, v]) => [k, v.rev]))) === JSON.stringify(Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, v.rev])));
   // 내용이 그대로면 받은 시각만 기억하고(파일은 그대로) 넘어간다 → 불필요한 커밋 방지
   if (same) { console.log('[lp-lcq] 변경 없음'); return; }
-  writeJson('raw/lp/lcq.json', { fetchedAt: new Date().toISOString(), pages });
+  writeJson('raw/lp/lcq.json', { fetchedAt: new Date().toISOString(), titles: Object.values(PAGES), pages });
   console.log(`[lp-lcq] ${Object.keys(pages).length}개 지역 페이지 저장`);
 }
 
