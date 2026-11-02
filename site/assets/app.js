@@ -9,7 +9,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem('algskr.' + k); return v === null ? d : JSON.parse(v); } catch { return k in mem ? mem[k] : d; } },
   set(k, v) { mem[k] = v; try { localStorage.setItem('algskr.' + k, JSON.stringify(v)); } catch {} },
 };
-const opt = { spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []) };
+const opt = { spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []), main: store.get('main', null) };
 
 /* ---------- 보기 모드: 한국 팀 · APAC North · 내 응원 팀 ----------
    모드마다 '관심 팀'이 달라지고, 홈 카드·표 강조·필터·진출 구조 칩이 모두 관심 팀 기준으로 바뀐다 */
@@ -20,6 +20,9 @@ const MODES = {
 };
 const ML = () => MODES[opt.mode] || MODES.kr;
 function setMode(m) { opt.mode = MODES[m] ? m : 'kr'; store.set('mode', opt.mode); FOCUS = null; render(); }
+// 대표 응원 팀: 응원 팀 중 하나를 홈 맨 위 큰 카드와 표 맨 앞 강조로
+const mainId = () => (opt.mode === 'custom' && opt.fav.includes(opt.main) ? opt.main : null);
+function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; render(); }
 function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : s.add(id); opt.fav = [...s]; store.set('fav', opt.fav); FOCUS = null; render(); }
 // 관심 팀 단계: kr 모드는 한국 팀/한국 선수 소속/한국 코치 팀, 다른 모드는 관심 팀이면 'team'
 function lvlOf(short) {
@@ -34,7 +37,7 @@ const isF = (short) => lvlOf(short) !== 'none';
 let FOCUS = null;
 function focusList() {
   if (opt.mode === 'kr') return A.kr || [];
-  if (FOCUS && FOCUS.a === A && FOCUS.b === BOARD && FOCUS.m === opt.mode) return FOCUS.list;
+  if (FOCUS && FOCUS.a === A && FOCUS.b === BOARD && FOCUS.m === opt.mode && FOCUS.mid === mainId()) return FOCUS.list;
   const bd = typeof board === 'function' ? board() : null;
   const pl2 = Object.values(A.pl).filter((p) => p.split === Math.max(...Object.values(A.pl).map((x) => x.split))).flatMap((p) => p.rows);
   const list = Object.values(A.teams).filter((t) => isF(t.short)).map((t) => {
@@ -44,7 +47,9 @@ function focusList() {
       pl: s2 ? { pos: s2.pos, rs: s2.rs, kills: s2.kills, qualified: s2.qualified } : null,
       intl: ir ? { pos: ir.pos, pts: ir.pts, of: A.intl.rows.length, next: ir.next } : null, nextSeries: null };
   }).sort((a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
-  FOCUS = { a: A, b: BOARD, m: opt.mode, list };
+  const mid = mainId();
+  if (mid) list.sort((a, b) => (team(b.short)?.id === mid) - (team(a.short)?.id === mid));
+  FOCUS = { a: A, b: BOARD, m: opt.mode, list, mid };
   return list;
 }
 
@@ -110,7 +115,7 @@ const krDot = (lvl0, short) => {
   if (!lvl || lvl === 'none') return '';
   return `<span class="krdot ${CAT[lvl]}" title="${opt.mode === 'kr' ? KR_LABEL[lvl] : ML().label}"></span>`;
 };
-const rowCls = (r) => { const l = r.short ? lvlOf(r.short) : r.kr; return l && l !== 'none' ? `kr ${CAT[l]}` : ''; };
+const rowCls = (r) => { const l = r.short ? lvlOf(r.short) : r.kr; return l && l !== 'none' ? `kr ${CAT[l]}${mainId() && A.teams[r.short]?.id === mainId() ? ' main' : ''}` : ''; };
 const coachBadge = () => '';
 const LP_SEASON = 'https://liquipedia.net/apexlegends/ALGS/2026-27';
 // 공식 경기 페이지가 있는 이벤트(슬러그가 사람이 읽는 이름)는 algs.ea.com, 없으면(LCQ 등) Liquipedia 시즌 페이지
@@ -314,7 +319,7 @@ function stageShort(short) {
 function krStrip(list) {
   return `<section class="sec" aria-labelledby="h-kr2">
     <div class="sec-head"><h2 class="h2" id="h-kr2">${ML().strip}</h2><a class="more" href="#/teams?g=kr">자세히 보기</a></div>
-    ${spoil(`<div class="kr-strip">${list.slice(0, opt.mode === 'kr' ? 99 : 12).map((k) => `<a class="kchip ${CAT[k.level]}" href="#/teams/${encodeURIComponent(k.short)}" title="${esc(k.name)}">${logo(k.short)}<span><b>${esc(k.short)}</b><small>${esc(stageShort(k.short))}</small></span></a>`).join('')}${list.length > 12 && opt.mode !== 'kr' ? `<a class="kchip more-chip" href="#/teams?g=kr"><span><b>+${list.length - 12}</b><small>전체 보기</small></span></a>` : ''}</div>`, intlKey(), '관심 팀 성적')}
+    ${spoil(`<div class="kr-strip">${list.slice(0, opt.mode === 'kr' ? 99 : 12).map((k) => `<a class="kchip ${CAT[k.level]}${mainId() && team(k.short)?.id === mainId() ? ' main' : ''}" href="#/teams/${encodeURIComponent(k.short)}" title="${esc(k.name)}">${logo(k.short)}<span><b>${esc(k.short)}</b><small>${esc(stageShort(k.short))}</small></span></a>`).join('')}${list.length > 12 && opt.mode !== 'kr' ? `<a class="kchip more-chip" href="#/teams?g=kr"><span><b>+${list.length - 12}</b><small>전체 보기</small></span></a>` : ''}</div>`, intlKey(), '관심 팀 성적')}
     ${krLegend()}
   </section>`;
 }
@@ -375,7 +380,7 @@ function heroCard(k) {
   const next = A.intl && si.text ? si.next : k.nextSeries;
   const roster = (t?.roster?.filter((p) => p.r !== 'k').map((p) => p.n).join(', ') || k.krPlayers.join(', ')) + (t?.roster?.some((p) => p.r === 'k') ? ' · 코치 ' + t.roster.filter((p) => p.r === 'k').map((p) => p.n).join(', ') : '');
   return `<section class="kr-hero" aria-labelledby="h-hero">
-    <span class="flag ${CAT[k.level] || ''}">${opt.mode === 'kr' ? KR_LABEL[k.level] || '' : ML().label}</span>
+    <span class="flag ${CAT[k.level] || ''}">${opt.mode === 'kr' ? KR_LABEL[k.level] || '' : mainId() && team(k.short)?.id === mainId() ? '★ 대표 응원 팀' : ML().label}</span>
     <div class="hero-id">${logo(k.short, 'xl', true)}<h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1></div>
     <p class="roster">${esc(roster)}</p>
     ${spoil(`<div class="kr-stats">
@@ -1039,6 +1044,7 @@ function favPicker() {
   const chip = (t) => `<button type="button" class="fav-chip${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${logo(t.short)}<b>${esc(t.short)}</b><small>${esc(t.name)}</small></button>`;
   return `<p class="lead">응원하고 싶은 팀을 누르세요. 고른 팀은 이 브라우저에 저장되고, '내 응원 팀' 모드에서 홈·표·경기가 이 팀들 위주로 바뀝니다. 지금 <b id="favCount">${opt.fav.length}</b>팀 선택. <a class="more" href="#/">홈에서 보기</a></p>
     <div class="controls">${modeSwitch()}${opt.fav.length ? '<button type="button" class="link-btn" data-fav-clear="1">모두 지우기</button>' : ''}</div>
+    ${opt.fav.length ? `<div class="main-pick"><b>대표 응원 팀</b> <span class="muted">홈 맨 위 큰 카드와 표 강조가 이 팀 기준이 됩니다</span><div class="main-opts">${opt.fav.map((id) => Object.values(A.teams).find((t) => t.id === id)).filter(Boolean).map((t) => `<button type="button" class="main-opt${opt.main === t.id ? ' on' : ''}" data-main="${esc(t.id)}" aria-pressed="${opt.main === t.id}">${logo(t.short)}${esc(t.short)}${opt.main === t.id ? ' ★' : ''}</button>`).join('')}</div></div>` : ''}
     <label class="visually-hidden" for="favSearch">팀 찾기</label><input class="search" id="favSearch" type="search" placeholder="팀 이름으로 찾기" autocomplete="off">
     ${['apac-n', 'apac-s', 'emea', 'americas'].map((r) => `<section class="sec fav-group"><h2 class="h2">${REGION[r]}</h2><div class="fav-grid">${all.filter((t) => t.region === r).map(chip).join('')}</div></section>`).join('')}`;
 }
@@ -1102,7 +1108,7 @@ function teamDetail(short) {
   const roleKo = { p: '선수', c: '주장', k: '코치' };
   const si = ir ? krStageInfo(short) : null;
   return `<p style="margin:14px 0 0"><a class="more" href="#/teams">팀 목록</a></p>
-    <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1><button type="button" class="fav-btn${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${opt.fav.includes(t.id) ? '★ 응원 중' : '☆ 응원하기'}</button></div>
+    <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1><span class="fav-btns"><button type="button" class="fav-btn${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${opt.fav.includes(t.id) ? '★ 응원 중' : '☆ 응원하기'}</button><button type="button" class="fav-btn main${opt.main === t.id ? ' on' : ''}" data-main="${esc(t.id)}" aria-pressed="${opt.main === t.id}">${opt.main === t.id ? '대표 팀' : '대표 팀으로'}</button></span></div>
     <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr ${CAT[t.krLevel]}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}</p>
     ${si?.text ? spoil(`<p class="lead"><b>${esc(ko(A.intl.name, EVENT_KO))}</b> · ${esc(si.text)}</p>`, intlKey(), '대회 성적') : ''}
     ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${playerLink(p.n, pName(p))}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + roleKo[p.r] : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
@@ -1225,10 +1231,15 @@ function bind() {
     // 고르기 화면에서는 다시 그리지 않고 버튼만 바꿔 검색어·스크롤 유지
     const set = new Set(opt.fav); set.has(b.dataset.fav) ? set.delete(b.dataset.fav) : set.add(b.dataset.fav);
     opt.fav = [...set]; store.set('fav', opt.fav); FOCUS = null;
-    b.classList.toggle('on'); b.setAttribute('aria-pressed', String(b.classList.contains('on')));
-    const cnt = document.getElementById('favCount'); if (cnt) cnt.textContent = opt.fav.length;
+    if (!opt.fav.includes(opt.main)) { opt.main = null; store.set('main', null); }
+    // 대표 팀 후보 목록도 바뀌므로 다시 그리되, 검색어는 유지
+    const q0 = document.getElementById('favSearch')?.value || '';
+    render();
+    const fs2 = document.getElementById('favSearch');
+    if (fs2 && q0) { fs2.value = q0; fs2.dispatchEvent(new Event('input')); }
   }));
-  app.querySelectorAll('[data-fav-clear]').forEach((b) => b.addEventListener('click', () => { opt.fav = []; store.set('fav', []); FOCUS = null; render(); }));
+  app.querySelectorAll('[data-main]').forEach((b) => b.addEventListener('click', () => setMain(b.dataset.main)));
+  app.querySelectorAll('[data-fav-clear]').forEach((b) => b.addEventListener('click', () => { opt.fav = []; store.set('fav', []); opt.main = null; store.set('main', null); FOCUS = null; render(); }));
   const fs = document.getElementById('favSearch');
   if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));

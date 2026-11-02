@@ -757,3 +757,20 @@ html, body { overflow-x: clip; }
 .fav-btn.on { background: var(--apex); color: #fff; }
 .kchip.more-chip { border-left-color: var(--steel); }
 .kchip.more-chip { border-left-color: var(--steel); }
+
+/* 대표 응원 팀 */
+.tbl tr.kr.main td { background: color-mix(in srgb, var(--apex) 18%, transparent); font-weight: 700; }
+.tbl tr.kr.main td:first-child { box-shadow: inset 7px 0 0 var(--apex); }
+.kchip.main { border-left-width: 6px; padding: 10px 16px 10px 12px; box-shadow: 0 0 0 2px var(--apex); }
+.kchip.main b { font-size: 21px; }
+.kchip.main b::after { content: ' ★'; color: var(--apex); }
+.kchip.main .tlogo { width: 28px; height: 28px; }
+.main-pick { margin: 14px 0 6px; padding: 12px; background: var(--card); border-left: 4px solid var(--apex); border-radius: var(--r-sm); }
+.main-pick .muted { font-size: 12.5px; }
+.main-opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.main-opt { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1.5px solid var(--rule); background: var(--paper); color: var(--ink); font: 700 13px/1 var(--body); cursor: pointer; border-radius: 999px; }
+.main-opt.on { border-color: var(--apex); background: var(--apex); color: #fff; }
+.fav-btns { margin-left: auto; display: flex; gap: 6px; align-self: center; flex-wrap: wrap; justify-content: flex-end; }
+.fav-btns .fav-btn { margin-left: 0; }
+.fav-btn.main { border-color: var(--brass); color: var(--brass); }
+.fav-btn.main.on { background: var(--brass); color: #fff; }
