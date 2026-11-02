@@ -1119,15 +1119,21 @@ function settleRows(ST) {
   });
 }
 
-// CP 동률이면 Split 2 플레이오프 성적이 좋은 팀이 위 (운영자 기준).
-// 순위: 대회 최종 순위 → (진행 중이면) 정산표의 확정·결승 실시간 순위. 플레이오프 미출전은 뒤, 그래도 같으면 공식 순위
+// CP 동률 (공식 규정 부록 C7.3): (A) Split 2 플레이오프 최종 순위가 좋은 팀 → (B) 프로리그 Split 2 최종 순위가 좋은 팀
+// → 그래도 같으면 C7.2(프로리그 Split 2 안의 세부 기준). C7.2는 프로리그 Split 2 정규 시즌 포인트 → 킬 순으로 근사하고, 마지막은 공식 순위.
+// (A)는 대회 최종 순위, 진행 중이면 정산표의 확정·결승 실시간 순위. 플레이오프 미출전은 출전 팀보다 뒤
 const TIE_EVENT = 'split-2-playoffs';
 let POIX = null;
 function poPos(r) {
   if (!POIX || POIX.src !== A.cpEvents) { const e = (A.cpEvents || []).find((x) => x.slug === TIE_EVENT); POIX = { src: A.cpEvents, m: new Map((e?.rows || []).filter((x) => x.id).map((x) => [x.id, x.pos])) }; }
   return POIX.m.get(r.id) ?? r.donePos ?? r.livePos ?? 999;
 }
-const cpTie = (a, b) => poPos(a) - poPos(b);
+let PLIX = null;
+function plS2(r) {
+  if (!PLIX || PLIX.src !== A.pl) { const m = new Map(); for (const p of Object.values(A.pl || {})) if (p.split === 2) for (const x of p.rows) m.set(x.id, x); PLIX = { src: A.pl, m }; }
+  return PLIX.m.get(r.id);
+}
+const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || (pb?.rs ?? 0) - (pa?.rs ?? 0) || (pb?.kills ?? 0) - (pa?.kills ?? 0); };
 const cpOrder = (a, b) => b.total - a.total || cpTie(a, b) || a.rank - b.rank;
 
 // 운영자 로스터 보정 (config cpRosterAdd): 공식 현재 로스터에서 빠진 선수를 팀 CP에 넣고 순위를 다시 매김.
@@ -1186,7 +1192,17 @@ const boardNote = () => {
 };
 
 // 같은 CP 팀이 이웃해 있으면 동률 기준(Split 2 플레이오프 순위)을 작게 표시
-const tieNote = (rows, i, k) => { const r = rows[i]; if (rows[i - 1]?.[k] !== r[k] && rows[i + 1]?.[k] !== r[k]) return ''; const p = poPos(r); return `<small class="tie">동률 · ${p < 999 ? `S2 PO ${p}위` : 'S2 PO 미출전'}</small>`; };
+// 같은 CP 팀이 이웃해 있으면 순서를 가른 기준을 작게 표시 (S2 플레이오프 순위 → 프로리그 S2 순위 → 프로리그 S2 포인트)
+const tieNote = (rows, i, k) => {
+  const r = rows[i];
+  const tied = rows.filter((x) => x[k] === r[k]);
+  if (tied.length < 2) return '';
+  const p = poPos(r), pl = plS2(r);
+  const byPo = new Set(tied.map(poPos)).size === tied.length;
+  const samePl = tied.filter((x) => poPos(x) === p && plS2(x)?.pos === pl?.pos).length > 1;
+  const why = p < 999 && (byPo || tied.filter((x) => poPos(x) === p).length === 1) ? `S2 PO ${p}위` : `PL S2 ${pl?.pos ?? '–'}위${samePl ? ` · ${pl?.rs ?? 0}점` : ''}`;
+  return `<small class="tie" title="동률 기준: S2 플레이오프 순위 → 프로리그 S2 순위 → 프로리그 S2 포인트">동률 · ${why}</small>`;
+};
 const qualTag = (direct) => direct ? '<span class="tag ok">직행권</span>' : '<span class="tag lcq">LCQ</span>';
 const QUAL_REGIONS = ['apac-n', 'apac-s', 'emea', 'americas'];
 // 지역별 챔피언십 직행권 팀 수. 아래 표와 같은 기준(대회 중·직후는 정산 순위, 그 밖에는 현재 순위)
@@ -1245,7 +1261,7 @@ function cpView(q) {
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
   const cpKey = BD.state === 'live' || BD.state === 'pending' ? intlKey() : null;
-  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합이고, CP가 같으면 Split 2 플레이오프 성적이 좋은 팀이 위입니다.</p>
+  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split 2 플레이오프 최종 순위, 그다음 프로리그 Split 2 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
     ${spoil(`<div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">${ML().title}</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>`, cpKey, '챔피언십 포인트 순위')}
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
@@ -1469,7 +1485,7 @@ function rules(parts, q) {
       <p>CP는 <b>선수 개인</b>이 받습니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 선수가 팀을 옮기면 CP도 따라갑니다.</p>
       <ul><li>프로리그 최종 순위별(1인): ${sc.cpProLeague.slice(0, 6).join(', ')} …</li><li>플레이오프 최종 순위별(1인): ${sc.cpPlayoffs.slice(0, 6).join(', ')} …</li>
       <li>CP 상위 ${S.cpDirectSlots}팀은 챔피언십 직행, 나머지 ${S.lcqSlots}자리는 LCQ(지역별 2팀)에서 정합니다.</li>
-      <li>CP가 같으면 Split 2 플레이오프 최종 순위가 좋은 팀이 위입니다.</li></ul>
+      <li>CP가 같으면 ① Split 2 플레이오프 최종 순위 ② 프로리그 Split 2 최종 순위 ③ 프로리그 Split 2 세부 기준 순으로 가립니다 (공식 규정 C7.3).</li></ul>
       <p class="lead"><a href="#/points/cp">포인트 탭</a>에서 현재 순위를 볼 수 있습니다.</p></section>
     <section class="sec rule-card" data-k="format"><h2 class="h2">레전드 밴 · POI 드래프트</h2>
       <p>경기 전 일부 레전드를 쓸 수 없게 막는 <b>레전드 밴</b>과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 <b>POI 드래프트</b>가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p></section>

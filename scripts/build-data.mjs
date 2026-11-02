@@ -105,10 +105,14 @@ for (const t of Object.values(teams)) {
 
 // ---------- 챔피언십 포인트 (공식 값) ----------
 const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => ({ rank, id, short, name, region: normRegion(region), total, players }));
-// CP 동률이면 Split 2 플레이오프 최종 순위가 좋은 팀이 위 (운영자 기준, 화면의 정산 순위와 같은 규칙). 미출전은 뒤, 그다음 공식 순위
+// CP 동률 (공식 규정 부록 C7.3, 화면의 정산 순위와 같은 규칙):
+//   (A) Split 2 플레이오프 최종 순위 (미출전은 뒤) → (B) 프로리그 Split 2 최종 순위
+//   → C7.2(프로리그 Split 2 세부 기준)는 정규 시즌 포인트 → 킬 순으로 근사 → 마지막은 공식 순위
 {
   const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === 'split-2-playoffs')?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
-  cpRows.sort((a, b) => b.total - a.total || (po.get(a.id) ?? 999) - (po.get(b.id) ?? 999) || a.rank - b.rank);
+  const pl2 = new Map(Object.entries(algs.pl).filter(([k]) => k.startsWith('s2:')).flatMap(([, rows]) => rows.map((r) => [r[3], { pos: r[0], rs: r[6] ?? 0, kills: r[8] ?? 0 }])));
+  cpRows.sort((a, b) => b.total - a.total || (po.get(a.id) ?? 999) - (po.get(b.id) ?? 999)
+    || (pl2.get(a.id)?.pos ?? 99) - (pl2.get(b.id)?.pos ?? 99) || (pl2.get(b.id)?.rs ?? 0) - (pl2.get(a.id)?.rs ?? 0) || (pl2.get(b.id)?.kills ?? 0) - (pl2.get(a.id)?.kills ?? 0) || a.rank - b.rank);
   cpRows.forEach((r, i) => (r.rank = i + 1));
 }
 const cp32 = cpRows.find((r) => r.rank === CP_DIRECT)?.total ?? 0;
