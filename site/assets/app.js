@@ -172,6 +172,9 @@ function render() {
   app.innerHTML = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + view(parts, q);
   bind();
   I.tree(app);
+  // 가로로 넘치는 LCQ 경기 탭: 고른 탭이 보이게
+  const on = app.querySelector('.lcq-tabs [aria-current="true"]');
+  if (on) { const bar = on.closest('.lcq-tabs'); bar.scrollLeft = on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2; }
 }
 
 /* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
@@ -549,13 +552,13 @@ const resultTable = (rows) => `<div class="tbl-wrap"><table class="tbl"><thead><
 const RP = {};
 async function loadReplay(sid) {
   if (RP[sid]?.loading) return;
-  RP[sid] = { loading: true };
+  RP[sid] = { ...(RP[sid] || {}), loading: true }; // 다시 받는 동안에도 지난 값을 보여 준다
   const api = LIVE.api, j = (u) => fetch(api + u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const [m, vt, v] = await Promise.all([j(`/series/${sid}/matches`), j(`/series/${sid}/vods/timeline`), j(`/series/${sid}/vods`)]);
   const matches = (m?.matches || []).filter((x) => x.status === 'completed' || x.status === 'live' || x.inGameStatus === 'postmatch');
   const stats = await Promise.all(matches.map((x) => j(`/stats/series/${sid}/match/number/${x.matchNumber}`)));
   RP[sid] = { matches, stats, segs: vt?.segments || [], vods: v?.vods || [], at: Date.now() };
-  if (parseHash().parts[1] === 'replay') render();
+  if (parseHash().parts[1] === 'replay' || RP_WATCH.has(sid)) render();
 }
 const ytAt = (id, ms) => `https://www.youtube.com/watch?v=${encodeURIComponent(id)}&t=${Math.max(0, Math.floor(ms / 1000))}s`;
 function vodLinks(D, num, shorts) {
@@ -580,7 +583,7 @@ function replayView(q) {
     <p class="lead">게임마다 탈락 순서를 재생합니다. 재생바를 움직이면 그 시점까지 탈락한 팀과 남은 팀이 바뀝니다. 공식 데이터에는 게임 중 위치가 없어 지도 동선은 아직 없습니다.</p>
     <div class="controls"><label class="rp-pick"><span class="visually-hidden">시리즈 고르기</span><select id="rpSeries">${opts}</select></label></div>`;
   const D = RP[s.id];
-  if (!D || D.loading) { loadReplay(s.id); return head + '<p class="empty">공식 경기 기록을 불러오는 중…</p>'; }
+  if (!D || (D.loading && !D.matches)) { loadReplay(s.id); return head + '<p class="empty">공식 경기 기록을 불러오는 중…</p>'; }
   if (!D.matches.length) return head + '<p class="empty">이 시리즈의 게임 기록이 아직 없습니다.</p>';
   const g = Math.min(Math.max(1, +(q.get('g') || 1)), D.matches.length);
   const m = D.matches.at(g - 1), st = D.stats.at(g - 1);
@@ -698,17 +701,22 @@ function intlBody(ev, view, L, key) {
 }
 
 /* ---------- LCQ (지역별 Last Chance Qualifier) ---------- */
-// 지역마다 40팀: 승자 1R 로비 A·B(각 20팀, 시드 순 스네이크 배정) → 로비별 상위 10 승자 2R, 하위 10 패자부활 1R
+// 지역마다 40팀. 시드 = 프로리그 팀은 챔피언십 포인트(CP) 순, 그 뒤 2부(챌린저 서킷) 팀은 서킷 포인트(CCP) 순
+// 그룹 A·B(각 20팀): 시드 지그재그 (A 1·4·5·8·9…, B 2·3·6·7·10…). 공식 배정이 나오면 그 배정
+// 승자 1R 그룹 A·B → 그룹별 상위 10 승자 2R, 하위 10 패자부활 1R
 // 승자 2R: 상위 10 결승, 하위 10 패자부활 2R / 패자부활 1R: 상위 10 패자부활 2R, 하위 10 탈락
 // 패자부활 2R: 상위 10 결승, 하위 10 탈락 / 매치 포인트 결승 20팀 중 상위 2팀 챔피언십
+// 진행 방식이 바뀌면 아래 두 표(LCQ_STAGES, LCQ_FLOW)만 고치면 탭·점수표·다음 경기 배정이 함께 바뀐다
 const LCQ_STAGES = [
-  { key: 'a', name: 'Winners Round 1 Lobby A', ko: '승자 1라운드 A로비', n: 20, cut: 10, up: '승자 2R로', down: '패자부활 1R로' },
-  { key: 'b', name: 'Winners Round 1 Lobby B', ko: '승자 1라운드 B로비', n: 20, cut: 10, up: '승자 2R로', down: '패자부활 1R로' },
-  { key: 'wr2', name: 'Winners Round 2', ko: '승자 2라운드', n: 20, cut: 10, up: '결승 진출', down: '패자부활 2R로' },
-  { key: 'er1', name: 'Elimination Round 1', ko: '패자부활 1라운드', n: 20, cut: 10, up: '패자부활 2R 진출', down: '탈락' },
-  { key: 'er2', name: 'Elimination Round 2', ko: '패자부활 2라운드', n: 20, cut: 10, up: '결승 진출', down: '탈락' },
-  { key: 'f', name: 'Match Point Finals', ko: '매치 포인트 결승', n: 20, top: 2 },
+  { key: 'a', name: 'Winners Round 1 Lobby A', ko: '승자 1라운드 그룹 A', tab: '승자 1R A', n: 20, cut: 10, up: '승자 2R', down: '패자 1R' },
+  { key: 'b', name: 'Winners Round 1 Lobby B', ko: '승자 1라운드 그룹 B', tab: '승자 1R B', n: 20, cut: 10, up: '승자 2R', down: '패자 1R' },
+  { key: 'wr2', name: 'Winners Round 2', ko: '승자 2라운드', tab: '승자 2R', n: 20, cut: 10, up: '결승', down: '패자 2R' },
+  { key: 'er1', name: 'Elimination Round 1', ko: '패자부활 1라운드', tab: '패자 1R', n: 20, cut: 10, up: '패자 2R', down: '탈락' },
+  { key: 'er2', name: 'Elimination Round 2', ko: '패자부활 2라운드', tab: '패자 2R', n: 20, cut: 10, up: '결승', down: '탈락' },
+  { key: 'f', name: 'Match Point Finals', ko: '매치 포인트 결승', tab: '결승', n: 20, top: 2, up: '챔피언십' },
 ];
+// 다음 경기로 올라가는 규칙: 단계 ← [앞 단계, 몇 위부터, 몇 위까지]. 이 순서대로 다음 경기 점수표의 칸이 만들어진다
+const LCQ_FLOW = { wr2: [['a', 1, 10], ['b', 1, 10]], er1: [['a', 11, 20], ['b', 11, 20]], er2: [['wr2', 11, 20], ['er1', 1, 10]], f: [['wr2', 1, 10], ['er2', 1, 10]] };
 const lcqEvents = () => A.lcq || [];
 // CP 순위 (CP 탭과 같은 기준: 대회 중·직후는 정산 순위)
 function cpStanding() {
@@ -717,89 +725,172 @@ function cpStanding() {
     ? BD.rows.map((r) => ({ id: r.id, short: r.short, name: r.name, region: r.region, rank: r.prank, total: r.min, direct: r.pstatus === 'direct' }))
     : A.cp.map((r) => ({ id: r.id, short: r.short, name: r.name, region: r.region, rank: r.rank, total: r.total, direct: r.status === 'direct' }));
 }
-// 출전 팀: 공식 명단이 나오면 그 명단, 아직이면 그 지역 프로리그 팀 중 CP 직행권 밖 팀 (CP 순 = 시드 순)
+// 시드 순번(0부터) → 그룹: 지그재그
+const lcqGroupOf = (i) => (Math.floor(i / 2) % 2 ? (i % 2 ? 'a' : 'b') : (i % 2 ? 'b' : 'a'));
+// 출전 팀과 시드: 공식 명단이 나오면 그 명단(공식 시드 순), 아직이면 예상 명단
+//   예상 명단 = 그 지역 프로리그 팀 중 직행권 밖 팀(CP 순) + 남은 자리(40 − 프로리그 팀 수)는 챌린저 서킷 팀
+//   2부 팀은 서킷 우승팀부터 자리를 받고(Liquipedia), 시드는 CCP 순
 function lcqEntrants(ev) {
   const cp = cpStanding();
+  const ss = A.series.filter((s) => s.eventId === ev.eventId);
+  const lobby = { a: ss.find((s) => s.name === LCQ_STAGES[0].name)?.lineup || null, b: ss.find((s) => s.name === LCQ_STAGES[1].name)?.lineup || null };
+  let E;
   if (ev.teams?.length) {
     const list = ev.teams.map((t) => ({ ...t, cp: cp.find((r) => r.id === t.id) }))
       .sort((a, b) => (a.seed ?? 999) - (b.seed ?? 999) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
-    return { src: 'official', list };
+    E = { src: 'official', list, pl: list.filter((t) => t.pl).length, ccN: list.filter((t) => !t.pl).length };
+  } else {
+    const pl = cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r }));
+    const cc = ev.cc || [];
+    const n = Math.max(0, 40 - pl.length);
+    const order = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)];
+    const pick = order.slice(0, n), next = order[n];
+    const tie = !!(next && pick.length && !pick.at(-1).win && pick.at(-1).pts === next.pts);
+    const ccSeeded = pick.slice().sort((x, y) => y.pts - x.pts || x.rank - y.rank);
+    E = { src: 'projected', pl: pl.length, ccN: pick.length, tie, list: [...pl, ...ccSeeded.map((c) => ({ id: null, short: c.short, name: c.name, pl: false, cc: c }))] };
   }
-  const pl = cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r }));
-  // 남은 자리 = 40 − 프로리그 팀 수. 챌린저 서킷 우승팀부터, 그다음 종합 포인트 순 (Liquipedia)
-  const cc = ev.cc || [];
-  const n = Math.max(0, 40 - pl.length);
-  const pick = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)].slice(0, n);
-  const next = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)][n];
-  const tie = !!(next && pick.length && !pick.at(-1).win && pick.at(-1).pts === next.pts);
-  return { src: 'projected', pl: pl.length, ccN: pick.length, tie, list: [...pl, ...pick.map((c) => ({ id: null, short: c.short, name: c.name, pl: false, cc: c }))] };
+  E.groupSrc = lobby.a?.length || lobby.b?.length ? 'official' : 'snake';
+  E.list = E.list.map((t, i) => ({ ...t, seedN: t.seed ?? i + 1, group: lobby.a?.includes(t.short) ? 'a' : lobby.b?.includes(t.short) ? 'b' : lcqGroupOf(i) }));
+  return E;
 }
+const ccLabel = (c) => (c.win > 0 ? `CC #${c.win} 우승` : c.win ? 'CC 우승' : `CC 종합 ${c.rank}위`);
+const seedLabel = (t) => (t.seed ? `${t.seed}번 시드` : t.cp ? `CP ${t.cp.rank}위` : t.cc ? ccLabel(t.cc) : '2부');
+// 단계별 상태와 출전 팀: 결과 > 공식 출전 명단 > 앞 경기 결과로 계산한 배정(LCQ_FLOW) / 그룹은 시드 배정
 function lcqBracket(ev) {
   const ss = A.series.filter((s) => s.eventId === ev.eventId);
   const E = lcqEntrants(ev);
-  const seed = (sh) => { const i = E.list.findIndex((t) => t.short === sh); const t = E.list[i]; return !t ? null : { n: t.seed ?? i + 1, label: t.seed ? `${t.seed}번 시드` : t.cp ? `CP ${t.cp.rank}위` : t.cc ? ccLabel(t.cc) : '2부' }; };
-  const B = { ev, E };
+  const bySh = new Map(E.list.map((t) => [t.short, t]));
+  const seed = (sh) => { const t = bySh.get(sh); return t ? { n: t.seedN, label: seedLabel(t) } : null; };
+  const B = { ev, E, seed };
   for (const S of LCQ_STAGES) {
     const x = ss.find((y) => y.name === S.name || (S.key === 'f' && y.phase === 'Match Point Finals'));
     B[S.key] = { ...S, ev, seed, s: x, start: x?.start, status: !x ? 'none' : x.status === 'completed' ? 'completed' : x.live || x.status === 'live' ? 'live' : 'pending' };
   }
-  const top = (st, a, b) => (st.s?.status === 'completed' && st.s.results ? st.s.results.filter((r) => r.pos >= a && r.pos <= b).map((r) => r.short) : null);
-  const both = (x, y) => (x && y ? [...x, ...y] : null);
-  const proj = { wr2: both(top(B.a, 1, 10), top(B.b, 1, 10)), er1: both(top(B.a, 11, 20), top(B.b, 11, 20)), er2: both(top(B.wr2, 11, 20), top(B.er1, 1, 10)), f: both(top(B.wr2, 1, 10), top(B.er2, 1, 10)) };
+  // 칸(slot): 다음 경기의 자리마다 '어느 경기 몇 위'가 오는지, 앞 경기가 끝났으면 그 팀
+  for (const S of LCQ_STAGES) {
+    const st = B[S.key];
+    st.slots = LCQ_FLOW[S.key]
+      ? LCQ_FLOW[S.key].flatMap(([k, a, b]) => Array.from({ length: b - a + 1 }, (_, i) => {
+        const p = a + i, src = B[k];
+        const r = src.s?.status === 'completed' ? src.s.results?.find((y) => y.pos === p) : null;
+        return { short: r?.short || null, label: `${src.tab} ${p}위` };
+      }))
+      : E.list.filter((t) => t.group === S.key).map((t) => ({ short: t.short, label: `${t.seedN}번 시드` }));
+  }
   for (const S of LCQ_STAGES) {
     const st = B[S.key], x = st.s;
+    const filled = st.slots.filter((y) => y.short).map((y) => y.short);
     if (x?.results?.length) { st.teams = x.results.map((r) => r.short); st.src = 'results'; }
     else if (x?.lineup?.length) { st.teams = x.lineup; st.src = 'official'; }
-    else if (proj[S.key]) { st.teams = proj[S.key]; st.src = 'projected'; }
-    else { st.teams = []; st.src = null; }
+    else if (filled.length === st.slots.length && filled.length) { st.teams = filled; st.src = LCQ_FLOW[S.key] ? 'projected' : E.groupSrc === 'official' ? 'official' : 'seeded'; }
+    else { st.teams = filled; st.src = filled.length ? 'partial' : null; }
   }
   B.list = LCQ_STAGES.map((S) => B[S.key]);
   B.started = B.list.some((st) => st.status === 'live' || st.status === 'completed');
   B.done = B.f.status === 'completed';
   return B;
 }
-const ccLabel = (c) => (c.win > 0 ? `CC #${c.win} 우승` : c.win ? 'CC 우승' : `CC 종합 ${c.rank}위`);
+// 순위 → 다음 경기
+const lcqDest = (st, pos) => (st.top ? (pos <= st.top ? st.up : '') : pos <= st.cut ? st.up : st.down);
 const lcqRegionDefault = () => {
   if (opt.mode === 'custom') { const t = Object.values(A.teams).find((x) => x.id === mainId()) || Object.values(A.teams).find((x) => opt.fav.includes(x.id)); if (t?.region) return t.region; }
   return 'apac-n';
 };
-// base: 이 화면의 주소 (순위 탭 또는 이전 결과)
+
+// 조 편성 탭: 그룹 A·B 시드 표
+function lcqGroups(B) {
+  const E = B.E;
+  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
+  const col = (g) => {
+    const st = B[g];
+    let ts = E.list.filter((t) => t.group === g);
+    const nF = ts.filter((t) => isF(t.short)).length;
+    if (opt.krOnly) ts = ts.filter((t) => isF(t.short));
+    return `<section class="lcq-g" aria-label="${esc(st.ko)}"><h3 class="h3">그룹 ${g.toUpperCase()} <small class="muted">${E.list.filter((t) => t.group === g).length}팀${nF ? ` · ${esc(ML().tag)} ${nF}` : ''}${st.start ? ` · ${esc(dateTime(st.start))} ${TZL}` : ''}</small></h3>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>시드</th><th>팀</th><th class="r">포인트</th><th class="r">근거</th></tr></thead><tbody>${ts.map(row).join('')}</tbody></table></div></section>`;
+  };
+  // 문장마다 <span>: 번역 사전이 문장 단위로 맞춘다
+  const basis = E.src === 'official' ? '<span>공식 API가 공개한 출전 명단입니다(공식 시드 순).</span>'
+    : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split 2 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}`;
+  const grp = E.groupSrc === 'official' ? '<span>그룹은 공식 배정입니다.</span>' : '<span>그룹은 시드 지그재그 배정(A: 1·4·5·8·9…, B: 2·3·6·7·10…)이며, 공식 배정이 나오면 바뀝니다.</span>';
+  const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
+  const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2><ul class="lcq-how">
+    <li>시드 순서대로 지그재그로 나눈 그룹 A·B(각 20팀)가 승자 1라운드에서 6게임씩 치릅니다.</li>
+    <li>그룹별 상위 10팀은 승자 2라운드, 하위 10팀은 패자부활 1라운드로 갑니다.</li>
+    <li>승자 2라운드 상위 10팀은 결승, 하위 10팀은 패자부활 2라운드로 갑니다. 패자부활 1라운드는 상위 10팀만 패자부활 2라운드로 가고 하위 10팀은 탈락합니다.</li>
+    <li>패자부활 2라운드 상위 10팀이 결승에 합류해 20팀이 매치 포인트 결승을 치르고, 상위 2팀이 챔피언십에 갑니다.</li></ul></section>`;
+  return `<p class="caption">${basis} ${grp}</p><div class="lcq-gcols">${col('a')}${col('b')}</div>${src}${how}`;
+}
+
+// 경기 탭: 점수표 (경기 전에는 빈 칸, 진행·종료 후 게임별 점수가 채워진다)
+const RP_WATCH = new Set();
+function lcqGrid(B, st) {
+  const x = st.s, res = x?.results?.length ? x.results : null;
+  const nG = st.top ? Math.min(Math.max(6, (x?.games || 0) + 1), x?.matches || 18) : x?.matches || 6;
+  let D = null;
+  if (x && (st.status === 'live' || st.status === 'completed')) {
+    RP_WATCH.add(x.id);
+    D = RP[x.id];
+    if (!D || (!D.loading && st.status === 'live' && Date.now() - (D.at || 0) > 45000)) loadReplay(x.id);
+  }
+  // 게임 번호(matchNumber)마다 공식 게임 기록. 칸 = 그 게임의 점수
+  const gameOf = (sh, i) => { const k = D?.matches ? D.matches.findIndex((m) => m.matchNumber === i + 1) : -1; return k < 0 ? null : D.stats[k]?.teams?.find((t) => t.shortName === sh); };
+  const slotOf = new Map(st.slots.filter((y) => y.short).map((y) => [y.short, y.label]));
+  let rows;
+  if (res) rows = res.map((r) => ({ ...r, label: slotOf.get(r.short) || B.seed(r.short)?.label || '' }));
+  else if (x?.lineup?.length) rows = x.lineup.map((sh) => ({ short: sh, label: slotOf.get(sh) || B.seed(sh)?.label || '' })).sort((a, b) => (B.seed(a.short)?.n ?? 999) - (B.seed(b.short)?.n ?? 999));
+  else rows = st.slots.map((y) => ({ short: y.short, label: y.label }));
+  while (rows.length < st.n) rows.push({ short: null, label: '' });
+  if (opt.krOnly) rows = rows.filter((r) => r.short && isF(r.short));
+  const dest = (r) => {
+    if (!r.pos) return '';
+    if (st.top) return r.won ? '<span class="tag mpe">우승</span>' : st.status === 'completed' && r.pos <= st.top ? '<span class="tag ok">챔피언십 진출</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '';
+    const d = lcqDest(st, r.pos);
+    return `<span class="adv ${r.pos <= st.cut ? 'up' : d === '탈락' ? 'out' : 'down'}">${d === '탈락' ? '탈락' : `→ ${esc(d)}`}</span>`;
+  };
+  const cell = (r, i) => { const g = r.short && gameOf(r.short, i); return g ? `<td class="c g num" title="${esc(`${g.placement}위 · ${g.kills}킬`)}">${g.points}</td>` : '<td class="c g muted">·</td>'; };
+  const body = rows.map((r, i) => {
+    const cutHere = !opt.krOnly && st.cut && (res ? r.pos === st.cut : false);
+    return `<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${Array.from({ length: nG }, (_, k) => cell(r, k)).join('')}<td class="r num"><b>${r.pts ?? '–'}</b></td><td class="r opt num">${r.kills ?? '–'}</td><td class="r small">${dest(r)}</td></tr>${cutHere ? `<tr class="cut-label"><td colspan="${nG + 5}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
+  }).join('');
+  const cap = res ? `<span>${esc(x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : '공식 결과')}</span>${D?.loading && !D.matches ? ' · <span>게임별 점수 불러오는 중</span>' : ''} · <span>칸에 마우스를 올리면 게임 순위·킬이 보입니다.</span>`
+    : x?.lineup?.length ? '공식 출전 명단입니다. 경기가 시작되면 칸이 채워집니다.'
+    : st.src === 'projected' ? '앞 경기 결과로 정해진 출전 팀입니다. 경기가 시작되면 칸이 채워집니다.'
+    : st.src === 'seeded' ? '시드 지그재그로 예상한 그룹입니다. 공식 배정이 나오면 바뀌고, 경기가 시작되면 칸이 채워집니다.'
+    : st.src === 'official' ? '공식 그룹 배정입니다. 경기가 시작되면 칸이 채워집니다.'
+    : '앞 경기가 끝나면 칸마다 표시된 자리의 팀이 들어옵니다.';
+  return `<div class="tbl-wrap"><table class="tbl lcq-grid"><thead><tr><th>#</th><th>팀</th>${Array.from({ length: nG }, (_, i) => `<th class="c g">G${i + 1}</th>`).join('')}<th class="r">합계</th><th class="r opt">킬</th><th class="r">${st.status === 'completed' ? '결과' : '다음'}</th></tr></thead><tbody>${body}</tbody></table></div><p class="caption">${cap}</p>`;
+}
+function lcqMatch(B, st) {
+  const x = st.s;
+  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+  const from = `출전: ${LCQ_FLOW[st.key] ? LCQ_FLOW[st.key].map(([k, a, b]) => `<span>${esc(`${B[k].tab} ${a}~${b}위`)}</span>`).join(' + ') : `<span>그룹 ${st.key.toUpperCase()} ${st.n}팀(시드 지그재그)</span>`}`;
+  const rule = st.top ? `매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승 · 상위 ${st.top}팀 챔피언십 진출` : `1~${st.cut}위 → ${st.up} · ${st.cut + 1}~${st.n}위 → ${st.down}`;
+  return `<section class="sec lcq-m"><div class="bk-stage-h"><h2 class="h2">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h2> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? `${dateTime(st.start)} ${TZL}` : '일정 미정'}</span></div>
+    <p class="bk-rule lcq-rule"><span>${from}</span><span>${esc(rule)}</span></p>${lcqGrid(B, st)}</section>`;
+}
+// LCQ 화면. base: 이 화면의 주소 (순위 탭 또는 이전 결과). 경기마다 탭(m=groups|a|b|wr2|er1|er2|f)
 function lcqBody(q, base) {
   const evs = lcqEvents();
   const region = evs.some((e) => e.region === q.get('r')) ? q.get('r') : lcqRegionDefault();
   const ev = evs.find((e) => e.region === region) || evs[0];
-  const B = lcqBracket(ev), E = B.E;
+  const B = lcqBracket(ev);
   const key = B.started && now() - new Date(ev.end) < 7 * 864e5 ? `ev:${ev.eventId}` : null;
   const focusIn = evs.flatMap((e) => lcqEntrants(e).list.filter((t) => isF(t.short)).map((t) => ({ ...t, region: e.region })));
   const seg = `<div class="seg" role="group" aria-label="지역">${evs.map((e) => { const n = focusIn.filter((t) => t.region === e.region).length; return `<a href="${qsLink(base, q, { r: e.region })}" aria-current="${e === ev}">${REGION[e.region]}${n ? ` <span class="seg-n">${n}</span>` : ''}</a>`; }).join('')}</div>`;
-  const st1 = [B.a, B.b].find((x) => x.start) || B.a;
-  const rounds = [
-    { ko: '승자 1라운드 (A·B로비)', st: st1, status: [B.a, B.b].every((x) => x.status === 'completed') ? 'completed' : [B.a, B.b].some((x) => x.status === 'live' || x.status === 'completed') ? 'live' : 'pending' },
-    { ko: '승자 2라운드', st: B.wr2 }, { ko: '패자부활 1라운드', st: B.er1 }, { ko: '패자부활 2라운드', st: B.er2 }, { ko: '매치 포인트 결승', st: B.f },
-  ];
-  const phases = rounds.map((r) => { const status = r.status || r.st.status; return `<li class="${status === 'completed' ? 'done' : status === 'live' ? 'now' : ''}"><span>${r.st.s ? olink(officialUrl(r.st.s), esc(r.ko)) : esc(r.ko)}</span><span class="when">${r.st.start ? dateTime(r.st.start) : ''}</span></li>`; }).join('');
-  const nPl = E.list.filter((t) => t.pl !== false).length, nCc = E.list.length - nPl;
   const focusLine = focusIn.length ? `<p class="lcq-focus"><b>${esc(ML().group)} ${focusIn.length}팀 출전</b> ${focusIn.map((t) => `<a class="lcq-chip ${CAT[lvlOf(t.short)] || ''}" href="${qsLink(base, q, { r: t.region })}">${logo(t.short)}<span>${esc(t.short)}</span><small>${esc(REGION[t.region])}</small></a>`).join('')}</p>` : '';
-  const entrants = `<section class="sec" aria-labelledby="h-lcq-t"><h2 class="h2" id="h-lcq-t">${E.src === 'official' ? '공식 출전 명단' : '예상 출전 팀'} <small class="muted">${E.list.length}팀</small></h2>
-    <p class="caption">${E.src === 'official' ? '공식 API가 공개한 출전 팀입니다. 시드 순서대로 A·B로비에 지그재그로 나뉩니다.' : `프로리그 ${nPl}팀: 챔피언십 포인트 직행권(${A.season.cpDirectSlots}위) 밖의 ${REGION[ev.region]} 팀, CP 순서. <br>2부 ${nCc}팀: Split 2 챌린저 서킷 우승팀과 종합 포인트 상위 팀 (Liquipedia 순위표 기준). ${E.tie ? '마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다. ' : ''}공식 명단이 나오면 그 명단으로 바뀝니다.`}</p>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">포인트</th><th class="r">근거</th></tr></thead><tbody>
-    ${E.list.filter((t) => !opt.krOnly || isF(t.short)).map((t, i) => `${E.src !== 'official' && i === nPl && nPl ? `<tr class="cut-label"><td colspan="4">여기부터 2부 리그(챌린저 서킷) 팀</td></tr>` : ''}<tr class="${rowCls(t)}"><td class="rank">${t.seed ?? i + 1}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}</td><td class="r num">${t.cp ? fmt(t.cp.total) : t.cc ? `<span class="muted">${fmt(t.cc.pts)}</span>` : '–'}</td><td class="r small muted">${t.cp ? `CP ${t.cp.rank}위` : t.cc ? esc(ccLabel(t.cc)) : ''}</td></tr>`).join('')}
-    </tbody></table></div>${E.src !== 'official' && nCc ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : ''}</section>`;
-  const lobbies = B.a.teams.length || B.b.teams.length;
-  const bracketHtml = `
-    <section class="sec bk bk-upper" aria-labelledby="h-lcq-up"><h2 class="h2 bk-h" id="h-lcq-up"><span class="bk-badge up">승자조</span></h2><div class="bk-cols">${stageTable(B.a)}${stageTable(B.b)}</div>${B.started ? stageTable(B.wr2) : ''}</section>
-    ${B.started ? `<section class="sec bk bk-lower" aria-labelledby="h-lcq-lo"><h2 class="h2 bk-h" id="h-lcq-lo"><span class="bk-badge low">패자조</span></h2><div class="bk-cols">${stageTable(B.er1)}${stageTable(B.er2)}</div></section>
-    <section class="sec bk bk-final" aria-labelledby="h-lcq-f"><h2 class="h2 bk-h" id="h-lcq-f">매치 포인트 결승</h2>${stageTable(B.f)}</section>` : ''}`;
-  const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2><ul class="lcq-how">
-    <li>40팀을 시드 순서대로 지그재그로 나눠 <b>승자 1라운드 A·B로비</b>(각 20팀)에서 6게임씩 치릅니다.</li>
-    <li>로비별 상위 10팀은 <b>승자 2라운드</b>, 하위 10팀은 <b>패자부활 1라운드</b>로 갑니다.</li>
-    <li>승자 2라운드 상위 10팀은 결승, 하위 10팀은 패자부활 2라운드로 갑니다. 패자부활 1라운드는 상위 10팀만 패자부활 2라운드로 가고 하위 10팀은 탈락합니다.</li>
-    <li>패자부활 2라운드 상위 10팀이 결승에 합류해 <b>20팀이 매치 포인트 결승</b>을 치르고, <b>상위 2팀이 챔피언십</b>에 갑니다.</li></ul></section>`;
-  return `<p class="lead">${esc(REGION[ev.region])} LCQ · ${esc(dayLabel(dayKey(st1.start || ev.start)))} 시작. 지역마다 40팀이 겨뤄 상위 2팀이 챔피언십에 갑니다.</p>
+  // 기본 탭: 진행 중 경기 → 출전 팀이 정해진 다음 경기 → 마지막으로 끝난 경기 → 조 편성
+  const live = B.list.find((st) => st.status === 'live');
+  const nextUp = B.list.find((st) => st.status !== 'completed' && st.teams.length === st.n);
+  const def = live?.key || (B.started ? (nextUp || B.list.filter((st) => st.status === 'completed').at(-1))?.key : null) || 'groups';
+  const m = q.get('m') === 'groups' || B[q.get('m')] ? q.get('m') : def;
+  const tabs = [['groups', '조 편성', null], ...B.list.map((st) => [st.key, st.tab, st])];
+  const tabBar = `<nav class="lcq-tabs" aria-label="LCQ 경기"><div class="seg">${tabs.map(([k, n, st]) => `<a href="${qsLink(base, q, { m: k })}" aria-current="${k === m}">${esc(n)}${st?.status === 'live' ? ' <span class="tab-live" aria-label="LIVE"></span>' : st?.status === 'completed' ? ' <small class="tab-done">종료</small>' : st?.start ? ` <small class="tab-when">${esc(dayLabel(dayKey(st.start)).slice(0, 5))}</small>` : ''}</a>`).join('')}</div></nav>`;
+  return `<p class="lead">${esc(REGION[ev.region])} LCQ · ${esc(dayLabel(dayKey(B.a.start || ev.start)))} 시작. 지역마다 40팀이 겨뤄 상위 2팀이 챔피언십에 갑니다.</p>
     ${!B.done ? refreshNote() : ''}
     <div class="controls">${seg}</div>${focusLine}
-    <section class="sec"><ol class="timeline tl-row">${phases}</ol></section>
-    ${spoil(B.started ? bracketHtml : (lobbies ? bracketHtml : '') + entrants + how, key, 'LCQ 결과')}`;
+    ${tabBar}
+    ${spoil(m === 'groups' ? lcqGroups(B) : lcqMatch(B, B[m]), key, 'LCQ 결과')}`;
 }
 
 /* ---------- 챔피언십 조 편성 (사이트 계산) ---------- */
