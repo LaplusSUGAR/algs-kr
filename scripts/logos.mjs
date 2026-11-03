@@ -201,7 +201,8 @@ async function processImage(sharp, buf, base) {
 async function main() {
   const { entries, report, todo } = plan();
   fs.mkdirSync(path.join(ROOT, 'raw/logos'), { recursive: true });
-  writeJson('raw/logos/report.json', { at: new Date().toISOString(), teams: report }, true);
+  // 내용이 바뀔 때만 쓴다 (시각만 바뀌어 매 빌드 커밋되는 일 방지)
+  if (JSON.stringify(readJson('raw/logos/report.json', {}).teams) !== JSON.stringify(report)) writeJson('raw/logos/report.json', { at: new Date().toISOString(), teams: report }, true);
   const s = report.reduce((a, r) => ((a[r.src || 'none'] = (a[r.src || 'none'] || 0) + 1), a), {});
   console.log(`[logos] 팀 ${report.length} · 출처 ${JSON.stringify(s)} · 새로 만들 로고 ${todo.length}`);
   if (PLAN) {
