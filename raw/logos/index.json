@@ -135,7 +135,7 @@
   "id:01KKX6TB0GXSA1T51XH4J90BCB": {
     "src": "lp",
     "f": [
-      "logos/t/bf3cc591",
+      null,
       "logos/t/bf3cc591"
     ]
   },
@@ -248,7 +248,7 @@
     "src": "official",
     "f": [
       "logos/t/ef296fc8",
-      "logos/t/f28f117c"
+      null
     ]
   },
   "id:01KHPREVFR66EX54TN3WXASC3F": {
@@ -296,7 +296,7 @@
   "id:01KHPREZ17WVRXCCZD256CRP5C": {
     "src": "official",
     "f": [
-      "logos/t/f229ede8",
+      null,
       "logos/t/74cd61f6"
     ]
   },
@@ -339,7 +339,7 @@
     "src": "lp",
     "f": [
       "logos/t/98dda722",
-      "logos/t/98dda722"
+      null
     ]
   },
   "id:01KHPREY6S6581HS9ZDSYXQJ31": {
@@ -450,7 +450,7 @@
   "id:01KHPREZ9GPCDSSQKNVXNEACVV": {
     "src": "official",
     "f": [
-      "logos/t/ae0d25b2",
+      null,
       "logos/t/1daaee2f"
     ]
   },
@@ -576,7 +576,7 @@
   "id:01KHPREWGJW7FR5G2XGYTE15TM": {
     "src": "lp",
     "f": [
-      "logos/t/35030b44",
+      null,
       "logos/t/35030b44"
     ]
   },
@@ -674,7 +674,7 @@
   "id:01KTSJN918EBK3C0ZF95Y79R47": {
     "src": "official",
     "f": [
-      "logos/t/02d1ea7f",
+      null,
       "logos/t/688e6edb"
     ]
   },
@@ -710,7 +710,7 @@
     "src": "official",
     "f": [
       "logos/t/b534d594",
-      "logos/t/47b6dc7e"
+      null
     ]
   },
   "id:01KJSEK7SCXK8JYAP8W3WF8VZV": {
@@ -737,7 +737,7 @@
   "id:01KTSJNA2Y21PNF3VHANB97EMK": {
     "src": "official",
     "f": [
-      "logos/t/dd728628",
+      null,
       "logos/t/d4f4fc26"
     ]
   },
@@ -755,11 +755,137 @@
       "logos/t/5e0431de"
     ]
   },
+  "id:01KTSJNA886ZZ7GB2SV5EK08R1": {
+    "src": "lp",
+    "f": [
+      "logos/t/e9a5694b",
+      "logos/t/e9a5694b"
+    ]
+  },
+  "id:01KTSJNAA5CR05C7HPH72X4AEM": {
+    "src": "lp",
+    "f": [
+      "logos/t/d886aca3",
+      "logos/t/d886aca3"
+    ]
+  },
+  "id:01KTSJN99S5QCPQBZDYKH7A37X": {
+    "src": "official",
+    "f": [
+      "logos/t/bbe38c26",
+      "logos/t/4807c7da"
+    ]
+  },
+  "cc:soten": {
+    "src": "lp",
+    "f": [
+      "logos/t/4507137a",
+      "logos/t/4507137a"
+    ]
+  },
   "cc:unlimitacademy": {
     "src": "lp",
     "f": [
       "logos/t/edd00d5d",
       "logos/t/edd00d5d"
+    ]
+  },
+  "cc:tirgaming": {
+    "src": "lp",
+    "f": [
+      "logos/t/3e3d520f",
+      "logos/t/b129d9fa"
+    ]
+  },
+  "cc:jyashin": {
+    "src": "lp",
+    "f": [
+      "logos/t/860ad9ab",
+      "logos/t/860ad9ab"
+    ]
+  },
+  "cc:growgaming": {
+    "src": "lp",
+    "f": [
+      "logos/t/06adc65b",
+      "logos/t/06adc65b"
+    ]
+  },
+  "cc:astranova": {
+    "src": "lp",
+    "f": [
+      "logos/t/f8b8b093",
+      "logos/t/153b31d3"
+    ]
+  },
+  "cc:nozelkakumeigun": {
+    "src": "lp",
+    "f": [
+      "logos/t/a1d47588",
+      "logos/t/66824a96"
+    ]
+  },
+  "cc:reftcomputergaming": {
+    "src": "lp",
+    "f": [
+      "logos/t/603b5177",
+      "logos/t/76e9ae51"
+    ]
+  },
+  "cc:thegoonz": {
+    "src": "lp",
+    "f": [
+      "logos/t/eab010d7",
+      "logos/t/2cedd67b"
+    ]
+  },
+  "cc:bluebees": {
+    "src": "lp",
+    "f": [
+      "logos/t/61c0c189",
+      "logos/t/61c0c189"
+    ]
+  },
+  "cc:asna": {
+    "src": "lp",
+    "f": [
+      "logos/t/fdeaa095",
+      "logos/t/fdeaa095"
+    ]
+  },
+  "cc:insidethering": {
+    "src": "lp",
+    "f": [
+      "logos/t/47a03f77",
+      "logos/t/b457a3d1"
+    ]
+  },
+  "cc:hungkuangfalcon": {
+    "src": "lp",
+    "f": [
+      "logos/t/137edeae",
+      "logos/t/137edeae"
+    ]
+  },
+  "cc:gentleintonight": {
+    "src": "lp",
+    "f": [
+      "logos/t/a4112f26",
+      "logos/t/17500cda"
+    ]
+  },
+  "cc:lotuszenith": {
+    "src": "lp",
+    "f": [
+      "logos/t/ea358774",
+      "logos/t/a41b4e67"
+    ]
+  },
+  "cc:nemesis": {
+    "src": "lp",
+    "f": [
+      "logos/t/c62858f2",
+      "logos/t/c62858f2"
     ]
   },
   "cc:voidesports": {
@@ -774,6 +900,69 @@
     "f": [
       "logos/t/f5a2b623",
       "logos/t/f5a2b623"
+    ]
+  },
+  "cc:sliceesport": {
+    "src": "lp",
+    "f": [
+      "logos/t/84c3ff19",
+      "logos/t/84c3ff19"
+    ]
+  },
+  "cc:sps": {
+    "src": "lp",
+    "f": [
+      null,
+      "logos/t/3f7423be"
+    ]
+  },
+  "cc:lics": {
+    "src": "lp",
+    "f": [
+      "logos/t/7fe54805",
+      "logos/t/7fe54805"
+    ]
+  },
+  "cc:legiongaming": {
+    "src": "lp",
+    "f": [
+      "logos/t/b60378c4",
+      "logos/t/b60378c4"
+    ]
+  },
+  "cc:zestfest": {
+    "src": "lp",
+    "f": [
+      "logos/t/e3036224",
+      "logos/t/e3036224"
+    ]
+  },
+  "cc:redeem": {
+    "src": "lp",
+    "f": [
+      "logos/t/d070da16",
+      "logos/t/bec6f372"
+    ]
+  },
+  "cc:szn": {
+    "src": "lp",
+    "f": [
+      "logos/t/acb80173",
+      "logos/t/acb80173"
+    ]
+  },
+  "cc:riqongaming": {
+    "src": "lp",
+    "f": [
+      "logos/t/ce26ab2a",
+      "logos/t/ce26ab2a"
+    ]
+  },
+  "cc:gamblers": {
+    "src": "lp",
+    "f": [
+      "logos/t/a396bc06",
+      "logos/t/a396bc06"
     ]
   }
 }
