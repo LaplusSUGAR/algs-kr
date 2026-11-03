@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, readJson, writeText, hash, normRegion, REGION_LABEL, nameKey } from './lib.mjs';
+import { nk as logoKey } from './lp-teams-parse.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -55,10 +56,17 @@ for (const key of Object.keys(algs.pl).sort().reverse()) {
   for (const r of algs.pl[key]) ensureTeam(r[3], r[1], r[2], region);
 }
 
-// 팀 로고 (공식 API, [logoLight 흰 로고, logoDark 어두운 로고])
-// 줄인 로고(site/logos/<해시>.png)가 있으면 그 파일을, 없으면 원본 주소를 쓴다
+// 팀 로고: [어두운 배경용(흰 로고), 밝은 배경용(어두운 로고)]
+// 1순위 scripts/logos.mjs가 만든 새 로고(raw/logos/index.json → 'logos/t/<해시>', 화면이 -64.webp·-160.webp를 붙여 씀:
+//   운영자 파일 > Liquipedia(이름·선수 대조 통과) > 공식 API). 없으면 예전 128px PNG, 그것도 없으면 공식 원본 주소
+const logoIndex = readJson('raw/logos/index.json', {});
 const localLogo = (u) => (u && fs.existsSync(path.join(ROOT, 'site/logos', `${hash(u)}.png`)) ? `logos/${hash(u)}.png` : u || null);
-for (const [id, lg] of Object.entries(algs.logos || {})) if (teams[id]) teams[id].logo = [localLogo(lg[0]), localLogo(lg[1])];
+const logoOf = (key, official) => {
+  const e = logoIndex[key];
+  if (e?.f && (e.f[0] || e.f[1])) return [e.f[0] || e.f[1], e.f[1] || e.f[0]];
+  return official ? [localLogo(official[0]), localLogo(official[1])] : null;
+};
+for (const t of Object.values(teams)) t.logo = logoOf(`id:${t.id}`, algs.logos?.[t.id]);
 
 // 로스터와 한국 판별
 // config/players.json: 선수별 수동 보정. role(coach/player)로 역할을 고치고, heritage: "KR"로 한국계(혼혈·이중국적 등)를 표시한다.
@@ -249,8 +257,7 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
   const ts = raw.teams.map(([id, short, name, seed]) => {
     const t = teams[id];
     if (!t?.current && short) {
-      const lg = algs.logos?.[id];
-      xteams[short] = { id, short, name: name || short, region: e.region, logo: lg ? [localLogo(lg[0]), localLogo(lg[1])] : null, d2: 1 };
+      xteams[short] = { id, short, name: name || short, region: e.region, logo: logoOf(`id:${id}`, algs.logos?.[id]) || logoOf(`cc:${logoKey(name)}`), d2: 1 };
     }
     return { id, short: t?.current ? t.short : short, name: t?.current ? t.name : name || short, seed, pl: !!t?.current };
   });
@@ -258,7 +265,7 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
   const cc = ccOf(e.region).map((c) => {
     let key = c.name;
     if (teams[shortToId[key]]?.current) key = `${c.name} (CC)`;
-    if (!xteams[key]) xteams[key] = { id: null, short: key, name: c.name, region: e.region, logo: null, d2: 1 };
+    if (!xteams[key]) xteams[key] = { id: null, short: key, name: c.name, region: e.region, logo: logoOf(`cc:${logoKey(c.name)}`), d2: 1 };
     return { ...c, short: key };
   });
   return { eventId: e.id, slug: e.slug, name: e.name, region: e.region, start: e.start, end: e.end, teams: ts, cc };

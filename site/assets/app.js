@@ -126,7 +126,9 @@ const LP_SEASON = 'https://liquipedia.net/apexlegends/ALGS/2026-27';
 // 공식 경기 페이지가 있는 이벤트(슬러그가 사람이 읽는 이름)는 algs.ea.com, 없으면(LCQ 등) Liquipedia 시즌 페이지
 const officialUrl = (s) => (/^[a-z][a-z0-9-]+$/.test(s.eventSlug || '') && s.eventSlug !== 'last-chance-qualifier' ? `https://algs.ea.com/en/year-6/${s.eventSlug}/match/${s.id}` : LP_SEASON);
 const olink = (url, label) => `<a class="olink" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
-// 공식 팀 로고 (없으면 약칭 두 글자 상자). dark: 어두운 배경 위에 놓일 때
+// 팀 로고 (없으면 약칭 상자). dark: 어두운 배경 위에 놓일 때
+// LOGO_PX: 크기별 화면 표시 너비(CSS px). 큰 로고(xl)는 큰 화면 확대(zoom)까지 생각해 넉넉히
+const LOGO_PX = { '': 18, lg: 30, xl: 100 };
 const logo = (short, cls = '', dark) => {
   const lg = xteam(short)?.logo;
   const d = dark ?? document.documentElement.dataset.theme === 'dark';
@@ -135,7 +137,10 @@ const logo = (short, cls = '', dark) => {
   if (!lg || (!lg[0] && !lg[1])) return `<span class="tlogo ph ${cls}" aria-hidden="true">${esc(String(short || '?').slice(0, 4))}</span>`;
   const src = d ? lg[0] || lg[1] : lg[1] || lg[0];
   const plate = d ? (lg[0] ? '' : ' plate-light') : (lg[1] ? '' : ' plate-dark');
-  return `<img class="tlogo ${cls}${plate}" src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span class=&quot;tlogo ph ${cls}&quot;>${esc(String(short || '?').slice(0, 4))}</span>'">`;
+  const fail = `onerror="this.outerHTML='<span class=&quot;tlogo ph ${cls}&quot;>${esc(String(short || '?').slice(0, 4))}</span>'"`;
+  // 새 로고(logos/t/…): 64px·160px WebP 두 장 중 표시 크기 × 화면 배율에 맞는 쪽을 브라우저가 고른다
+  if (/^logos\/t\//.test(src)) return `<img class="tlogo ${cls}${plate}" src="${esc(src)}-64.webp" srcset="${esc(src)}-64.webp 64w, ${esc(src)}-160.webp 160w" sizes="${LOGO_PX[cls] || 30}px" alt="" loading="lazy" decoding="async" ${fail}>`;
+  return `<img class="tlogo ${cls}${plate}" src="${esc(src)}" alt="" loading="lazy" decoding="async" ${fail}>`;
 };
 const D2 = '<span class="tag d2" title="2부 리그(챌린저 서킷) 팀">2부</span>';
 const teamLink = (short, label) => (team(short) ? `<a class="tl" href="#/teams/${encodeURIComponent(short)}">${logo(short)}<span>${esc(label || short)}</span></a>`

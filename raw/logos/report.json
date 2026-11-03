@@ -1,0 +1,2941 @@
+{
+  "at": "2026-11-03T13:30:12.522Z",
+  "teams": [
+    {
+      "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
+      "short": "VSN",
+      "name": "Team Vision",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Team Vision",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREW7EJXVPJCD4RCPQSZSE",
+      "short": "AURA",
+      "name": "Aurora",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Aurora",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWNWEZSQCQDGZVAF5CCW",
+      "short": "TL",
+      "name": "Team Liquid",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Team Liquid",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AHGDBRH2T7FSQNCDPY1M",
+      "short": "ZETA",
+      "name": "ZETA DIVISION",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "ZETA DIVISION",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV8NHAB1CHG0W7MEFS6P",
+      "short": "ALL",
+      "name": "Alliance",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Alliance",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVRNJA90XSYQQ4NBG32E",
+      "short": "WOL",
+      "name": "Wolves Esports",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Wolves Esports",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREY4M77GTWNWD0VHCK60M",
+      "short": "UNL",
+      "name": "UNLIMIT",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "UNLIMIT",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ7K2SCE2CCYGXHMDQAZ",
+      "short": "RRQ",
+      "name": "Team RRQ",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "RRQ",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPRETW5SA96GN6HXY5N6V2F",
+      "short": "NIP",
+      "name": "NinjasinPyjamas",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Ninjas in Pyjamas",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX30SHMDHM5YQ3ENN0SQ",
+      "short": "RC",
+      "name": "REJECT",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "REJECT",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXGF2G62Y6H5QG87ZYEE",
+      "short": "FLCN",
+      "name": "Team Falcons",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Team Falcons",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXDFYWX2GJ7Z1VNARJDV",
+      "short": "SEN",
+      "name": "Sentinels",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Sentinels",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXF10RF8GQKJJ6N16YHS",
+      "short": "GK",
+      "name": "Geekay Esports",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "Geekay Esports",
+        "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KHPREV3DXVRZDG7Z61J7XXG2",
+      "short": "E36",
+      "name": "ENTER FORCE.36",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "ENTER FORCE.36",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVAQ5N265YD102VN8SK9",
+      "short": "GG",
+      "name": "GaiminGladiators",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Gaimin Gladiators",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWX8J5GD5QTZ62E4VRVD",
+      "short": "CRT",
+      "name": "Crazy Thieves",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Crazy Thieves",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV6NS3VKTPR8KAHX31N0",
+      "short": "PV",
+      "name": "PVISION",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "BANDITS",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KHPREX79D112W371YQ819V49",
+      "short": "AG",
+      "name": "AG GLOBAL",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "All Gamers Global",
+        "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AGVDK6XFG76BXCJ3QEPW",
+      "short": "WGR",
+      "name": "WhiteGrimReaper",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "White Grim Reaper",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KKX6TB0GXSA1T51XH4J90BCB",
+      "short": "FWG",
+      "name": "Forged Wolves",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Forged Wolves",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYZJPA7ZQ3AMR94XEB6J",
+      "short": "VKG",
+      "name": "VK GAMING",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "VK Gaming",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYBBR2PWR9YXF0X2C281",
+      "short": "S8UL",
+      "name": "S8UL",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "S8UL Esports",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYD403WZ7N0JWCAZ73TC",
+      "short": "GEN",
+      "name": "Gen.G Citadel",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Gen.G Esports",
+        "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVCG4KW85GDKW4B811Y0",
+      "short": "FFUN",
+      "name": "ForFun Esports",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "For Fun Esports",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXADNBT3YBAPQC8K39C8",
+      "short": "NRG",
+      "name": "NRG",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "선수 2명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "SSS",
+        "overlap": 2
+      }
+    },
+    {
+      "key": "id:01KHPREWVFQ8KJBCB3AY6Q42T2",
+      "short": "SR",
+      "name": "ShopifyRebellion",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Shopify Rebellion",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXSN4ECWZQ35M6W1YP5S",
+      "short": "KNC",
+      "name": "KINOTROPE CLUB",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "KINOTROPE Club",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWCZGM90NRYMFFN8RWQR",
+      "short": "DCG",
+      "name": "Relove DCG",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Deep Cross Gaming",
+        "by": "약자·같은 조직 이름 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPRETY9SBG2WNXQYHXJHNVS",
+      "short": "STAL",
+      "name": "Stallions",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Stallions",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX5NAJ267Q5TT8TPA6QF",
+      "short": "DINO",
+      "name": "DINOS",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "DINOS",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVWPTXN5RCMV8N6TM8RB",
+      "short": "TOP",
+      "name": "TOP",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "TOP",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREW8YFA3WZDFTAH7WMVHA",
+      "short": "PXX",
+      "name": "PXX",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Pork Xiaolongbao Xpert",
+        "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYPK26VSEXTX14Y1H1GT",
+      "short": "DKF",
+      "name": "DKF",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Geekay Esports",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KHPREW40F3JGV2MKBYXYW5RK",
+      "short": "MIH",
+      "name": "Made In Heaven",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Made In Heaven",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME84B9DFWTQWPTCTEXRHSD0",
+      "short": "WAR",
+      "name": "Team WaR",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Team WaR",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWJ40HYNJSHV1D5GWDGY",
+      "short": "WRLD",
+      "name": "World Wide",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "World Wide",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVFR66EX54TN3WXASC3F",
+      "short": "TEC",
+      "name": "TitanEsportsClub",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "Titan Esports Club",
+        "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KHPREXKPB1ZHBC2S31AN0P7E",
+      "short": "RID0",
+      "name": "RIDDLEORDER ZERO",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "RIDDLE ZERO",
+        "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+      "short": "ZIP",
+      "name": "ZIPLINE MAFIA",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "ZiPLine Mafia",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXY6ACYJFDBYCH61WC8E",
+      "short": "LTX",
+      "name": "LawsonTicketXone",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "LawsonTicketXone",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ4208EN3K1VJB0G8S6N",
+      "short": "7VEN",
+      "name": "7VEN",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "선수 2명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Daylight Savings",
+        "overlap": 2
+      }
+    },
+    {
+      "key": "id:01KHPREYY3VBJ72QFHDHTGFV3K",
+      "short": "KN",
+      "name": "KINOTROPE gaming",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "KINOTROPE",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ17WVRXCCZD256CRP5C",
+      "short": "ECL",
+      "name": "TEAM ECLIPSE",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Team Eclipse",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYVAK3KCYDMH8PMXA0GZ",
+      "short": "NFX",
+      "name": "NOEZ FOXX",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "NOEZ FOXX",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX931TTBJDXH1AN6D121",
+      "short": "JDG",
+      "name": "JD GAMING",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "JD Gaming",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXR9RN3TFMXM8PE4MRB7",
+      "short": "RID1",
+      "name": "RIDDLEORDER ONE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "RIDDLE ONE",
+        "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWZZYVXJSJ489BJRNRR9",
+      "short": "TIE",
+      "name": "TIE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "TIE",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+      "short": "SBI",
+      "name": "SBI eSports",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "SBI e-Sports",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYKNXC01C0G2S5H19F38",
+      "short": "TLNP",
+      "name": "TLN PIRATES",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "TLN Pirates",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREY6S6581HS9ZDSYXQJ31",
+      "short": "KRS",
+      "name": "Kirisame",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Kirisame",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVHTW9Y3A7FRCKDE8N9C",
+      "short": "DOG",
+      "name": "Dogred",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Dogred",
+        "by": "이름 같음 · 선수 1명 겹침"
+      }
+    },
+    {
+      "key": "id:01KJSEK7XNMD7VYXNHJKRPBFV3",
+      "short": "URNM",
+      "name": "Unreal Nightmare",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Unreal Nightmare",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+      "short": "VEXX",
+      "name": "VexX Gaming",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "VexX Gaming",
+        "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KHPREYRD48P80Q2ME3FWEX57",
+      "short": "NICE",
+      "name": "Nice Guys",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Nice Guys",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXNNT22QYHC28MBPEAT8",
+      "short": "RIG",
+      "name": "REIGNITE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "REIGNITE",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVKC6EEY344B6ENY3GHM",
+      "short": "SWQ",
+      "name": "SaWeiQi",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "DaBing SaWeiQi",
+        "by": "약자·같은 조직 이름 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9FCV6Q57S7410RHJC1Z",
+      "short": "NE",
+      "name": "noEND",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "noEND",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVYF1NA2MVWBPZDR7J23",
+      "short": "D4C",
+      "name": "D4C",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "D4C",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KK8VGFSV46119MRVWFS1T5JH",
+      "short": "BH",
+      "name": "black hole",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Black Hole",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYF197FBMPQBY0AKNF59",
+      "short": "OTS",
+      "name": "Outside",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "선수 4명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Comeback",
+        "overlap": 4
+      }
+    },
+    {
+      "key": "id:01KHPREVNDKME8CCMTZ5K982KG",
+      "short": "FIN",
+      "name": "Finishers",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Finishers Esports",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ5K85VCBMCJVQY1MYNC",
+      "short": "TECA",
+      "name": "TEC-Academy",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "TEC Academy",
+        "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KHPREW5FG3P1Y4J66PFX67E4",
+      "short": "RDG",
+      "name": "RENDANG",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Rendang",
+        "by": "이름 같음 · 선수 1명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXJ8WBZW7KTGMW23GHTS",
+      "short": "SRL",
+      "name": "SYRALE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "SYRALE",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA72958BY5HZC4TC9ASN",
+      "short": "ORG",
+      "name": "Orange",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Orange",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ9GPCDSSQKNVXNEACVV",
+      "short": "FUL",
+      "name": "FUL",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "FUL",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV4ZS8N3WZ0D5ACHCJ37",
+      "short": "CPR",
+      "name": "CPR",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "name": "CPR",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV1T302YDPPGD1DA2391",
+      "short": "BS",
+      "name": "BLACK Sheeps",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "BLACK Sheeps",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9E6HENNGMP9TC1HV5AA",
+      "short": "O2",
+      "name": "O2esports",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "O2 esports",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KMF09WG9A551ZCYGZWWKPCXZ",
+      "short": "FXI",
+      "name": "Full XI",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Full XI",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXVANAQTNCBJWW7TNBY1",
+      "short": "FL",
+      "name": "FENNEL",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "FENNEL",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXZXP4CYR54DGSY5VW4Q",
+      "short": "MTR",
+      "name": "Meteor",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Meteor",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYN75Y400N800M8NCTSV",
+      "short": "RON",
+      "name": "Ronin",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Ronin",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KJSEK7G2AAFZS9C17W5T6DGH",
+      "short": "RRX",
+      "name": "RRX",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "RRX",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
+      "short": "HEAD",
+      "name": "Headglytch",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Headglytch",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWQ7ZZGP8S40W48MFHF9",
+      "short": "BLSD",
+      "name": "Blessed",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Blessed",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+      "short": "2C1M",
+      "name": "2c1m",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "2C1M",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWKQ5W4FDQCRGX4KDCAN",
+      "short": "INF",
+      "name": "Infinite",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Infinite",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AH0B3CKM5VXXCHSH3G3M",
+      "short": "HABN",
+      "name": "HABNW",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "HABNW",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYGFHD5EYT03ZQN9A8QR",
+      "short": "SH",
+      "name": "Summer Haze",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Summer Haze",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9HZF6VQ73RXXTM4XPS9",
+      "short": "TBSU",
+      "name": "TuBoShu",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "TuBoShu",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREY171TGAJBD2NNB8SVFY",
+      "short": "ALT",
+      "name": "ALTERNATIVE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Alternative Gaming",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AHCFT4C53BNA6E2Z9FD6",
+      "short": "ARAM",
+      "name": "ARAM",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "name": "ARAM",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME84BNZF9VA8WAKE2K048P4",
+      "short": "3MEN",
+      "name": "3 MEN",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "3 MEN",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWGJW7FR5G2XGYTE15TM",
+      "short": "MAMA",
+      "name": "MaMa Clubs",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "MaMa Clubs",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX1EC5Z0DQ4472BPDS5H",
+      "short": "BB",
+      "name": "Buckle Boys",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Buckle Boys",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREW26WW7WFZ1H5YMJXWN2",
+      "short": "BEN",
+      "name": "Ben",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "ben",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9DSBGY29GVSMXNNHT5D",
+      "short": "RR",
+      "name": "RED Rams",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "RED Rams",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9JEEE9MTYJWA3P7TPHJ",
+      "short": "DN",
+      "name": "DN",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "DN",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AHE4FYSB8AJPMJVY4REK",
+      "short": "UBI",
+      "name": "UBI CILEMBU",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "name": "UBI CILEMBU",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVTPFF65ZFGRMQZF97YW",
+      "short": "MAM",
+      "name": "MAMMA MIA",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "MAMMA MIA",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA350MXM4N2G21X0FQES",
+      "short": "ETS",
+      "name": "ETiAS",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "ETiAS",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREY2Q30PNMWXNRJF2KSSZ",
+      "short": "FNC",
+      "name": "FNATIC",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Fnatic",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AH4NG8W8G65J2H899XP4",
+      "short": "GT",
+      "name": "GoaT",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "GoaT",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV02KZK07880PESMKJ3V",
+      "short": "RLZ",
+      "name": "REALIZE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "REALIZE",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AGN68R686YAX6GHNHJHX",
+      "short": "FCN",
+      "name": "FCN YAMABUN",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Function Kyoto",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KHPREZ2JRAK2RGDG62J3AEEW",
+      "short": "PXL",
+      "name": "Pixel Lumina",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Pixel Lumina",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9J6TVW8D1T8J1BS4MS0",
+      "short": "MAJN",
+      "name": "Majin",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Majin Club",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREWEXHYMAN629M2QBZTB8",
+      "short": "ALX",
+      "name": "AELIX",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Aelix",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREYST26ZBGYJRQ03Z93B6",
+      "short": "FISH",
+      "name": "STRONGFISH",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "STRONGFISH",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN918EBK3C0ZF95Y79R47",
+      "short": "PRES",
+      "name": "W Press",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "W PRESS",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA3H7NEGVZK3D60YX1PB",
+      "short": "XECT",
+      "name": "XECT",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "XECT",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME84BM2K6S5120YXYV4NZ75",
+      "short": "GCR",
+      "name": "Glacier",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Glacier",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9HSBXC8Y8JF0FW1WHGC",
+      "short": "VOID",
+      "name": "Void Esports OCE",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Void Esports OCE",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9MCZXCJV0JJSCS02MNR",
+      "short": "DRK",
+      "name": "Team Darkspire",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Team Darkspire",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA9AWZ5WVGXCMVHV0P87",
+      "short": "RD",
+      "name": "REDRAGON",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Redragon",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KKCH1ZQ2PBZQ3NRKKV8QTVV5",
+      "short": "FREE",
+      "name": "Free Thinkers",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "Free Thinkers",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KJSEK7SCXK8JYAP8W3WF8VZV",
+      "short": "TECB",
+      "name": "TEC Black",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "TEC Academy",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KTSJN9JW27TZSF9G5810CXTY",
+      "short": "BPR",
+      "name": "BPR",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "BPR",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9JPC99AJFDDXPESJWTM",
+      "short": "TF",
+      "name": "Take Flyte",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Take Flyte",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9NNNMNFHY2H1EMVSD27",
+      "short": "SLG",
+      "name": "SLG",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Seventh Letter",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KHPREXBTGD37GD3ZJ25R7ABW",
+      "short": "VR",
+      "name": "EBOYS",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KTSJNA2Y21PNF3VHANB97EMK",
+      "short": "UFZ",
+      "name": "UNFAZED",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "REIGA",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KTSJNA9YTACQ35510GKMSRK2",
+      "short": "BCL",
+      "name": "Bacalhau",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Bacalhau",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9FK1SE98BD2N5JM97ZZ",
+      "short": "4QUA",
+      "name": "4QuattroFormaggi",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "name": "4QuattroFormaggi",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA886ZZ7GB2SV5EK08R1",
+      "short": "FURY",
+      "name": "FURY",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "FURY",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9KPK3JT213PMP606X99",
+      "short": "FTL",
+      "name": "Fear the Lamb",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "GEI",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KTSJNA15N4JQB8DG7ZYXK4VR",
+      "short": "SHIN",
+      "name": "Shinobi",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "STORM",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KTSJNAA5CR05C7HPH72X4AEM",
+      "short": "SO9",
+      "name": "Shadows Of Nine",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Shadows of Nine",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN99S5QCPQBZDYKH7A37X",
+      "short": "SO",
+      "name": "Sesame oil",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "Sesame oil",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "cc:0nionz",
+      "name": "0nionz",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "0nionz",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Butteramn, M1kyEGAO, Halneyyy)"
+      }
+    },
+    {
+      "key": "cc:laughtale",
+      "name": "Laugh Tale",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Laugh Tale",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Lemon, YuRyo, Aqua)"
+      }
+    },
+    {
+      "key": "cc:teamtomodachi",
+      "name": "Team Tomodachi",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Team Tomodachi",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Otakky, Kondamin, Asddwdw3)"
+      }
+    },
+    {
+      "key": "cc:waked",
+      "name": "waked",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "waked",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Minun2nd, Mirytaya, Tarumeeen)"
+      }
+    },
+    {
+      "key": "cc:soten",
+      "name": "SOTEN",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "SOTEN",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ZkYuTa, NIKO215, Mido)"
+      }
+    },
+    {
+      "key": "cc:unlimitacademy",
+      "name": "UNLIMIT ACADEMY",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "UNLIMIT ACADEMY",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Mizore, Tatuta, Saro)"
+      }
+    },
+    {
+      "key": "cc:02demonslayers",
+      "name": "02DemonSlayers",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "02DemonSlayers",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Aecxr, IHateTheApex, Naohiro22)"
+      }
+    },
+    {
+      "key": "cc:rerereta",
+      "name": "rerereta",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "rerereta",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: KEISUKEFROMRYUQ, KANAMEDAISUKIMAN, Rerereta)"
+      }
+    },
+    {
+      "key": "cc:tirgaming",
+      "name": "TIR GAMING",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "TIR GAMING",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: APOLLONIA, Lily, Splash)"
+      }
+    },
+    {
+      "key": "cc:schweinrequiem",
+      "name": "SchweinRequiem",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "SchweinRequiem",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Maki, Eden, Lsalza)"
+      }
+    },
+    {
+      "key": "cc:cuticle",
+      "name": "Cuticle",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Cuticle",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 7ne, Gqzeln, Milim)"
+      }
+    },
+    {
+      "key": "cc:iam",
+      "name": "iAM",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "iAM",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Sayagiu, Ugiugii, Doramin)"
+      }
+    },
+    {
+      "key": "cc:jyashin",
+      "name": "JYASHIN",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "JYASHIN",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Jyasintereta, MatsuTasu, MakaaaaA)"
+      }
+    },
+    {
+      "key": "cc:growgaming",
+      "name": "GROW Gaming",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "GROW Gaming",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Gongon, IBUZOSQN, Nene)"
+      }
+    },
+    {
+      "key": "cc:astranova",
+      "name": "AstraNova",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "AstraNova",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Takuma, Yutaku7796, Ice7)"
+      }
+    },
+    {
+      "key": "cc:gunso",
+      "name": "GUNSO",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "GUNSO",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ouzia, 0FERU, TenTen)"
+      }
+    },
+    {
+      "key": "cc:sukisukidream",
+      "name": "SukiSukiDream",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "SukiSukiDream",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Momotyann, Sawani, Tommypocopants)"
+      }
+    },
+    {
+      "key": "cc:tridentigl",
+      "name": "Trident IGL",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Trident IGL",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kanata, CohMe1, Maca)"
+      }
+    },
+    {
+      "key": "cc:miffys",
+      "name": "miffys",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "miffys",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Rimuffy, Yum1air, 7fishys)"
+      }
+    },
+    {
+      "key": "cc:nozelkakumeigun",
+      "name": "NOZEL KAKUMEIGUN",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "NOZEL KAKUMEIGUN",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Loxvedream, Nokkusu, Upaupa3)"
+      }
+    },
+    {
+      "key": "cc:auuuuuuyuta",
+      "name": "!AUUUUUU!YUTA!",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "!AUUUUUU!YUTA!",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Tama, Lqct, Rad)"
+      }
+    },
+    {
+      "key": "cc:sasanqua",
+      "name": "sasanqua",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "sasanqua",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 9kug, TAIBANA, Umikoefps)"
+      }
+    },
+    {
+      "key": "cc:reftcomputergaming",
+      "name": "RefTComputerGaming",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "RefTComputerGaming",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Cyrus, Leyz, Yun1air)"
+      }
+    },
+    {
+      "key": "cc:nrcjapan",
+      "name": "NRC Japan",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "NRC Japan",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Pachi, ShynkChan, Rei_kun)"
+      }
+    },
+    {
+      "key": "cc:kerokeroparadise",
+      "name": "kerokeroparadise",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "kerokeroparadise",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: TUYONEKO, Haaruyade, Ant2)"
+      }
+    },
+    {
+      "key": "cc:thegoonz",
+      "name": "THE GOONz",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "THE GOONz",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Aries, Kissshot, Hikuman)"
+      }
+    },
+    {
+      "key": "cc:buhibuhicompany",
+      "name": "buhibuhi company",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "buhibuhi company",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kanpeeman, C4lmerq, ReiApex)"
+      }
+    },
+    {
+      "key": "cc:bluebees",
+      "name": "BLUE BEES",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "BLUE BEES",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: SmileSlime, Uni, Nagi1K)"
+      }
+    },
+    {
+      "key": "cc:souwacompany",
+      "name": "souwa company",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "souwa company",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Uru82, Souwa, Nabe)"
+      }
+    },
+    {
+      "key": "cc:triham",
+      "name": "TriHAM",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "TriHAM",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Yuuki_MsR, Bark, M)"
+      }
+    },
+    {
+      "key": "cc:luckytrigger",
+      "name": "Luckytrigger",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Luckytrigger",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: P1npxn, 4boko, Shoh)"
+      }
+    },
+    {
+      "key": "cc:asna",
+      "name": "ASNA",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "ASNA",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wash1n, CH3COONa, AXElA)"
+      }
+    },
+    {
+      "key": "cc:fmzenith",
+      "name": "FMZenith",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "FMZenith",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Onichocolate, Utuha2, ZNutuha6)"
+      }
+    },
+    {
+      "key": "cc:poppyplaytime",
+      "name": "Poppy Playtime",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Poppy Playtime",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: SeNaLMG7, JACKdao, Duckz)"
+      }
+    },
+    {
+      "key": "cc:triangle",
+      "name": "Triangle",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Triangle",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Xhivi, Lassie-26, KENTA1007)"
+      }
+    },
+    {
+      "key": "cc:aiaimer",
+      "name": "AI aimer",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "AI aimer",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Actor, Ezfactory, Kamo)"
+      }
+    },
+    {
+      "key": "cc:zako63",
+      "name": "zako63",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "zako63",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kyu63, NAGi, Yaranndau)"
+      }
+    },
+    {
+      "key": "cc:expedictor",
+      "name": "Expedictor",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Expedictor",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Neo, Kirin_ame, Ray_(Japanese_player))"
+      }
+    },
+    {
+      "key": "cc:tnpktru",
+      "name": "tnpktru",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "tnpktru",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: N4tsu, Kenkun, Monariza)"
+      }
+    },
+    {
+      "key": "cc:always",
+      "name": "Always",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Always",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ultimatekodak, Reo4004, Kentin1217)"
+      }
+    },
+    {
+      "key": "cc:senior",
+      "name": "SeNioR",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SeNioR",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Niikoluas, RobinFTW, SillyStepSis)"
+      }
+    },
+    {
+      "key": "cc:koupiyan",
+      "name": "KOU PI YAN",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "KOU PI YAN",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moxi, MarkL1ly, Mtulc)"
+      }
+    },
+    {
+      "key": "cc:dma",
+      "name": "DMA",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "DMA",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: DiLu, Selka, ArHe111111)"
+      }
+    },
+    {
+      "key": "cc:insidethering",
+      "name": "Inside The Ring",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Inside The Ring",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Exitlifee, NEWKU, Peterseng6974)"
+      }
+    },
+    {
+      "key": "cc:meowers",
+      "name": "MEOWERS",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "MEOWERS",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Empire, ClaYoshi, Bakrryboo)"
+      }
+    },
+    {
+      "key": "cc:sat",
+      "name": "SAT",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SAT",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nonameguy, Intoyou, Zobo)"
+      }
+    },
+    {
+      "key": "cc:sohai",
+      "name": "SOHAI",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SOHAI",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wei, LUZIFER23, Sora)"
+      }
+    },
+    {
+      "key": "cc:genz",
+      "name": "GenZ",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "GenZ",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: XIAOQI, Xiago, Moses)"
+      }
+    },
+    {
+      "key": "cc:highkillratio",
+      "name": "High Kill Ratio",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "High Kill Ratio",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: StarB0tz, ToadMunch, KoBeNoOb)"
+      }
+    },
+    {
+      "key": "cc:mrgreedy",
+      "name": "mr greedy",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "mr greedy",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Malchowski, Okkkkkjoshh, Wey)"
+      }
+    },
+    {
+      "key": "cc:triplep",
+      "name": "TripleP",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "TripleP",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Fwadyy, KhunPond, LLLLRangoLLLL)"
+      }
+    },
+    {
+      "key": "cc:bbz",
+      "name": "bbz",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "bbz",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Dokiovo, Suibingbing, NotWinter)"
+      }
+    },
+    {
+      "key": "cc:laststand",
+      "name": "LAST STAND",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "LAST STAND",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Koyful_(Macau_player), LeGoP1G, 21Faker)"
+      }
+    },
+    {
+      "key": "cc:pancakegaming",
+      "name": "PanCakeGaming",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "PanCakeGaming",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Waff1e, LanCet, M3)"
+      }
+    },
+    {
+      "key": "cc:blackjack",
+      "name": "BlackJack",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "BlackJack",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: LokizZ, Yuri_(Hong_Kong_player), YC)"
+      }
+    },
+    {
+      "key": "cc:kmk",
+      "name": "KMK",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "KMK",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kikiki-w-, LeeAki, Evieee)"
+      }
+    },
+    {
+      "key": "cc:evolutionv",
+      "name": "EvolutionV",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "EvolutionV",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: OHH, SKY_WILL, Killme)"
+      }
+    },
+    {
+      "key": "cc:futuretopsquad",
+      "name": "Future Top Squad",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Future Top Squad",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Inori, B8O0WW, Doro)"
+      }
+    },
+    {
+      "key": "cc:hungkuangfalcon",
+      "name": "HungKuang Falcon",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "HungKuang Falcon",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moe, Vicliao10q, Shuinyou)"
+      }
+    },
+    {
+      "key": "cc:ewh",
+      "name": "EWH",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "EWH",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ecl, Zyx666, Hinson)"
+      }
+    },
+    {
+      "key": "cc:3naple",
+      "name": "3 NAPLE",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "3 NAPLE",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: LPwarrior, Yuzuki, R0y888)"
+      }
+    },
+    {
+      "key": "cc:darkknightshadow",
+      "name": "DarkKnightShadow",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "DarkKnightShadow",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ALOlll, Kn1fe, Silent8r)"
+      }
+    },
+    {
+      "key": "cc:ltn1c",
+      "name": "LtN1c",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "LtN1c",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: CcY, BlueoCean, QwQjame)"
+      }
+    },
+    {
+      "key": "cc:progressoath",
+      "name": "Progress Oath",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Progress Oath",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wendykilling, Vitalemon_tea, FISHFISH)"
+      }
+    },
+    {
+      "key": "cc:ignint",
+      "name": "IGNINT",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "IGNINT",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: L1nkyy, GrannyySmith, Hag)"
+      }
+    },
+    {
+      "key": "cc:accidentalchamp",
+      "name": "Accidental Champ",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Accidental Champ",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ToeyNiestZ, S4dmannn, Pyrosama)"
+      }
+    },
+    {
+      "key": "cc:abyssalmonarch",
+      "name": "Abyssal Monarch",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Abyssal Monarch",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: The_Z3ros, Nexus, Isooney)"
+      }
+    },
+    {
+      "key": "cc:brandon",
+      "name": "Brandon",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Brandon",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Spork, Enekonya, Akwaintance)"
+      }
+    },
+    {
+      "key": "cc:agt",
+      "name": "AGT",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "AGT",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: P90sm0ke9renade, Ching, Loading-_-OwO)"
+      }
+    },
+    {
+      "key": "cc:toska",
+      "name": "TOSKA",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "TOSKA",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Tbone, 23Tikss, Medusaa)"
+      }
+    },
+    {
+      "key": "cc:kzg",
+      "name": "KZG",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "KZG",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Shark, BayMax04, LeLeTea)"
+      }
+    },
+    {
+      "key": "cc:fizzybubbly",
+      "name": "Fizzy Bubbly",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Fizzy Bubbly",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Andong, TimmyTiiimE, Lux)"
+      }
+    },
+    {
+      "key": "cc:bael",
+      "name": "BAEL",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "BAEL",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: VOolongTea, Zeally, EricChengzZ)"
+      }
+    },
+    {
+      "key": "cc:blackreign",
+      "name": "Black Reign",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Black Reign",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Bones, By59, 2x-4xNemesisGod)"
+      }
+    },
+    {
+      "key": "cc:mowan",
+      "name": "mowan",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "mowan",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ParoxetineHydro, LuoouL, Tangbao)"
+      }
+    },
+    {
+      "key": "cc:gentleintonight",
+      "name": "Gentle IntoNight",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Gentle IntoNight",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: CX, Sa1tyFish, ANXUAN)"
+      }
+    },
+    {
+      "key": "cc:lotuszenith",
+      "name": "Lotus Zenith",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Lotus Zenith",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: YY, Qiqi49OwO, Keke)"
+      }
+    },
+    {
+      "key": "cc:ttkx",
+      "name": "TTKX",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "TTKX",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: LizhiKouun, Hang, Bear_(Chinese_player))"
+      }
+    },
+    {
+      "key": "cc:lion",
+      "name": "Lion",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "Lion",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Happy, Xiaowei, Xyx1nn)"
+      }
+    },
+    {
+      "key": "cc:quicklyfightlive",
+      "name": "QuicklyFightLive",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "QuicklyFightLive",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Refew00, Six6, Cloud_(APAC_player))"
+      }
+    },
+    {
+      "key": "cc:havoclegends",
+      "name": "Havoc Legends",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Havoc Legends",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: XOSAM2-, Osamh_gun, IKrrio)"
+      }
+    },
+    {
+      "key": "cc:meow",
+      "name": "MEOW",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "MEOW",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: LotusNessu, Kuaksi, LukaQT)"
+      }
+    },
+    {
+      "key": "cc:glamurniepadonki",
+      "name": "GlamurniePadonki",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "GlamurniePadonki",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 9impulse, Rxgve, Tokken)"
+      }
+    },
+    {
+      "key": "cc:qsm",
+      "name": "QSM",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "QSM",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Takami, RYoor1k, Mohapix)"
+      }
+    },
+    {
+      "key": "cc:clocks",
+      "name": "Clocks",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Clocks",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Paul_FpsTv, ISneax, Biohazardsv)"
+      }
+    },
+    {
+      "key": "cc:burgerboys",
+      "name": "Burger Boys",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Burger Boys",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Fabupapu, Alfnzy, Hamish)"
+      }
+    },
+    {
+      "key": "cc:nemesis",
+      "name": "Nemesis",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Nemesis",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: QPMS, Clone, BadSniper)"
+      }
+    },
+    {
+      "key": "cc:voidesports",
+      "name": "Void Esports",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Void Esports",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Luxr, Mesuko, RCreed)"
+      }
+    },
+    {
+      "key": "cc:sivispacem",
+      "name": "Si vis pacem",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Si vis pacem",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: IR-Matteo, Ti-mat06, KarnageSMG)"
+      }
+    },
+    {
+      "key": "cc:forgedinhell",
+      "name": "FORGED IN HELL",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "FORGED IN HELL",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Mayborn, Misfit, Nezedia)"
+      }
+    },
+    {
+      "key": "cc:toros",
+      "name": "Toros",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Toros",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nisa, Mox600, Red)"
+      }
+    },
+    {
+      "key": "cc:kdv",
+      "name": "KDV",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "KDV",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kylar, Dijai, Volgrath)"
+      }
+    },
+    {
+      "key": "cc:forfunacademy",
+      "name": "For Fun Academy",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "For Fun Academy",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Chxrge, Sweterflayer, Lunalj)"
+      }
+    },
+    {
+      "key": "cc:ballbusters",
+      "name": "Ball Busters",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Ball Busters",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kaido, Noiises, InSaNe)"
+      }
+    },
+    {
+      "key": "cc:asd",
+      "name": "ASD",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "ASD",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ss11, Fitoo, D0ubl3w)"
+      }
+    },
+    {
+      "key": "cc:daikoku",
+      "name": "Daikoku",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Daikoku",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Olal52, P3iro, LangerdJM)"
+      }
+    },
+    {
+      "key": "cc:throuple",
+      "name": "Throuple",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Throuple",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: SimplyAshton, Milomilon, TryhardThor)"
+      }
+    },
+    {
+      "key": "cc:riftreverie",
+      "name": "RIFT - REVERIE",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "RIFT - REVERIE",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Staplebreak, Raize, ZMB)"
+      }
+    },
+    {
+      "key": "cc:sliceesport",
+      "name": "Slice Esport",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Slice Esport",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: VDanDa, Slickk8, NyxVanta)"
+      }
+    },
+    {
+      "key": "cc:svpshadow",
+      "name": "SVP Shadow",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "SVP Shadow",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nonodelf17, Sheinzeld, Areignos)"
+      }
+    },
+    {
+      "key": "cc:h4rd",
+      "name": "H4RD",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "H4RD",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: L4goa, LuHardy, IitzRainy)"
+      }
+    },
+    {
+      "key": "cc:carrymeharder",
+      "name": "Carry me harder",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Carry me harder",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nesty, Reven, CAPO)"
+      }
+    },
+    {
+      "key": "cc:spaceembrace",
+      "name": "Space Embrace",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Space Embrace",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kurloki, Izy, Yuwamushi)"
+      }
+    },
+    {
+      "key": "cc:misoudee",
+      "name": "misoudee",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "misoudee",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Feelseternally9, Tseitii, Jay)"
+      }
+    },
+    {
+      "key": "cc:trex",
+      "name": "T.REX",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "T.REX",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Vasjavas, Pric0t, Toose)"
+      }
+    },
+    {
+      "key": "cc:heist",
+      "name": "Heist",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Heist",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Slio, JuicyMcGoozy, Rondon)"
+      }
+    },
+    {
+      "key": "cc:sea",
+      "name": "SEA",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "SEA",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Eccio_(Alessio_D’Avino), Shex, AdaM_zZ)"
+      }
+    },
+    {
+      "key": "cc:cherviachki",
+      "name": "Cherviachki",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Cherviachki",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 7Adaaaam, Jukes, KIFUSS)"
+      }
+    },
+    {
+      "key": "cc:sps",
+      "name": "SPS",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "SPS",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Declx, Vooshii, Tyhr)"
+      }
+    },
+    {
+      "key": "cc:dvp",
+      "name": "DVP",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "DVP",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: PaniiK, Vaynn1, Eldiabloloco1310)"
+      }
+    },
+    {
+      "key": "cc:kiroshi",
+      "name": "Kiroshi",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Kiroshi",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Mugetsuxr, Yuzzzu, 5MoriSan)"
+      }
+    },
+    {
+      "key": "cc:mmgg",
+      "name": "MMGG",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "MMGG",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nav1zzo, Torex, IItzPocoyoo)"
+      }
+    },
+    {
+      "key": "cc:gleepglorp",
+      "name": "gleepglorp",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "gleepglorp",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Norumi, Lfg_yuki, ZyroxFPS)"
+      }
+    },
+    {
+      "key": "cc:xm4",
+      "name": "xm4",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "xm4",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Marat, Xynguzo, 4ven)"
+      }
+    },
+    {
+      "key": "cc:bkomachi",
+      "name": "B KOMACHI",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "B KOMACHI",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ryokku, Andrew, AkiRxZ)"
+      }
+    },
+    {
+      "key": "cc:onechance",
+      "name": "One Chance",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "One Chance",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Banana789, Ko0mbra, Plomme)"
+      }
+    },
+    {
+      "key": "cc:69iq",
+      "name": "69 IQ",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "69 IQ",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Slayers, Jeazh, JC)"
+      }
+    },
+    {
+      "key": "cc:lithiiumesports",
+      "name": "Lithiium-Esports",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Lithiium-Esports",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Oudee, Ecko, SpiN)"
+      }
+    },
+    {
+      "key": "cc:thewestren",
+      "name": "the westren",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "the westren",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: HeadShot, Vision, S2HR)"
+      }
+    },
+    {
+      "key": "cc:everborn",
+      "name": "Everborn",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Everborn",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Excentis, HUGOwolfy, Themokad)"
+      }
+    },
+    {
+      "key": "cc:asianbanger",
+      "name": "AsianBanger",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "AsianBanger",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 0zreign, Collin, Asianaimer0)"
+      }
+    },
+    {
+      "key": "cc:pawsocksunited",
+      "name": "PawSocksUnited",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "PawSocksUnited",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Immu, Vodery, Moonp0rtals)"
+      }
+    },
+    {
+      "key": "cc:aboveall",
+      "name": "Above All",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Above All",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Delroar, Garyy7, Khenzo)"
+      }
+    },
+    {
+      "key": "cc:lics",
+      "name": "Lics",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Lics",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: MAC, TayluSs, Kriss)"
+      }
+    },
+    {
+      "key": "cc:zq7",
+      "name": "ZQ7",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "ZQ7",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Zillach, PANIC, Wiz)"
+      }
+    },
+    {
+      "key": "cc:tired",
+      "name": "Tired",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Tired",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Aeo, UMI, MJ)"
+      }
+    },
+    {
+      "key": "cc:connections",
+      "name": "Connections",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Connections",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Hun7smann, Wave, Kenny)"
+      }
+    },
+    {
+      "key": "cc:aura",
+      "name": "Aura",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Aura",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Vudo, ImEurusk, Hach)"
+      }
+    },
+    {
+      "key": "cc:gc8",
+      "name": "GC8",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "GC8",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: KoZaGC8, Emcy, Anwsrrd)"
+      }
+    },
+    {
+      "key": "cc:happybirthday",
+      "name": "Happy Birthday",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Happy Birthday",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: P1tchey, Syenth, Ezuom)"
+      }
+    },
+    {
+      "key": "cc:undecided",
+      "name": "UnDeciDeD",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "UnDeciDeD",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Renafying, Roxx, MikeJitsu)"
+      }
+    },
+    {
+      "key": "cc:legiongaming",
+      "name": "Legion Gaming",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Legion Gaming",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Teddy_(Canadian_player), Wishh3, Crizik)"
+      }
+    },
+    {
+      "key": "cc:fullsend",
+      "name": "Full Send",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Full Send",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: MessiaH, Lauder, IsWxGsI)"
+      }
+    },
+    {
+      "key": "cc:missionary",
+      "name": "missionary",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "missionary",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Advrse, Titotheemu, Spazzapex)"
+      }
+    },
+    {
+      "key": "cc:sequence",
+      "name": "sequence",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "sequence",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Pucaa, THaless, Reviriem)"
+      }
+    },
+    {
+      "key": "cc:twerkaholics",
+      "name": "Twerkaholics",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Twerkaholics",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Renzalations, Cates, Kjthepro)"
+      }
+    },
+    {
+      "key": "cc:durags",
+      "name": "DURAGS",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "DURAGS",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Milez, Bofer, Eeth)"
+      }
+    },
+    {
+      "key": "cc:grace",
+      "name": "Grace",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Grace",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Errorist, QuietApex, Meltdown)"
+      }
+    },
+    {
+      "key": "cc:thecooks",
+      "name": "The Cooks",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "The Cooks",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Choppt, Iklipsa, Xetiq)"
+      }
+    },
+    {
+      "key": "cc:dgap",
+      "name": "DGAP",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "DGAP",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Golden, Avuhlie, Bokiiyu)"
+      }
+    },
+    {
+      "key": "cc:runninglate",
+      "name": "Running Late",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Running Late",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Double0negative, MelonGoddess, KindlyMonkey)"
+      }
+    },
+    {
+      "key": "cc:zestfest",
+      "name": "Zest Fest",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Zest Fest",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Snipzylol, Eslopes, Aveckii)"
+      }
+    },
+    {
+      "key": "cc:coughingbaby",
+      "name": "Coughing Baby",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Coughing Baby",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: FluentTEG, PurrkourCat, ACEBGremZ)"
+      }
+    },
+    {
+      "key": "cc:tvt",
+      "name": "TVT",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "TVT",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Vaqki, Tysahh, AyoTulii)"
+      }
+    },
+    {
+      "key": "cc:ggwp",
+      "name": "G G W P",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "G G W P",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: YKeviN9, Tiz, Aqx_ntc)"
+      }
+    },
+    {
+      "key": "cc:redeem",
+      "name": "Redeem",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Redeem",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: BuMush, Serialcat, Vozskii)"
+      }
+    },
+    {
+      "key": "cc:szn",
+      "name": "SZN",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "SZN",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ProdigyAces, MfBonBon, Clane)"
+      }
+    },
+    {
+      "key": "cc:section8",
+      "name": "Section8",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Section8",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: TURBULENCE, Drizzyapex, Section8richh)"
+      }
+    },
+    {
+      "key": "cc:straightgeeked",
+      "name": "Straight Geeked",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Straight Geeked",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Squirrel, Deadlysoos, PlayLr)"
+      }
+    },
+    {
+      "key": "cc:idk",
+      "name": "IDK",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "IDK",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 7KILLUA, Neaztry, NotJovas)"
+      }
+    },
+    {
+      "key": "cc:placeholder",
+      "name": "placeHolder",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "placeHolder",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: XXxArchAngelz, Scythey, TheGr33nB3an)"
+      }
+    },
+    {
+      "key": "cc:wompwomp",
+      "name": "Womp Womp",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Womp Womp",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Dom2Cracked, Vaspy, Pep2)"
+      }
+    },
+    {
+      "key": "cc:breakout",
+      "name": "Breakout",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Breakout",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Adondee, YCuzzo, Fikkax)"
+      }
+    },
+    {
+      "key": "cc:riqongaming",
+      "name": "RIQON Gaming",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "RIQON Gaming",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Leafays, Tempest, Charmander)"
+      }
+    },
+    {
+      "key": "cc:gamblers",
+      "name": "Gamblers",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Gamblers",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Yuhaaviatam, Osivien, Adiuvant)"
+      }
+    },
+    {
+      "key": "cc:valkyrieesports",
+      "name": "Valkyrie Esports",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Valkyrie Esports",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Noiyzi, Wvlly, K2pler)"
+      }
+    },
+    {
+      "key": "cc:thugshvke",
+      "name": "Thugshvke",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Thugshvke",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Foewastaken, BexiK, Wvke)"
+      }
+    },
+    {
+      "key": "cc:dynamic",
+      "name": "Dynamic",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Dynamic",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ryu_a_qt, Domsan, Ak-pellah)"
+      }
+    },
+    {
+      "key": "cc:reborn",
+      "name": "Reborn",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Reborn",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Suhfrs, CrusaderRonnoc, Verrahh)"
+      }
+    },
+    {
+      "key": "cc:npc",
+      "name": "NPC",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "NPC",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ben2fly, Lethal, Carltin)"
+      }
+    }
+  ]
+}
