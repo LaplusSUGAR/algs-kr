@@ -12,6 +12,11 @@ const PAGES = {
   'apac-s': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_South',
   emea: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/EMEA',
   americas: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/Americas',
+  // 브래킷 페이지: 진행 방식(Format)과 조 배정(Group Layout)
+  'bk:apac-n': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_North/Bracket',
+  'bk:apac-s': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_South/Bracket',
+  'bk:emea': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/EMEA/Bracket',
+  'bk:americas': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/Americas/Bracket',
   // 챌린저 서킷 종합 순위 (LCQ 남은 자리를 채우는 순서)
   'cc:apac-n': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_North',
   'cc:apac-s': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_South',

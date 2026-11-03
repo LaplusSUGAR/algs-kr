@@ -1145,22 +1145,45 @@ function plS2(r) {
 const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || (pb?.rs ?? 0) - (pa?.rs ?? 0) || (pb?.kills ?? 0) - (pa?.kills ?? 0); };
 const cpOrder = (a, b) => b.total - a.total || cpTie(a, b) || a.rank - b.rank;
 
-// 운영자 로스터 보정 (config cpRosterAdd): 공식 현재 로스터에서 빠진 선수를 팀 CP에 넣고 순위를 다시 매김.
-// 공식 값이 60초마다 새로 들어오면 다시 적용된다. 동률 순서도 여기서 맞춘다
+// 운영자 로스터 보정 (config overrides: rosterMoves → cpRosterOut·cpRosterAdd, 그리고 cpRosterAdd):
+// 공식 현재 로스터에 아직 반영되지 않은 이적을 팀 CP에 반영하고 순위를 다시 매긴다.
+//   빠진 선수(out)는 그 팀 합계에서 빼고, 들어온 선수(in)는 자기 CP(12경기 이상 뛴 대회의 CP 합)를 가지고 온다.
+//   팀 CP는 현재 로스터 선수 중 이번 Split 프로리그에서 12경기 이상 뛴 선수의 상위 3인 합 (공식 순위표와 같은 조건)
+//   선수를 빼면 공식 상위 3인 밖이던 로스터 선수가 3인 안으로 들어올 수 있어 남은 로스터 전원을 다시 본다.
+// 공식 값이 60초마다 새로 들어오면 다시 적용된다(이미 반영된 이적은 두 번 적용되지 않음). 동률 순서도 여기서 맞춘다
+const curSplitGames = (pid) => {
+  const sp = Math.max(...(A.cpEvents || []).filter((e) => e.kind === 'pl').map((e) => e.split));
+  let n = 0, known = false;
+  for (const e of A.cpEvents || []) if (e.kind === 'pl' && e.split === sp) { const g = played(e.id, pid); if (g != null) { known = true; n += g; } }
+  return known ? n : null;
+};
+const playerCp = (pid) => cpHistory(pid).filter((x) => eligible(x.e.id, pid)).reduce((a, x) => a + x.r.cp, 0);
 function applyCpRoster() {
-  const add = A.cpRosterAdd || {};
+  const add = A.cpRosterAdd || {}, out = A.cpRosterOut || {};
   if (A.cp.__adj) return;
-  for (const [short, names] of Object.entries(add)) {
+  for (const short of new Set([...Object.keys(add), ...Object.keys(out)])) {
     const r = A.cp.find((x) => x.short === short);
     if (!r) continue;
-    for (const n of names) {
+    r.total0 ??= r.total; // 공식 합계
+    const outK = new Set((out[short] || []).map((n) => String(n).toLowerCase()));
+    const before = r.players.map((p) => p[0]);
+    r.players = r.players.filter((p) => !outK.has(String(p[0]).toLowerCase()));
+    const cand = new Map(r.players.map((p) => [String(p[0]).toLowerCase(), p]));
+    // 들어온 선수 + 남은 로스터 선수(공식 상위 3인 밖이던 선수)
+    const roster = (team(short)?.roster || []).filter((p) => p.r !== 'k').map((p) => p.n);
+    for (const n of [...(add[short] || []), ...(outK.size ? roster : [])]) {
+      const k = String(n).toLowerCase();
+      if (cand.has(k) || outK.has(k)) continue;
       const pid = pidOf(n);
-      if (!pid || r.players.some((p) => p[2] === pid)) continue;
-      const v = cpHistory(pid).filter((x) => eligible(x.e.id, pid)).reduce((a, x) => a + x.r.cp, 0);
-      r.players.push([n, v, pid, 'add']);
+      const g = pid ? curSplitGames(pid) : null;
+      const v = pid && (g == null || g >= MIN_MATCHES) ? playerCp(pid) : 0;
+      cand.set(k, [n, v, pid, (add[short] || []).includes(n) ? 'add' : 'roster', g]);
     }
-    r.total = r.players.map((p) => p[1]).sort((a, b) => b - a).slice(0, 3).reduce((a, x) => a + x, 0);
-    r.added = true;
+    const all = [...cand.values()].sort((a, b) => b[1] - a[1]);
+    r.players = all.slice(0, 3);
+    r.bench = all.slice(3);
+    r.total = r.players.reduce((a, p) => a + p[1], 0);
+    r.moves = { out: before.filter((n) => outK.has(String(n).toLowerCase())), in: (add[short] || []).filter((n) => !before.includes(n)) };
   }
   A.cp.sort(cpOrder);
   A.cp.forEach((r, i) => (r.rank = i + 1));
@@ -1168,6 +1191,8 @@ function applyCpRoster() {
   for (const r of A.cp) { r.status = r.rank <= cut ? 'direct' : 'lcq'; r.gap = r.rank <= cut ? r.total - c33 : c32 - r.total; }
   A.cp.__adj = true;
 }
+// 로스터 이동 안내 한 줄 (CP 표의 팀 칸)
+const moveNote = (r) => (r.moves && (r.moves.out.length || r.moves.in.length) ? `<small class="sub-note">로스터 변경 반영: ${[...r.moves.out.map((n) => `${esc(n)} 이탈`), ...r.moves.in.map((n) => `${esc(n)} 합류`)].join(' · ')}${r.total0 != null && r.total0 !== r.total ? ` (공식 ${fmt(r.total0)} → ${fmt(r.total)})` : ''}</small>` : '');
 
 let BOARD = null;
 function board() {
@@ -1246,7 +1271,7 @@ function cpView(q) {
   if (view === 'min') {
     let rows = BD.rows.filter((r) => (region === 'all' || r.region === region) && (!opt.krOnly || isF(r.short)));
     table = `    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r opt">대회 전</th><th class="r opt2">${esc(ST.e.short)}</th><th class="r">${BD.state === 'live' ? (finalsLivePos() ? '정산 (결승 실시간)' : '정산 (최소 보장)') : '정산'}</th><th class="r opt">최대</th><th class="r opt2">상태</th></tr></thead><tbody>
-      ${rows.map((r, ri) => { const isCut = region === 'all' && !opt.krOnly && r.prank === cut; return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="st-${ri}" tabindex="0" aria-expanded="false"><td class="rank">${r.prank}<small class="mv">${r.prank < r.rank ? '▲' + (r.rank - r.prank) : r.prank > r.rank ? '▼' + (r.prank - r.rank) : ''}</small></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}<small class="sm-only">${qualTag(r.pstatus === 'direct')} ${r.alive ? (r.livePos ? `결승 ${r.livePos}위 (실시간) +${fmt(r.gain)}` : `${esc(ST.e.short)} 진행 중 · 최소 +${fmt(r.gain)}`) : r.donePos ? `${esc(ST.e.short)} ${r.donePos}위${r.gain > 0 ? ` +${fmt(r.gain)}` : ''}` : r.gain ? `대체 출전 +${fmt(r.gain)}` : ''}${r.notes.length ? `<br>${r.notes.map(esc).join('<br>')}` : ''}</small></td><td class="r opt num">${fmt(r.total)}</td><td class="r small opt2">${r.alive ? (r.livePos ? `<span class="tag live">결승 ${r.livePos}위</span> +${fmt(r.gain)}` : `<span class="tag live">진행 중</span> 최소 +${fmt(r.gain)}`) : r.donePos ? `${r.donePos}위${r.gain > 0 ? ` <span class="muted">+${fmt(r.gain)}</span>` : ''}` : r.gain ? `<span class="muted">+${fmt(r.gain)}</span>` : '<span class="muted">미출전</span>'}${r.notes.length ? `<small class="sub-note">${r.notes.map(esc).join('<br>')}</small>` : ''}</td><td class="r num"><b>${fmt(r.min)}</b>${tieNote(rows, ri, 'min')}</td><td class="r opt num muted">${fmt(r.max)}</td><td class="r opt2">${qualTag(r.pstatus === 'direct')}</td></tr>
+      ${rows.map((r, ri) => { const isCut = region === 'all' && !opt.krOnly && r.prank === cut; return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="st-${ri}" tabindex="0" aria-expanded="false"><td class="rank">${r.prank}<small class="mv">${r.prank < r.rank ? '▲' + (r.rank - r.prank) : r.prank > r.rank ? '▼' + (r.prank - r.rank) : ''}</small></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${moveNote(r)}<small class="sm-only">${qualTag(r.pstatus === 'direct')} ${r.alive ? (r.livePos ? `결승 ${r.livePos}위 (실시간) +${fmt(r.gain)}` : `${esc(ST.e.short)} 진행 중 · 최소 +${fmt(r.gain)}`) : r.donePos ? `${esc(ST.e.short)} ${r.donePos}위${r.gain > 0 ? ` +${fmt(r.gain)}` : ''}` : r.gain ? `대체 출전 +${fmt(r.gain)}` : ''}${r.notes.length ? `<br>${r.notes.map(esc).join('<br>')}` : ''}</small></td><td class="r opt num">${fmt(r.total)}</td><td class="r small opt2">${r.alive ? (r.livePos ? `<span class="tag live">결승 ${r.livePos}위</span> +${fmt(r.gain)}` : `<span class="tag live">진행 중</span> 최소 +${fmt(r.gain)}`) : r.donePos ? `${r.donePos}위${r.gain > 0 ? ` <span class="muted">+${fmt(r.gain)}</span>` : ''}` : r.gain ? `<span class="muted">+${fmt(r.gain)}</span>` : '<span class="muted">미출전</span>'}${r.notes.length ? `<small class="sub-note">${r.notes.map(esc).join('<br>')}</small>` : ''}</td><td class="r num"><b>${fmt(r.min)}</b>${tieNote(rows, ri, 'min')}</td><td class="r opt num muted">${fmt(r.max)}</td><td class="r opt2">${qualTag(r.pstatus === 'direct')}</td></tr>
         <tr class="detail" id="st-${ri}" hidden><td></td><td colspan="6"><div class="st-parts"><b>합산 선수 (상위 3인)</b> ${(r.parts || []).map((v) => `<span class="cpb-i"><i>${esc(v.n)}</i> <b>${fmt(v.min)}</b>${v.got ? ` <small>이번 ${v.got.pos ? v.got.pos + '위' : v.got.livePos ? '결승 ' + v.got.livePos + '위' : '최소'} +${fmt(v.got.min)}${v.got.short12 ? ' (12경기 미달)' : ''}</small>` : ''}</span>`).join('')}${r.others?.length ? `<br><span class="muted">그 밖: ${r.others.map((v) => `${esc(v.n)} ${fmt(v.min)}`).join(', ')}</span>` : ''}</div></td></tr>${isCut ? `<tr class="cut-label"><td colspan="7">여기까지 ${finalsLivePos() || BD.state !== 'live' ? '' : '최소 보장 기준 '}챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`; }).join('')}
     </tbody></table></div>
     <p class="lead">팀 CP는 상위 3인 합이라, 결승 진출 팀은 '1인 최저 CP × 3'을 더했습니다. '최대'는 우승했을 때입니다.</p>`;
@@ -1256,7 +1281,7 @@ function cpView(q) {
     table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r">상태</th></tr></thead><tbody>
       ${rows.map((r, i) => {
         const isCut = region === 'all' && !opt.krOnly && r.rank === cut;
-        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small></td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}</td><td class="r">${qualTag(r.status === 'direct')}</td></tr>
+        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}</td><td class="r">${qualTag(r.status === 'direct')}</td></tr>
         <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="3">${r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join('')}</td></tr>
         ${isCut ? `<tr class="cut-label"><td colspan="4">여기까지 챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`;
       }).join('')}

@@ -85,9 +85,36 @@ for (const [id, s] of Object.entries(algs.rosters)) {
     if (rep) p.rep = rep;
     if ((krRep && c !== 'KR') || (c === 'KR' && rep && rep !== 'KR') || o.heritage === 'KR') p.mix = 1;
     if (o.note) p.note = o.note;
+    if (o.country) p.c = o.country; // 운영자가 국적을 적어 둔 경우
     return p;
   });
 }
+// 로스터 이동 (config/overrides.json rosterMoves): 공식 API에 반영되기 전의 이적을 팀 로스터에 먼저 반영한다.
+//   out = 빠진 선수, in = 들어온 선수. 들어온 선수의 국적·역할은 다른 팀 공식 로스터에서 찾고, 없으면 players.json(country) 또는 미상
+//   팀 CP(현재 로스터 상위 3인)는 화면이 cpRosterOut·cpRosterAdd로 다시 계산한다
+const rosterMoves = (ov.rosterMoves || []).filter((m) => m.team);
+const cpRosterOut = {}, cpRosterAdd = Object.fromEntries(Object.entries(ov.cpRosterAdd || {}).map(([k, v]) => [k, [...v]]));
+{
+  const known = new Map();
+  for (const t of Object.values(teams)) for (const p of t.roster) if (!known.has(nameKey(p.n))) known.set(nameKey(p.n), p);
+  for (const m of rosterMoves) {
+    const t = Object.values(teams).find((x) => x.short === m.team && x.roster.length);
+    if (!t) { console.log(`[build] 로스터 이동: ${m.team} 팀을 찾지 못함`); continue; }
+    const outK = new Set((m.out || []).map(nameKey));
+    t.roster = t.roster.filter((p) => !outK.has(nameKey(p.n)));
+    for (const n of m.in || []) {
+      if (t.roster.some((p) => nameKey(p.n) === nameKey(n))) continue;
+      const k = known.get(nameKey(n)), o = pcfg(n);
+      const p = { n: k?.n || n, c: o.country || k?.c || '', r: ROLE_CODE[o.role] || 'p', moved: m.date || 1 };
+      if (k?.rep) p.rep = k.rep;
+      if (k?.mix || o.heritage === 'KR') p.mix = 1;
+      t.roster.push(p);
+    }
+    (cpRosterOut[m.team] ||= []).push(...(m.out || []));
+    (cpRosterAdd[m.team] ||= []).push(...(m.in || []).filter((n) => !(cpRosterAdd[m.team] || []).includes(n)));
+  }
+}
+
 // 한국 선수·코치 판정은 국적 KR만. 한국계(혼혈·이중국적, mix)는 표시만 하고 한국 관련 팀으로 묶지 않는다.
 const isKrP = (p) => p.c === 'KR';
 for (const key of Object.keys(algs.pl).sort()) { // s1 → s2 순서로 최신 값이 남게
@@ -332,7 +359,8 @@ const data = {
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
-  cpRosterAdd: ov.cpRosterAdd || {},
+  cpRosterAdd, cpRosterOut,
+  rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null })),
   // 대회별 선수 출전 경기 수 { eventId: { 선수ID: 경기 수 } } — 12경기 이상이어야 그 대회 CP를 받음
   mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
