@@ -63,7 +63,7 @@ const logoIndex = readJson('raw/logos/index.json', {});
 const localLogo = (u) => (u && fs.existsSync(path.join(ROOT, 'site/logos', `${hash(u)}.png`)) ? `logos/${hash(u)}.png` : u || null);
 const logoOf = (key, official) => {
   const e = logoIndex[key];
-  if (e?.f && (e.f[0] || e.f[1])) return [e.f[0] || e.f[1], e.f[1] || e.f[0]];
+  if (e?.f && (e.f[0] || e.f[1])) return [e.f[0] || null, e.f[1] || null]; // 한쪽이 없으면 화면이 다른 쪽을 반대색 받침 위에 놓음
   return official ? [localLogo(official[0]), localLogo(official[1])] : null;
 };
 for (const t of Object.values(teams)) t.logo = logoOf(`id:${t.id}`, algs.logos?.[t.id]);

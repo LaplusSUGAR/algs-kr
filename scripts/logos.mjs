@@ -177,6 +177,16 @@ async function getBytes(p) {
 }
 
 // ---------- 줄이기 ----------
+// 밝기 검사: 로고의 불투명한 부분 평균 밝기(0 검정 ~ 1 흰색). 밝은 배경용이 거의 흰색이거나 어두운 배경용이 거의 검정이면
+// 그 배경에서 안 보이므로 쓰지 않는다(화면이 다른 쪽 로고를 반대색 받침 위에 놓음)
+const STATS = 'raw/logos/stats.json';
+async function measure(sharp, base) {
+  const { data, info } = await sharp(path.join(ROOT, `${base}-64.webp`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let sum = 0, n = 0;
+  for (let i = 0; i < data.length; i += info.channels) if (data[i + 3] > 32) { sum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255; n++; }
+  return { lum: n ? +(sum / n).toFixed(3) : 0.5, fill: +(n / (data.length / info.channels)).toFixed(3) };
+}
+
 async function processImage(sharp, buf, base) {
   let img = sharp(buf, { density: 300 }).ensureAlpha();
   // 투명 여백 자르기 (가장자리가 투명할 때만)
@@ -194,7 +204,11 @@ async function main() {
   writeJson('raw/logos/report.json', { at: new Date().toISOString(), teams: report }, true);
   const s = report.reduce((a, r) => ((a[r.src || 'none'] = (a[r.src || 'none'] || 0) + 1), a), {});
   console.log(`[logos] 팀 ${report.length} · 출처 ${JSON.stringify(s)} · 새로 만들 로고 ${todo.length}`);
-  if (PLAN) { writeIndex(entries); process.exit(todo.length ? 1 : 0); }
+  if (PLAN) {
+    writeIndex(entries);
+    const stats = readJson(STATS, {});
+    process.exit(todo.length || allBases(entries).some((b) => !stats[b]) ? 1 : 0);
+  }
   if (todo.length) {
     const sharp = (await import('sharp')).default;
     fs.mkdirSync(path.join(ROOT, OUT), { recursive: true });
@@ -211,18 +225,32 @@ async function main() {
     if (browser) await browser.close();
     console.log(`[logos] ${ok}/${Math.min(todo.length, MAX_NEW)}개 만듦`);
   }
+  // 밝기 기록이 없는 로고 재기
+  const stats = readJson(STATS, {});
+  const missing = allBases(entries).filter((b) => !stats[b]);
+  if (missing.length) {
+    const sharp = (await import('sharp')).default;
+    for (const b of missing) { try { stats[b] = await measure(sharp, b); } catch (e) { console.error('[logos] 밝기 재기 실패', b, e.message); } }
+    writeJson(STATS, stats, true);
+  }
   writeIndex(entries);
   prune();
 }
 
+const allBases = (entries) => [...new Set(Object.values(entries).flatMap((e) => (e.pick || []).filter((p) => p && done(p.id)).map((p) => fileBase(p.id))))];
+
 // 화면이 쓸 대응표: 만들어진 파일만 넣는다 (아직 못 만든 것은 다음 빌드에)
 function writeIndex(entries) {
   const index = {};
+  const stats = readJson(STATS, {});
   for (const e of Object.values(entries)) {
     if (!e.pick) continue;
-    const f = e.pick.map((p) => (p && done(p.id) ? fileBase(p.id).replace(/^site\//, '') : null));
-    if (!f[0] && !f[1]) continue;
-    index[e.key] = { src: e.src, f };
+    const b = e.pick.map((p) => (p && done(p.id) ? fileBase(p.id) : null));
+    if (!b[0] && !b[1]) continue;
+    // [0] 어두운 배경용이 너무 어두우면, [1] 밝은 배경용이 너무 밝으면 뺀다 (둘 다 빠지면 그대로 둠)
+    const ok = [b[0] && !(stats[b[0]]?.lum < 0.15), b[1] && !(stats[b[1]]?.lum > 0.9)];
+    const f = ok[0] || ok[1] ? [ok[0] ? b[0] : null, ok[1] ? b[1] : null] : b;
+    index[e.key] = { src: e.src, f: f.map((x) => (x ? x.replace(/^site\//, '') : null)) };
   }
   writeJson('raw/logos/index.json', index, true);
 }
