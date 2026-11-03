@@ -35,6 +35,8 @@ jobs:
         run: node scripts/fetch-algs.mjs
       - name: LCQ 출전 팀 (Liquipedia 위키 원문, 매시 1회)
         run: node scripts/fetch-lcq-lp.mjs
+      - name: Liquipedia 팀 이름·선수·로고 아이콘 (페이지마다 7일에 1회)
+        run: node scripts/fetch-lp-teams.mjs
       - name: 팀 로고 줄이기 (새 로고가 있을 때만)
         run: node scripts/fetch-logos.mjs --check || (npm i --no-save --no-package-lock sharp@0.33 && node scripts/fetch-logos.mjs)
       - name: Battlefy
