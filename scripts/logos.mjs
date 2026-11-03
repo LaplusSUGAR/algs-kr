@@ -234,7 +234,7 @@ async function main() {
     writeJson(STATS, stats, true);
   }
   writeIndex(entries);
-  prune();
+  prune(entries);
 }
 
 const allBases = (entries) => [...new Set(Object.values(entries).flatMap((e) => (e.pick || []).filter((p) => p && done(p.id)).map((p) => fileBase(p.id))))];
@@ -256,9 +256,10 @@ function writeIndex(entries) {
 }
 
 // 쓰지 않는 파일 지우기: site/logos/t 의 옛 파일, 그리고 옛 128px PNG(모든 팀이 새 로고로 옮겨 간 뒤)
-function prune() {
+// 지금 고른 로고의 파일은 모두 남긴다 (밝기 검사로 화면에서 뺀 쪽도: 지우면 다음 빌드가 다시 만들기 때문)
+function prune(entries) {
   const index = readJson('raw/logos/index.json', {});
-  const keep = new Set(Object.values(index).flatMap((e) => e.f.filter(Boolean)).flatMap((b) => SIZES.map((s) => path.basename(`${b}-${s}.webp`))));
+  const keep = new Set(allBases(entries).flatMap((b) => SIZES.map((s) => path.basename(`${b}-${s}.webp`))));
   const dir = path.join(ROOT, OUT);
   let n = 0;
   if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir)) if (!keep.has(f)) { fs.unlinkSync(path.join(dir, f)); n++; }
