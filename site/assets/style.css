@@ -125,6 +125,13 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
 .tbl tr.kr td { background: var(--ring-soft); }
 .tbl tr.kr td:first-child { box-shadow: inset 3px 0 0 var(--ring); }
 .tbl tr.cut td { border-bottom: 2px solid var(--ink); }
+/* 점수 표기 공통: 순위 점수 / 킬 점수 / 종합 점수 */
+.tbl th.pts-h { text-align: right; }
+@media (max-width: 520px) { .tbl th.pts-h { white-space: normal; line-height: 1.2; min-width: 2.4em; } }
+.trio { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.trio i { font-style: normal; opacity: .45; margin: 0 1px; }
+.trio b { font-weight: 800; }
+.pts-key { font-size: 11.5px; color: var(--steel); }
 .tbl tr.cut-label td { padding: 3px 6px 8px; border-bottom: 0; font-size: 11.5px; color: var(--steel); background: transparent; box-shadow: none; }
 .tbl tbody tr.expandable { cursor: pointer; }
 .tbl tr.detail td { white-space: normal; background: var(--card); font-size: 13px; color: var(--steel); }
@@ -813,9 +820,9 @@ html, body { overflow-x: clip; }
 .lcq-g .h3 { margin: 6px 0 6px; font-size: 16px; }
 .lcq-g .h3 small { font-size: 12px; font-weight: 500; }
 @media (max-width: 760px) { .lcq-gcols { grid-template-columns: 1fr; } }
-.tbl.lcq-grid th.g, .tbl.lcq-grid td.g { width: 34px; min-width: 30px; padding-left: 2px; padding-right: 2px; text-align: center; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.tbl.lcq-grid th.g, .tbl.lcq-grid td.g { min-width: 30px; padding-left: 3px; padding-right: 3px; text-align: center; font-variant-numeric: tabular-nums; font-size: 12px; }
 .tbl.lcq-grid th.g { color: var(--steel); font-weight: 600; }
-.tbl.lcq-grid td.g.muted { color: var(--steel); opacity: .35; }
+.tbl.lcq-grid .g-empty { color: var(--steel); opacity: .35; } /* 칸 자체가 아니라 점만 흐리게 (응원 팀 줄 배경 유지) */
 .lcq-rule { display: flex; flex-wrap: wrap; gap: 2px 16px; }
 .tbl.lcq-grid td.team { min-width: 96px; }
 .tbl.lcq-grid td.team small { display: block; margin-left: 0; font-size: 11px; white-space: nowrap; }
