@@ -285,6 +285,7 @@ const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) 
 const lpLcq = readJson('raw/lp/lcq.json', null);
 const nk = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const unent = (x) => String(x).replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#160;/g, ' ');
+const lpTeamsSrc = readJson('raw/lp/teams-src.json', { pages: {} });
 const ccOf = (region) => {
   const html = lpLcq?.cc?.[region]?.html || '';
   const rows = [...html.matchAll(/<tr><td class="([^"]*)">(\d+)<\/td><td[^>]*>[\s\S]*?team-template-text"><a[^>]*>([^<]+)<\/a>[\s\S]*?<\/td><td[^>]*><b>([\d,]+)<\/b>/g)]
@@ -296,8 +297,22 @@ const ccOf = (region) => {
     if (c && !/Rankings/.test(m[2])) won[nk(m[1])] = +c[1];
   }
   const plNames = new Set(Object.values(teams).filter((t) => t.current && t.region === region).map((t) => nk(t.name)));
+  // 팀 이름 변경: 서킷 순위표는 포인트를 딴 때의 이름이라, LCQ 참가 명단(Liquipedia)의 새 이름으로 바꾼다.
+  //   1) config/overrides.json ccRenames { 옛 이름: 새 이름 }  2) 참가 명단에 같은 이름이 없고, 선수(서브 제외) 2명 이상이 같은 참가 팀이 하나뿐이면 그 이름
+  const opps = [...(lpLcq?.pages?.[region]?.text || '').matchAll(/\{\{Opponent\|([^\n|}]*)\s*\|players=\{\{Persons([\s\S]*?)\n\s*\}\}/g)]
+    .map((m) => ({ name: m[1].trim(), players: [...m[2].matchAll(/\{\{Person\|([^|}]+)([^}]*)\}\}/g)].filter((p) => !/status=sub|played=false/.test(p[2])).map((p) => nk(p[1])) }));
+  const oppNames = new Set(opps.map((o) => nk(o.name)));
+  const ccPlayers = new Map((lpTeamsSrc.pages?.[`cc:${region}`]?.teams || []).map((t) => [nk(t.name), (t.players || []).map(nk)]));
+  const renameOf = (name) => {
+    if (ov.ccRenames?.[name]) return ov.ccRenames[name];
+    if (!opps.length || oppNames.has(nk(name))) return null;
+    const ps = ccPlayers.get(nk(name)) || [];
+    if (ps.length < 2) return null;
+    const hit = opps.filter((o) => !plNames.has(nk(o.name)) && o.players.filter((p) => ps.includes(p)).length >= 2);
+    return hit.length === 1 ? hit[0].name : null;
+  };
   return rows.filter((r) => !plNames.has(nk(r.name))).slice(0, 32)
-    .map((r) => ({ name: r.name, rank: r.rank, pts: r.pts, win: won[nk(r.name)] || (/green/.test(r.cls) ? -1 : 0) }));
+    .map((r) => { const to = renameOf(r.name); const name = to || r.name; return { name, ...(to ? { was: r.name } : {}), rank: r.rank, pts: r.pts, win: won[nk(name)] || won[nk(r.name)] || (/green/.test(r.cls) ? -1 : 0) }; });
 };
 
 // ---------- LCQ (지역별) ----------

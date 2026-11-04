@@ -131,6 +131,7 @@
     ['승자 {n}R 그룹 {w}', 'ウィナーズ{1}R グループ{2}', 'Winners R{1} Group {2}'], ['조별 리그 (4개 조)', 'グループステージ（4組）', 'Group stage (4 groups)'], ['조마다 다른 세 조와 한 번씩 ({n}경기)', '各組がほかの3組と1回ずつ（{1}シリーズ）', 'Each group meets the other three once ({1} series)'],
     ['LCQ 진행 방식', 'LCQの進行方式', 'LCQ format'], ['챔피언십 진행 방식', 'チャンピオンシップの進行方式', 'Championship format'], ['{t} LCQ 진행 방식', '{1} LCQの進行方式', '{1} LCQ format'],
     ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
+    ['구 {t}', '旧 {1}', 'formerly {1}'],
     // 챔피언십 탭
     ['챔피언십 결과', 'チャンピオンシップ結果', 'Championship results'], ['챔피언십 경기', 'チャンピオンシップの試合', 'Championship matches'], ['시각', '時刻', 'Time'],
     ['조별 리그 {w}조 vs {w}조', 'グループステージ {1} vs {2}', 'Group stage: {1} vs {2}'], ['{w}조 {n}팀 + {w}조 {n}팀', 'グループ{1} {2}チーム + グループ{3} {4}チーム', 'Group {1} ({2}) + Group {3} ({4})'],

@@ -840,7 +840,7 @@ const lcqRegionDefault = () => {
 // 조 편성 탭: 그룹 A·B 시드 표
 function lcqGroups(B) {
   const E = B.E;
-  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
+  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was ? `<small>구 ${esc(t.cc.was)}</small>` : ''}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
   const col = (g) => {
     const st = B[g];
     let ts = E.list.filter((t) => t.group === g);
