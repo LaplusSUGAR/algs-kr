@@ -126,6 +126,12 @@
     ['공식 시각은 태평양 시간으로 금 17:00, 토 12:00, 토 17:00, 일 15:00입니다.', '公式の時刻は太平洋時間で金 17:00、土 12:00、土 17:00、日 15:00です。', 'Official times are Fri 17:00, Sat 12:00, Sat 17:00 and Sun 15:00 Pacific Time.'],
     ['이 사이트의 점수표는 모두 순위 / 킬 / 종합(순위 점수 / 킬 점수 / 종합 점수) 순서로 적습니다.', 'このサイトのスコア表はすべて 順位 / キル / 総合（順位ポイント / キルポイント / 総合ポイント）の順で表示します。', 'Every scoreboard on this site shows Place / Kills / Total (placement / kill / total points).'],
     ['등수는 # 칸입니다.', '順位（何位か）は # の列です。', 'Rank is in the # column.'],
+    // 챔피언십 탭
+    ['챔피언십 결과', 'チャンピオンシップ結果', 'Championship results'], ['챔피언십 경기', 'チャンピオンシップの試合', 'Championship matches'], ['시각', '時刻', 'Time'],
+    ['조별 리그 {w}조 vs {w}조', 'グループステージ {1} vs {2}', 'Group stage: {1} vs {2}'], ['{w}조 {n}팀 + {w}조 {n}팀', 'グループ{1} {2}チーム + グループ{3} {4}チーム', 'Group {1} ({2}) + Group {3} ({4})'],
+    ['{n}팀 (조별 리그 {n}경기 합산)', '{1}チーム（グループステージ{2}シリーズ合計）', '{1} teams (total of {2} group series)'],
+    ['{x} 시각 미정', '{1} 時刻未定', '{1}, time TBD'], ['조별 리그 경기 결과를 사이트에서 합산한 순위입니다.', 'グループステージの結果をサイトで合計した順位です。', 'Standings summed by this site from the group stage results.'],
+    ['공식 조 배정입니다.', '公式のグループ分けです。', 'Official groups.'], ['조별 순위 {n}~{n}위', 'グループ順位 {1}～{2}位', 'Group stage {1o}–{2o}'], ['승자 라운드 {n}위', 'ウィナーズラウンド {1}位', 'Winners Round {1o}'], ['승자 라운드 {n}~{n}위', 'ウィナーズラウンド {1}～{2}位', 'Winners Round {1o}–{2o}'],
     // LCQ 탭·점수표
     ['조 편성', 'グループ分け', 'Groups'], ['LCQ 경기', 'LCQの試合', 'LCQ matches'], ['시드', 'シード', 'Seed'], ['합계', '合計', 'Total'], ['챔피언십 진출', 'チャンピオンシップ進出', 'To Championship'], ['공식 결과', '公式結果', 'Official results'], ['출전:', '出場:', 'Teams:'],
     ['승자 {n}R {w}', 'ウィナーズ{1}R {2}', 'Winners R{1} {2}'], ['승자 {n}R', 'ウィナーズ{1}R', 'Winners R{1}'], ['패자 {n}R', 'エリミネーション{1}R', 'Elim. R{1}'], ['그룹 {w}', 'グループ{1}', 'Group {1}'], ['승자 {n}라운드 그룹 {w}', 'ウィナーズラウンド{1} グループ{2}', 'Winners Round {1} Group {2}'],
