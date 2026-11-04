@@ -300,9 +300,19 @@ const ccOf = (region) => {
   // 팀 이름 변경: 서킷 순위표는 포인트를 딴 때의 이름이라, LCQ 참가 명단(Liquipedia)의 새 이름으로 바꾼다.
   //   1) config/overrides.json ccRenames { 옛 이름: 새 이름 }  2) 참가 명단에 같은 이름이 없고, 선수(서브 제외) 2명 이상이 같은 참가 팀이 하나뿐이면 그 이름
   const opps = [...(lpLcq?.pages?.[region]?.text || '').matchAll(/\{\{Opponent\|([^\n|}]*)\s*\|players=\{\{Persons([\s\S]*?)\n\s*\}\}/g)]
-    .map((m) => ({ name: m[1].trim(), players: [...m[2].matchAll(/\{\{Person\|([^|}]+)([^}]*)\}\}/g)].filter((p) => !/status=sub|played=false/.test(p[2])).map((p) => nk(p[1])) }));
+    .map((m) => {
+      const ps = [...m[2].matchAll(/\{\{Person\|([^|}]+)([^}]*)\}\}/g)].map((p) => ({ n: p[1].trim(), c: (p[2].match(/flag=([a-z]{2})\b/i)?.[1] || '').toUpperCase(), sub: /status=sub|played=false/.test(p[2]) }));
+      return { name: m[1].trim(), roster: ps, players: ps.filter((p) => !p.sub).map((p) => nk(p.n)) };
+    });
   const oppNames = new Set(opps.map((o) => nk(o.name)));
-  const ccPlayers = new Map((lpTeamsSrc.pages?.[`cc:${region}`]?.teams || []).map((t) => [nk(t.name), (t.players || []).map(nk)]));
+  const ccSrc = new Map((lpTeamsSrc.pages?.[`cc:${region}`]?.teams || []).map((t) => [nk(t.name), t.players || []]));
+  const ccPlayers = new Map([...ccSrc].map(([k, v]) => [k, v.map(nk)]));
+  // 선수 명단: LCQ 참가 명단(국적·서브 포함) > 서킷 순위표 팀 카드. [이름, 국적, 서브면 1]
+  const rosterOf = (name, was) => {
+    const o = opps.find((x) => nk(x.name) === nk(name)) || (was && opps.find((x) => nk(x.name) === nk(was)));
+    if (o?.roster.length) return o.roster.map((p) => [p.n, p.c, p.sub ? 1 : 0]);
+    return (ccSrc.get(nk(was || name)) || ccSrc.get(nk(name)) || []).map((n) => [n, '', 0]);
+  };
   const renameOf = (name) => {
     if (ov.ccRenames?.[name]) return ov.ccRenames[name];
     if (!opps.length || oppNames.has(nk(name))) return null;
@@ -312,7 +322,7 @@ const ccOf = (region) => {
     return hit.length === 1 ? hit[0].name : null;
   };
   return rows.filter((r) => !plNames.has(nk(r.name))).slice(0, 32)
-    .map((r) => { const to = renameOf(r.name); const name = to || r.name; return { name, ...(to ? { was: r.name } : {}), rank: r.rank, pts: r.pts, win: won[nk(name)] || won[nk(r.name)] || (/green/.test(r.cls) ? -1 : 0) }; });
+    .map((r) => { const to = renameOf(r.name); const name = to || r.name; return { name, ...(to ? { was: r.name } : {}), rank: r.rank, pts: r.pts, win: won[nk(name)] || won[nk(r.name)] || (/green/.test(r.cls) ? -1 : 0), players: rosterOf(name, to ? r.name : null) }; });
 };
 
 // ---------- LCQ (지역별) ----------

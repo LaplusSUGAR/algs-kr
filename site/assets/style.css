@@ -815,6 +815,9 @@ html, body { overflow-x: clip; }
 .lcq-gcols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 10px; }
 .lcq-g .h3 { margin: 6px 0 6px; font-size: 16px; }
 .lcq-g .h3 small { font-size: 12px; font-weight: 500; }
+.tbl td.team .lcq-roster { display: block; margin: 3px 0 0; white-space: normal; font-size: 11.5px; line-height: 1.45; color: var(--steel); font-weight: 500; }
+.lcq-roster .kr-p { color: var(--ink); font-weight: 700; }
+.lcq-roster .krdot { width: 6px; height: 6px; margin-right: 3px; vertical-align: 1px; }
 @media (max-width: 760px) { .lcq-gcols { grid-template-columns: 1fr; } }
 .lcq-rule { display: flex; flex-wrap: wrap; gap: 2px 16px; }
 time.tbd { font-size: 12px; color: var(--steel); }

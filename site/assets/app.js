@@ -838,9 +838,18 @@ const lcqRegionDefault = () => {
 };
 
 // 조 편성 탭: 그룹 A·B 시드 표
+// 선수 명단 한 줄: 선수 · 코치. 프로리그 팀은 공식 로스터(로스터 이동 반영), 2부 팀은 Liquipedia LCQ 참가 명단
+//   한국 선수는 점 표시, 서브는 (서브)
+function rosterLine(t, ev) {
+  const ps = t.pl ? (team(t.short)?.roster || []).map((p) => [p.n, p.c, 0, p.r]) : (t.cc?.players || ev.cc?.find((c) => c.short === t.short || c.name === t.name)?.players || []);
+  if (!ps.length) return '';
+  const nm = (p) => `<span${p[1] === 'KR' ? ' class="kr-p"' : ''}>${p[1] === 'KR' ? '<span class="krdot k-team"></span>' : ''}${esc(p[0])}${p[2] ? ' <span class="sub">(서브)</span>' : ''}</span>`;
+  const co = ps.filter((p) => p[3] === 'k');
+  return `<small class="lcq-roster">${ps.filter((p) => p[3] !== 'k').map(nm).join(' · ')}${co.length ? ` · 코치 ${co.map(nm).join(', ')}` : ''}</small>`;
+}
 function lcqGroups(B) {
   const E = B.E;
-  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was ? `<small>구 ${esc(t.cc.was)}</small>` : ''}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
+  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was ? `<small>구 ${esc(t.cc.was)}</small>` : ''}${rosterLine(t, B.ev)}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
   const col = (g) => {
     const st = B[g];
     let ts = E.list.filter((t) => t.group === g);
