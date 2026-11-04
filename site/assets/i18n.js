@@ -133,6 +133,9 @@
     ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
     ['구 {t}', '旧 {1}', 'formerly {1}'],
     ['(서브)', '(サブ)', '(sub)'],
+    // 대표 팀 카드
+    ['대회 중', '大会中', 'Live event'], ['국제전 기록 없음', '国際大会の記録なし', 'No international results'], ['지역 리그 기록 없음', '地域リーグの記録なし', 'No league results'], ['최종 순위', '最終順位', 'Final placing'],
+    ['종합 점수', '総合ポイント', 'Total points'],
     // 로스터 변경 기록
     ['종류', '種類', 'Type'],
     ['로스터 변경', 'ロースター変更', 'Roster changes'], ['공식 로스터 변경', '公式ロースター変更', 'Official roster change'], ['자동 반영', '自動反映', 'Auto-applied'], ['자동 반영 끝', '自動反映終了', 'Auto-apply ended'], ['수동 반영', '手動反映', 'Manual'], ['수동 반영 삭제', '手動反映削除', 'Manual removed'],

@@ -467,21 +467,121 @@ function stageMini(B) {
   </tbody></table></div>`;
 }
 
+// 대표 팀 카드 성적 (평시): 챔피언십 포인트 · 가장 최근 국제전 최종 순위 · 가장 최근 지역 리그 최종 순위
+// 대회 도중(LCQ·플레이오프·챔피언십이 시작됐고 끝난 지 3일 안)이고 그 팀이 나가면: 그 대회의 지금 단계 순위 · 점수 · 다음 단계
+function cpOfTeam(short) {
+  const BD = board();
+  const b = (BD.state === 'live' || BD.state === 'pending') && BD.rows.find((r) => r.short === short);
+  if (b) return { rank: b.prank, total: b.min };
+  const c = A.cp.find((r) => r.short === short);
+  return c ? { rank: c.rank, total: c.total } : null;
+}
+// 끝난 국제전에서 팀의 최종 순위: 공식 대회별 순위(cpEvents)가 있으면 그것, 없으면 결승 → 패자 2R(21~30위) → 패자 1R(31~40위) 결과로
+function intlPlace(evId, short) {
+  const ce = A.cpEvents.find((e) => e.id === evId);
+  const r = ce?.rows.find((x) => x.short === short);
+  if (r) return { pos: r.pos, cp: r.cp };
+  const ss = A.series.filter((x) => x.eventId === evId && x.results?.length);
+  const at = (name, add) => { const y = ss.find((x) => x.name === name || (name === 'Match Point Finals' && x.phase === 'Match Point Finals'))?.results.find((z) => z.short === short); return y ? y.pos + add : null; };
+  const f = at('Match Point Finals', 0);
+  if (f) return { pos: f };
+  const e2 = at('Elimination Round 2', 10); if (e2 > 20) return { pos: e2 };
+  const e1 = at('Elimination Round 1', 20); if (e1 > 30) return { pos: e1 };
+  return null;
+}
+function lastIntl(short) {
+  const evs = [...A.cpEvents.filter((e) => e.kind === 'po').map((e) => ({ id: e.id, name: e.label, start: e.start })),
+    ...(A.past || []).map((e) => ({ id: e.eventId, name: ko(e.name, EVENT_KO), start: e.start }))]
+    .filter((e, i, arr) => arr.findIndex((x) => x.id === e.id) === i && new Date(e.start) < now()).sort((a, b) => b.start.localeCompare(a.start));
+  const ev = evs.find((e) => !intlCurrent() || e.id !== A.intl?.eventId) || evs[0];
+  return ev ? { name: ev.name, ...(intlPlace(ev.id, short) || {}) } : null;
+}
+function lastLeague(short) {
+  const t = team(short);
+  const evs = A.cpEvents.filter((e) => e.kind === 'pl' && (!t?.region || e.region === t.region)).sort((a, b) => b.start.localeCompare(a.start));
+  for (const e of evs) { const r = e.rows.find((x) => x.short === short); if (r) return { name: e.label, pos: r.pos, cp: r.cp }; }
+  return evs[0] ? { name: evs[0].label } : null;
+}
+// 진행 중 대회에서 팀의 성적. 없으면 null
+function eventNow(short) {
+  const recent = (B, end) => B.started && (!B.done || now() - new Date(B.f?.start || end) < 3 * 864e5);
+  const stage = (B, title, key, base, q) => {
+    const sts = B.list.filter((x) => (x.teams || []).includes(short));
+    if (!sts.length) return null;
+    // 지금 단계: 진행 중 → 결과가 나온 마지막 단계 → 다음 단계
+    const cur = sts.find((x) => x.status === 'live') || sts.filter((x) => x.status === 'completed').at(-1) || sts[0];
+    const r = cur.s?.results?.find((x) => x.short === short);
+    const p = r ? ptsOf(r.pts, r.kills) : null;
+    const dest = !r ? '' : cur.key === 'f' ? (r.won ? '우승' : cur.top && cur.status === 'completed' && r.pos <= cur.top ? '챔피언십 진출' : r.mpe ? '매치 포인트' : '') : cur.cut ? lcqDest(cur, r.pos) : '';
+    const nextSt = sts.find((x) => x !== cur && x.status !== 'completed' && B.list.indexOf(x) > B.list.indexOf(cur));
+    return { title, key, link: qsLink(base, q, { m: cur.key }),
+      boxes: [
+        { big: r ? `${r.pos}위` : '–', label: `${cur.ko}<br>${stageState(cur)}` },
+        { big: p ? `${p.tp}점` : '–', label: p ? `순위 ${p.pp} / 킬 ${p.kp}` : '종합 점수' },
+        { big: dest || (nextSt ? nextSt.tab : '–'), label: dest ? (cur.status === 'completed' ? '결과' : '현재 기준') : '다음 경기' },
+      ],
+      next: (nextSt || (cur.status !== 'completed' ? cur : null))?.s || null };
+  };
+  // 챔피언십
+  if (champsTimeline()) {
+    const C = champsBracket();
+    if (recent(C, C.tl.end)) { const x = stage(C, '챔피언십', `ev:${C.ss[0].eventId}`, champsNow() ? '/standings' : '/standings/champs', new URLSearchParams()); if (x) return x; }
+  }
+  // LCQ
+  for (const e of lcqEvents()) {
+    const B = lcqBracket(e);
+    if (recent(B, e.end)) { const x = stage(B, `${REGION[e.region]} LCQ`, `ev:${e.eventId}`, '/standings', new URLSearchParams({ r: e.region })); if (x) return x; }
+  }
+  // 플레이오프 (진행 중 국제전)
+  if (intlCurrent() && !champsNow()) {
+    const B = bracket(), g = A.intl.rows.find((x) => x.short === short);
+    if (!g) return null;
+    let last = null;
+    for (const st of B.list.slice(1)) if (st.teams?.includes(short)) last = st;
+    const r = last ? last.s?.results?.find((x) => x.short === short) : g;
+    const p = r ? ptsOf(r.pts, r.kills) : null;
+    const st = last || B.gs;
+    const dest = last ? (r ? (last.key === 'f' ? (r.won ? '우승' : r.mpe ? '매치 포인트' : '') : r.pos <= last.cut ? last.up : last.down) : '') : ko(g.next, PHASE_KO);
+    return { title: ko(A.intl.name, EVENT_KO), key: intlKey(), link: '#/standings',
+      boxes: [
+        { big: r ? `${r.pos}위` : '–', label: `${st.ko}<br>${stageState(st)}` },
+        { big: p ? `${p.tp}점` : '–', label: p ? `순위 ${p.pp} / 킬 ${p.kp}` : '종합 점수' },
+        { big: dest || '–', label: last?.status === 'completed' ? '결과' : '다음 단계' },
+      ], next: krStageInfo(short).next };
+  }
+  return null;
+}
+// 대회 전: 팀이 나갈 LCQ·챔피언십 첫 경기
+function teamUpcoming(short) {
+  const Bs = [...lcqEvents().map((e) => lcqBracket(e)), ...(champsTimeline() ? [champsBracket()] : [])];
+  for (const B of Bs) { const st = B.list.find((x) => x.status !== 'completed' && x.s && (x.teams || []).includes(short)); if (st) return st.s; }
+  return null;
+}
 function heroCard(k) {
   const t = team(k.short);
-  const si = A.intl ? krStageInfo(k.short) : { text: '', next: null };
-  const next = A.intl && si.text ? si.next : k.nextSeries;
+  const ev = eventNow(k.short);
+  const si = !ev && A.intl ? krStageInfo(k.short) : { text: '', next: null };
+  const next = ev ? ev.next : (A.intl && si.text ? si.next : k.nextSeries) || teamUpcoming(k.short);
   const roster = (t?.roster?.filter((p) => p.r !== 'k').map((p) => p.n).join(', ') || k.krPlayers.join(', ')) + (t?.roster?.some((p) => p.r === 'k') ? ' · 코치 ' + t.roster.filter((p) => p.r === 'k').map((p) => p.n).join(', ') : '');
+  const box = (b) => `<div><b${String(b.big).length > 5 ? ' class="sm"' : ''}>${esc(b.big)}</b><span>${b.label}</span></div>`;
+  let stats, key;
+  if (ev) {
+    stats = `<p class="kr-ev"><a href="${esc(ev.link)}">${esc(ev.title)}</a> <span class="tag live">대회 중</span></p><div class="kr-stats">${ev.boxes.map((b) => ({ big: b.big, label: b.label.split('<br>').map(esc).join('<br>') })).map(box).join('')}</div>`;
+    key = ev.key;
+  } else {
+    const cp = cpOfTeam(k.short) || k.cp, li = lastIntl(k.short), ll = lastLeague(k.short);
+    stats = `<div class="kr-stats">
+      ${box({ big: cp ? `${cp.rank}위` : '–', label: `챔피언십 포인트<br>${cp ? `${fmt(cp.total)} CP` : ''}` })}
+      ${box({ big: li?.pos ? `${li.pos}위` : '–', label: li ? `${esc(li.name)}<br>${li.pos ? (li.cp ? `+${fmt(li.cp)} CP` : '최종 순위') : '미출전'}` : '국제전 기록 없음' })}
+      ${box({ big: ll?.pos ? `${ll.pos}위` : '–', label: ll ? `${esc(ll.name)}<br>${ll.pos ? (ll.cp ? `+${fmt(ll.cp)} CP` : '최종 순위') : '미출전'}` : '지역 리그 기록 없음' })}
+    </div>`;
+    key = intlKey();
+  }
   return `<section class="kr-hero" aria-labelledby="h-hero">
     <span class="flag ${CAT[k.level] || ''}">${opt.mode === 'kr' ? KR_LABEL[k.level] || '' : mainId() && team(k.short)?.id === mainId() ? '★ 대표 응원 팀' : ML().label}</span>
     <div class="hero-id">${logo(k.short, 'xl', true)}<h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1></div>
     <p class="roster">${esc(roster)}</p>
-    ${spoil(`<div class="kr-stats">
-      <div><b>${k.cp ? k.cp.rank + '위' : '–'}</b><span>챔피언십 포인트<br>${k.cp ? fmt(k.cp.total) + ' CP' : ''}</span></div>
-      <div><b>${k.intl ? k.intl.pos + '위' : '–'}</b><span>${k.intl ? esc(ko(A.intl.name, EVENT_KO)) + '<br>조별 리그 ' + k.intl.of + '팀' : '국제전 미출전'}</span></div>
-      <div><b>${k.pl ? k.pl.pos + '위' : '–'}</b><span>Split 2 프로리그<br>${REGION[t?.region] || ''}</span></div>
-    </div>
-    ${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, intlKey(), '성적')}
+    ${spoil(`${stats}${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, key, '성적')}
     ${next ? `<div class="kr-next"><span>${next.live || next.status === 'live' ? '진행 중' : '다음 경기'} · ${esc(ko(next.name, PHASE_KO))}<br><span style="opacity:.7">${next.timeTbd ? '시각 미정' : `${dateTime(next.start)} ${TZL}`}</span></span><b>${esc(next.timeTbd ? '' : until(next.start) || '진행 중')}</b></div>` : ''}
   </section>`;
 }

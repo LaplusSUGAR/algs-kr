@@ -96,6 +96,10 @@ main { padding: 4px 18px 8px; outline: none; }
 .kr-stats div { border-top: 1px solid rgba(236, 235, 231, .22); padding-top: 8px; }
 .kr-stats b { display: block; font: 800 30px/1 var(--display); }
 .kr-stats span { font-size: 12px; opacity: .72; }
+.kr-stats b.sm { font-size: 20px; line-height: 1.5; }
+.kr-ev { margin: 14px 0 0; font-size: 13px; font-weight: 700; }
+.kr-ev a { color: inherit; }
+.kr-ev .tag { margin-left: 4px; }
 .kr-next { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(236, 235, 231, .22); display: flex; justify-content: space-between; gap: 10px; align-items: baseline; font-size: 13.5px; }
 .kr-next b { font: 800 22px/1 var(--display); color: #FF8A99; }
 
