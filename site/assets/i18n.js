@@ -126,6 +126,11 @@
     ['공식 시각은 태평양 시간으로 금 17:00, 토 12:00, 토 17:00, 일 15:00입니다.', '公式の時刻は太平洋時間で金 17:00、土 12:00、土 17:00、日 15:00です。', 'Official times are Fri 17:00, Sat 12:00, Sat 17:00 and Sun 15:00 Pacific Time.'],
     ['이 사이트의 점수표는 모두 순위 / 킬 / 종합(순위 점수 / 킬 점수 / 종합 점수) 순서로 적습니다.', 'このサイトのスコア表はすべて 順位 / キル / 総合（順位ポイント / キルポイント / 総合ポイント）の順で表示します。', 'Every scoreboard on this site shows Place / Kills / Total (placement / kill / total points).'],
     ['등수는 # 칸입니다.', '順位（何位か）は # の列です。', 'Rank is in the # column.'],
+    // 진행 방식 그림 · 홈
+    ['상위 {n}', '上位{1}', 'Top {1}'], ['하위 {n}', '下位{1}', 'Bottom {1}'], ['하위 {n} 탈락', '下位{1} 敗退', 'Bottom {1} out'], ['매치 포인트 우승', 'マッチポイントで優勝', 'Match point win'],
+    ['승자 {n}R 그룹 {w}', 'ウィナーズ{1}R グループ{2}', 'Winners R{1} Group {2}'], ['조별 리그 (4개 조)', 'グループステージ（4組）', 'Group stage (4 groups)'], ['조마다 다른 세 조와 한 번씩 ({n}경기)', '各組がほかの3組と1回ずつ（{1}シリーズ）', 'Each group meets the other three once ({1} series)'],
+    ['LCQ 진행 방식', 'LCQの進行方式', 'LCQ format'], ['챔피언십 진행 방식', 'チャンピオンシップの進行方式', 'Championship format'], ['{t} LCQ 진행 방식', '{1} LCQの進行方式', '{1} LCQ format'],
+    ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
     // 챔피언십 탭
     ['챔피언십 결과', 'チャンピオンシップ結果', 'Championship results'], ['챔피언십 경기', 'チャンピオンシップの試合', 'Championship matches'], ['시각', '時刻', 'Time'],
     ['조별 리그 {w}조 vs {w}조', 'グループステージ {1} vs {2}', 'Group stage: {1} vs {2}'], ['{w}조 {n}팀 + {w}조 {n}팀', 'グループ{1} {2}チーム + グループ{3} {4}チーム', 'Group {1} ({2}) + Group {3} ({4})'],

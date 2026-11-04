@@ -305,17 +305,39 @@ function bracketFlow(B) {
 }
 
 /* ---------- 홈 ---------- */
+// LCQ·챔피언십이 시작되면 홈 맨 위에 진행 방식 그림과 지금 경기 점수표 (끝나고 3일까지)
+function eventHome() {
+  const recent = (B, end) => !B.done || now() - new Date(B.f.start || end) < 3 * 864e5;
+  let B, base, q, title, L, key;
+  const C = champsTimeline() ? champsBracket() : null;
+  if (C?.started && recent(C, C.tl.end)) {
+    B = C; base = champsNow() ? '/standings' : '/standings/champs'; q = new URLSearchParams(); title = '챔피언십'; L = CH_FLOW_L; key = `ev:${C.ss[0].eventId}`;
+  } else if (lcqEvents().length && !intlCurrent()) {
+    const ev = lcqEvents().find((e) => e.region === lcqRegionDefault()) || lcqEvents()[0];
+    const X = lcqBracket(ev);
+    if (!X.started || !recent(X, ev.end)) return '';
+    B = X; base = '/standings'; q = new URLSearchParams({ r: ev.region }); title = `${REGION[ev.region]} LCQ`; L = LCQ_FLOW_L; key = `ev:${ev.eventId}`;
+  } else return '';
+  B.base = base; B.q = q;
+  const sts = homeStages(B);
+  return `<section class="sec flow-sec" aria-labelledby="h-ev">
+      <div class="sec-head"><h2 class="h2" id="h-ev">${esc(title)}</h2><a class="more" href="${qsLink(base, q, { m: 'groups' })}">전체 보기</a></div>
+      <div class="flow-grid"><div>${spoil(stageFlow(B, L, (k) => qsLink(base, q, { m: k }), `${title} 진행 방식`), key, '진출 결과')}</div>
+      <div>${sts.map((st) => `<h3 class="h3 up-h">${esc(st.ko)} <small class="muted">${esc(stageState(st))}</small></h3>${spoil(stageGrid(B, st, 10), key, '점수표')}<a class="more" href="${qsLink(base, q, { m: st.key })}">전체 점수표</a>`).join('')}</div></div>
+    </section>`;
+}
 function home() {
   const krs = focusList();
   const lead = krs.find((k) => k.level === 'team') || krs[0];
   const others = krs.filter((k) => k !== lead);
   const upcoming = A.series.filter((s) => s.status !== 'completed').sort((a, b) => a.start.localeCompare(b.start));
   const B = bracket();
-  const showFlow = B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
+  const evHome = eventHome();
+  const showFlow = !evHome && B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
   const upList = `<div class="up-list">${upcoming.slice(0, 3).map(matchItem).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
-  return `${modeBar}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
+  return `${modeBar}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
       <div class="sec-head"><h2 class="h2" id="h-up">${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/standings">전체 순위</a></div>
       <div class="flow-grid"><div>${spoil(bracketFlow(B), intlKey(), '진출 결과')}</div><div><h3 class="h3 up-h">다가오는 경기</h3>${upList}<a class="more" href="#/schedule">경기 전체</a></div></div>
     </section>` : ''}
@@ -832,12 +854,8 @@ function lcqGroups(B) {
     : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split 2 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}`;
   const grp = E.groupSrc === 'official' ? '<span>그룹은 공식 배정입니다.</span>' : '<span>그룹은 시드 지그재그 배정(A: 1·4·5·8·9…, B: 2·3·6·7·10…)이며, 공식 배정이 나오면 바뀝니다.</span>';
   const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
-  const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2><ul class="lcq-how">
-    <li>시드 순서대로 지그재그로 나눈 그룹 A·B(각 20팀)가 승자 1라운드에서 6게임씩 치릅니다.</li>
-    <li>그룹별 상위 10팀은 승자 2라운드, 하위 10팀은 패자부활 1라운드로 갑니다.</li>
-    <li>승자 2라운드 상위 10팀은 결승, 하위 10팀은 패자부활 2라운드로 갑니다. 패자부활 1라운드는 상위 10팀만 패자부활 2라운드로 가고 하위 10팀은 탈락합니다.</li>
-    <li>패자부활 2라운드 상위 10팀이 결승에 합류해 20팀이 매치 포인트 결승을 치르고, 상위 2팀이 챔피언십에 갑니다.</li></ul></section>`;
-  return `${schedTable(B)}<p class="caption">${basis} ${grp}</p><div class="lcq-gcols">${col('a')}${col('b')}</div>${src}${how}`;
+  const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2>${stageFlow(B, LCQ_FLOW_L, (k) => qsLink(B.base, B.q, { m: k }), 'LCQ 진행 방식')}</section>`;
+  return `${how}${schedTable(B)}<p class="caption">${basis} ${grp}</p><div class="lcq-gcols">${col('a')}${col('b')}</div>${src}`;
 }
 
 // 일정표 (LCQ·챔피언십 조 편성 탭)
@@ -846,9 +864,65 @@ const schedTable = (B) => `<section class="sec" aria-labelledby="h-st-sch"><h2 c
   ${B.list.map((st) => `<tr><td><a href="${qsLink(B.base, B.q, { m: st.key })}">${esc(st.ko)}</a></td><td class="num">${esc(stWhen(st))}</td><td class="r small">${esc(stageState(st))}</td></tr>`).join('')}
   </tbody></table></div></section>`;
 
+// 진행 방식 그림 (LCQ·챔피언십 공통). 상자 = 경기(상태·시각·관심 팀), 화살표 = 진출. 상자를 누르면 그 경기 탭
+//   L = { h: 그림 높이, nodes: { 단계: [x, y, 제목] }, edges: [[출발, 도착, 출발 y, 도착 y, 라벨]], notes: [[단계, 글]] (상자 아래 한 줄) }
+const LCQ_FLOW_L = {
+  h: 256,
+  nodes: { a: [10, 8, '승자 1R 그룹 A'], b: [10, 136, '승자 1R 그룹 B'], wr2: [240, 8, '승자 2라운드'], er1: [240, 136, '패자부활 1라운드'], er2: [470, 136, '패자부활 2라운드'], f: [700, 72, '매치 포인트 결승'] },
+  edges: [['a', 'wr2', 30, 30, '상위 10'], ['a', 'er1', 70, 30, '하위 10'], ['b', 'wr2', 30, 70, '상위 10'], ['b', 'er1', 70, 70, '하위 10'],
+    ['wr2', 'f', 30, 30, '상위 10'], ['wr2', 'er2', 70, 30, '하위 10'], ['er1', 'er2', 50, 70, '상위 10'], ['er2', 'f', 50, 70, '상위 10']],
+  notes: [['er1', '하위 10 탈락'], ['er2', '하위 10 탈락'], ['f', '상위 2팀 챔피언십 진출']],
+};
+const CH_FLOW_L = {
+  h: 256,
+  nodes: { gs: [10, 72, '조별 리그 (4개 조)'], wr: [240, 8, '승자 라운드'], er1: [240, 136, '패자부활 1라운드'], er2: [470, 136, '패자부활 2라운드'], f: [700, 72, '매치 포인트 결승'] },
+  edges: [['gs', 'wr', 30, 48, '상위 20'], ['gs', 'er1', 66, 48, '하위 20'], ['wr', 'f', 30, 30, '상위 10'], ['wr', 'er2', 70, 30, '하위 10'], ['er1', 'er2', 50, 70, '상위 10'], ['er2', 'f', 50, 70, '상위 10']],
+  notes: [['gs', '조마다 다른 세 조와 한 번씩 (6경기)'], ['er1', '하위 10 탈락'], ['er2', '하위 10 탈락'], ['f', '매치 포인트 우승']],
+};
+function stageFlow(B, L, href, label) {
+  const W = 170, H = 96;
+  const st = (k) => B[k] || B.list.find((x) => x.key === k);
+  const nextKey = B.list.find((x) => L.nodes[x.key] && (x.status === 'pending' || x.status === 'live' || x.status === 'none'))?.key;
+  const adv = (x, sh) => { if (x.status !== 'completed') return null; const r = x.s?.results?.find((y) => y.short === sh); return !r ? null : x.key === 'f' ? !!r.won : r.pos <= x.cut; };
+  const edge = ([a, b, oy, iy, lab]) => {
+    const [ax, ay] = L.nodes[a], [bx, by] = L.nodes[b];
+    const x1 = ax + W, y1 = ay + oy, x2 = bx, y2 = by + iy, mx = (x1 + x2) / 2;
+    return `<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2 - 3} ${y2}" class="bf-edge" marker-end="url(#sfArrow)"/><text x="${x1 + 6}" y="${y1 - 5}" class="bf-elab">${esc(lab)}</text>`;
+  };
+  const node = (k) => {
+    const x0 = st(k); if (!x0) return '';
+    const [x, y, title] = L.nodes[k];
+    const cls = ['bf-node', x0.status === 'completed' ? 'done' : '', x0.status === 'live' ? 'live' : '', k === nextKey && x0.status !== 'live' ? 'next' : ''].join(' ');
+    const ks = krIn(x0.teams || []);
+    let cx = x + 12;
+    const chips = ks.slice(0, 4).map((sh) => {
+      const w = sh.length * 7.4 + 12, a = adv(x0, sh);
+      const out = `<g class="bf-chip ${CAT[krOf(sh)]} ${a === false ? 'out' : a ? 'up' : ''}"><rect x="${cx}" y="${y + 66}" width="${w}" height="18" rx="9"/><text x="${cx + w / 2}" y="${y + 79}" text-anchor="middle">${esc(sh)}</text></g>`;
+      cx += w + 4; return out;
+    }).join('') + (ks.length > 4 ? `<text x="${cx}" y="${y + 77}" class="bf-more" dy="2">+${ks.length - 4}</text>` : '');
+    const when = stTab(x0);
+    return `<a href="${esc(href(k))}" class="${cls}" aria-label="${esc(title)} ${esc(stageState(x0))}${ks.length ? ', ' + ks.join(' ') : ''}">
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10" class="bf-box"/>
+      <text x="${x + 12}" y="${y + 21}" class="bf-title">${esc(title)}</text>
+      <text x="${x + 12}" y="${y + 38}" class="bf-state">${esc(stageState(x0))}</text>
+      <text x="${x + 12}" y="${y + 53}" class="bf-sub">${x0.n}팀${when ? ' · ' + esc(when) : ''}</text>
+      ${ks.length ? chips : `<text x="${x + 12}" y="${y + 79}" class="bf-sub2">${x0.teams?.length ? esc(ML().none) : '출전 팀 미정'}</text>`}</a>`;
+  };
+  const note = ([k, t]) => { const [x, y] = L.nodes[k]; return `<text x="${x + 12}" y="${y + H + 16}" class="bf-note">${esc(t)}</text>`; };
+  return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 ${L.h}" role="group" aria-label="${esc(label)}">
+    <defs><marker id="sfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
+    ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div>`;
+}
+// 홈 점수표: 지금(진행 중 → 마지막으로 끝난 → 출전 팀이 정해진 다음) 경기. 같은 시각에 함께 열리는 경기(예: 그룹 A·B)도 함께
+const homeStages = (B) => {
+  const ms = B.list.filter((x) => x.key !== 'gs');
+  const c = ms.find((x) => x.status === 'live') || ms.filter((x) => x.status === 'completed').at(-1) || ms.find((x) => x.teams?.length === x.n);
+  return !c ? [] : c.start ? ms.filter((x) => x.start === c.start && x.status === c.status) : [c];
+};
+
 // 점수표 (LCQ·챔피언십 공통): 경기 전에는 자리 칸, 결과가 들어오면 순위 / 킬 / 종합
 //   다음(결과) 칸: 진출 규칙(cut)이 있는 단계와 결승만
-function stageGrid(B, st) {
+function stageGrid(B, st, limit = 0) {
   const x = st.s, res = x?.results?.length ? x.results : null;
   const slotOf = new Map(st.slots.filter((y) => y.short).map((y) => [y.short, y.label]));
   let rows;
@@ -857,6 +931,7 @@ function stageGrid(B, st) {
   else rows = st.slots.map((y) => ({ short: y.short, label: y.label }));
   while (rows.length < st.n) rows.push({ short: null, label: '' });
   if (opt.krOnly) rows = rows.filter((r) => r.short && isF(r.short));
+  if (limit) rows = rows.filter((r, i) => i < limit || (r.short && isF(r.short)));
   const hasDest = !!st.cut || st.key === 'f';
   const dest = (r) => {
     if (!r.pos) return '';
@@ -1036,7 +1111,8 @@ function champsView(q, base) {
   const qBox = `<section class="sec" aria-labelledby="h-cq"><h2 class="h2" id="h-cq">LCQ 진출 팀 <small class="muted">지역별 2팀</small></h2>
     <div class="cq-grid">${Q.map((x) => `<div class="cq"><b>${esc(REGION[x.region])}</b>${x.done ? x.teams.map((sh) => `<span>${teamLink(sh)}</span>`).join('') : `<span class="muted">${lcqEvents().find((e) => e.region === x.region) && lcqBracket(lcqEvents().find((e) => e.region === x.region)).started ? 'LCQ 진행 중' : 'LCQ 전'}</span>`}</div>`).join('')}</div>
     <p class="caption">${allDone ? 'LCQ 진출 8팀을 CP 순서대로 33~40번 자리에 넣었습니다. CP가 같으면 LCQ 결승 순위가 높은 팀이 앞입니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</p></section>`;
-  const groupsTab = `${schedTable(B)}
+  const how = `<section class="sec" aria-labelledby="h-ch-how"><h2 class="h2" id="h-ch-how">진행 방식</h2>${stageFlow(B, CH_FLOW_L, (k) => qsLink(base, q, { m: k }), '챔피언십 진행 방식')}</section>`;
+  const groupsTab = `${how}${schedTable(B)}
     <section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${champsNow() ? '공식 조 배정입니다.' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}</p>${groupsHtml}</section>${qBox}`;
   return `<section class="sec past-ev"><h2 class="h2">챔피언십</h2><p class="lead">${tl ? `${esc(tl.start.slice(0, 4))}.${esc(tl.start.slice(5).replace('-', '.'))} – ${esc(tl.end.slice(5).replace('-', '.'))} · ${esc(tl.where)}` : ''}</p></section>
     ${B.started && !B.done ? refreshNote() : ''}

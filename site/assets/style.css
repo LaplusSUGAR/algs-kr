@@ -280,6 +280,7 @@ sup.mix { font-size: 10px; font-weight: 700; color: var(--ring); margin-left: 2p
 .bf-chip.out { opacity: .38; }
 .bf-chip.up rect { stroke: var(--ink); stroke-width: 1.5; }
 .bf-more { font-size: 11px; fill: var(--steel); }
+.bf-note { font-size: 11px; fill: var(--steel); font-weight: 600; }
 .up-list .match:first-child { margin-top: 0; }
 
 /* 브래킷 순위 */
