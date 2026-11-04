@@ -112,6 +112,20 @@
     ['이 사이트의 점수표는 모두', 'このサイトのスコア表はすべて', 'Every scoreboard on this site shows'], ['순위 점수 / 킬 점수 / 종합 점수', '順位ポイント / キルポイント / 総合ポイント', 'placement / kill / total points'], ['순서로 적습니다.', 'の順で表示します。', ', in that order.'],
     ['승자 {n}라운드 그룹 A·B', 'ウィナーズラウンド{1} グループA・B', 'Winners Round {1} Groups A/B'], ['그룹별 상위 {n}팀 → 승자 {n}라운드, 하위 {n}팀 → 패자부활 {n}라운드', 'グループごと上位{1}チーム → ウィナーズラウンド{2}、下位{3}チーム → エリミネーションラウンド{4}', 'Top {1} per group → Winners Round {2}, bottom {3} → Elimination Round {4}'],
     ['시드 순서대로 지그재그로 나눠 승자 {n}라운드 그룹 A·B(각 {n}팀)', 'シード順にジグザグで分けてウィナーズラウンド{1} グループA・B（各{2}チーム）', 'Split zigzag by seed into Winners Round {1} Groups A/B ({2} teams each)'],
+    // 점수표 머리글(data-tr) · LCQ 시각
+    ['순위 점수 칸', '順位', 'Place'], ['킬 점수 칸', 'キル', 'Kills'], ['종합 점수 칸', '総合', 'Total'],
+    ['시각 미정', '時刻未定', 'Time TBD'], ['시각 보정', '時刻補正', 'Time adjusted'], ['현지 {x}', '現地 {1}', 'Local {1}'],
+    ['한국 시간', '日本時間', 'Korea time (KST)'], ['현지 시간', '現地時間', 'Local time'], ['일정', '日程', 'Schedule'],
+    ['공식 페이지 시각({x})은 네 지역에 똑같이 들어간 임시값이라 시각을 비워 둡니다.', '公式ページの時刻（{1}）は4地域すべてに同じ仮の値が入っているため、時刻は空欄にしています。', 'The official time ({1}) is the same placeholder for all four regions, so the time is left blank.'],
+    ['날짜는 {x}입니다.', '日程は{1}です。', 'Dates: {1}.'],
+    ['공식 페이지 시각이 네 지역 공통 임시값이라 시각을 비워 둡니다.', '公式ページの時刻が4地域共通の仮の値のため、時刻は空欄にしています。', 'The official time is a placeholder shared by all four regions, so it is left blank.'], ['근거: 조 편성 탭 일정', '根拠: グループ分けタブの日程', 'Details: schedule on the Groups tab'],
+    ['사이트 보정 시각입니다.', 'サイトで補正した時刻です。', 'Time adjusted by this site.'], ['공식 시각 그대로입니다.', '公式の時刻のままです。', 'Official time as published.'],
+    ['공식 페이지는 네 지역 LCQ에 똑같은 시각(토 10:00 KST 시작)을 넣어 두었고, 이는 태평양 시간 금 17:00으로 입력된 값입니다. 같은 현지 시각(금 17:00, 토 12:00, 토 17:00, 일 15:00)을 한국 시간으로 옮겼습니다. 예년 APAC North LCQ도 금 17시, 토 12시, 토 17시에 시작했습니다.',
+      '公式ページは4地域のLCQに同じ時刻（土 10:00 JST開始）を入れており、これは太平洋時間の金 17:00として入力された値です。同じ現地時刻（金 17:00、土 12:00、土 17:00、日 15:00）を日本時間に置き換えました。例年のAPAC North LCQも金 17時、土 12時、土 17時に始まっています。',
+      'The official page lists the same time for all four regional LCQs (Sat 10:00 KST start), which is Fri 17:00 entered in Pacific Time. The same local times (Fri 17:00, Sat 12:00, Sat 17:00, Sun 15:00) are shown here in Korea time. Past APAC North LCQs also started Fri 17:00, Sat 12:00 and Sat 17:00.'],
+    ['공식 시각은 태평양 시간으로 금 17:00, 토 12:00, 토 17:00, 일 15:00입니다.', '公式の時刻は太平洋時間で金 17:00、土 12:00、土 17:00、日 15:00です。', 'Official times are Fri 17:00, Sat 12:00, Sat 17:00 and Sun 15:00 Pacific Time.'],
+    ['이 사이트의 점수표는 모두 순위 / 킬 / 종합(순위 점수 / 킬 점수 / 종합 점수) 순서로 적습니다.', 'このサイトのスコア表はすべて 順位 / キル / 総合（順位ポイント / キルポイント / 総合ポイント）の順で表示します。', 'Every scoreboard on this site shows Place / Kills / Total (placement / kill / total points).'],
+    ['등수는 # 칸입니다.', '順位（何位か）は # の列です。', 'Rank is in the # column.'],
     // LCQ 탭·점수표
     ['조 편성', 'グループ分け', 'Groups'], ['LCQ 경기', 'LCQの試合', 'LCQ matches'], ['시드', 'シード', 'Seed'], ['합계', '合計', 'Total'], ['챔피언십 진출', 'チャンピオンシップ進出', 'To Championship'], ['공식 결과', '公式結果', 'Official results'], ['출전:', '出場:', 'Teams:'],
     ['승자 {n}R {w}', 'ウィナーズ{1}R {2}', 'Winners R{1} {2}'], ['승자 {n}R', 'ウィナーズ{1}R', 'Winners R{1}'], ['패자 {n}R', 'エリミネーション{1}R', 'Elim. R{1}'], ['그룹 {w}', 'グループ{1}', 'Group {1}'], ['승자 {n}라운드 그룹 {w}', 'ウィナーズラウンド{1} グループ{2}', 'Winners Round {1} Group {2}'],
@@ -332,6 +346,8 @@
     let n;
     while ((n = w.nextNode())) if (HANGUL.test(n.nodeValue)) nodes.push(n);
     for (const x of nodes) { if (x.parentElement && x.parentElement.closest('script,style,[data-no-tr]')) continue; x.nodeValue = t(x.nodeValue); }
+    // data-tr="사전 키": 같은 한국어가 자리마다 다른 뜻일 때 (예: 점수표 '순위' = 순위 점수)
+    if (root.querySelectorAll) for (const el of root.querySelectorAll('[data-tr]')) el.textContent = t(el.dataset.tr);
     const els = root.querySelectorAll ? [root, ...root.querySelectorAll('[title],[aria-label],[placeholder],[alt]')] : [];
     for (const el of els) for (const a of ATTRS) { const v = el.getAttribute && el.getAttribute(a); if (v && HANGUL.test(v)) el.setAttribute(a, t(v)); }
   }

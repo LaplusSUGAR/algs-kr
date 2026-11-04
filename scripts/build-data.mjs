@@ -215,7 +215,32 @@ const series = algs.series.map(([id, eventId, phase, name, status, start, region
   const lineup = algs.lineups?.[id] || lcqLineups[id] || null;
   return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
-}).sort((a, b) => a.start.localeCompare(b.start));
+});
+// LCQ 시각 보정 (config/overrides.json lcqSchedule)
+//   공식 API가 네 지역 LCQ의 같은 단계에 똑같은 시각을 넣어 둔 동안은 지역 구분 없는 임시값으로 본다
+//   (공식 사이트는 태평양 시간 기준으로 입력: 토 01:00 UTC = 금 17:00 PT).
+//   보정 시각이 있으면 그 시각, keep이면 공식 값 그대로, 둘 다 없으면 '시각 미정'(timeTbd).
+//   공식 값이 지역마다 달라지면 보정 없이 공식 값을 쓴다.
+{
+  const lcqIds = new Set(Object.values(evById).filter((e) => e.slug.startsWith('last-chance-qualifier')).map((e) => e.id));
+  const lcqS = series.filter((x) => lcqIds.has(x.eventId));
+  const fix = ov.lcqSchedule || {};
+  // 먼저 단계별로 임시값인지 판단 (보정하면서 시각이 바뀌기 전에)
+  const temp = new Set([...new Set(lcqS.map((x) => x.name))].filter((n) => {
+    const same = lcqS.filter((y) => y.name === n);
+    return new Set(same.map((y) => y.region)).size >= 3 && new Set(same.map((y) => y.start)).size === 1;
+  }));
+  for (const x of lcqS) {
+    if (!temp.has(x.name)) continue; // 지역별 공식 시각이 있음
+    const f = fix[x.region] || {};
+    x.startOfficial = x.start;
+    if (f[x.name]) { x.start = new Date(f[x.name]).toISOString(); x.startFix = 'site'; }
+    else if (f.keep) x.startFix = 'keep';
+    else x.timeTbd = true;
+    if (f.note) x.startNote = f.note;
+  }
+}
+series.sort((a, b) => a.start.localeCompare(b.start));
 
 // ---------- 진행 중 국제전 단계 순위 ----------
 const intlEv = Object.values(evById).find((e) => /playoffs|champs/.test(e.slug) && algs.poGroup.length && new Date(e.start) <= new Date(algs.fetchedAt) && new Date(e.end) >= new Date(new Date(algs.fetchedAt) - 3 * 864e5));
