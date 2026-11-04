@@ -202,7 +202,7 @@ function subtabs(tab, parts, q) {
         ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']]
       : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
-    teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r])],
+    teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
     streams: [['전체', '#/streams', sv === 'all'], ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
@@ -1647,11 +1647,28 @@ function pidOf(name) {
 }
 const playerLink = (name, html) => { const id = pidOf(name); return id ? `<a class="plink" href="#/players/${encodeURIComponent(id)}">${html ?? esc(name)}</a>` : (html ?? esc(name)); };
 const pName = (p) => `${isKrP(p) ? `<b class="krn">${esc(p.n)}</b>` : esc(p.n)}${p.mix ? '<sup class="mix" title="한국계 (국적과 대표 국가가 다르거나 운영자 확인)">계</sup>' : ''}`;
+// 로스터 변경 기록 (scripts/rosters.mjs가 빌드마다 남김): 공식 로스터 변경, Liquipedia로 먼저 반영, 수동 반영, 2부 팀 명단·이름
+const ROSTER_KIND = { official: '공식 로스터 변경', auto: '자동 반영', 'auto-end': '자동 반영 끝', manual: '수동 반영', 'manual-end': '수동 반영 삭제', cc: '2부 팀 명단 변경', rename: '2부 팀 이름 변경', start: '자동 확인 시작' };
+function rosterLogView(q) {
+  const all = A.rosterLog || [];
+  const r = q.get('r') || 'all';
+  let list = r === 'all' ? all : all.filter((e) => e.region === r);
+  if (opt.krOnly) list = list.filter((e) => isF(e.team));
+  const seg = `<div class="seg" role="group" aria-label="지역">${[['all', '전체'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((x) => [x, REGION[x]])].map(([k, n]) => `<a href="${qsLink('/teams', q, { g: 'moves', r: k })}" aria-current="${k === r}">${esc(n)}</a>`).join('')}</div>`;
+  const who = (e) => e.team ? (team(e.team) || A.xteams?.[e.team] ? teamLink(e.team, e.teamName || undefined) : esc(e.team)) : '';
+  const rows = list.map((e) => `<tr class="${e.team ? rowCls({ short: e.team }) : ''}"><td class="num small">${esc(dayLabel(dayKey(e.at)))} ${esc(hhmm(e.at))}</td><td class="small"><span class="tag ${e.kind === 'auto' ? 'kr' : e.kind === 'official' ? 'ok' : ''}">${esc(ROSTER_KIND[e.kind] || e.kind)}</span></td><td class="team">${who(e)}${e.region ? `<small>${esc(REGION[e.region] || '')}</small>` : ''}</td><td class="small">${e.was ? `<span>구 ${esc(e.was)}</span>` : (e.out || []).map(esc).join(', ')}</td><td class="small">${(e.in || []).map(esc).join(', ')}</td></tr>`).join('');
+  return `<h1 class="title">로스터 변경</h1>
+    <p class="lead">빌드(약 5분마다)가 공식 API 로스터와 Liquipedia LCQ 참가 명단을 확인해 남기는 기록입니다. 공식 로스터보다 Liquipedia에 먼저 올라온 이적은 자동으로 팀 로스터와 팀 CP에 반영하고, 공식 로스터가 같아지면 거둡니다.</p>
+    <div class="controls">${seg}</div>
+    ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>시각</th><th>종류</th><th>팀</th><th>빠진 선수</th><th>들어온 선수</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p class="empty">기록이 없습니다.</p>'}
+    <p class="caption"><a href="https://github.com/LaplusSUGAR/algs-kr/blob/main/logs/roster-changes.md" target="_blank" rel="noopener">전체 기록 (GitHub)</a></p>`;
+}
 function teams(parts, q) {
   if (parts[1] === 'pick') return `<h1 class="title">응원 팀 고르기</h1>${favPicker()}`;
   if (parts[1]) return teamDetail(decodeURIComponent(parts[1]));
   const g = q.get('g') || 'all';
   if (g === 'kr') return krTeams();
+  if (g === 'moves') return rosterLogView(q);
   const all = Object.values(A.teams);
   const tile = (t) => {
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');

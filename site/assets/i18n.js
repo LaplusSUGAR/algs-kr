@@ -133,6 +133,14 @@
     ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
     ['구 {t}', '旧 {1}', 'formerly {1}'],
     ['(서브)', '(サブ)', '(sub)'],
+    // 로스터 변경 기록
+    ['종류', '種類', 'Type'],
+    ['로스터 변경', 'ロースター変更', 'Roster changes'], ['공식 로스터 변경', '公式ロースター変更', 'Official roster change'], ['자동 반영', '自動反映', 'Auto-applied'], ['자동 반영 끝', '自動反映終了', 'Auto-apply ended'], ['수동 반영', '手動反映', 'Manual'], ['수동 반영 삭제', '手動反映削除', 'Manual removed'],
+    ['2부 팀 명단 변경', '2部チームのロースター変更', 'Tier-2 roster change'], ['2부 팀 이름 변경', '2部チームの名前変更', 'Tier-2 team renamed'], ['자동 확인 시작', '自動確認開始', 'Tracking started'],
+    ['빠진 선수', '抜けた選手', 'Out'], ['들어온 선수', '加入した選手', 'In'], ['기록이 없습니다.', '記録がありません。', 'No records.'], ['전체 기록 (GitHub)', '全記録（GitHub）', 'Full log (GitHub)'],
+    ['빌드(약 5분마다)가 공식 API 로스터와 Liquipedia LCQ 참가 명단을 확인해 남기는 기록입니다. 공식 로스터보다 Liquipedia에 먼저 올라온 이적은 자동으로 팀 로스터와 팀 CP에 반영하고, 공식 로스터가 같아지면 거둡니다.',
+      'ビルド（約5分ごと）が公式APIのロースターとLiquipediaのLCQ参加リストを確認して残す記録です。公式より先にLiquipediaに載った移籍は自動でチームのロースターとチームCPに反映し、公式のロースターが同じになると外します。',
+      'Logged by each build (about every 5 minutes) from the official API rosters and the Liquipedia LCQ entrant lists. Transfers that appear on Liquipedia before the official roster are applied to team rosters and team CP automatically, and removed once the official roster matches.'],
     // 챔피언십 탭
     ['챔피언십 결과', 'チャンピオンシップ結果', 'Championship results'], ['챔피언십 경기', 'チャンピオンシップの試合', 'Championship matches'], ['시각', '時刻', 'Time'],
     ['조별 리그 {w}조 vs {w}조', 'グループステージ {1} vs {2}', 'Group stage: {1} vs {2}'], ['{w}조 {n}팀 + {w}조 {n}팀', 'グループ{1} {2}チーム + グループ{3} {4}チーム', 'Group {1} ({2}) + Group {3} ({4})'],

@@ -1,0 +1,119 @@
+[
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "start",
+  "team": "",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "rename",
+  "team": "REGAL RISE",
+  "region": "apac-n",
+  "was": "JYASHIN",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "rename",
+  "team": "ORB GARDEN",
+  "region": "apac-n",
+  "was": "Laugh Tale",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "TLNP",
+  "teamName": "TLN PIRATES",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "Nono"
+  ]
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "D4C",
+  "teamName": "D4C",
+  "region": "emea",
+  "out": [
+   "Nono"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "VOID",
+  "teamName": "Void Esports OCE",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "aflow"
+  ]
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "OTS",
+  "teamName": "Outside",
+  "region": "apac-s",
+  "out": [
+   "aflow"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "ALT",
+  "teamName": "ALTERNATIVE",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "EIN"
+  ]
+ },
+ {
+  "at": "2026-11-04T11:50:24.877Z",
+  "kind": "auto",
+  "team": "FNC",
+  "teamName": "FNATIC",
+  "region": "apac-n",
+  "out": [
+   "EIN"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-03T00:00:00+09:00",
+  "kind": "manual",
+  "team": "ALT",
+  "teamName": "ALTERNATIVE",
+  "region": "apac-n",
+  "out": [
+   "Lible Ace"
+  ],
+  "in": [
+   "EIN"
+  ]
+ },
+ {
+  "at": "2026-11-03T00:00:00+09:00",
+  "kind": "manual",
+  "team": "FNC",
+  "teamName": "FNATIC",
+  "region": "apac-n",
+  "out": [
+   "EIN"
+  ],
+  "in": [
+   "CHROM"
+  ]
+ }
+]

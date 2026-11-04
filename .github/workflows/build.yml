@@ -48,7 +48,7 @@ jobs:
         run: |
           git config user.name "algs-kr-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add raw site/data site/index.html site/logos
+          git add raw logs site/data site/index.html site/logos
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else

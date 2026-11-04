@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, readJson, writeText, hash, normRegion, REGION_LABEL, nameKey } from './lib.mjs';
 import { nk as logoKey } from './lp-teams-parse.mjs';
+import { createRosterWatch } from './rosters.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -89,10 +90,21 @@ for (const [id, s] of Object.entries(algs.rosters)) {
     return p;
   });
 }
-// 로스터 이동 (config/overrides.json rosterMoves): 공식 API에 반영되기 전의 이적을 팀 로스터에 먼저 반영한다.
+// 현재 팀 = CP 순위표, 최신 Split Pro League, 최근 국제전에 있는 팀
+const latestSplit = Object.keys(algs.pl).map((k) => k.split(':')[0]).sort().at(-1);
+const currentIds = new Set([...algs.cp.map((r) => r[1]), ...algs.poGroup.map((r) => r[3]),
+  ...Object.entries(algs.pl).filter(([k]) => k.startsWith(latestSplit + ':')).flatMap(([, rows]) => rows.map((r) => r[3]))]);
+
+// 로스터 변경 자동 확인 (scripts/rosters.mjs): 공식 로스터 변경 기록, Liquipedia LCQ 명단으로 먼저 반영할 이동, 수동 이동 기록
+const RW = createRosterWatch(new Date().toISOString());
+RW.official(teams, currentIds);
+const autoMoves = RW.lcq(readJson('raw/lp/lcq.json', null));
+RW.manual(ov.rosterMoves);
+
+// 로스터 이동 (config/overrides.json rosterMoves + 자동 이동): 공식 API에 반영되기 전의 이적을 팀 로스터에 먼저 반영한다.
 //   out = 빠진 선수, in = 들어온 선수. 들어온 선수의 국적·역할은 다른 팀 공식 로스터에서 찾고, 없으면 players.json(country) 또는 미상
 //   팀 CP(현재 로스터 상위 3인)는 화면이 cpRosterOut·cpRosterAdd로 다시 계산한다
-const rosterMoves = (ov.rosterMoves || []).filter((m) => m.team);
+const rosterMoves = [...(ov.rosterMoves || []).filter((m) => m.team), ...autoMoves];
 const cpRosterOut = {}, cpRosterAdd = Object.fromEntries(Object.entries(ov.cpRosterAdd || {}).map(([k, v]) => [k, [...v]]));
 {
   const known = new Map();
@@ -105,7 +117,7 @@ const cpRosterOut = {}, cpRosterAdd = Object.fromEntries(Object.entries(ov.cpRos
     for (const n of m.in || []) {
       if (t.roster.some((p) => nameKey(p.n) === nameKey(n))) continue;
       const k = known.get(nameKey(n)), o = pcfg(n);
-      const p = { n: k?.n || n, c: o.country || k?.c || '', r: ROLE_CODE[o.role] || 'p', moved: m.date || 1 };
+      const p = { n: k?.n || n, c: o.country || k?.c || RW.flags?.[logoKey(n)] || '', r: ROLE_CODE[o.role] || 'p', moved: m.date || 1 };
       if (k?.rep) p.rep = k.rep;
       if (k?.mix || o.heritage === 'KR') p.mix = 1;
       t.roster.push(p);
@@ -121,9 +133,6 @@ for (const key of Object.keys(algs.pl).sort()) { // s1 → s2 순서로 최신 �
   for (const r of algs.pl[key]) if (teams[r[3]] && r[10]) teams[r[3]].krPlayers = r[10].split(',');
 }
 // 현재 팀 = CP 순위표, 최신 Split Pro League, 최근 국제전에 있는 팀. 지난 Split에만 있던 로스터로 한국 판정을 하지 않는다.
-const latestSplit = Object.keys(algs.pl).map((k) => k.split(':')[0]).sort().at(-1);
-const currentIds = new Set([...algs.cp.map((r) => r[1]), ...algs.poGroup.map((r) => r[3]),
-  ...Object.entries(algs.pl).filter(([k]) => k.startsWith(latestSplit + ':')).flatMap(([, rows]) => rows.map((r) => r[3]))]);
 for (const t of Object.values(teams)) {
   t.current = currentIds.has(t.id);
   if (!t.current) { t.krPlayers = []; }
@@ -398,6 +407,10 @@ const streams = {
 // ---------- Battlefy ----------
 const cc = bf ? { fetchedAt: bf.fetchedAt, apacN: (bf.leaderboards['asia-pacific-north'] || []).slice(0, 15).map(([rank, name, score, players]) => ({ rank, name, score, players })) } : null;
 
+// 2부 팀 명단·이름 변경 기록, 상태와 기록 파일 저장
+RW.cc(lcq);
+const rosterLog = RW.save();
+
 const data = {
   generated: new Date().toISOString(),
   sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, battlefy: bf?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
@@ -410,7 +423,8 @@ const data = {
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
   cpRosterAdd, cpRosterOut,
-  rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null })),
+  rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null, ...(m.auto ? { auto: 1 } : {}) })),
+  rosterLog: rosterLog.slice(0, 200),
   // 대회별 선수 출전 경기 수 { eventId: { 선수ID: 경기 수 } } — 12경기 이상이어야 그 대회 CP를 받음
   mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, cc, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
