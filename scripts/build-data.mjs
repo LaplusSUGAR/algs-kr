@@ -98,7 +98,11 @@ const currentIds = new Set([...algs.cp.map((r) => r[1]), ...algs.poGroup.map((r)
 // 로스터 변경 자동 확인 (scripts/rosters.mjs): 공식 로스터 변경 기록, Liquipedia LCQ 명단으로 먼저 반영할 이동, 수동 이동 기록
 const RW = createRosterWatch(new Date().toISOString());
 RW.official(teams, currentIds);
-const autoMoves = RW.lcq(readJson('raw/lp/lcq.json', null));
+// 자동 이동을 막을 선수: config/overrides.json rosterAutoIgnore [{ team, player }] (team을 비우면 모든 팀)
+const autoIgnore = (ov.rosterAutoIgnore || []).map((x) => [x.team || '', nameKey(x.player || '')]);
+const ignored = (team, n) => autoIgnore.some(([t, k]) => (!t || t === team) && k === nameKey(n));
+const autoMoves = RW.lcq(readJson('raw/lp/lcq.json', null))
+  .map((m) => ({ ...m, out: m.out.filter((n) => !ignored(m.team, n)), in: m.in.filter((n) => !ignored(m.team, n)) })).filter((m) => m.out.length || m.in.length);
 RW.manual(ov.rosterMoves);
 
 // 로스터 이동 (config/overrides.json rosterMoves + 자동 이동): 공식 API에 반영되기 전의 이적을 팀 로스터에 먼저 반영한다.
