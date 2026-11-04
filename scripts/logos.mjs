@@ -103,10 +103,12 @@ function plan() {
   const entries = {};
   const report = [];
   const usedLp = new Set();
+  const usedMan = new Set(); // 팀에 쓰인 운영자 파일
   for (const t of teams) {
     const m = match(t);
     if (m.ok) usedLp.add(`${m.from}|${nk(m.lpName)}`);
     const man = manual[nk(t.short)] || manual[nk(t.name)];
+    if (man) usedMan.add(manual[nk(t.short)] ? nk(t.short) : nk(t.name));
     const lpx = m.ok ? lp.find((x) => x.page === m.lpPage && x.pageKey === m.from && nk(x.name) === nk(m.lpName)) : null;
     const off = snap.logos?.[t.id];
     let src = null, pick = null;
@@ -123,11 +125,21 @@ function plan() {
     const key = `cc:${nk(x.name)}`;
     if (entries[key]) continue;
     const man = manual[nk(x.name)];
+    if (man) usedMan.add(nk(x.name));
     let src = null, pick = null;
     if (man) { src = 'manual'; pick = man.map((p) => (p ? { kind: 'file', id: `file:${p}:${fs.statSync(path.join(ROOT, p)).mtimeMs}`, path: p } : null)); }
     else if (x.icon[0] || x.icon[1]) { src = 'lp'; pick = x.icon.map((u) => (u ? { kind: 'lp', id: u, url: u, page: x.pageUrl } : null)); }
     entries[key] = { key, short: '', name: x.name, src, pick };
     report.push({ key, name: x.name, region: x.region, src, lp: { name: x.name, by: 'Liquipedia 서킷 순위표의 팀 (선수: ' + x.players.join(', ') + ')' } });
+  }
+  // 남은 운영자 파일: 이름이 바뀐 2부 팀처럼 서킷 순위표에 없는 이름이면 그 이름 그대로 cc:<이름> 로고로 둔다
+  // (build-data가 화면 이름으로 cc:<새 이름>을 찾는다. 예: 'ORB GARDEN.png' → Laugh Tale에서 이름을 바꾼 팀)
+  for (const [k, man] of Object.entries(manual)) {
+    const key = `cc:${k}`;
+    if (usedMan.has(k) || entries[key]) continue;
+    const pick = man.map((p) => (p ? { kind: 'file', id: `file:${p}:${fs.statSync(path.join(ROOT, p)).mtimeMs}`, path: p } : null));
+    entries[key] = { key, short: '', name: k, src: 'manual', pick };
+    report.push({ key, name: k, region: null, src: 'manual', lp: { why: '운영자 파일 (팀 표에 없는 이름: 이름이 바뀐 2부 팀 등)' } });
   }
   // 한쪽 배경용만 있으면 다른 쪽도 같은 그림 (화면이 반대색 받침을 깔아 줌)
   const todo = [];
