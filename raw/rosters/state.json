@@ -499,19 +499,6 @@
     "Dogma"
    ]
   },
-  "ECL": {
-   "region": "emea",
-   "name": "TEAM ECLIPSE",
-   "players": [
-    "PostKiLL",
-    "1kxst",
-    "K4SHERA",
-    "Mysi"
-   ],
-   "coaches": [
-    "Kryzen"
-   ]
-  },
   "NFX": {
    "region": "apac-n",
    "name": "NOEZ FOXX",
@@ -524,17 +511,6 @@
    "coaches": [
     "TAKUMI"
    ]
-  },
-  "JDG": {
-   "region": "americas",
-   "name": "JD GAMING",
-   "players": [
-    "Keon",
-    "Talmadge",
-    "gent",
-    "Naughty"
-   ],
-   "coaches": []
   },
   "RID1": {
    "region": "apac-n",
@@ -679,17 +655,6 @@
     "kota"
    ]
   },
-  "D4C": {
-   "region": "emea",
-   "name": "D4C",
-   "players": [
-    "Faenex",
-    "zodxyy",
-    "Nono",
-    "Feuda"
-   ],
-   "coaches": []
-  },
   "BH": {
    "region": "apac-s",
    "name": "black hole",
@@ -701,6 +666,19 @@
    ],
    "coaches": []
   },
+  "ECL": {
+   "region": "emea",
+   "name": "TEAM ECLIPSE",
+   "players": [
+    "PostKiLL",
+    "1kxst",
+    "K4SHERA",
+    "Mysi"
+   ],
+   "coaches": [
+    "Kryzen"
+   ]
+  },
   "OTS": {
    "region": "apac-s",
    "name": "Outside",
@@ -709,6 +687,17 @@
     "FAFAFIF",
     "noelsang",
     "aflow"
+   ],
+   "coaches": []
+  },
+  "D4C": {
+   "region": "emea",
+   "name": "D4C",
+   "players": [
+    "Faenex",
+    "zodxyy",
+    "Nono",
+    "Feuda"
    ],
    "coaches": []
   },
@@ -1207,6 +1196,17 @@
    ],
    "coaches": []
   },
+  "JDG": {
+   "region": "americas",
+   "name": "JD GAMING",
+   "players": [
+    "Keon",
+    "Talmadge",
+    "gent",
+    "Naughty"
+   ],
+   "coaches": []
+  },
   "GCR": {
    "region": "emea",
    "name": "Glacier",
@@ -1358,16 +1358,6 @@
    ],
    "coaches": []
   },
-  "FURY": {
-   "region": "apac-s",
-   "name": "FURY",
-   "players": [
-    "Noble",
-    "Lochchan",
-    "Lexxen"
-   ],
-   "coaches": []
-  },
   "FTL": {
    "region": "emea",
    "name": "Fear the Lamb",
@@ -1398,6 +1388,16 @@
     "rondonstreams",
     "Zeeko",
     "mioseNN"
+   ],
+   "coaches": []
+  },
+  "FURY": {
+   "region": "apac-s",
+   "name": "FURY",
+   "players": [
+    "Noble",
+    "Lochchan",
+    "Lexxen"
    ],
    "coaches": []
   },

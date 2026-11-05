@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-03T13:45:20.698Z",
+  "at": "2026-11-05T03:56:59.479Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -470,17 +470,6 @@
       }
     },
     {
-      "key": "id:01KHPREZ17WVRXCCZD256CRP5C",
-      "short": "ECL",
-      "name": "TEAM ECLIPSE",
-      "region": "emea",
-      "src": "official",
-      "lp": {
-        "name": "Team Eclipse",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREYVAK3KCYDMH8PMXA0GZ",
       "short": "NFX",
       "name": "NOEZ FOXX",
@@ -489,17 +478,6 @@
       "lp": {
         "name": "NOEZ FOXX",
         "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREX931TTBJDXH1AN6D121",
-      "short": "JDG",
-      "name": "JD GAMING",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "JD Gaming",
-        "by": "이름 같음 · 선수 2명 겹침"
       }
     },
     {
@@ -636,17 +614,6 @@
       }
     },
     {
-      "key": "id:01KHPREVYF1NA2MVWBPZDR7J23",
-      "short": "D4C",
-      "name": "D4C",
-      "region": "emea",
-      "src": "official",
-      "lp": {
-        "name": "D4C",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
       "key": "id:01KK8VGFSV46119MRVWFS1T5JH",
       "short": "BH",
       "name": "black hole",
@@ -655,6 +622,17 @@
       "lp": {
         "name": "Black Hole",
         "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREZ17WVRXCCZD256CRP5C",
+      "short": "ECL",
+      "name": "TEAM ECLIPSE",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Team Eclipse",
+        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
@@ -667,6 +645,17 @@
         "why": "선수 4명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "Comeback",
         "overlap": 4
+      }
+    },
+    {
+      "key": "id:01KHPREVYF1NA2MVWBPZDR7J23",
+      "short": "D4C",
+      "name": "D4C",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "D4C",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1134,6 +1123,17 @@
       }
     },
     {
+      "key": "id:01KHPREX931TTBJDXH1AN6D121",
+      "short": "JDG",
+      "name": "JD GAMING",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "JD Gaming",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
       "key": "id:01KME84BM2K6S5120YXYV4NZ75",
       "short": "GCR",
       "name": "Glacier",
@@ -1281,17 +1281,6 @@
       }
     },
     {
-      "key": "id:01KTSJNA886ZZ7GB2SV5EK08R1",
-      "short": "FURY",
-      "name": "FURY",
-      "region": "apac-s",
-      "src": "lp",
-      "lp": {
-        "name": "FURY",
-        "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
       "key": "id:01KTSJN9KPK3JT213PMP606X99",
       "short": "FTL",
       "name": "Fear the Lamb",
@@ -1323,6 +1312,17 @@
       "src": "lp",
       "lp": {
         "name": "Shadows of Nine",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA886ZZ7GB2SV5EK08R1",
+      "short": "FURY",
+      "name": "FURY",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "FURY",
         "by": "이름 같음 · 선수 2명 겹침"
       }
     },
