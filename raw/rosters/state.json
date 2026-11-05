@@ -1897,6 +1897,13 @@
   "FREE": {
    "off": [],
    "lp": []
+  },
+  "DKF": {
+   "off": [
+    "DROPPED",
+    "Jxmo"
+   ],
+   "lp": []
   }
  },
  "moves": [
@@ -1917,6 +1924,22 @@
    "since": "2026-11-04T11:50:24.877Z"
   },
   {
+   "team": "ALX",
+   "out": [
+    "spades"
+   ],
+   "in": [],
+   "since": "2026-11-05T12:02:55.268Z"
+  },
+  {
+   "team": "CPR",
+   "out": [],
+   "in": [
+    "spades"
+   ],
+   "since": "2026-11-05T12:02:55.268Z"
+  },
+  {
    "team": "OTS",
    "out": [
     "aflow"
@@ -1931,6 +1954,22 @@
     "aflow"
    ],
    "since": "2026-11-04T11:50:24.877Z"
+  },
+  {
+   "team": "FURY",
+   "out": [
+    "Lochchan"
+   ],
+   "in": [],
+   "since": "2026-11-05T12:02:55.268Z"
+  },
+  {
+   "team": "ECL",
+   "out": [
+    "Mysi"
+   ],
+   "in": [],
+   "since": "2026-11-05T12:02:55.268Z"
   },
   {
    "team": "D4C",
@@ -1987,7 +2026,7 @@
   "apac-n:02demonslayers": [
    "iHateTheApex",
    "aecxr",
-   "yes oi"
+   "naohiro22"
   ],
   "apac-n:rerereta": [
    "KANAMEDAISUKIMAN",
@@ -2029,7 +2068,8 @@
    "T9ma6",
    "yutaku7796",
    "Ice7",
-   "Breaker"
+   "Breaker",
+   "Zefon"
   ],
   "apac-n:gunso": [
    "ouzia",
@@ -2606,11 +2646,12 @@
  },
  "renames": {
   "apac-n:laughtale": "ORB GARDEN",
-  "apac-n:jyashin": "REGAL RISE"
+  "apac-n:jyashin": "REGAL RISE JYASHIN",
+  "apac-n:02demonslayers": "NovaCroatia"
  },
  "manual": [
   "FNC|EIN|CHROM",
   "ALT|Lible Ace|EIN"
  ],
- "_mdBase": "{\"RID0\":{\"off\":[\"Assii\"],\"lp\":[]},\"LTX\":{\"off\":[\"Kontyan\"],\"lp\":[]},\"KN\":{\"off\":[],\"lp\":[]},\"NFX\":{\"off\":[\"Raygh\"],\"lp\":[]},\"RIG\":{\"off\":[\"Chanriyo\"],\"lp\":[]},\"O2\":{\"off\":[],\"lp\":[]},\"RR\":{\"off\":[\"Vulcan300\"],\"lp\":[]},\"ETS\":{\"off\":[],\"lp\":[]},\"BS\":{\"off\":[],\"lp\":[]},\"FL\":{\"off\":[\"SYACHI\"],\"lp\":[]},\"RID1\":{\"off\":[\"MUSCLE\"],\"lp\":[]},\"RRX\":{\"off\":[\"Mitarashi\"],\"lp\":[]},\"TIE\":{\"off\":[],\"lp\":[]},\"XECT\":{\"off\":[],\"lp\":[\"Mqty\"]},\"SBI\":{\"off\":[],\"lp\":[]},\"RLZ\":{\"off\":[\"Fzr\"],\"lp\":[\"inkya\"]},\"MTR\":{\"off\":[\"Anemone\"],\"lp\":[]},\"FNC\":{\"off\":[\"kisekiduck\",\"EIN\"],\"lp\":[\"Chrom\"]},\"SRL\":{\"off\":[\"Shohei\"],\"lp\":[]},\"UFZ\":{\"off\":[],\"lp\":[\"NIRU\"]},\"ALT\":{\"off\":[\"Lible Ace\",\"Mosh\"],\"lp\":[\"Ein\"]},\"4QUA\":{\"off\":[\"RingoOisi7\"],\"lp\":[\"Ria\",\"Nekuru\"]},\"FCN\":{\"off\":[\"chikochandao\"],\"lp\":[\"Tico\"]},\"NE\":{\"off\":[\"c4lmerq\"],\"lp\":[\"kota\"]},\"TEC\":{\"off\":[\"Arm\"],\"lp\":[\"Honeypie\"]},\"7VEN\":{\"off\":[\"hannzi\",\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"DOG\":{\"off\":[\"yanlys\"],\"lp\":[]},\"BH\":{\"off\":[\"xxfps\"],\"lp\":[\"XX\"]},\"CPR\":{\"off\":[],\"lp\":[]},\"KRS\":{\"off\":[\"xinhai\"],\"lp\":[]},\"SWQ\":{\"off\":[\"Lzoho\",\"Moku\"],\"lp\":[\"GuoZi\"]},\"TBSU\":{\"off\":[],\"lp\":[]},\"2C1M\":{\"off\":[],\"lp\":[]},\"OTS\":{\"off\":[\"aflow\"],\"lp\":[]},\"HABN\":{\"off\":[],\"lp\":[]},\"MAMA\":{\"off\":[],\"lp\":[]},\"TECA\":{\"off\":[\"KBBLANK\"],\"lp\":[\"Wang\"]},\"GT\":{\"off\":[],\"lp\":[]},\"VOID\":{\"off\":[],\"lp\":[\"aflow\"]},\"FIN\":{\"off\":[],\"lp\":[]},\"RDG\":{\"off\":[\"Salvatorez\"],\"lp\":[]},\"ORG\":{\"off\":[\"Max Verstappen\"],\"lp\":[\"跳跳loveJK\"]},\"ALX\":{\"off\":[],\"lp\":[]},\"ARAM\":{\"off\":[],\"lp\":[]},\"FURY\":{\"off\":[],\"lp\":[]},\"TECB\":{\"off\":[\"WWUUZZII\"],\"lp\":[\"Wuzi\"]},\"UBI\":{\"off\":[\"Aviisan\"],\"lp\":[]},\"WAR\":{\"off\":[\"ihtw-www-\"],\"lp\":[\"Rename\"]},\"ECL\":{\"off\":[],\"lp\":[]},\"TLNP\":{\"off\":[\"Hiarka\",\"Esteves33\"],\"lp\":[\"nono\"]},\"ZIP\":{\"off\":[],\"lp\":[]},\"D4C\":{\"off\":[\"Faenex\",\"Nono\"],\"lp\":[]},\"MIH\":{\"off\":[\"Yanzz\"],\"lp\":[]},\"FUL\":{\"off\":[],\"lp\":[]},\"SH\":{\"off\":[\"CalamityVX\"],\"lp\":[\"Calamitous\"]},\"DN\":{\"off\":[],\"lp\":[]},\"INF\":{\"off\":[],\"lp\":[]},\"MAJN\":{\"off\":[\"Ixren\"],\"lp\":[]},\"BEN\":{\"off\":[],\"lp\":[\"Zuni\"]},\"3MEN\":{\"off\":[\"tyhr\"],\"lp\":[]},\"RON\":{\"off\":[\"ChaoticMuch\"],\"lp\":[]},\"MAM\":{\"off\":[],\"lp\":[]},\"BLSD\":{\"off\":[],\"lp\":[]},\"RD\":{\"off\":[],\"lp\":[]},\"PXL\":{\"off\":[],\"lp\":[]},\"BPR\":{\"off\":[],\"lp\":[]},\"TF\":{\"off\":[\"henryojlk\"],\"lp\":[]},\"BCL\":{\"off\":[],\"lp\":[]},\"FTL\":{\"off\":[],\"lp\":[]},\"SO9\":{\"off\":[],\"lp\":[]},\"GCR\":{\"off\":[\"QPMS\"],\"lp\":[]},\"WRLD\":{\"off\":[\"Winnie\"],\"lp\":[]},\"VEXX\":{\"off\":[\"KIMCHI\"],\"lp\":[]},\"NICE\":{\"off\":[\"RamBeau\"],\"lp\":[]},\"FXI\":{\"off\":[],\"lp\":[]},\"JDG\":{\"off\":[\"Talmadge\"],\"lp\":[]},\"DRK\":{\"off\":[],\"lp\":[]},\"PRES\":{\"off\":[\"Charmander\"],\"lp\":[]},\"HEAD\":{\"off\":[\"Zuni\"],\"lp\":[]},\"BB\":{\"off\":[],\"lp\":[]},\"VR\":{\"off\":[\"Hoplodamus\"],\"lp\":[]},\"SO\":{\"off\":[],\"lp\":[\"Brick\"]},\"SLG\":{\"off\":[],\"lp\":[]},\"FISH\":{\"off\":[],\"lp\":[]},\"URNM\":{\"off\":[\"MaliceMamba\"],\"lp\":[]},\"FREE\":{\"off\":[],\"lp\":[]}}"
+ "_mdBase": "{\"RID0\":{\"off\":[\"Assii\"],\"lp\":[]},\"LTX\":{\"off\":[\"Kontyan\"],\"lp\":[]},\"KN\":{\"off\":[],\"lp\":[]},\"NFX\":{\"off\":[\"Raygh\"],\"lp\":[]},\"RIG\":{\"off\":[\"Chanriyo\"],\"lp\":[]},\"O2\":{\"off\":[],\"lp\":[]},\"RR\":{\"off\":[\"Vulcan300\"],\"lp\":[]},\"ETS\":{\"off\":[],\"lp\":[]},\"BS\":{\"off\":[],\"lp\":[]},\"FL\":{\"off\":[\"SYACHI\"],\"lp\":[]},\"RID1\":{\"off\":[\"MUSCLE\"],\"lp\":[]},\"RRX\":{\"off\":[\"Mitarashi\"],\"lp\":[]},\"TIE\":{\"off\":[],\"lp\":[]},\"XECT\":{\"off\":[],\"lp\":[\"Mqty\"]},\"SBI\":{\"off\":[],\"lp\":[]},\"RLZ\":{\"off\":[\"Fzr\"],\"lp\":[\"inkya\"]},\"MTR\":{\"off\":[\"Anemone\"],\"lp\":[]},\"FNC\":{\"off\":[\"kisekiduck\",\"EIN\"],\"lp\":[\"Chrom\"]},\"SRL\":{\"off\":[\"Shohei\"],\"lp\":[]},\"UFZ\":{\"off\":[],\"lp\":[\"NIRU\"]},\"ALT\":{\"off\":[\"Lible Ace\",\"Mosh\"],\"lp\":[\"Ein\"]},\"4QUA\":{\"off\":[\"RingoOisi7\"],\"lp\":[\"Ria\",\"Nekuru\"]},\"FCN\":{\"off\":[\"chikochandao\"],\"lp\":[\"Tico\"]},\"NE\":{\"off\":[\"c4lmerq\"],\"lp\":[\"kota\"]},\"TEC\":{\"off\":[\"Arm\"],\"lp\":[\"Honeypie\"]},\"7VEN\":{\"off\":[\"hannzi\",\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"DOG\":{\"off\":[\"yanlys\"],\"lp\":[]},\"BH\":{\"off\":[\"xxfps\"],\"lp\":[\"XX\"]},\"CPR\":{\"off\":[],\"lp\":[]},\"KRS\":{\"off\":[\"xinhai\"],\"lp\":[]},\"SWQ\":{\"off\":[\"Lzoho\",\"Moku\"],\"lp\":[\"GuoZi\"]},\"TBSU\":{\"off\":[],\"lp\":[]},\"2C1M\":{\"off\":[],\"lp\":[]},\"OTS\":{\"off\":[\"aflow\"],\"lp\":[]},\"HABN\":{\"off\":[],\"lp\":[]},\"MAMA\":{\"off\":[],\"lp\":[]},\"TECA\":{\"off\":[\"KBBLANK\"],\"lp\":[\"Wang\"]},\"GT\":{\"off\":[],\"lp\":[]},\"VOID\":{\"off\":[],\"lp\":[\"aflow\"]},\"FIN\":{\"off\":[],\"lp\":[]},\"RDG\":{\"off\":[\"Salvatorez\"],\"lp\":[]},\"ORG\":{\"off\":[\"Max Verstappen\"],\"lp\":[\"跳跳loveJK\"]},\"ALX\":{\"off\":[],\"lp\":[]},\"ARAM\":{\"off\":[],\"lp\":[]},\"FURY\":{\"off\":[],\"lp\":[]},\"TECB\":{\"off\":[\"WWUUZZII\"],\"lp\":[\"Wuzi\"]},\"UBI\":{\"off\":[\"Aviisan\"],\"lp\":[]},\"WAR\":{\"off\":[\"ihtw-www-\"],\"lp\":[\"Rename\"]},\"ECL\":{\"off\":[],\"lp\":[]},\"TLNP\":{\"off\":[\"Hiarka\",\"Esteves33\"],\"lp\":[\"nono\"]},\"ZIP\":{\"off\":[],\"lp\":[]},\"D4C\":{\"off\":[\"Faenex\",\"Nono\"],\"lp\":[]},\"MIH\":{\"off\":[\"Yanzz\"],\"lp\":[]},\"FUL\":{\"off\":[],\"lp\":[]},\"SH\":{\"off\":[\"CalamityVX\"],\"lp\":[\"Calamitous\"]},\"DN\":{\"off\":[],\"lp\":[]},\"INF\":{\"off\":[],\"lp\":[]},\"MAJN\":{\"off\":[\"Ixren\"],\"lp\":[]},\"BEN\":{\"off\":[],\"lp\":[\"Zuni\"]},\"3MEN\":{\"off\":[\"tyhr\"],\"lp\":[]},\"RON\":{\"off\":[\"ChaoticMuch\"],\"lp\":[]},\"MAM\":{\"off\":[],\"lp\":[]},\"BLSD\":{\"off\":[],\"lp\":[]},\"RD\":{\"off\":[],\"lp\":[]},\"PXL\":{\"off\":[],\"lp\":[]},\"BPR\":{\"off\":[],\"lp\":[]},\"TF\":{\"off\":[\"henryojlk\"],\"lp\":[]},\"BCL\":{\"off\":[],\"lp\":[]},\"FTL\":{\"off\":[],\"lp\":[]},\"SO9\":{\"off\":[],\"lp\":[]},\"GCR\":{\"off\":[\"QPMS\"],\"lp\":[]},\"WRLD\":{\"off\":[\"Winnie\"],\"lp\":[]},\"VEXX\":{\"off\":[\"KIMCHI\"],\"lp\":[]},\"NICE\":{\"off\":[\"RamBeau\"],\"lp\":[]},\"FXI\":{\"off\":[],\"lp\":[]},\"JDG\":{\"off\":[\"Talmadge\"],\"lp\":[]},\"DRK\":{\"off\":[],\"lp\":[]},\"PRES\":{\"off\":[\"Charmander\"],\"lp\":[]},\"HEAD\":{\"off\":[\"Zuni\"],\"lp\":[]},\"BB\":{\"off\":[],\"lp\":[]},\"VR\":{\"off\":[\"Hoplodamus\"],\"lp\":[]},\"SO\":{\"off\":[],\"lp\":[\"Brick\"]},\"SLG\":{\"off\":[],\"lp\":[]},\"FISH\":{\"off\":[],\"lp\":[]},\"URNM\":{\"off\":[\"MaliceMamba\"],\"lp\":[]},\"FREE\":{\"off\":[],\"lp\":[]},\"DKF\":{\"off\":[\"DROPPED\",\"Jxmo\"],\"lp\":[]}}"
 }

@@ -1,5 +1,89 @@
 [
  {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "cc",
+  "team": "AstraNova",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "Zefon"
+  ]
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "rename",
+  "team": "REGAL RISE JYASHIN",
+  "region": "apac-n",
+  "was": "JYASHIN",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "rename",
+  "team": "NovaCroatia",
+  "region": "apac-n",
+  "was": "02DemonSlayers",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "cc",
+  "team": "NovaCroatia",
+  "region": "apac-n",
+  "out": [
+   "yes oi"
+  ],
+  "in": [
+   "naohiro22"
+  ]
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "auto",
+  "team": "ECL",
+  "teamName": "TEAM ECLIPSE",
+  "region": "emea",
+  "out": [
+   "Mysi"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "auto",
+  "team": "FURY",
+  "teamName": "FURY",
+  "region": "apac-s",
+  "out": [
+   "Lochchan"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "auto",
+  "team": "CPR",
+  "teamName": "CPR",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "spades"
+  ]
+ },
+ {
+  "at": "2026-11-05T12:02:55.268Z",
+  "kind": "auto",
+  "team": "ALX",
+  "teamName": "AELIX",
+  "region": "apac-s",
+  "out": [
+   "spades"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-04T11:50:24.877Z",
   "kind": "start",
   "team": "",

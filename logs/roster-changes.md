@@ -4,6 +4,14 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 21:02 | 2부 팀 명단 변경 | APAC North | AstraNova |  | Zefon |
+| 2026-11-05 21:02 | 2부 팀 이름 변경 | APAC North | REGAL RISE JYASHIN |  | 구 JYASHIN |
+| 2026-11-05 21:02 | 2부 팀 이름 변경 | APAC North | NovaCroatia |  | 구 02DemonSlayers |
+| 2026-11-05 21:02 | 2부 팀 명단 변경 | APAC North | NovaCroatia | yes oi | naohiro22 |
+| 2026-11-05 21:02 | 자동 반영 (Liquipedia) | EMEA | ECL (TEAM ECLIPSE) | Mysi |  |
+| 2026-11-05 21:02 | 자동 반영 (Liquipedia) | APAC South | FURY | Lochchan |  |
+| 2026-11-05 21:02 | 자동 반영 (Liquipedia) | APAC South | CPR |  | spades |
+| 2026-11-05 21:02 | 자동 반영 (Liquipedia) | APAC South | ALX (AELIX) | spades |  |
 | 2026-11-04 20:50 | 로스터 자동 확인 시작 |  |  |  |  |
 | 2026-11-04 20:50 | 2부 팀 이름 변경 | APAC North | REGAL RISE |  | 구 JYASHIN |
 | 2026-11-04 20:50 | 2부 팀 이름 변경 | APAC North | ORB GARDEN |  | 구 Laugh Tale |
@@ -73,3 +81,4 @@
 | VR (EBOYS) | Americas | Hoplodamus |  |
 | SO (Sesame oil) | Americas |  | Brick |
 | URNM (Unreal Nightmare) | Americas | MaliceMamba |  |
+| DKF | Americas | DROPPED, Jxmo |  |
