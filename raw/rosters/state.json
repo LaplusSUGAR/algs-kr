@@ -2528,9 +2528,9 @@
    "Emccyy"
   ],
   "americas:happybirthday": [
-   "P1tchey",
-   "Syenth",
-   "Ezuom"
+   "p1tchey",
+   "ezuom",
+   "syenth"
   ],
   "americas:undecided": [
    "Roxx",
@@ -2579,9 +2579,9 @@
    "Xetiq"
   ],
   "americas:dgap": [
-   "Avuhlie",
    "Golden",
-   "bokiiyu"
+   "Avuhlie",
+   "Bokiiyu"
   ],
   "americas:runninglate": [
    "KindlyMonkey",
@@ -2647,7 +2647,8 @@
  "renames": {
   "apac-n:laughtale": "ORB GARDEN",
   "apac-n:jyashin": "REGAL RISE JYASHIN",
-  "apac-n:02demonslayers": "NovaCroatia"
+  "apac-n:02demonslayers": "NovaCroatia",
+  "americas:missionary": "chronic"
  },
  "manual": [
   "FNC|EIN|CHROM",
