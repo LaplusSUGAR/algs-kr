@@ -1,5 +1,27 @@
 [
  {
+  "at": "2026-11-06T00:00:00+09:00",
+  "kind": "manual",
+  "team": "WGR",
+  "teamName": "WhiteGrimReaper",
+  "region": "apac-n",
+  "out": [
+   "Re9zq"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-06T00:00:00+09:00",
+  "kind": "manual",
+  "team": "TIE",
+  "teamName": "TIE",
+  "region": "apac-n",
+  "out": [
+   "Ftyan"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-05T13:04:54.831Z",
   "kind": "rename",
   "team": "chronic",
