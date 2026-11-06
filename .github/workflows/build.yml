@@ -53,8 +53,6 @@ jobs:
         run: node scripts/fetch-lp-teams.mjs
       - name: 팀 로고 (Liquipedia 확인 → 이름·선수 대조 → 받기·캡처 → 64·160px WebP, 새로 만들 것이 있을 때만 도구 설치)
         run: node scripts/logos.mjs --plan || (npm i --no-save --no-package-lock sharp@0.33 playwright-core@1.47.2 && node scripts/logos.mjs)
-      - name: Battlefy
-        run: node scripts/fetch-battlefy.mjs
       - name: 병합·빌드
         run: node scripts/build-data.mjs
       - name: 바뀐 데이터만 커밋

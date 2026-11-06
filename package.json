@@ -7,8 +7,7 @@
   "scripts": {
     "fetch:lp": "node scripts/fetch-liquipedia.mjs",
     "fetch:algs": "node scripts/fetch-algs.mjs",
-    "fetch:battlefy": "node scripts/fetch-battlefy.mjs",
-    "fetch": "npm run fetch:lp && npm run fetch:algs && npm run fetch:battlefy",
+    "fetch": "npm run fetch:lp && npm run fetch:algs",
     "build": "node scripts/build-data.mjs",
     "all": "npm run fetch && npm run build",
     "serve": "npx --yes serve site -l 5173",

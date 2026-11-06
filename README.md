@@ -28,9 +28,11 @@ ALGS(Apex Legends Global Series) 결과를 한국 팀 중심으로 보여주는 
 
 ```
 fetch-liquipedia.mjs  → raw/lp/        (1순위, API 키 필요)
-fetch-algs.mjs        → raw/algs/      (공식 API: CP, 국적, 경기별 결과)
-fetch-battlefy.mjs    → raw/battlefy/  (Challenger Circuit)
-build-data.mjs        → site/data/algs-data.js + ver.json
+fetch-algs.mjs        → raw/algs/      (공식 API: CP, 국적, 경기별 결과. 요청은 3개씩 동시에, 끝난 지 하루 넘은 시리즈·로고는 매시 한 번만 다시 받음)
+fetch-lcq-lp.mjs      → raw/lp/lcq.json        (Liquipedia 위키 원문: LCQ 참가 명단, Challenger Circuit 순위)
+fetch-lp-teams.mjs    → raw/lp/teams-src.json  (Liquipedia 팀 표: 팀·선수·로고 아이콘)
+logos.mjs             → site/logos/t/  (팀 로고 64·160px WebP)
+build-data.mjs        → site/data/algs-data.js + ver.json (26자 공식 ID는 표 `_u`의 번호로 줄여 냄 → app.js `unpack`이 되돌림)
 브라우저 실시간 조회    → 경기 중 진행 중인 시리즈만 공식 API에서 10초(+0~3초)마다 직접 확인
 worker/live-worker.js → /live.json     (선택: 방문자가 많아지면 서버 한 곳에서 조회하도록 전환)
 ```
@@ -41,8 +43,8 @@ worker/live-worker.js → /live.json     (선택: 방문자가 많아지면 서�
 | --- | --- | --- |
 | 경기 중 점수 | 약 10초 | 브라우저가 진행 중인 시리즈만 공식 API에서 직접 확인. 탭을 보고 있을 때만 동작. "비공식 실시간"으로 표시 |
 | 경기 종료 직후 | 10초 안 | 같은 조회에서 시리즈 종료를 감지해 "비공식 집계"로 표시 |
-| 확정 데이터 | 5분 | GitHub Actions 예약 빌드 (예약 실행은 몇 분 늦어질 수 있음). 데이터가 바뀐 경우에만 커밋·배포 |
-| 화면 반영 | 30초 | 브라우저가 `ver.json`만 확인하다가 바뀌면 데이터 파일을 다시 받음 |
+| 확정 데이터 | 약 5분 | GitHub Actions 빌드가 끝날 때마다 다음 실행을 직접 거는 이어 달리기(예약 실행은 예비). 데이터가 바뀐 경우에만 커밋·배포 |
+| 화면 반영 | 30초 | 브라우저가 `ver.json`만 확인하다가 바뀌면 데이터 파일을 다시 받음. 탭을 숨기면 쉬고, 다시 보면 바로 확인 |
 
 화면 오른쪽 위 표시(예: "실시간 · 3초 전", "5분 갱신 · 01:51")를 누르면 갱신 주기와 현재 상태가 나옵니다. 실시간 방식은 `site/assets/config.js`의 `liveMode`로 바꿉니다 (`direct` 기본, `worker`, `off`).
 
@@ -55,7 +57,7 @@ worker/live-worker.js → /live.json     (선택: 방문자가 많아지면 서�
 ```bash
 npm run build      # raw/ 에 있는 데이터로 site/data 생성 (네트워크 불필요)
 npm run serve      # http://localhost:5173
-npm run all        # 세 출처 수집 후 빌드
+npm run all        # 공식 API·Liquipedia 수집 후 빌드 (LCQ·로고 수집은 build.yml 순서 참고)
 ```
 
 `raw/algs/snapshot.json`에는 2026-11-01 01:00 KST에 공식 API에서 받은 실제 데이터가 들어 있어 바로 실행해 볼 수 있습니다.

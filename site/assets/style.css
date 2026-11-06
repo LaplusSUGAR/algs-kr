@@ -109,12 +109,6 @@ main { padding: 4px 18px 8px; outline: none; }
 .ringline .caption { font-size: 12.5px; color: var(--steel); margin-top: 6px; }
 
 /* 한국 선수 소속 팀 줄 */
-.kr-list { display: grid; gap: 8px; }
-.kr-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 12px 14px; background: var(--card); border-radius: var(--r-sm); text-decoration: none; }
-.kr-row .who { font-weight: 700; }
-.kr-row .who small { font-weight: 500; color: var(--steel); margin-left: 6px; }
-.kr-row .val { font: 800 20px/1 var(--display); text-align: right; }
-.kr-row .sub { grid-column: 1 / -1; font-size: 12.5px; color: var(--steel); }
 
 /* 표 */
 .tbl-wrap { overflow-x: auto; margin: 0 -18px; padding: 0 18px; }
@@ -335,7 +329,6 @@ details.past > summary .h2 { display: inline; margin-right: 8px; color: var(--in
   .mv { grid-template-columns: 1.15fr 1fr; align-items: center; gap: 24px; }
   .stream-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; align-items: start; }
   .pl-row { grid-template-columns: minmax(180px, 1fr) 2fr; align-items: center; }
-  .split-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 36px; align-items: start; }
 }
 @media (min-width: 1200px) {
   .frame { max-width: 1240px; }
@@ -416,8 +409,6 @@ main:focus, main:focus-visible { outline: none; }
 .krdot.k-team, .krdot.k-member, .krdot.k-coach { background: var(--kc-col); border: 0; width: 9px; height: 9px; vertical-align: 1px; }
 .krdot.k-member { border-radius: 2px; transform: rotate(45deg) scale(.9); }
 .krdot.k-coach { border-radius: 2px; }
-.cbadge { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--coach); color: #fff; font: 800 9.5px/1 var(--body); margin: 0 4px 0 5px; vertical-align: 1px; text-decoration: none; }
-.legend .cbadge { margin-left: 0; }
 .tbl tr.kr.k-team td, .tbl tr.kr.k-member td, .tbl tr.kr.k-coach td { background: var(--kc-soft); }
 .tbl tr.kr.k-team td:first-child, .tbl tr.kr.k-member td:first-child, .tbl tr.kr.k-coach td:first-child { box-shadow: inset 4px 0 0 var(--kc-col); }
 .tag.kr.k-team, .tag.kr.k-member, .tag.kr.k-coach { border-color: var(--kc-col); color: var(--kc-col); }
@@ -807,8 +798,6 @@ html, body { overflow-x: clip; }
 .lcq-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 999px; background: var(--card); color: inherit; text-decoration: none; border: 1px solid var(--rule); font-weight: 700; }
 .lcq-chip small { color: var(--steel); font-weight: 500; font-size: 11px; }
 .lcq-chip.k-team { border-color: var(--kr-team); } .lcq-chip.k-member { border-color: var(--kr-member); } .lcq-chip.k-coach { border-color: var(--coach); }
-.lcq-how { margin: 6px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.65; }
-.lcq-how li + li { margin-top: 4px; }
 .lcq-tabs { position: relative; margin: 16px 0 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .lcq-tabs .seg { flex-wrap: nowrap; white-space: nowrap; }
 .lcq-tabs .seg a { display: inline-flex; align-items: center; gap: 4px; }

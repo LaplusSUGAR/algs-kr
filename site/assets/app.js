@@ -1,5 +1,14 @@
 // EASY ALGS KR — 화면 렌더링 (빌드 도구 없이 동작하는 ES 모듈)
-let A = window.ALGS;
+// 빌드가 용량을 줄이려고 공식 ID를 표(_u)의 순번 '~번호'로 바꿔 보낸다. 읽자마자 원래 ID로 되돌려, 아래 코드는 원래 값만 본다
+function unpack(d) {
+  const U = d?._u;
+  if (!U) return d;
+  const id = (x) => (x.charCodeAt(0) === 126 && /^~[0-9a-z]+$/.test(x) ? U[parseInt(x.slice(1), 36)] : x);
+  const dec = (v) => (typeof v === 'string' ? id(v) : Array.isArray(v) ? v.map(dec) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [id(k), dec(x)])) : v);
+  const { _u, ...rest } = d;
+  return dec(rest);
+}
+let A = unpack(window.ALGS);
 const C = window.ALGS_CONFIG || {};
 const app = document.getElementById('app');
 
@@ -123,7 +132,6 @@ const team = (short) => A.teams[short];
 const xteam = (short) => A.teams[short] || A.xteams?.[short];
 const krOf = (short) => lvlOf(short);
 const KR_LABEL = { team: '한국 팀', member: '한국 선수 소속', coach: '한국 코치 팀' };
-const kcOf = (short) => !!team(short)?.kc;
 // 색 구분: 빨강 = 한국 팀(한국 선수 2명 이상), 주황 = 한국 선수 소속(1명), 파랑 = 한국 코치 팀(선수 없이 코치만)
 // 한국 선수와 한국 코치가 모두 있는 팀은 한국 선수 기준(빨강·주황)으로만 표시한다.
 const CAT = { team: 'k-team', member: 'k-member', coach: 'k-coach' };
@@ -618,17 +626,6 @@ function ringLine(krs) {
   </section>`;
 }
 
-function krRow(k) {
-  const bits = [];
-  if (k.intl) bits.push(`${ko(A.intl.name, EVENT_KO)} ${krStage(k.short)}`);
-  if (k.pl) bits.push(`Split 2 프로리그 ${k.pl.pos}위`);
-  return `<a class="kr-row" href="#/teams/${encodeURIComponent(k.short)}">
-    <span class="who">${krDot(k.level, k.short)}${esc(k.name)}${coachBadge(k.level, k.short)}<small>${esc([k.krPlayers.join(', '), k.krCoaches?.length ? '코치 ' + k.krCoaches.join(', ') : ''].filter(Boolean).join(' · '))}</small></span>
-    <span class="val">${k.cp ? 'CP ' + k.cp.rank + '위' : ''}</span>
-    <span class="sub">${esc(bits.join(' / '))}${k.cp && k.cp.status !== 'direct' ? ` / 직행권까지 ${fmt(k.cp.gap)} CP 부족` : ''}</span>
-  </a>`;
-}
-
 function intlMini() {
   const rows = A.intl.rows;
   const show = rows.filter((r, i) => i < 5 || isF(r.short));
@@ -636,15 +633,6 @@ function intlMini() {
     ${show.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}<td class="r small muted">${esc(ko(r.next, PHASE_KO))}</td></tr>`).join('')}
   </tbody></table></div>
   <p class="lead">조별 리그 누적 기준. 상위 ${A.intl.winnersCut}팀은 승자 라운드, 나머지는 패자부활 라운드로 갑니다.</p>`;
-}
-
-function seasonTimeline() {
-  const t = now();
-  return `<ol class="timeline">${A.season.timeline.map((e) => {
-    const s = new Date(e.start + 'T00:00:00+09:00'), en = new Date(e.end + 'T23:59:59+09:00');
-    const cls = t > en ? 'done' : t >= s ? 'now' : '';
-    return `<li class="${cls}"><span>${e.url ? olink(e.url, esc(e.name)) : esc(e.name)}<br><span class="when">${esc(e.where)}</span></span><span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}</span></li>`;
-  }).join('')}</ol>`;
 }
 
 /* ---------- 경기 ---------- */
@@ -1573,7 +1561,8 @@ function applyCpRoster() {
   A.cp.__adj = true;
 }
 // 로스터 이동 안내 한 줄 (CP 표의 팀 칸)
-const moveNote = (r) => (r.moves && (r.moves.out.length || r.moves.in.length) ? `<small class="sub-note">로스터 변경 반영: ${[...r.moves.out.map((n) => `${esc(n)} 이탈`), ...r.moves.in.map((n) => `${esc(n)} 합류`)].join(' · ')}${r.total0 != null && r.total0 !== r.total ? ` (공식 ${fmt(r.total0)} → ${fmt(r.total)})` : ''}</small>` : '');
+// 조각마다 따로 감싸 번역이 조각 단위로 맞게 한다 (예: 'Nono 합류', '(공식 840 → 984)')
+const moveNote = (r) => (r.moves && (r.moves.out.length || r.moves.in.length) ? `<small class="sub-note"><span>로스터 변경 반영:</span> ${[...r.moves.out.map((n) => `<span>${esc(n)} 이탈</span>`), ...r.moves.in.map((n) => `<span>${esc(n)} 합류</span>`)].join(' · ')}${r.total0 != null && r.total0 !== r.total ? ` <span>(공식 ${fmt(r.total0)} → ${fmt(r.total)})</span>` : ''}</small>` : '');
 
 let BOARD = null;
 function board() {
@@ -2047,10 +2036,10 @@ function setupSettings() {
 const dataInfo = () => {
   const s = A.sources;
   const f = (iso) => (iso ? dateTime(iso) : '수집 안 됨');
-  return `데이터 갱신: ${dateTime(A.generated)} ${TZL}<br>Liquipedia: ${f(s.lp)}<br>ALGS 공식: ${f(s.algs)}<br>Battlefy: ${f(s.battlefy)}${A.conflicts?.length ? `<br>출처 간 차이 ${A.conflicts.length}건 (Liquipedia 값 표시)` : ''}`;
+  return `데이터 갱신: ${dateTime(A.generated)} ${TZL}<br>ALGS 공식: ${f(s.algs)}<br>Liquipedia: ${f(s.lpLcq || s.lp)}${A.conflicts?.length ? `<br>출처 간 차이 ${A.conflicts.length}건 (Liquipedia 값 표시)` : ''}`;
 };
 const footer = () => { footer0(); I.tree(document.getElementById('sourceLine')); };
-const footer0 = () => { document.getElementById('sourceLine').innerHTML = `데이터: <a href="https://liquipedia.net/apexlegends/" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA 3.0), <a href="https://algs.ea.com/" target="_blank" rel="noopener">ALGS 공식</a>, Battlefy. 갱신 ${dateTime(A.generated)} ${TZL}`; };
+const footer0 = () => { document.getElementById('sourceLine').innerHTML = `데이터: <a href="https://liquipedia.net/apexlegends/" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA 3.0), <a href="https://algs.ea.com/" target="_blank" rel="noopener">ALGS 공식</a>. 갱신 ${dateTime(A.generated)} ${TZL}`; };
 
 /* ---------- 데이터 갱신: 버전 확인 + 경기 중 실시간 ---------- */
 const R = A.season.refresh || { buildMinutes: 5, liveSeconds: 10 };
@@ -2060,7 +2049,7 @@ function refreshNote() {
   return `<details class="refresh-note"><summary><b>갱신 주기</b> 점수 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초 · 순위·CP ${Math.round(OFF.ms / 1000)}초 <span class="more-hint">자세히</span></summary>진행 중인 시리즈 점수는 공식 API에서 약 ${C.livePollMs ? Math.round(C.livePollMs / 1000) : R.liveSeconds}초마다, 순위·챔피언십 포인트·다음 단계 출전 명단은 ${Math.round(OFF.ms / 1000)}초마다(시리즈가 끝나는 순간에는 즉시) 공식 API에서 직접 받아 바꿉니다. Liquipedia 대조는 ${R.buildMinutes}분 주기 빌드에서 합니다. 마지막 빌드 ${dateTime(A.generated)} ${TZL}.</details>`;
 }
 function refreshInfo() {
-  return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>확정값: 챔피언십 포인트·조별 리그 순위·출전 명단을 공식 API에서 ${Math.round(OFF.ms / 1000)}초마다, 시리즈 종료 즉시 다시 받음${OFF.lastAt ? ` (마지막 ${ago(OFF.lastAt)})` : ''}.<br>평상시: ${R.buildMinutes}분마다 자동 빌드 (GitHub 예약 실행이라 몇 분 늦어질 수 있음). 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
+  return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>확정값: 대회 기간에는 조별 리그 순위·출전 명단(국제전은 챔피언십 포인트도)을 공식 API에서 ${Math.round(OFF.ms / 1000)}초마다, 시리즈 종료 즉시 다시 받음${OFF.lastAt ? ` (마지막 ${ago(OFF.lastAt)})` : ''}.<br>평상시: 약 ${R.buildMinutes}분마다 자동 빌드. 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
 }
 function updatePill() {
   const pill = document.getElementById('refreshPill'), txt = document.getElementById('refreshText');
@@ -2125,8 +2114,8 @@ async function refreshOfficial() {
     const rows = r.standings.map((x) => ({ pos: x.position, short: x.shortName, name: x.name, id: x.teamId, group: x.group, pts: x.points, kills: x.kills, region: regionOf(x.teamId, x.region), kr: krOf(x.shortName), next: x.position <= A.intl.winnersCut ? 'Winners Round' : 'Elimination Round 1' }));
     if (JSON.stringify(rows.map((x) => [x.short, x.pts])) !== JSON.stringify(A.intl.rows.map((x) => [x.short, x.pts]))) { A.intl.rows = rows; changed = true; }
   }));
-  // 3) 챔피언십 포인트 순위 (공식 페이지와 같은 조건)
-  if (A.api?.cpEventIds?.length) jobs.push(j(`/seasons/${A.seasonId}/standings/teams?eventIds=${encodeURIComponent(A.api.cpEventIds.join(','))}&minAmountOfMatches=12`).then((r) => {
+  // 3) 챔피언십 포인트 순위 (공식 페이지와 같은 조건). 국제전 진행·정산 중에만: 평소에는 5분마다 도는 빌드 값으로 충분하다
+  if (A.api?.cpEventIds?.length && ['live', 'pending'].includes(board().state)) jobs.push(j(`/seasons/${A.seasonId}/standings/teams?eventIds=${encodeURIComponent(A.api.cpEventIds.join(','))}&minAmountOfMatches=12`).then((r) => {
     if (!r?.standings?.length) return;
     const cut = A.season.cpDirectSlots;
     const rows = r.standings.map((x) => ({ rank: x.rank, id: x.teamId, short: x.shortName, name: x.teamName, region: regionOf(x.teamId, x.region), total: x.totalPoints, players: x.players.map((p) => [p.name.trim(), p.points, p.id]) }));
@@ -2152,9 +2141,16 @@ async function refreshOfficial() {
   if (changed) render();
 }
 setInterval(refreshOfficial, OFF.ms);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.mode === 'direct') pollDirect(); });
+// 탭을 다시 보면 밀린 확인을 바로 한다 (숨긴 동안에는 버전 확인·시계·홈 다시 그리기를 쉰다)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  pollVer(); updatePill();
+  if (LIVE.mode === 'direct') { pollDirect(); if (Date.now() - OFF.lastAt > OFF.ms) refreshOfficial(); }
+  if (!parseHash().parts[0]) render();
+});
 let curVer = null;
 async function pollVer() {
+  if (document.hidden) return;
   try {
     const r = await fetch(`${C.verUrl}?t=${Date.now()}`, { cache: 'no-store' });
     if (!r.ok) return;
@@ -2167,7 +2163,7 @@ function reloadData(v) {
   return new Promise((res) => {
     const s = document.createElement('script');
     s.src = `data/algs-data.js?v=${v}`;
-    s.onload = () => { s.remove(); A = window.ALGS; applyLive(); footer(); render(); updatePill(); if (LIVE.mode === 'direct') pollDirect(); res(); };
+    s.onload = () => { s.remove(); A = unpack(window.ALGS); applyLive(); footer(); render(); updatePill(); if (LIVE.mode === 'direct') pollDirect(); res(); };
     s.onerror = () => { s.remove(); res(); };
     document.head.appendChild(s);
   });
@@ -2219,5 +2215,5 @@ setInterval(pollVer, C.verPollMs || 30000);
 if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
 else if (LIVE.mode === 'direct') { pollDirect(); refreshOfficial(); }
 updatePill();
-setInterval(updatePill, 1000);
-setInterval(() => { if (!parseHash().parts[0]) render(); }, 60000); // 홈 카운트다운 갱신
+setInterval(() => { if (!document.hidden) updatePill(); }, 1000);
+setInterval(() => { if (!document.hidden && !parseHash().parts[0]) render(); }, 60000); // 홈 카운트다운 갱신

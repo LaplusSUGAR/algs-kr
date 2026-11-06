@@ -4,7 +4,7 @@
 //   - 순위·결과·로스터: Liquipedia(raw/lp) > 공식 API(raw/algs). 값이 다르면 Liquipedia 값을 쓰고 conflicts에 기록
 //   - 챔피언십 포인트: 공식 API 값 표시 (Liquipedia는 공식 값을 옮겨 적는 데이터)
 //   - 선수 국적(한국 판별): 공식 API country
-//   - Challenger Circuit: Battlefy
+//   - Challenger Circuit·LCQ 참가 명단: Liquipedia 위키 원문(raw/lp/lcq.json, teams-src.json)
 //   - 수동 보정: config/overrides.json (팀 한글명, 색, 한국 판정 강제 등)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,7 +28,6 @@ stampAssets();
 const algs = readJson('raw/algs/snapshot.json');
 if (!algs) throw new Error('raw/algs/snapshot.json 이 없습니다. 먼저 npm run fetch:algs');
 const lpPlacements = readJson('raw/lp/placements.json');
-const bf = readJson('raw/battlefy/cc.json');
 const ov = readJson('config/overrides.json', {});
 const season = readJson('config/season.json');
 
@@ -408,16 +407,13 @@ const streams = {
   players: playerStreams.concat(ov.streams || []),
 };
 
-// ---------- Battlefy ----------
-const cc = bf ? { fetchedAt: bf.fetchedAt, apacN: (bf.leaderboards['asia-pacific-north'] || []).slice(0, 15).map(([rank, name, score, players]) => ({ rank, name, score, players })) } : null;
-
 // 2부 팀 명단·이름 변경 기록, 상태와 기록 파일 저장
 RW.cc(lcq);
 const rosterLog = RW.save();
 
 const data = {
   generated: new Date().toISOString(),
-  sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, battlefy: bf?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
+  sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
   seasonId: algs.seasonId,
   season,
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
@@ -430,7 +426,7 @@ const data = {
   rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null, ...(m.auto ? { auto: 1 } : {}) })),
   rosterLog: rosterLog.slice(0, 200),
   // 대회별 선수 출전 경기 수 { eventId: { 선수ID: 경기 수 } } — 12경기 이상이어야 그 대회 CP를 받음
-  mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, cc, conflicts,
+  mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
     cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
@@ -439,10 +435,37 @@ const data = {
   },
 };
 
+// 용량 줄이기: 26자 공식 ID(ULID, 선수·팀·대회·시리즈)는 화면 데이터에 수천 번 나온다(원본의 약 30%).
+// 모든 ID를 표(_u) 하나에 모으고 그 자리에는 '~순번(36진수)'만 남긴다. 화면(app.js unpack)이 읽자마자 원래 값으로 되돌리므로
+// 다른 코드는 그대로 원래 ID를 본다. 되돌린 값이 원본과 똑같은지 여기서 확인하고, 다르면 줄이지 않고 그대로 낸다.
+function packIds(obj) {
+  const ULID = /^[0-9A-HJKMNP-TV-Z]{26}$/, MARK = /^~[0-9a-z]+$/;
+  const cnt = new Map();
+  let clash = false;
+  const see = (x) => { if (ULID.test(x)) cnt.set(x, (cnt.get(x) || 0) + 1); else if (MARK.test(x)) clash = true; };
+  const scan = (v) => { if (typeof v === 'string') see(v); else if (Array.isArray(v)) v.forEach(scan); else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) { see(k); scan(x); } };
+  scan(obj);
+  if (clash || !cnt.size) return obj; // 원래 글자 중에 '~숫자' 모양이 있으면 헷갈리므로 줄이지 않는다
+  const U = [...cnt].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([id]) => id); // 자주 나오는 ID일수록 짧은 번호
+  const code = new Map(U.map((id, i) => [id, '~' + i.toString(36)]));
+  const enc = (v) => (typeof v === 'string' ? code.get(v) ?? v : Array.isArray(v) ? v.map(enc) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [code.get(k) ?? k, enc(x)])) : v);
+  const packed = { _u: U, ...enc(obj) };
+  if (JSON.stringify(unpackIds(packed)) !== JSON.stringify(obj)) { console.log('[build] ID 줄이기 확인 실패: 줄이지 않고 냄'); return obj; }
+  return packed;
+}
+// site/assets/app.js의 unpack과 같은 규칙 (확인용)
+function unpackIds(d) {
+  const U = d._u, MARK = /^~[0-9a-z]+$/;
+  const id = (x) => (MARK.test(x) ? U[parseInt(x.slice(1), 36)] : x);
+  const dec = (v) => (typeof v === 'string' ? id(v) : Array.isArray(v) ? v.map(dec) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [id(k), dec(x)])) : v);
+  const { _u, ...rest } = d;
+  return dec(rest);
+}
+
 const v = hash(JSON.stringify({ ...data, generated: null }));
 const prevVer = readJson('site/data/ver.json');
 if (prevVer?.v === v && !process.argv.includes('--force')) { console.log(`[build] 변경 없음 (v=${v})`); process.exit(0); }
-const body = JSON.stringify(data);
+const body = JSON.stringify(packIds(data));
 writeText('site/data/algs-data.js', `// generated by scripts/build-data.mjs - do not edit\nwindow.ALGS = ${body};\n`);
 { const idx = path.join(ROOT, 'site/index.html'); const html = fs.readFileSync(idx, 'utf8').replace(/data\/algs-data\.js(\?v=\w+)?"/, `data/algs-data.js?v=${v}"`); fs.writeFileSync(idx, html); }
 writeText('site/data/ver.json', JSON.stringify({ v, built: data.generated, sources: data.sources }));

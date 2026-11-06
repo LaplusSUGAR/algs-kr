@@ -22,6 +22,18 @@ const SEASON_SLUG = process.env.ALGS_SEASON || 'year-6';
 const KR = 'KR';
 const roleCode = (r) => ({ player: 'p', captain: 'c', coach: 'k' }[r] || '?');
 const get = (p) => fetchJson(API + p);
+// 요청을 동시에 N개까지 보내고, 결과는 넣은 순서대로 돌려준다 (실패한 칸은 null).
+// 결과 처리는 받은 뒤 원래 순서대로 하므로 스냅샷 내용·순서는 한 줄씩 받던 때와 같다.
+async function pmap(items, fn, n = 3) {
+  const out = new Array(items.length).fill(null);
+  let i = 0;
+  const worker = async () => { while (i < items.length) { const k = i++; try { out[k] = await fn(items[k], k); } catch { out[k] = null; } } };
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
+  return out;
+}
+// 매시 첫 5분(5분 간격 실행 중 한 번)이나 --full이면 끝난 시리즈·로고까지 모두 다시 받는다. 그 밖에는 이전 스냅샷 값을 다시 쓴다
+// (--quick: 시각과 상관없이 다시 쓰기, 시험용)
+const FULL = process.argv.includes('--full') || (!process.argv.includes('--quick') && new Date().getUTCMinutes() < 5);
 
 async function main() {
   const structure = await get('/seasons/structure');
@@ -38,11 +50,12 @@ async function main() {
 
   const pl = {};
   const rosters = {};
-  for (const { e } of plEvents) {
+  const plRes = await pmap(plEvents, ({ e }) => Promise.all([get(`/events/${e.id}/standings`), get(`/stats/phases/${e.phases[0].id}/standings`)]));
+  for (const [k, { e }] of plEvents.entries()) {
     const split = 's' + e.slug.match(/^split-(\d)/)[1];
     const region = e.slug.replace(/^split-\d-pro-league-/, '');
-    const phase = e.phases[0];
-    const [ev, ph] = await Promise.all([get(`/events/${e.id}/standings`), get(`/stats/phases/${phase.id}/standings`)]);
+    if (!plRes[k]) throw new Error(`프로리그 순위를 받지 못함: ${e.slug}`); // 예전처럼 전체 실패 → 이전 스냅샷 유지
+    const [ev, ph] = plRes[k];
     const pm = Object.fromEntries((ph.standings || []).map((s) => [s.teamId, s]));
     pl[`${split}:${region}`] = (ev.standings || []).map((s) => {
       const q = pm[s.teamId] || {};
@@ -62,10 +75,12 @@ async function main() {
   //   cpEvents: [[eventId, slug, rows[[순위, 1인당CP, teamId, 팀이름, "선수ID|이름;..."(코치 제외)]]]]  아직 정해지지 않은 순위는 teamId null
   const cpEvents = [];
   const logoSources = [];
-  for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /^split-\d-(pro-league-|playoffs)/.test(x.slug))) {
-    if (new Date(e.startDate) > new Date()) continue;
+  const cpEvs = season.tournaments.flatMap((t) => t.events).filter((x) => /^split-\d-(pro-league-|playoffs)/.test(x.slug) && new Date(x.startDate) <= new Date());
+  const cpEvRes = await pmap(cpEvs, (e) => get(`/events/${e.id}/standings`));
+  for (const [k, e] of cpEvs.entries()) {
     try {
-      const st = await get(`/events/${e.id}/standings`);
+      const st = cpEvRes[k];
+      if (!st) continue;
       logoSources.push(st.standings || []);
       const rows = (st.standings || []).filter((r) => r.points != null).map((r) => [r.position, r.points, r.teamId || null, r.name || null,
         (r.players || []).filter((p) => p.role !== 'coach').map((p) => `${p.id}|${p.name.trim()}`).join(';')]);
@@ -80,11 +95,17 @@ async function main() {
   const isWanted = (s) => /playoffs|last-chance|lcq|champs/i.test(s.event?.slug || '') || /Last Chance|Playoffs|Championship/.test(s.tournament?.name || '')
     || (s.event?.slug || '').startsWith('split-2-pro-league-apac-north');
   const series = [];
-  for (const s of allSeries.filter(isWanted)) {
+  // 끝난 지 하루가 넘은 시리즈의 결과는 바뀌지 않으므로 이전 스냅샷 값을 쓴다 (매시 한 번은 모두 다시 받음)
+  const prevSnap = readJson('raw/algs/snapshot.json', {});
+  const prevRes = new Map((prevSnap.series || []).filter((r) => r[4] === 'completed' && r[9]).map((r) => [r[0], r[9]]));
+  const wanted = allSeries.filter(isWanted);
+  const reuse = (s) => !FULL && s.status === 'completed' && prevRes.has(s.id) && Date.now() - new Date(s.startsAt) > 864e5;
+  const stats = await pmap(wanted, (s) => ((s.status === 'completed' || s.status === 'live') && !reuse(s) ? get(`/stats/series/${s.id}`) : null));
+  for (const [k, s] of wanted.entries()) {
     let res = null;
-    if (s.status === 'completed' || s.status === 'live') {
-      let st = {};
-      try { st = await get(`/stats/series/${s.id}`); } catch { /* 막 시작해 통계가 아직 없음 */ }
+    if (reuse(s)) res = prevRes.get(s.id);
+    else if (s.status === 'completed' || s.status === 'live') {
+      const st = stats[k] || {}; // 막 시작해 통계가 아직 없으면 빈 값
       const intl = !(s.event?.slug || '').includes('pro-league');
       // 5번째 값: 1 = 매치 포인트 도달, 2 = 매치 포인트 우승
       res = (st.teams || []).filter((t) => intl || t.position <= 3 || krShorts.has(t.shortName)).map((t) => [t.position, t.shortName, t.points, t.kills, t.wonMatchPoint ? 2 : t.matchPointEligible ? 1 : 0]);
@@ -100,13 +121,8 @@ async function main() {
   // 국제전 출전 로스터 (대체 선수 포함, 비자 문제 등으로 바뀐 실제 명단): { teamId: [[선수ID, 이름, 역할]] }
   const poRosters = {};
   if (intlEvent) {
-    try {
-      const pt = await get(`/phases/${intlEvent.phases[0].id}/teams`);
-      for (const tm of pt.teams || []) poRosters[tm.teamId] = tm.players.map((p) => [p.id, p.name.trim(), roleCode(p.role)]);
-    } catch {}
-  }
-  if (intlEvent) {
-    const gs = await get(`/stats/phases/${intlEvent.phases[0].id}/standings`);
+    const [pt, gs] = await Promise.all([get(`/phases/${intlEvent.phases[0].id}/teams`).catch(() => null), get(`/stats/phases/${intlEvent.phases[0].id}/standings`)]);
+    for (const tm of pt?.teams || []) poRosters[tm.teamId] = tm.players.map((p) => [p.id, p.name.trim(), roleCode(p.role)]);
     poGroup = (gs.standings || []).map((s) => [s.position, s.shortName, s.name, s.teamId, s.group, s.points, s.kills, s.region]);
   }
 
@@ -116,8 +132,10 @@ async function main() {
   const krStreams = [];
   const logos = {}; // teamId: [logoLight(흰 로고, 어두운 배경용), logoDark(어두운 로고, 밝은 배경용)] 공식 팀 로고 URL. 없는 쪽은 null
   const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
-  for (const { e } of latestPl) {
-    const teams = (await get(`/phases/${e.phases[0].id}/teams`)).teams || [];
+  const latestRes = await pmap(latestPl, ({ e }) => get(`/phases/${e.phases[0].id}/teams`));
+  for (const [k, { e }] of latestPl.entries()) {
+    if (!latestRes[k]) throw new Error(`로스터를 받지 못함: ${e.slug}`);
+    const teams = latestRes[k].teams || [];
     for (const tm of teams) {
       if (tm.logoLight || tm.logoDark) logos[tm.teamId] = [tm.logoLight || null, tm.logoDark || null];
       rosters[tm.teamId] = tm.players.map((p) => {
@@ -159,24 +177,22 @@ async function main() {
   // 진행 중 국제전의 남은 시리즈 출전 팀 (브래킷 표시용)
   const lineups = {};
   if (intlEvent) {
-    for (const s of allSeries.filter((x) => x.event?.id === intlEvent.id && x.status !== 'completed')) {
-      try {
-        const r = await get(`/series/${s.id}/teams`);
-        const shorts = (r.teams || []).map((t) => t.shortName).filter(Boolean);
-        if (shorts.length) lineups[s.id] = shorts;
-      } catch {}
+    const left = allSeries.filter((x) => x.event?.id === intlEvent.id && x.status !== 'completed');
+    const res = await pmap(left, (s) => get(`/series/${s.id}/teams`));
+    for (const [k, s] of left.entries()) {
+      const shorts = (res[k]?.teams || []).map((t) => t.shortName).filter(Boolean);
+      if (shorts.length) lineups[s.id] = shorts;
     }
   }
 
   // 국제전별 조별 리그 누적: 이전 결과 보기용. 끝나고 이틀이 지난 대회는 보관된 값을 그대로 쓴다
   const poGroups = { ...(prev.poGroups || {}) };
-  for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /playoffs|champs/.test(x.slug) && x.phases.length && new Date(x.startDate) <= new Date())) {
-    if (poGroups[e.id]?.length && new Date(e.endDate) < Date.now() - 2 * 864e5) continue;
-    try {
-      const gs = await get(`/stats/phases/${e.phases[0].id}/standings`);
-      const rows = (gs.standings || []).map((s) => [s.position, s.shortName, s.name, s.teamId, s.group, s.points, s.kills, s.region]);
-      if (rows.length) poGroups[e.id] = rows;
-    } catch {}
+  const pgEvs = season.tournaments.flatMap((t) => t.events).filter((x) => /playoffs|champs/.test(x.slug) && x.phases.length && new Date(x.startDate) <= new Date())
+    .filter((e) => !(poGroups[e.id]?.length && new Date(e.endDate) < Date.now() - 2 * 864e5));
+  const pgRes = await pmap(pgEvs, (e) => get(`/stats/phases/${e.phases[0].id}/standings`));
+  for (const [k, e] of pgEvs.entries()) {
+    const rows = (pgRes[k]?.standings || []).map((s) => [s.position, s.shortName, s.name, s.teamId, s.group, s.points, s.kills, s.region]);
+    if (rows.length) poGroups[e.id] = rows;
   }
 
   // LCQ (지역별 40팀): 공식 출전 명단과 시리즈별 출전 팀(승자 1R 로비 배정). 명단이 나오기 전에는 404라서 재시도 없이 한 번만 확인한다
@@ -195,10 +211,13 @@ async function main() {
       lcqLogos.push([t.teamId, t.logoLight, t.logoDark]);
     };
     if (new Date(e.endDate) > Date.now() - 864e5) {
-      for (const ph of e.phases) for (const t of (await peek(`/phases/${ph.id}/teams`))?.teams || []) add(t, t.seed ?? t.seeding ?? null);
+      const phT = await pmap(e.phases, (ph) => peek(`/phases/${ph.id}/teams`));
+      for (const r of phT) for (const t of r?.teams || []) add(t, t.seed ?? t.seeding ?? null);
       const close = new Date(e.startDate) - Date.now() < 2 * 864e5;
-      for (const s of allSeries.filter((x) => x.event?.id === e.id && x.status !== 'completed' && (close || /Lobby/.test(x.name || '')))) {
-        const ts = ((await peek(`/series/${s.id}/teams`))?.teams || []).filter((t) => t.shortName);
+      const ss = allSeries.filter((x) => x.event?.id === e.id && x.status !== 'completed' && (close || /Lobby/.test(x.name || '')));
+      const sT = await pmap(ss, (s) => peek(`/series/${s.id}/teams`));
+      for (const [k, s] of ss.entries()) {
+        const ts = (sT[k]?.teams || []).filter((t) => t.shortName);
         if (ts.length) { out.lineups[s.id] = ts.map((t) => t.shortName.trim()); for (const t of ts) add(t); }
       }
     } else out.teams = prev.lcq?.[e.id]?.teams || [];
@@ -220,8 +239,12 @@ async function main() {
   for (const st of logoSources) for (const r of st) addLogo(r.teamId, r.logoLight, r.logoDark);
   for (const [id, l, d] of lcqLogos) addLogo(id, l, d);
   const needIds = new Set([...cp.map((r) => r[1]), ...Object.values(pl).flat().map((r) => r[3])].filter((id) => !logos[id]));
-  for (const id of needIds) {
-    try { const tv = await get(`/teams/${id}`); for (const v of tv.versions || []) addLogo(id, v.logoLight, v.logoDark); } catch {}
+  // 다른 곳에 로고가 없는 팀은 팀 기록에서 찾는다. 지난번에 찾은 팀은 매시 한 번만 다시 확인
+  const needList = [...needIds];
+  const tvRes = await pmap(needList, (id) => (!FULL && prev.logos?.[id] ? null : get(`/teams/${id}`)));
+  for (const [k, id] of needList.entries()) {
+    if (!FULL && prev.logos?.[id]) { logos[id] = prev.logos[id]; continue; }
+    for (const v of tvRes[k]?.versions || []) addLogo(id, v.logoLight, v.logoDark);
   }
 
   const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, partnerStreams,
