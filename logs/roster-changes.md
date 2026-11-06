@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-06 22:01 | 2부 팀 이름 변경 | EMEA | OnChikken |  | 구 Throuple |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | WGR (WhiteGrimReaper) | Re9zq |  |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | TIE | Ftyan |  |
 | 2026-11-05 22:04 | 2부 팀 이름 변경 | Americas | chronic |  | 구 missionary |

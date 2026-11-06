@@ -1,5 +1,14 @@
 [
  {
+  "at": "2026-11-06T13:01:52.296Z",
+  "kind": "rename",
+  "team": "OnChikken",
+  "region": "emea",
+  "was": "Throuple",
+  "out": [],
+  "in": []
+ },
+ {
   "at": "2026-11-06T00:00:00+09:00",
   "kind": "manual",
   "team": "WGR",

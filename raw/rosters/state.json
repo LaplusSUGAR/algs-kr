@@ -2403,8 +2403,8 @@
   ],
   "emea:throuple": [
    "SimplyAshton",
-   "Milomilon",
-   "TryhardThor"
+   "TryhardThor",
+   "milomilon"
   ],
   "emea:riftreverie": [
    "Staplebreak",
@@ -2648,7 +2648,8 @@
   "apac-n:laughtale": "ORB GARDEN",
   "apac-n:jyashin": "REGAL RISE JYASHIN",
   "apac-n:02demonslayers": "NovaCroatia",
-  "americas:missionary": "chronic"
+  "americas:missionary": "chronic",
+  "emea:throuple": "OnChikken"
  },
  "manual": [
   "FNC|EIN|CHROM",
