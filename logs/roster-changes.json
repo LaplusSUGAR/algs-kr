@@ -1,5 +1,16 @@
 [
  {
+  "at": "2026-11-07T10:04:57.785Z",
+  "kind": "auto",
+  "team": "TIE",
+  "teamName": "TIE",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "hikuman"
+  ]
+ },
+ {
   "at": "2026-11-06T13:01:52.296Z",
   "kind": "rename",
   "team": "OnChikken",

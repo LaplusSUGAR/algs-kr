@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-07 19:04 | 자동 반영 (Liquipedia) | APAC North | TIE |  | hikuman |
 | 2026-11-06 22:01 | 2부 팀 이름 변경 | EMEA | OnChikken |  | 구 Throuple |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | WGR (WhiteGrimReaper) | Re9zq |  |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | TIE | Ftyan |  |

@@ -1908,6 +1908,14 @@
  },
  "moves": [
   {
+   "team": "TIE",
+   "out": [],
+   "in": [
+    "hikuman"
+   ],
+   "since": "2026-11-07T10:04:57.785Z"
+  },
+  {
    "team": "FNC",
    "out": [
     "EIN"
