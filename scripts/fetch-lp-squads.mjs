@@ -90,14 +90,30 @@ async function main() {
   const lcq = readJson('raw/lp/lcq.json', { pages: {} });
   const opp = [];
   for (const r of ['apac-n', 'apac-s', 'emea', 'americas']) for (const o of lcqOpponents(lcq.pages?.[r]?.text || '')) { teamTitles.add(o.name); opp.push(...o.roster.map((p) => p.n)); }
-  // 선수 페이지: 공식 현재 로스터 선수 + LCQ 참가 명단 선수
+  // 공식 현재 팀 이름(조직이 바뀐 팀은 Liquipedia 표보다 공식 이름이 먼저 바뀐다)
   const snap = readJson('raw/algs/snapshot.json', {});
+  for (const r of snap.cp || []) if (r[2]) teamTitles.add(String(r[2]).trim());
+  // 선수 페이지: 공식 현재 로스터 선수 + LCQ 참가 명단 선수
   const playerTitles = new Set(opp);
   for (const ps of Object.values(snap.rosters || {})) for (const p of ps) playerTitles.add(String(p[1]).trim());
   const T = await texts([...teamTitles].filter(Boolean));
+  // 최근 1년 안에 나간 선수의 새 팀(newteam=팀 틀 이름, 소문자일 때가 많음)도 받는다: 조직 이적·이름 변경을 따라가려고
+  const yearAgo = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);
+  const have = new Set([...Object.keys(T.out), ...Object.keys(T.redirects)].map((x) => x.toLowerCase()));
+  const more = new Set();
+  const cap = (x) => x.replace(/(^|[\s.\-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+  for (const text of Object.values(T.out)) for (const r of squadOf(text) || []) {
+    const nt = r.newteam.trim();
+    if (!nt || (r.leave || '') < yearAgo || /^(retired|none|tbd|-)$/i.test(nt) || have.has(nt.toLowerCase())) continue;
+    for (const v of new Set([nt, cap(nt), nt.toUpperCase()])) more.add(v);
+  }
+  if (more.size) {
+    const M = await texts([...more]);
+    for (const [k, v] of Object.entries(M.out)) if (v != null) T.out[k] = v;
+    Object.assign(T.redirects, M.redirects);
+  }
   const P = await texts([...playerTitles].filter(Boolean));
   const teams = {};
-  const yearAgo = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);
   for (const [title, text] of Object.entries(T.out)) {
     const sq = squadOf(text)?.filter((r) => r.status !== 'former' || (r.leave || '') >= yearAgo);
     if (sq?.length) teams[title] = sq;
