@@ -140,7 +140,8 @@
   },
   "_ccRenames": "2부(챌린저 서킷) 팀 이름 변경: 서킷 순위표 이름 → 새 이름. Liquipedia LCQ 참가 명단에서 선수 2명 이상이 같은 팀은 자동으로 바뀌므로, 자동으로 안 될 때 적는다. 화면에는 새 이름과 '구 옛 이름'이 함께 나온다",
   "ccRenames": {
-    "Laugh Tale": "ORB GARDEN"
+    "Laugh Tale": "ORB GARDEN",
+    "Team Tomodachi": "VAMOS"
   },
   "_rosterAutoIgnore": "자동 로스터 반영(Liquipedia LCQ 명단)을 막을 선수. [{\"team\": \"팀 약칭(비우면 모든 팀)\", \"player\": \"선수 이름\"}]. 자동 반영이 틀렸을 때 적는다. 기록은 logs/roster-changes.md, 사이트 팀 탭 '로스터 변경'",
   "rosterAutoIgnore": []
