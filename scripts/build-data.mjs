@@ -86,6 +86,7 @@ for (const [id, s] of Object.entries(algs.rosters)) {
     if ((krRep && c !== 'KR') || (c === 'KR' && rep && rep !== 'KR') || o.heritage === 'KR') p.mix = 1;
     if (o.note) p.note = o.note;
     if (o.country) p.c = o.country; // 운영자가 국적을 적어 둔 경우
+    if (o.title && p.r === 'k') p.title = o.title; // 코치 자리에 보일 직함(애널리스트·대표 등)
     return p;
   });
 }
@@ -121,12 +122,14 @@ const cpRosterOut = {}, cpRosterAdd = Object.fromEntries(Object.entries(ov.cpRos
       if (t.roster.some((p) => nameKey(p.n) === nameKey(n))) continue;
       const k = known.get(nameKey(n)), o = pcfg(n);
       const p = { n: k?.n || n, c: o.country || k?.c || RW.flags?.[logoKey(n)] || '', r: ROLE_CODE[o.role] || 'p', moved: m.date || 1 };
+      if (o.title && p.r === 'k') p.title = o.title;
       if (k?.rep) p.rep = k.rep;
       if (k?.mix || o.heritage === 'KR') p.mix = 1;
       t.roster.push(p);
     }
     (cpRosterOut[m.team] ||= []).push(...(m.out || []));
-    (cpRosterAdd[m.team] ||= []).push(...(m.in || []).filter((n) => !(cpRosterAdd[m.team] || []).includes(n)));
+    // 들어온 코치는 팀 CP(선수 상위 3인) 계산에 넣지 않는다
+    (cpRosterAdd[m.team] ||= []).push(...(m.in || []).filter((n) => ROLE_CODE[pcfg(n).role] !== 'k' && !(cpRosterAdd[m.team] || []).includes(n)));
   }
 }
 

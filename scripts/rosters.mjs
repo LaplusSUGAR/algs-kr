@@ -66,8 +66,10 @@ export function createRosterWatch(nowIso) {
     for (const [sh, c] of Object.entries(cur)) {
       const p = st.official[sh];
       if (!p) continue;
-      const out = [...p.players.filter((n) => !c.players.includes(n)), ...p.coaches.filter((n) => !c.coaches.includes(n)).map((n) => `${n} (코치)`)];
-      const inn = [...c.players.filter((n) => !p.players.includes(n)), ...c.coaches.filter((n) => !p.coaches.includes(n)).map((n) => `${n} (코치)`)];
+      // 선수 ↔ 코치 역할만 바뀐 사람(config/players.json 역할 보정 포함)은 변경으로 보지 않는다
+      const pAll = [...p.players, ...p.coaches], cAll = [...c.players, ...c.coaches];
+      const out = [...p.players.filter((n) => !cAll.includes(n)), ...p.coaches.filter((n) => !cAll.includes(n)).map((n) => `${n} (코치)`)];
+      const inn = [...c.players.filter((n) => !pAll.includes(n)), ...c.coaches.filter((n) => !pAll.includes(n)).map((n) => `${n} (코치)`)];
       if (out.length || inn.length) { add({ kind: 'official', team: sh, teamName: c.name, region: c.region, out, in: inn }); W.changedTeams.add(sh); }
     }
     W.cur = cur;

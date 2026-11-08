@@ -22,6 +22,7 @@ ALGS(Apex Legends Global Series) 결과를 한국 팀 중심으로 보여주는 
 - 점수표는 모두 **순위 / 킬 / 종합**(순위 점수 / 킬 점수 / 종합 점수) 세 칸으로 적고, 등수 칸은 `#`로 쓴다 (킬 1개 = 1점이라 순위 점수 = 종합 − 킬). 새 표도 `app.js`의 `PTS_TH`·`ptsTd`·`ptsLine`을 쓴다. 프로리그 포인트(시리즈 순위마다 받는 리그 포인트)는 나뉘지 않으므로 예외.
 - 시각은 모두 24시간제 `HH:mm` (`hhmm`).
 - 로스터 변경 자동 확인(`scripts/rosters.mjs`, 빌드마다): 공식 API 로스터 변경을 기록하고, Liquipedia LCQ 참가 명단에 먼저 올라온 이동(같은 지역 공식 선수의 이적, 확인 시작 뒤 새로 생긴 차이)은 팀 로스터·팀 CP에 자동 반영한다. 공식 로스터가 같아지면 자동 반영을 거둔다. 기록은 `logs/roster-changes.md`(처음부터 달랐던 명단은 아래 '확인용' 표), 사이트 팀 탭 '로스터 변경', 상태는 `raw/rosters/state.json`.
+- 로스터 최신화 점검: Actions의 build를 `refresh=squads`로 실행하면 Liquipedia 팀 페이지 로스터를 지금 받는다(`refresh=1`은 팀 표·LCQ 명단까지 모두). 공식 로스터와 다른 점 중 팀 페이지에 나간 날짜가 있거나 LCQ 명단·팀 페이지 둘 다에 없는 선수는 `config/overrides.json`의 `rosterMoves`로, 공식 API에 선수로 올라 있지만 팀 페이지에서 코치·운영진인 사람은 `config/players.json`의 `role`(필요하면 `title`)로 고친다. 이름 표기만 다른 같은 선수(예: W-L-A2 = Walking L)는 공식 표기를 그대로 둔다(바꾸면 그 선수의 CP가 빠진다).
 - LCQ 시각: 공식 API가 네 지역에 똑같은 임시 시각을 넣어 두면 `config/overrides.json`의 `lcqSchedule`로 지역별 시각을 보정한다(빌드 단계). 공식 값이 지역마다 달라지면 자동으로 공식 값을 쓴다.
 
 ## 데이터 흐름
@@ -31,6 +32,7 @@ fetch-liquipedia.mjs  → raw/lp/        (1순위, API 키 필요)
 fetch-algs.mjs        → raw/algs/      (공식 API: CP, 국적, 경기별 결과. 요청은 3개씩 동시에, 끝난 지 하루 넘은 시리즈·로고는 매시 한 번만 다시 받음)
 fetch-lcq-lp.mjs      → raw/lp/lcq.json        (Liquipedia 위키 원문: LCQ 참가 명단, Challenger Circuit 순위)
 fetch-lp-teams.mjs    → raw/lp/teams-src.json  (Liquipedia 팀 표: 팀·선수·로고 아이콘)
+fetch-lp-squads.mjs   → raw/lp/squads.json     (Liquipedia 팀 페이지 현재 로스터·들어온 날·나간 날, 선수 페이지 넘겨주기. 7일에 1회)
 logos.mjs             → site/logos/t/  (팀 로고 64·160px WebP)
 build-data.mjs        → site/data/algs-data.js + ver.json (26자 공식 ID는 표 `_u`의 번호로 줄여 냄 → app.js `unpack`이 되돌림)
 브라우저 실시간 조회    → 경기 중 진행 중인 시리즈만 공식 API에서 10초(+0~3초)마다 직접 확인
