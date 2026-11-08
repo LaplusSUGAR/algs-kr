@@ -14,7 +14,7 @@ on:
         required: false
         default: '0'
       refresh:
-        description: "1이면 Liquipedia 팀 표·팀 페이지 로스터·LCQ 명단을 지금 모두 다시 받음 (로스터 최신화 점검용, 몇 분 걸림)"
+        description: "1이면 Liquipedia 팀 표·팀 페이지 로스터·LCQ 명단을 지금 모두 다시 받음 (몇 분 걸림), squads면 팀 페이지 로스터만 (30초쯤)"
         required: false
         default: '0'
   push:
@@ -57,8 +57,8 @@ jobs:
         env:
           LP_TEAMS_MAX: ${{ inputs.refresh == '1' && '8' || '2' }}
         run: node scripts/fetch-lp-teams.mjs ${{ inputs.refresh == '1' && '--force' || '' }}
-      - name: Liquipedia 팀 페이지 로스터·선수 정보 (7일에 1회, refresh=1이면 지금)
-        run: node scripts/fetch-lp-squads.mjs ${{ inputs.refresh == '1' && '--force --raw' || '' }}
+      - name: Liquipedia 팀 페이지 로스터·선수 정보 (7일에 1회, refresh=1·squads면 지금)
+        run: node scripts/fetch-lp-squads.mjs ${{ (inputs.refresh == '1' || inputs.refresh == 'squads') && '--force --raw' || '' }}
       - name: 팀 로고 (Liquipedia 확인 → 이름·선수 대조 → 받기·캡처 → 64·160px WebP, 새로 만들 것이 있을 때만 도구 설치)
         run: node scripts/logos.mjs --plan || (npm i --no-save --no-package-lock sharp@0.33 playwright-core@1.47.2 && node scripts/logos.mjs)
       - name: 병합·빌드

@@ -33,20 +33,38 @@ async function texts(titles) {
 }
 
 const val = (s, k) => (s.match(new RegExp(`\\|\\s*${k}\\s*=\\s*([^|}\\n]*)`)) || [])[1]?.trim() || '';
+// 각주·주석은 값 안에 '|'·'/'를 섞어 넣으므로 먼저 지운다
+const clean = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/<ref[^>]*\/>/gi, '').replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, '').replace(/<ref[^>]*>/gi, '');
 
-// 팀 페이지의 로스터: {{SquadPlayer|...}} 줄마다 이름·국적·역할·들어온 날·나간 날과, 그 줄이 속한 묶음(active/inactive/former)
+// 팀 페이지의 로스터 묶음({{Squad|status=…|type=staff}} … }})을 차례로 돌려준다
+export function squadBlocks(text) {
+  const out = [];
+  const re = /\{\{\s*Squad\s*\|([^\n]*)/gi;
+  for (let m; (m = re.exec(text)); ) {
+    // 묶음 끝: 줄 머리의 '}}'
+    const e = text.indexOf('\n}}', m.index);
+    const body = text.slice(m.index, e > 0 ? e + 3 : text.length);
+    const head = '|' + m[1];
+    out.push({ status: (val(head, 'status') || 'active').toLowerCase(), staff: /staff/i.test(val(head, 'type')), body });
+    re.lastIndex = e > 0 ? e : text.length;
+  }
+  return out;
+}
+
+// 로스터 줄: {{Person|id=|flag=|role=|joindate=|leavedate=|inactivedate=|newteam=|link=}} (옛 틀 {{SquadPlayer}}도 같은 꼴)
 export function squadOf(text) {
   if (!text) return null;
   const rows = [];
-  let status = 'active';
-  // 묶음 머리: {{Squad|status=former …}}, {{SquadStart|…}}, ==Former== 같은 제목
-  const re = /\{\{\s*Squad\s*\|([^\n]*)|\{\{\s*SquadStart[^\n]*|^=+\s*([^=\n]+?)\s*=+\s*$|\{\{\s*SquadPlayer\s*\|((?:[^{}]|\{\{[^{}]*\}\})*)\}\}/gim;
-  for (const m of text.matchAll(re)) {
-    if (m[1] != null) { const st = val('|' + m[1], 'status').toLowerCase(); status = st || 'active'; continue; }
-    if (m[2] != null) { const h = m[2].toLowerCase(); if (/former/.test(h)) status = 'former'; else if (/inactive/.test(h)) status = 'inactive'; else if (/active|player roster|roster/.test(h)) status = 'active'; continue; }
-    if (m[3] != null) {
-      const s = '|' + m[3];
-      rows.push({ n: val(s, 'id'), link: val(s, 'link'), c: val(s, 'flag').toUpperCase(), role: val(s, 'role') || val(s, 'position'), join: val(s, 'joindate'), leave: val(s, 'leavedate'), inactive: val(s, 'inactivedate'), status: val(s, 'leavedate') ? 'former' : val(s, 'inactivedate') ? 'inactive' : status });
+  for (const b of squadBlocks(clean(text))) {
+    for (const m of b.body.matchAll(/\{\{\s*(?:Person|SquadPlayer)\s*\|((?:[^{}]|\{\{[^{}]*\}\})*)\}\}/gi)) {
+      const s = '|' + m[1];
+      const leave = val(s, 'leavedate'), inactive = val(s, 'inactivedate'), role = val(s, 'role') || val(s, 'position');
+      rows.push({
+        n: val(s, 'id'), link: val(s, 'link'), c: val(s, 'flag').toUpperCase(), role,
+        staff: b.staff || /coach|analyst|manager|owner|ceo|director|strateg|trainer/i.test(role),
+        join: val(s, 'joindate'), leave, inactive, newteam: val(s, 'newteam'),
+        status: b.status === 'former' || leave ? 'former' : b.status === 'inactive' || inactive ? 'inactive' : 'active',
+      });
     }
   }
   return rows.filter((r) => r.n);
@@ -79,12 +97,17 @@ async function main() {
   const T = await texts([...teamTitles].filter(Boolean));
   const P = await texts([...playerTitles].filter(Boolean));
   const teams = {};
-  for (const [title, text] of Object.entries(T.out)) { const sq = squadOf(text); if (sq?.length) teams[title] = sq; }
+  const yearAgo = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);
+  for (const [title, text] of Object.entries(T.out)) {
+    const sq = squadOf(text)?.filter((r) => r.status !== 'former' || (r.leave || '') >= yearAgo);
+    if (sq?.length) teams[title] = sq;
+  }
   const players = {};
   for (const [title, text] of Object.entries(P.out)) { const p = playerOf(text); if (p) players[title] = p; }
   const out = { at: new Date().toISOString(), teamRedirects: T.redirects, playerRedirects: P.redirects, teams, players };
   if (keepRaw) {
-    const cut = (t) => { const a = t.search(/\{\{\s*Squad/i), b = t.lastIndexOf('SquadPlayer'); return a < 0 ? '' : t.slice(a, b > a ? Math.min(t.length, b + 600) : a + 600); };
+    // 원문은 지금 묶음(active·inactive·staff)과 최근 1년 안에 나간 기록이 있는 묶음만
+    const cut = (t) => squadBlocks(t).filter((b) => b.status !== 'former' || [...b.body.matchAll(/leavedate\s*=\s*(\d{4}-\d\d-\d\d)/g)].some((m) => m[1] >= yearAgo)).map((b) => b.body).join('\n');
     out.teamsRaw = Object.fromEntries(Object.entries(T.out).filter(([, t]) => t).map(([k, t]) => [k, cut(t)]));
     out.playersRaw = Object.fromEntries(Object.entries(P.out).filter(([, t]) => t).map(([k, t]) => { const i = t.search(/\{\{\s*Infobox player/i); const e = t.indexOf('\n}}', i); return [k, i < 0 ? '' : t.slice(i, e > i ? e + 3 : i + 3000)]; }));
   }
