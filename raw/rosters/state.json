@@ -29,10 +29,11 @@
    "players": [
     "Sikezz",
     "PanicApex",
-    "Zer0",
-    "Kapreme"
+    "Zer0"
    ],
-   "coaches": []
+   "coaches": [
+    "Kapreme"
+   ]
   },
   "ZETA": {
    "region": "apac-n",
@@ -76,26 +77,26 @@
    "region": "apac-n",
    "name": "UNLIMIT",
    "players": [
-    "PENGERION",
     "Peace",
     "Yulariman",
     "Xtsuvi"
    ],
    "coaches": [
-    "Yona"
+    "Yona",
+    "PENGERION"
    ]
   },
   "RRQ": {
    "region": "apac-s",
    "name": "Team RRQ",
    "players": [
-    "Panayie",
     "Prycyy",
     "STRAFINGFLAME",
     "EzFlashKIDZ"
    ],
    "coaches": [
-    "jmz"
+    "jmz",
+    "Panayie"
    ]
   },
   "NIP": {
@@ -104,21 +105,23 @@
    "players": [
     "Vein",
     "Kurev",
-    "Raven",
     "cole"
    ],
-   "coaches": []
+   "coaches": [
+    "Raven"
+   ]
   },
   "RC": {
    "region": "apac-n",
    "name": "REJECT",
    "players": [
-    "wabu",
     "Euriece",
     "4rufa",
     "Axis"
    ],
-   "coaches": []
+   "coaches": [
+    "wabu"
+   ]
   },
   "FLCN": {
    "region": "americas",
@@ -173,11 +176,11 @@
    "players": [
     "Zaine",
     "Blasts",
-    "Lufka",
-    "ladypexi"
+    "Lufka"
    ],
    "coaches": [
-    "AfrO4E"
+    "AfrO4E",
+    "ladypexi"
    ]
   },
   "CRT": {
@@ -261,11 +264,12 @@
    "name": "S8UL",
    "players": [
     "Sharky",
-    "Rogers",
     "Jesko",
     "Legacy"
    ],
-   "coaches": []
+   "coaches": [
+    "Rogers"
+   ]
   },
   "GEN": {
    "region": "apac-s",
@@ -284,34 +288,36 @@
    "players": [
     "kaishihaa",
     "Tylerfps",
-    "RemixPowers",
-    "Bowzey"
+    "RemixPowers"
    ],
-   "coaches": []
+   "coaches": [
+    "Bowzey"
+   ]
   },
   "NRG": {
    "region": "americas",
    "name": "NRG",
    "players": [
-    "Android Dream",
     "Sweet",
     "slayr",
     "sacred"
    ],
    "coaches": [
-    "SvenAPEX"
+    "SvenAPEX",
+    "Android Dream"
    ]
   },
   "SR": {
    "region": "americas",
    "name": "ShopifyRebellion",
    "players": [
-    "Don",
     "zap",
     "Xynew",
     "sauceror"
    ],
-   "coaches": []
+   "coaches": [
+    "Don"
+   ]
   },
   "KNC": {
    "region": "apac-n",
@@ -319,11 +325,11 @@
    "players": [
     "chappy",
     "DAMADAO",
-    "Moyashii 9",
-    "1ron"
+    "Moyashii 9"
    ],
    "coaches": [
-    "Cqnty"
+    "Cqnty",
+    "1ron"
    ]
   },
   "DCG": {
@@ -367,10 +373,11 @@
    "players": [
     "taskmast33r",
     "ozzzus7",
-    "dsblf",
     "Prestis"
    ],
-   "coaches": []
+   "coaches": [
+    "dsblf"
+   ]
   },
   "PXX": {
    "region": "apac-s",
@@ -471,21 +478,23 @@
    "players": [
     "RIGHT",
     "wqtagashi",
-    "5CG",
-    "Kontyan"
+    "5CG"
    ],
-   "coaches": []
+   "coaches": [
+    "Kontyan"
+   ]
   },
   "7VEN": {
    "region": "apac-s",
    "name": "7VEN",
    "players": [
     "Heckk",
-    "hannzi",
     "W-L-A2",
     "Lymo"
    ],
-   "coaches": []
+   "coaches": [
+    "hannzi"
+   ]
   },
   "KN": {
    "region": "apac-n",
@@ -505,11 +514,11 @@
    "players": [
     "gavomk",
     "kakigoori7",
-    "MiaK",
-    "Raygh"
+    "MiaK"
    ],
    "coaches": [
-    "TAKUMI"
+    "TAKUMI",
+    "Raygh"
    ]
   },
   "RID1": {
@@ -518,10 +527,11 @@
    "players": [
     "sho",
     "KatsuKing",
-    "MUSCLE",
     "HIROMUNE"
    ],
-   "coaches": []
+   "coaches": [
+    "MUSCLE"
+   ]
   },
   "TIE": {
    "region": "apac-n",
@@ -565,10 +575,10 @@
    "players": [
     "XoyoBda",
     "xKenn",
-    "xinhai",
     "Cumulonimbus"
    ],
    "coaches": [
+    "xinhai",
     "Aphiatic"
    ]
   },
@@ -624,12 +634,13 @@
    "region": "apac-n",
    "name": "REIGNITE",
    "players": [
-    "Chanriyo",
     "Lully",
     "Taida",
     "ReyzyGG"
    ],
-   "coaches": []
+   "coaches": [
+    "Chanriyo"
+   ]
   },
   "SWQ": {
    "region": "apac-s",
@@ -742,12 +753,13 @@
    "region": "apac-n",
    "name": "SYRALE",
    "players": [
-    "Shohei",
     "Ail3iS",
     "LEAH",
     "IeNaGa27"
    ],
-   "coaches": []
+   "coaches": [
+    "Shohei"
+   ]
   },
   "ORG": {
    "region": "apac-s",
@@ -822,12 +834,12 @@
    "name": "FENNEL",
    "players": [
     "izzxxv",
-    "SYACHI",
     "NefuDoll",
     "sumiyoshi"
    ],
    "coaches": [
-    "Yoshida"
+    "Yoshida",
+    "SYACHI"
    ]
   },
   "MTR": {
@@ -836,10 +848,11 @@
    "players": [
     "Maron",
     "983kuma",
-    "Anemone",
     "Kuroton"
    ],
-   "coaches": []
+   "coaches": [
+    "Anemone"
+   ]
   },
   "RON": {
    "region": "emea",
@@ -1022,11 +1035,12 @@
    "name": "RED Rams",
    "players": [
     "Rye",
-    "Vulcan300",
     "fia",
     "Datch"
    ],
-   "coaches": []
+   "coaches": [
+    "Vulcan300"
+   ]
   },
   "DN": {
    "region": "emea",
@@ -1105,12 +1119,13 @@
    "region": "apac-n",
    "name": "REALIZE",
    "players": [
-    "Fzr",
     "SIZU",
     "N1ght",
     "simubo"
    ],
-   "coaches": []
+   "coaches": [
+    "Fzr"
+   ]
   },
   "FCN": {
    "region": "apac-n",
@@ -1143,10 +1158,10 @@
    "players": [
     "Ozie",
     "Brenn",
-    "Ixren",
     "Juh1s"
    ],
    "coaches": [
+    "Ixren",
     "DiPaolo"
    ]
   },
@@ -1201,11 +1216,12 @@
    "name": "JD GAMING",
    "players": [
     "Keon",
-    "Talmadge",
     "gent",
     "Naughty"
    ],
-   "coaches": []
+   "coaches": [
+    "Talmadge"
+   ]
   },
   "GCR": {
    "region": "emea",
@@ -2664,7 +2680,39 @@
   "FNC|EIN|CHROM",
   "ALT|Lible Ace|EIN",
   "TIE|Ftyan|",
-  "WGR|Re9zq|"
+  "WGR|Re9zq|",
+  "NE|c4lmerq|",
+  "FCN|Duckz|",
+  "RID0|Assii|",
+  "RRX|Mitarashi|",
+  "FNC|kisekiduck|",
+  "ALT|Mosh|",
+  "UFZ||NIRU",
+  "4QUA|RingoOisi7|Ria,Nekuru",
+  "XECT||Mqty",
+  "O2|ibayann|",
+  "DOG|Killoposz,yanlys|",
+  "TEC|Arm|Killoposz",
+  "GT|CAIGOU|",
+  "VOID|Swarkst3r|",
+  "SWQ|Moku|",
+  "VKG|Lqdud|",
+  "TLNP|Hiarka,Esteves33|",
+  "MIH|Yanzz|",
+  "MIH|Pandaz809|",
+  "RON|arctic,ChaoticMuch|",
+  "BEN||Zuni",
+  "TF|henryojlk|",
+  "GCR|QPMS|",
+  "HEAD|Zuni|",
+  "VR|Hoplodamus|",
+  "NICE|RamBeau|",
+  "VEXX|KIMCHI,Unruly|jugga,sh00k",
+  "WRLD|Winnie|",
+  "URNM|MaliceMamba|",
+  "FWG|Leafays|",
+  "PRES|Charmander|",
+  "SHIN|MikeJitsu,ImEurusk,khenzo|"
  ],
  "_mdBase": "{\"RID0\":{\"off\":[\"Assii\"],\"lp\":[]},\"LTX\":{\"off\":[\"Kontyan\"],\"lp\":[]},\"KN\":{\"off\":[],\"lp\":[]},\"NFX\":{\"off\":[\"Raygh\"],\"lp\":[]},\"RIG\":{\"off\":[\"Chanriyo\"],\"lp\":[]},\"O2\":{\"off\":[],\"lp\":[]},\"RR\":{\"off\":[\"Vulcan300\"],\"lp\":[]},\"ETS\":{\"off\":[],\"lp\":[]},\"BS\":{\"off\":[],\"lp\":[]},\"FL\":{\"off\":[\"SYACHI\"],\"lp\":[]},\"RID1\":{\"off\":[\"MUSCLE\"],\"lp\":[]},\"RRX\":{\"off\":[\"Mitarashi\"],\"lp\":[]},\"TIE\":{\"off\":[],\"lp\":[]},\"XECT\":{\"off\":[],\"lp\":[\"Mqty\"]},\"SBI\":{\"off\":[],\"lp\":[]},\"RLZ\":{\"off\":[\"Fzr\"],\"lp\":[\"inkya\"]},\"MTR\":{\"off\":[\"Anemone\"],\"lp\":[]},\"FNC\":{\"off\":[\"kisekiduck\",\"EIN\"],\"lp\":[\"Chrom\"]},\"SRL\":{\"off\":[\"Shohei\"],\"lp\":[]},\"UFZ\":{\"off\":[],\"lp\":[\"NIRU\"]},\"ALT\":{\"off\":[\"Lible Ace\",\"Mosh\"],\"lp\":[\"Ein\"]},\"4QUA\":{\"off\":[\"RingoOisi7\"],\"lp\":[\"Ria\",\"Nekuru\"]},\"FCN\":{\"off\":[\"chikochandao\"],\"lp\":[\"Tico\"]},\"NE\":{\"off\":[\"c4lmerq\"],\"lp\":[\"kota\"]},\"TEC\":{\"off\":[\"Arm\"],\"lp\":[\"Honeypie\"]},\"7VEN\":{\"off\":[\"hannzi\",\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"DOG\":{\"off\":[\"yanlys\"],\"lp\":[]},\"BH\":{\"off\":[\"xxfps\"],\"lp\":[\"XX\"]},\"CPR\":{\"off\":[],\"lp\":[]},\"KRS\":{\"off\":[\"xinhai\"],\"lp\":[]},\"SWQ\":{\"off\":[\"Lzoho\",\"Moku\"],\"lp\":[\"GuoZi\"]},\"TBSU\":{\"off\":[],\"lp\":[]},\"2C1M\":{\"off\":[],\"lp\":[]},\"OTS\":{\"off\":[\"aflow\"],\"lp\":[]},\"HABN\":{\"off\":[],\"lp\":[]},\"MAMA\":{\"off\":[],\"lp\":[]},\"TECA\":{\"off\":[\"KBBLANK\"],\"lp\":[\"Wang\"]},\"GT\":{\"off\":[],\"lp\":[]},\"VOID\":{\"off\":[],\"lp\":[\"aflow\"]},\"FIN\":{\"off\":[],\"lp\":[]},\"RDG\":{\"off\":[\"Salvatorez\"],\"lp\":[]},\"ORG\":{\"off\":[\"Max Verstappen\"],\"lp\":[\"跳跳loveJK\"]},\"ALX\":{\"off\":[],\"lp\":[]},\"ARAM\":{\"off\":[],\"lp\":[]},\"FURY\":{\"off\":[],\"lp\":[]},\"TECB\":{\"off\":[\"WWUUZZII\"],\"lp\":[\"Wuzi\"]},\"UBI\":{\"off\":[\"Aviisan\"],\"lp\":[]},\"WAR\":{\"off\":[\"ihtw-www-\"],\"lp\":[\"Rename\"]},\"ECL\":{\"off\":[],\"lp\":[]},\"TLNP\":{\"off\":[\"Hiarka\",\"Esteves33\"],\"lp\":[\"nono\"]},\"ZIP\":{\"off\":[],\"lp\":[]},\"D4C\":{\"off\":[\"Faenex\",\"Nono\"],\"lp\":[]},\"MIH\":{\"off\":[\"Yanzz\"],\"lp\":[]},\"FUL\":{\"off\":[],\"lp\":[]},\"SH\":{\"off\":[\"CalamityVX\"],\"lp\":[\"Calamitous\"]},\"DN\":{\"off\":[],\"lp\":[]},\"INF\":{\"off\":[],\"lp\":[]},\"MAJN\":{\"off\":[\"Ixren\"],\"lp\":[]},\"BEN\":{\"off\":[],\"lp\":[\"Zuni\"]},\"3MEN\":{\"off\":[\"tyhr\"],\"lp\":[]},\"RON\":{\"off\":[\"ChaoticMuch\"],\"lp\":[]},\"MAM\":{\"off\":[],\"lp\":[]},\"BLSD\":{\"off\":[],\"lp\":[]},\"RD\":{\"off\":[],\"lp\":[]},\"PXL\":{\"off\":[],\"lp\":[]},\"BPR\":{\"off\":[],\"lp\":[]},\"TF\":{\"off\":[\"henryojlk\"],\"lp\":[]},\"BCL\":{\"off\":[],\"lp\":[]},\"FTL\":{\"off\":[],\"lp\":[]},\"SO9\":{\"off\":[],\"lp\":[]},\"GCR\":{\"off\":[\"QPMS\"],\"lp\":[]},\"WRLD\":{\"off\":[\"Winnie\"],\"lp\":[]},\"VEXX\":{\"off\":[\"KIMCHI\"],\"lp\":[]},\"NICE\":{\"off\":[\"RamBeau\"],\"lp\":[]},\"FXI\":{\"off\":[],\"lp\":[]},\"JDG\":{\"off\":[\"Talmadge\"],\"lp\":[]},\"DRK\":{\"off\":[],\"lp\":[]},\"PRES\":{\"off\":[\"Charmander\"],\"lp\":[]},\"HEAD\":{\"off\":[\"Zuni\"],\"lp\":[]},\"BB\":{\"off\":[],\"lp\":[]},\"VR\":{\"off\":[\"Hoplodamus\"],\"lp\":[]},\"SO\":{\"off\":[],\"lp\":[\"Brick\"]},\"SLG\":{\"off\":[],\"lp\":[]},\"FISH\":{\"off\":[],\"lp\":[]},\"URNM\":{\"off\":[\"MaliceMamba\"],\"lp\":[]},\"FREE\":{\"off\":[],\"lp\":[]},\"DKF\":{\"off\":[\"DROPPED\",\"Jxmo\"],\"lp\":[]}}"
 }

@@ -21,6 +21,165 @@
   "in": []
  },
  {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "SHIN",
+  "teamName": "Shinobi",
+  "region": "americas",
+  "out": [
+   "MikeJitsu",
+   "ImEurusk",
+   "khenzo"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "PRES",
+  "teamName": "W Press",
+  "region": "americas",
+  "out": [
+   "Charmander"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "FWG",
+  "teamName": "Forged Wolves",
+  "region": "americas",
+  "out": [
+   "Leafays"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "URNM",
+  "teamName": "Unreal Nightmare",
+  "region": "americas",
+  "out": [
+   "MaliceMamba"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "WRLD",
+  "teamName": "World Wide",
+  "region": "americas",
+  "out": [
+   "Winnie"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "GCR",
+  "teamName": "Glacier",
+  "region": "emea",
+  "out": [
+   "QPMS"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "TF",
+  "teamName": "Take Flyte",
+  "region": "emea",
+  "out": [
+   "henryojlk"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "BEN",
+  "teamName": "Ben",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "Zuni"
+  ]
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "4QUA",
+  "teamName": "4QuattroFormaggi",
+  "region": "apac-n",
+  "out": [
+   "RingoOisi7"
+  ],
+  "in": [
+   "Ria",
+   "Nekuru"
+  ]
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "UFZ",
+  "teamName": "UNFAZED",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "NIRU"
+  ]
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "ALT",
+  "teamName": "ALTERNATIVE",
+  "region": "apac-n",
+  "out": [
+   "Mosh"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "FNC",
+  "teamName": "FNATIC",
+  "region": "apac-n",
+  "out": [
+   "kisekiduck"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "RRX",
+  "teamName": "RRX",
+  "region": "apac-n",
+  "out": [
+   "Mitarashi"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-08T00:00:00+09:00",
+  "kind": "manual",
+  "team": "RID0",
+  "teamName": "RIDDLEORDER ZERO",
+  "region": "apac-n",
+  "out": [
+   "Assii"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-07T10:04:57.785Z",
   "kind": "auto",
   "team": "TIE",
@@ -38,6 +197,17 @@
   "region": "emea",
   "was": "Throuple",
   "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-06T00:00:00+09:00",
+  "kind": "manual",
+  "team": "MIH",
+  "teamName": "Made In Heaven",
+  "region": "emea",
+  "out": [
+   "Pandaz809"
+  ],
   "in": []
  },
  {
@@ -247,6 +417,32 @@
   "in": []
  },
  {
+  "at": "2026-11-04T00:00:00+09:00",
+  "kind": "manual",
+  "team": "VEXX",
+  "teamName": "VexX Gaming",
+  "region": "americas",
+  "out": [
+   "KIMCHI",
+   "Unruly"
+  ],
+  "in": [
+   "jugga",
+   "sh00k"
+  ]
+ },
+ {
+  "at": "2026-11-03T00:00:00+09:00",
+  "kind": "manual",
+  "team": "XECT",
+  "teamName": "XECT",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "Mqty"
+  ]
+ },
+ {
   "at": "2026-11-03T00:00:00+09:00",
   "kind": "manual",
   "team": "ALT",
@@ -271,5 +467,175 @@
   "in": [
    "CHROM"
   ]
+ },
+ {
+  "at": "2026-10-29T00:00:00+09:00",
+  "kind": "manual",
+  "team": "O2",
+  "teamName": "O2esports",
+  "region": "apac-n",
+  "out": [
+   "ibayann"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-10-26T00:00:00+09:00",
+  "kind": "manual",
+  "team": "TEC",
+  "teamName": "TitanEsportsClub",
+  "region": "apac-s",
+  "out": [
+   "Arm"
+  ],
+  "in": [
+   "Killoposz"
+  ]
+ },
+ {
+  "at": "2026-10-26T00:00:00+09:00",
+  "kind": "manual",
+  "team": "DOG",
+  "teamName": "Dogred",
+  "region": "apac-s",
+  "out": [
+   "Killoposz",
+   "yanlys"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-10-23T00:00:00+09:00",
+  "kind": "manual",
+  "team": "MIH",
+  "teamName": "Made In Heaven",
+  "region": "emea",
+  "out": [
+   "Yanzz"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-10-19T00:00:00+09:00",
+  "kind": "manual",
+  "team": "TLNP",
+  "teamName": "TLN PIRATES",
+  "region": "emea",
+  "out": [
+   "Hiarka",
+   "Esteves33"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-10-03T00:00:00+09:00",
+  "kind": "manual",
+  "team": "RON",
+  "teamName": "Ronin",
+  "region": "emea",
+  "out": [
+   "arctic",
+   "ChaoticMuch"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-09-29T00:00:00+09:00",
+  "kind": "manual",
+  "team": "FCN",
+  "teamName": "FCN YAMABUN",
+  "region": "apac-n",
+  "out": [
+   "Duckz"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-09-21T00:00:00+09:00",
+  "kind": "manual",
+  "team": "VR",
+  "teamName": "EBOYS",
+  "region": "americas",
+  "out": [
+   "Hoplodamus"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-09-17T00:00:00+09:00",
+  "kind": "manual",
+  "team": "VOID",
+  "teamName": "Void Esports OCE",
+  "region": "apac-s",
+  "out": [
+   "Swarkst3r"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-09-09T00:00:00+09:00",
+  "kind": "manual",
+  "team": "HEAD",
+  "teamName": "Headglytch",
+  "region": "americas",
+  "out": [
+   "Zuni"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-09-02T00:00:00+09:00",
+  "kind": "manual",
+  "team": "NE",
+  "teamName": "noEND",
+  "region": "apac-n",
+  "out": [
+   "c4lmerq"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-08-06T00:00:00+09:00",
+  "kind": "manual",
+  "team": "NICE",
+  "teamName": "Nice Guys",
+  "region": "americas",
+  "out": [
+   "RamBeau"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-07-11T00:00:00+09:00",
+  "kind": "manual",
+  "team": "VKG",
+  "teamName": "VK GAMING",
+  "region": "apac-s",
+  "out": [
+   "Lqdud"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-05-30T00:00:00+09:00",
+  "kind": "manual",
+  "team": "GT",
+  "teamName": "GoaT",
+  "region": "apac-s",
+  "out": [
+   "CAIGOU"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-01-18T00:00:00+09:00",
+  "kind": "manual",
+  "team": "SWQ",
+  "teamName": "SaWeiQi",
+  "region": "apac-s",
+  "out": [
+   "Moku"
+  ],
+  "in": []
  }
 ]

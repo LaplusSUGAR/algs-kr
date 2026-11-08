@@ -6,8 +6,23 @@
 | --- | --- | --- | --- | --- | --- |
 | 2026-11-08 20:31 | 2부 팀 명단 변경 | Americas | SZN | Clane | Pandxrz |
 | 2026-11-08 20:31 | 2부 팀 이름 변경 | APAC North | VAMOS |  | 구 Team Tomodachi |
+| 2026-11-08 00:00 | 수동 반영 (config) | Americas | SHIN (Shinobi) | MikeJitsu, ImEurusk, khenzo |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | Americas | PRES (W Press) | Charmander |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | Americas | FWG (Forged Wolves) | Leafays |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | Americas | URNM (Unreal Nightmare) | MaliceMamba |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | Americas | WRLD (World Wide) | Winnie |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | EMEA | GCR (Glacier) | QPMS |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | EMEA | TF (Take Flyte) | henryojlk |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | EMEA | BEN (Ben) |  | Zuni |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | 4QUA (4QuattroFormaggi) | RingoOisi7 | Ria, Nekuru |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | UFZ (UNFAZED) |  | NIRU |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | ALT (ALTERNATIVE) | Mosh |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | FNC (FNATIC) | kisekiduck |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | RRX | Mitarashi |  |
+| 2026-11-08 00:00 | 수동 반영 (config) | APAC North | RID0 (RIDDLEORDER ZERO) | Assii |  |
 | 2026-11-07 19:04 | 자동 반영 (Liquipedia) | APAC North | TIE |  | hikuman |
 | 2026-11-06 22:01 | 2부 팀 이름 변경 | EMEA | OnChikken |  | 구 Throuple |
+| 2026-11-06 00:00 | 수동 반영 (config) | EMEA | MIH (Made In Heaven) | Pandaz809 |  |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | WGR (WhiteGrimReaper) | Re9zq |  |
 | 2026-11-06 00:00 | 수동 반영 (config) | APAC North | TIE | Ftyan |  |
 | 2026-11-05 22:04 | 2부 팀 이름 변경 | Americas | chronic |  | 구 missionary |
@@ -28,8 +43,25 @@
 | 2026-11-04 20:50 | 자동 반영 (Liquipedia) | APAC South | OTS (Outside) | aflow |  |
 | 2026-11-04 20:50 | 자동 반영 (Liquipedia) | APAC North | ALT (ALTERNATIVE) |  | EIN |
 | 2026-11-04 20:50 | 자동 반영 (Liquipedia) | APAC North | FNC (FNATIC) | EIN |  |
+| 2026-11-04 00:00 | 수동 반영 (config) | Americas | VEXX (VexX Gaming) | KIMCHI, Unruly | jugga, sh00k |
+| 2026-11-03 00:00 | 수동 반영 (config) | APAC North | XECT |  | Mqty |
 | 2026-11-03 00:00 | 수동 반영 (config) | APAC North | ALT (ALTERNATIVE) | Lible Ace | EIN |
 | 2026-11-03 00:00 | 수동 반영 (config) | APAC North | FNC (FNATIC) | EIN | CHROM |
+| 2026-10-29 00:00 | 수동 반영 (config) | APAC North | O2 (O2esports) | ibayann |  |
+| 2026-10-26 00:00 | 수동 반영 (config) | APAC South | TEC (TitanEsportsClub) | Arm | Killoposz |
+| 2026-10-26 00:00 | 수동 반영 (config) | APAC South | DOG (Dogred) | Killoposz, yanlys |  |
+| 2026-10-23 00:00 | 수동 반영 (config) | EMEA | MIH (Made In Heaven) | Yanzz |  |
+| 2026-10-19 00:00 | 수동 반영 (config) | EMEA | TLNP (TLN PIRATES) | Hiarka, Esteves33 |  |
+| 2026-10-03 00:00 | 수동 반영 (config) | EMEA | RON (Ronin) | arctic, ChaoticMuch |  |
+| 2026-09-29 00:00 | 수동 반영 (config) | APAC North | FCN (FCN YAMABUN) | Duckz |  |
+| 2026-09-21 00:00 | 수동 반영 (config) | Americas | VR (EBOYS) | Hoplodamus |  |
+| 2026-09-17 00:00 | 수동 반영 (config) | APAC South | VOID (Void Esports OCE) | Swarkst3r |  |
+| 2026-09-09 00:00 | 수동 반영 (config) | Americas | HEAD (Headglytch) | Zuni |  |
+| 2026-09-02 00:00 | 수동 반영 (config) | APAC North | NE (noEND) | c4lmerq |  |
+| 2026-08-06 00:00 | 수동 반영 (config) | Americas | NICE (Nice Guys) | RamBeau |  |
+| 2026-07-11 00:00 | 수동 반영 (config) | APAC South | VKG (VK GAMING) | Lqdud |  |
+| 2026-05-30 00:00 | 수동 반영 (config) | APAC South | GT (GoaT) | CAIGOU |  |
+| 2026-01-18 00:00 | 수동 반영 (config) | APAC South | SWQ (SaWeiQi) | Moku |  |
 
 ## 확인용: 처음부터 달랐던 명단 (자동 반영하지 않음)
 
