@@ -1,5 +1,16 @@
 [
  {
+  "at": "2026-11-08T15:03:15.925Z",
+  "kind": "auto",
+  "team": "HABN",
+  "teamName": "HABNW",
+  "region": "apac-s",
+  "out": [
+   "Nonameguy"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-08T11:31:42.308Z",
   "kind": "cc",
   "team": "SZN",
