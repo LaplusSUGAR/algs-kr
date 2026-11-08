@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-05T03:56:59.479Z",
+  "at": "2026-11-08T11:31:35.695Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1441,7 +1441,7 @@
       "key": "cc:cuticle",
       "name": "Cuticle",
       "region": "apac-n",
-      "src": null,
+      "src": "lp",
       "lp": {
         "name": "Cuticle",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: 7ne, Gqzeln, Milim)"
@@ -2191,7 +2191,7 @@
       "key": "cc:burgerboys",
       "name": "Burger Boys",
       "region": "emea",
-      "src": null,
+      "src": "lp",
       "lp": {
         "name": "Burger Boys",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Fabupapu, Alfnzy, Hamish)"
@@ -2544,7 +2544,7 @@
       "src": null,
       "lp": {
         "name": "AsianBanger",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: 0zreign, Collin, Asianaimer0)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: 0zreign, Asianaimer0, Collin)"
       }
     },
     {
@@ -2554,7 +2554,7 @@
       "src": null,
       "lp": {
         "name": "PawSocksUnited",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Immu, Vodery, Moonp0rtals)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moonp0rtals, Immu, Vodery)"
       }
     },
     {
@@ -2574,7 +2574,7 @@
       "src": "lp",
       "lp": {
         "name": "Lics",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: MAC, TayluSs, Kriss)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kriss, MAC, TayluSs)"
       }
     },
     {
@@ -2584,7 +2584,7 @@
       "src": null,
       "lp": {
         "name": "ZQ7",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Zillach, PANIC, Wiz)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: PANIC, Zillach, Wiz)"
       }
     },
     {
@@ -2594,7 +2594,7 @@
       "src": null,
       "lp": {
         "name": "Tired",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Aeo, UMI, MJ)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: MJ, UMI, Aeo)"
       }
     },
     {
@@ -2604,7 +2604,7 @@
       "src": null,
       "lp": {
         "name": "Connections",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Hun7smann, Wave, Kenny)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wave, Kenny, Hun7smann)"
       }
     },
     {
@@ -2634,7 +2634,7 @@
       "src": null,
       "lp": {
         "name": "Happy Birthday",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: P1tchey, Syenth, Ezuom)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Syenth, Ezuom, P1tchey)"
       }
     },
     {
@@ -2654,7 +2654,7 @@
       "src": "lp",
       "lp": {
         "name": "Legion Gaming",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Teddy_(Canadian_player), Wishh3, Crizik)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wishh3, Crizik, Teddy_(Canadian_player))"
       }
     },
     {
@@ -2664,7 +2664,17 @@
       "src": null,
       "lp": {
         "name": "Full Send",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: MessiaH, Lauder, IsWxGsI)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: MessiaH, IsWxGsI, Lauder)"
+      }
+    },
+    {
+      "key": "cc:thecooks",
+      "name": "The Cooks",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "The Cooks",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Iklipsa, Xetiq, Choppt)"
       }
     },
     {
@@ -2684,7 +2694,7 @@
       "src": null,
       "lp": {
         "name": "sequence",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Pucaa, THaless, Reviriem)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: THaless, Pucaa, Reviriem)"
       }
     },
     {
@@ -2704,7 +2714,17 @@
       "src": null,
       "lp": {
         "name": "DURAGS",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Milez, Bofer, Eeth)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Eeth, Milez, Bofer)"
+      }
+    },
+    {
+      "key": "cc:zestfest",
+      "name": "Zest Fest",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Zest Fest",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Snipzylol, Aveckii, Eslopes)"
       }
     },
     {
@@ -2714,17 +2734,7 @@
       "src": null,
       "lp": {
         "name": "Grace",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Errorist, QuietApex, Meltdown)"
-      }
-    },
-    {
-      "key": "cc:thecooks",
-      "name": "The Cooks",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "The Cooks",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Choppt, Iklipsa, Xetiq)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: QuietApex, Errorist, Meltdown)"
       }
     },
     {
@@ -2744,17 +2754,7 @@
       "src": null,
       "lp": {
         "name": "Running Late",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Double0negative, MelonGoddess, KindlyMonkey)"
-      }
-    },
-    {
-      "key": "cc:zestfest",
-      "name": "Zest Fest",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Zest Fest",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Snipzylol, Eslopes, Aveckii)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: KindlyMonkey, Double0negative, MelonGoddess)"
       }
     },
     {
@@ -2774,7 +2774,7 @@
       "src": null,
       "lp": {
         "name": "TVT",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Vaqki, Tysahh, AyoTulii)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Tysahh, AyoTulii, Vaqki)"
       }
     },
     {
@@ -2784,7 +2784,7 @@
       "src": null,
       "lp": {
         "name": "G G W P",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: YKeviN9, Tiz, Aqx_ntc)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Tiz, YKeviN9, Aqx_ntc)"
       }
     },
     {
@@ -2804,7 +2804,7 @@
       "src": "lp",
       "lp": {
         "name": "SZN",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: ProdigyAces, MfBonBon, Clane)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: ProdigyAces, MfBonBon, Pandxrz)"
       }
     },
     {
@@ -2814,7 +2814,7 @@
       "src": null,
       "lp": {
         "name": "Section8",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: TURBULENCE, Drizzyapex, Section8richh)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Drizzyapex, Section8richh, TURBULENCE)"
       }
     },
     {
@@ -2824,7 +2824,7 @@
       "src": null,
       "lp": {
         "name": "Straight Geeked",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Squirrel, Deadlysoos, PlayLr)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Deadlysoos, Squirrel, PlayLr)"
       }
     },
     {
@@ -2844,7 +2844,7 @@
       "src": null,
       "lp": {
         "name": "placeHolder",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: XXxArchAngelz, Scythey, TheGr33nB3an)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Scythey, XXxArchAngelz, TheGr33nB3an)"
       }
     },
     {
@@ -2854,7 +2854,7 @@
       "src": null,
       "lp": {
         "name": "Womp Womp",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Dom2Cracked, Vaspy, Pep2)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Dom2Cracked, Pep2, Vaspy)"
       }
     },
     {
@@ -2864,7 +2864,7 @@
       "src": null,
       "lp": {
         "name": "Breakout",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Adondee, YCuzzo, Fikkax)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Fikkax, Adondee, YCuzzo)"
       }
     },
     {
@@ -2884,7 +2884,7 @@
       "src": "lp",
       "lp": {
         "name": "Gamblers",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Yuhaaviatam, Osivien, Adiuvant)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Adiuvant, Yuhaaviatam, Osivien)"
       }
     },
     {
@@ -2904,7 +2904,7 @@
       "src": null,
       "lp": {
         "name": "Thugshvke",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Foewastaken, BexiK, Wvke)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wvke, BexiK, Foewastaken)"
       }
     },
     {
@@ -2924,7 +2924,7 @@
       "src": null,
       "lp": {
         "name": "Reborn",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Suhfrs, CrusaderRonnoc, Verrahh)"
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: CrusaderRonnoc, Suhfrs, Verrahh)"
       }
     },
     {

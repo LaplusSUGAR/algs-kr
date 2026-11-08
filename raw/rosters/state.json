@@ -2602,13 +2602,13 @@
    "Snipzylol"
   ],
   "americas:tvt": [
-   "Vaqki",
    "Tysahh",
-   "AyoTulii"
+   "AyoTulii",
+   "Vaqki"
   ],
   "americas:ggwp": [
-   "YKeviN9",
    "Tiz",
+   "YKeviN9",
    "Aqx_ntc"
   ],
   "americas:redeem": [
@@ -2619,12 +2619,12 @@
   "americas:szn": [
    "ProdigyAces",
    "MfBonBon",
-   "Clane"
+   "Pandxrz"
   ],
   "americas:section8": [
-   "TURBULENCE",
    "Drizzyapex",
-   "Section8richh"
+   "Section8richh",
+   "TURBULENCE"
   ],
   "americas:straightgeeked": [
    "Deadlysoos",
@@ -2637,19 +2637,19 @@
    "NotJovas"
   ],
   "americas:placeholder": [
-   "XXxArchAngelz",
    "Scythey",
+   "XXxArchAngelz",
    "TheGr33nB3an"
   ],
   "americas:wompwomp": [
    "Dom2Cracked",
-   "Vaspy",
-   "Pep2"
+   "Pep2",
+   "Vaspy"
   ],
   "americas:breakout": [
+   "Fikkax",
    "Adondee",
-   "YCuzzo",
-   "Fikkax"
+   "YCuzzo"
   ]
  },
  "renames": {
@@ -2657,7 +2657,8 @@
   "apac-n:jyashin": "REGAL RISE JYASHIN",
   "apac-n:02demonslayers": "NovaCroatia",
   "americas:missionary": "chronic",
-  "emea:throuple": "OnChikken"
+  "emea:throuple": "OnChikken",
+  "apac-n:teamtomodachi": "VAMOS"
  },
  "manual": [
   "FNC|EIN|CHROM",

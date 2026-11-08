@@ -1,5 +1,26 @@
 [
  {
+  "at": "2026-11-08T11:31:42.308Z",
+  "kind": "cc",
+  "team": "SZN",
+  "region": "americas",
+  "out": [
+   "Clane"
+  ],
+  "in": [
+   "Pandxrz"
+  ]
+ },
+ {
+  "at": "2026-11-08T11:31:42.308Z",
+  "kind": "rename",
+  "team": "VAMOS",
+  "region": "apac-n",
+  "was": "Team Tomodachi",
+  "out": [],
+  "in": []
+ },
+ {
   "at": "2026-11-07T10:04:57.785Z",
   "kind": "auto",
   "team": "TIE",
