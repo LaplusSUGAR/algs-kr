@@ -53,7 +53,8 @@
 
 ## 확인 필요 (바꾸지 않음)
 
-- **팀 페이지는 이탈, LCQ 명단은 아직 주전**: MTR Maron (09-16 RIDDLE로), ALX Razi·R33P3S (09-30, spades는 CPR로 자동 반영됨).
+- **팀 페이지는 이탈, LCQ 명단은 아직 주전**: ALX Razi·R33P3S (09-30, spades는 CPR로 자동 반영됨).
+- **11-09 추가**: MTR Maron 이탈, Lible Ace 합류 (Meteor 공식 X 발표, 11-09 18:00 KST). Lible Ace의 CP 38은 Meteor 팀 CP로 옮겨 계산.
 - **팀 이름**: URNM(Unreal Nightmare) 로스터가 10-17 Flat으로 옮겼고 LCQ 명단도 Flat. 공식 이름은 아직 Unreal Nightmare.
 - **LCQ에만 근거가 있는 차이** (팀 페이지 없음): D4C Faenex, RDG Salvatorez, UBI Aviisan, 3MEN tyhr, DKF DROPPED·Jxmo, TECA KBBLANK(서브 Wang) — 공식 값 유지.
 - **LCQ에만 있는 추가 선수**: SO Brick(4번째 주전). 서브 RLZ inkya, NE kota, TEC Honeypie는 넣지 않음(자동 반영 규칙과 같음).
