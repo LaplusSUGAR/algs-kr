@@ -1,5 +1,189 @@
 [
  {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "rename",
+  "team": "SLG APAC S",
+  "region": "apac-s",
+  "was": "High Kill Ratio",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto-end",
+  "team": "VOID",
+  "teamName": "Void Esports OCE",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "aflow"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto-end",
+  "team": "OTS",
+  "teamName": "Outside",
+  "region": "apac-s",
+  "out": [
+   "aflow"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto-end",
+  "team": "CPR",
+  "teamName": "CPR",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "spades"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto-end",
+  "team": "ALT",
+  "teamName": "ALTERNATIVE",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "EIN"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "SO",
+  "teamName": "Sesame oil",
+  "region": "americas",
+  "out": [
+   "PlutoReality"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "ARAM",
+  "teamName": "ARAM",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "refra1nnn"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "SWQ",
+  "teamName": "SaWeiQi",
+  "region": "apac-s",
+  "out": [
+   "refra1nnn"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "VOID",
+  "teamName": "Void Esports OCE",
+  "region": "apac-s",
+  "out": [
+   "Swarkst3r"
+  ],
+  "in": [
+   "aflow"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "OTS",
+  "teamName": "Outside",
+  "region": "apac-s",
+  "out": [
+   "aflow"
+  ],
+  "in": [
+   "Arm"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "TEC",
+  "teamName": "TitanEsportsClub",
+  "region": "apac-s",
+  "out": [
+   "Arm"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "CPR",
+  "teamName": "CPR",
+  "region": "apac-s",
+  "out": [
+   "crumbs"
+  ],
+  "in": [
+   "spades"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "4QUA",
+  "teamName": "4QuattroFormaggi",
+  "region": "apac-n",
+  "out": [
+   "Xexarzv"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "MTR",
+  "teamName": "Meteor",
+  "region": "apac-n",
+  "out": [
+   "Maron"
+  ],
+  "in": [
+   "Lible Ace"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "ALT",
+  "teamName": "ALTERNATIVE",
+  "region": "apac-n",
+  "out": [
+   "Lible Ace"
+  ],
+  "in": [
+   "EIN"
+  ]
+ },
+ {
+  "at": "2026-11-09T11:01:49.100Z",
+  "kind": "auto",
+  "team": "SBI",
+  "teamName": "SBI eSports",
+  "region": "apac-n",
+  "out": [
+   "shoh"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-09T00:00:00+09:00",
   "kind": "manual",
   "team": "MTR",

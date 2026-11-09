@@ -4,6 +4,22 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-09 20:01 | 2부 팀 이름 변경 | APAC South | SLG APAC S |  | 구 High Kill Ratio |
+| 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | VOID (Void Esports OCE) |  | aflow |
+| 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | OTS (Outside) | aflow |  |
+| 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | CPR |  | spades |
+| 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC North | ALT (ALTERNATIVE) |  | EIN |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | Americas | SO (Sesame oil) | PlutoReality |  |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | ARAM |  | refra1nnn |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | SWQ (SaWeiQi) | refra1nnn |  |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | VOID (Void Esports OCE) | Swarkst3r | aflow |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | OTS (Outside) | aflow | Arm |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | TEC (TitanEsportsClub) | Arm |  |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC South | CPR | crumbs | spades |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC North | 4QUA (4QuattroFormaggi) | Xexarzv |  |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC North | MTR (Meteor) | Maron | Lible Ace |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC North | ALT (ALTERNATIVE) | Lible Ace | EIN |
+| 2026-11-09 20:01 | 자동 반영 (Liquipedia) | APAC North | SBI (SBI eSports) | shoh |  |
 | 2026-11-09 00:00 | 수동 반영 (config) | APAC North | MTR (Meteor) | Maron | Lible Ace |
 | 2026-11-09 00:03 | 자동 반영 (Liquipedia) | APAC South | HABN (HABNW) | Nonameguy |  |
 | 2026-11-08 20:31 | 2부 팀 명단 변경 | Americas | SZN | Clane | Pandxrz |

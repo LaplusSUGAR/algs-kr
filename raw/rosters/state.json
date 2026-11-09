@@ -1932,6 +1932,34 @@
    "since": "2026-11-07T10:04:57.785Z"
   },
   {
+   "team": "SBI",
+   "out": [
+    "shoh"
+   ],
+   "in": [],
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "ALT",
+   "out": [
+    "Lible Ace"
+   ],
+   "in": [
+    "EIN"
+   ],
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "MTR",
+   "out": [
+    "Maron"
+   ],
+   "in": [
+    "Lible Ace"
+   ],
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
    "team": "FNC",
    "out": [
     "EIN"
@@ -1940,12 +1968,12 @@
    "since": "2026-11-04T11:50:24.877Z"
   },
   {
-   "team": "ALT",
-   "out": [],
-   "in": [
-    "EIN"
+   "team": "4QUA",
+   "out": [
+    "Xexarzv"
    ],
-   "since": "2026-11-04T11:50:24.877Z"
+   "in": [],
+   "since": "2026-11-09T11:01:49.100Z"
   },
   {
    "team": "ALX",
@@ -1957,11 +1985,31 @@
   },
   {
    "team": "CPR",
-   "out": [],
+   "out": [
+    "crumbs"
+   ],
    "in": [
     "spades"
    ],
-   "since": "2026-11-05T12:02:55.268Z"
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "TEC",
+   "out": [
+    "Arm"
+   ],
+   "in": [],
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "OTS",
+   "out": [
+    "aflow"
+   ],
+   "in": [
+    "Arm"
+   ],
+   "since": "2026-11-09T11:01:49.100Z"
   },
   {
    "team": "HABN",
@@ -1972,20 +2020,30 @@
    "since": "2026-11-08T15:03:15.925Z"
   },
   {
-   "team": "OTS",
-   "out": [
-    "aflow"
-   ],
-   "in": [],
-   "since": "2026-11-04T11:50:24.877Z"
-  },
-  {
    "team": "VOID",
-   "out": [],
+   "out": [
+    "Swarkst3r"
+   ],
    "in": [
     "aflow"
    ],
-   "since": "2026-11-04T11:50:24.877Z"
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "SWQ",
+   "out": [
+    "refra1nnn"
+   ],
+   "in": [],
+   "since": "2026-11-09T11:01:49.100Z"
+  },
+  {
+   "team": "ARAM",
+   "out": [],
+   "in": [
+    "refra1nnn"
+   ],
+   "since": "2026-11-09T11:01:49.100Z"
   },
   {
    "team": "FURY",
@@ -2018,6 +2076,14 @@
     "Nono"
    ],
    "since": "2026-11-04T11:50:24.877Z"
+  },
+  {
+   "team": "SO",
+   "out": [
+    "PlutoReality"
+   ],
+   "in": [],
+   "since": "2026-11-09T11:01:49.100Z"
   }
  ],
  "cc": {
@@ -2682,7 +2748,8 @@
   "apac-n:02demonslayers": "NovaCroatia",
   "americas:missionary": "chronic",
   "emea:throuple": "OnChikken",
-  "apac-n:teamtomodachi": "VAMOS"
+  "apac-n:teamtomodachi": "VAMOS",
+  "apac-s:highkillratio": "SLG APAC S"
  },
  "manual": [
   "FNC|EIN|CHROM",
