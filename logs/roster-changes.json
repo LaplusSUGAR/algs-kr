@@ -1,5 +1,18 @@
 [
  {
+  "at": "2026-11-09T00:00:00+09:00",
+  "kind": "manual",
+  "team": "MTR",
+  "teamName": "Meteor",
+  "region": "apac-n",
+  "out": [
+   "Maron"
+  ],
+  "in": [
+   "Lible Ace"
+  ]
+ },
+ {
   "at": "2026-11-08T15:03:15.925Z",
   "kind": "auto",
   "team": "HABN",
