@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-09 22:00 | 자동 반영 (Liquipedia) | APAC North | XECT | Onnelu | kanata |
 | 2026-11-09 20:01 | 2부 팀 이름 변경 | APAC South | SLG APAC S |  | 구 High Kill Ratio |
 | 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | VOID (Void Esports OCE) |  | aflow |
 | 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | OTS (Outside) | aflow |  |

@@ -1,5 +1,18 @@
 [
  {
+  "at": "2026-11-09T13:00:24.112Z",
+  "kind": "auto",
+  "team": "XECT",
+  "teamName": "XECT",
+  "region": "apac-n",
+  "out": [
+   "Onnelu"
+  ],
+  "in": [
+   "kanata"
+  ]
+ },
+ {
   "at": "2026-11-09T11:01:49.100Z",
   "kind": "rename",
   "team": "SLG APAC S",
