@@ -1,5 +1,152 @@
 [
  {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto-end",
+  "team": "SO",
+  "teamName": "Sesame oil",
+  "region": "americas",
+  "out": [
+   "PlutoReality"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto-end",
+  "team": "ECL",
+  "teamName": "TEAM ECLIPSE",
+  "region": "emea",
+  "out": [
+   "Mysi"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "SO",
+  "teamName": "Sesame oil",
+  "region": "americas",
+  "out": [
+   "PlutoReality"
+  ],
+  "in": [
+   "Rileymekinac"
+  ]
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "HEAD",
+  "teamName": "Headglytch",
+  "region": "americas",
+  "out": [
+   "Rileymekinac"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "BB",
+  "teamName": "Buckle Boys",
+  "region": "americas",
+  "out": [
+   "ssirsay"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "JDG",
+  "teamName": "JD GAMING",
+  "region": "americas",
+  "out": [
+   "Keon",
+   "gent"
+  ],
+  "in": [
+   "Floating",
+   "Fuhhnq"
+  ]
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "DKF",
+  "teamName": "DKF",
+  "region": "americas",
+  "out": [
+   "Floating"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "SO9",
+  "teamName": "Shadows Of Nine",
+  "region": "emea",
+  "out": [
+   "Grzybek",
+   "rondonstreams",
+   "Zeeko"
+  ],
+  "in": [
+   "bobo4781",
+   "vexaims"
+  ]
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "BPR",
+  "teamName": "BPR",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "King Viktor"
+  ]
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "DN",
+  "teamName": "DN",
+  "region": "emea",
+  "out": [
+   "Ju1cy_o"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "ECL",
+  "teamName": "TEAM ECLIPSE",
+  "region": "emea",
+  "out": [
+   "Mysi"
+  ],
+  "in": [
+   "Yanzz"
+  ]
+ },
+ {
+  "at": "2026-11-10T15:01:02.494Z",
+  "kind": "auto",
+  "team": "MIH",
+  "teamName": "Made In Heaven",
+  "region": "emea",
+  "out": [
+   "Yanzz"
+  ],
+  "in": [
+   "Bzbblegum"
+  ]
+ },
+ {
   "at": "2026-11-10T14:04:08.857Z",
   "kind": "auto",
   "team": "RIG",

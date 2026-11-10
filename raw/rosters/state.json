@@ -2097,12 +2097,24 @@
    "since": "2026-11-05T12:02:55.268Z"
   },
   {
+   "team": "MIH",
+   "out": [
+    "Yanzz"
+   ],
+   "in": [
+    "Bzbblegum"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
    "team": "ECL",
    "out": [
     "Mysi"
    ],
-   "in": [],
-   "since": "2026-11-05T12:02:55.268Z"
+   "in": [
+    "Yanzz"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
   },
   {
    "team": "PF2",
@@ -2125,12 +2137,79 @@
    "since": "2026-11-10T04:00:36.827Z"
   },
   {
+   "team": "DN",
+   "out": [
+    "Ju1cy_o"
+   ],
+   "in": [],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "BPR",
+   "out": [],
+   "in": [
+    "King Viktor"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "SO9",
+   "out": [
+    "Grzybek",
+    "rondonstreams",
+    "Zeeko"
+   ],
+   "in": [
+    "bobo4781",
+    "vexaims"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "DKF",
+   "out": [
+    "Floating"
+   ],
+   "in": [],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "JDG",
+   "out": [
+    "Keon",
+    "gent"
+   ],
+   "in": [
+    "Floating",
+    "Fuhhnq"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "BB",
+   "out": [
+    "ssirsay"
+   ],
+   "in": [],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
+   "team": "HEAD",
+   "out": [
+    "Rileymekinac"
+   ],
+   "in": [],
+   "since": "2026-11-10T15:01:02.494Z"
+  },
+  {
    "team": "SO",
    "out": [
     "PlutoReality"
    ],
-   "in": [],
-   "since": "2026-11-09T11:01:49.100Z"
+   "in": [
+    "Rileymekinac"
+   ],
+   "since": "2026-11-10T15:01:02.494Z"
   }
  ],
  "cc": {
