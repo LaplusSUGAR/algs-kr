@@ -1,5 +1,14 @@
 [
  {
+  "at": "2026-11-10T15:26:43.848Z",
+  "kind": "manual-end",
+  "team": "GT",
+  "out": [
+   "CAIGOU"
+  ],
+  "in": []
+ },
+ {
   "at": "2026-11-10T15:01:02.494Z",
   "kind": "auto-end",
   "team": "SO",
@@ -1049,6 +1058,17 @@
   "region": "apac-s",
   "out": [
    "Lqdud"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-05-30T00:00:00+09:00",
+  "kind": "manual",
+  "team": "DF",
+  "teamName": "DreamFire",
+  "region": "apac-s",
+  "out": [
+   "CAIGOU"
   ],
   "in": []
  },

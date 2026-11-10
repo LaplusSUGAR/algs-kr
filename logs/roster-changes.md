@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-11 00:26 | 수동 반영 삭제 |  | GT | CAIGOU |  |
 | 2026-11-11 00:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | Americas | SO (Sesame oil) | PlutoReality |  |
 | 2026-11-11 00:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | EMEA | ECL (TEAM ECLIPSE) | Mysi |  |
 | 2026-11-11 00:01 | 자동 반영 (Liquipedia) | Americas | SO (Sesame oil) | PlutoReality | Rileymekinac |
@@ -97,6 +98,7 @@
 | 2026-09-02 00:00 | 수동 반영 (config) | APAC North | NE (noEND) | c4lmerq |  |
 | 2026-08-06 00:00 | 수동 반영 (config) | Americas | NICE (Nice Guys) | RamBeau |  |
 | 2026-07-11 00:00 | 수동 반영 (config) | APAC South | VKG (VK GAMING) | Lqdud |  |
+| 2026-05-30 00:00 | 수동 반영 (config) | APAC South | DF (DreamFire) | CAIGOU |  |
 | 2026-05-30 00:00 | 수동 반영 (config) | APAC South | GT (GoaT) | CAIGOU |  |
 | 2026-01-18 00:00 | 수동 반영 (config) | APAC South | SWQ (SaWeiQi) | Moku |  |
 
