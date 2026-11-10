@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-10T04:00:30.438Z",
+  "at": "2026-11-10T18:08:07.780Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -357,17 +357,6 @@
       }
     },
     {
-      "key": "id:01KHPREW40F3JGV2MKBYXYW5RK",
-      "short": "MIH",
-      "name": "Made In Heaven",
-      "region": "emea",
-      "src": "lp",
-      "lp": {
-        "name": "Made In Heaven",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
       "key": "id:01KME84B9DFWTQWPTCTEXRHSD0",
       "short": "WAR",
       "name": "Team WaR",
@@ -399,6 +388,17 @@
         "why": "이름은 같지만 선수가 겹치지 않음",
         "name": "Titan Esports Club",
         "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KHPREW40F3JGV2MKBYXYW5RK",
+      "short": "MIH",
+      "name": "Made In Heaven",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Made In Heaven",
+        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
@@ -436,14 +436,13 @@
     },
     {
       "key": "id:01KHPREZ4208EN3K1VJB0G8S6N",
-      "short": "7VEN",
-      "name": "7VEN",
+      "short": "DLS",
+      "name": "Daylight Savings",
       "region": "apac-s",
       "src": "official",
       "lp": {
-        "why": "선수 2명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "Daylight Savings",
-        "overlap": 2
+        "by": "이름 같음 · 선수 2명 겹침"
       }
     },
     {
@@ -525,6 +524,17 @@
       }
     },
     {
+      "key": "id:01KHPREZ17WVRXCCZD256CRP5C",
+      "short": "ECL",
+      "name": "TEAM ECLIPSE",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Team Eclipse",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
       "key": "id:01KHPREY6S6581HS9ZDSYXQJ31",
       "short": "KRS",
       "name": "Kirisame",
@@ -592,17 +602,6 @@
       }
     },
     {
-      "key": "id:01KHPREXNNT22QYHC28MBPEAT8",
-      "short": "RIG",
-      "name": "REIGNITE",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "REIGNITE",
-        "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
       "key": "id:01KTSJN9FCV6Q57S7410RHJC1Z",
       "short": "NE",
       "name": "noEND",
@@ -636,17 +635,6 @@
       }
     },
     {
-      "key": "id:01KHPREZ17WVRXCCZD256CRP5C",
-      "short": "ECL",
-      "name": "TEAM ECLIPSE",
-      "region": "emea",
-      "src": "official",
-      "lp": {
-        "name": "Team Eclipse",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREYF197FBMPQBY0AKNF59",
       "short": "OTS",
       "name": "Outside",
@@ -656,6 +644,17 @@
         "why": "선수 4명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "Comeback",
         "overlap": 4
+      }
+    },
+    {
+      "key": "id:01KHPREXNNT22QYHC28MBPEAT8",
+      "short": "RIG",
+      "name": "REIGNITE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "REIGNITE",
+        "by": "이름 같음 · 선수 2명 겹침"
       }
     },
     {
@@ -751,13 +750,14 @@
     },
     {
       "key": "id:01KTSJN9E6HENNGMP9TC1HV5AA",
-      "short": "O2",
-      "name": "O2esports",
+      "short": "SLP",
+      "name": "SLEEPY",
       "region": "apac-n",
-      "src": "lp",
+      "src": "official",
       "lp": {
+        "why": "선수 2명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "O2 esports",
-        "by": "이름 같음 · 선수 2명 겹침"
+        "overlap": 2
       }
     },
     {
@@ -780,17 +780,6 @@
       "lp": {
         "name": "FENNEL",
         "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREXZXP4CYR54DGSY5VW4Q",
-      "short": "MTR",
-      "name": "Meteor",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "Meteor",
-        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -880,17 +869,6 @@
       "lp": {
         "name": "TuBoShu",
         "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREY171TGAJBD2NNB8SVFY",
-      "short": "ALT",
-      "name": "ALTERNATIVE",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "Alternative Gaming",
-        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1004,6 +982,17 @@
       }
     },
     {
+      "key": "id:01KHPREXZXP4CYR54DGSY5VW4Q",
+      "short": "MTR",
+      "name": "Meteor",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Meteor",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
       "key": "id:01KME2AHCFT4C53BNA6E2Z9FD6",
       "short": "ARAM",
       "name": "ARAM",
@@ -1034,17 +1023,6 @@
       "lp": {
         "name": "Pixel Lumina",
         "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
-      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
-      "short": "HEAD",
-      "name": "Headglytch",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Headglytch",
-        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1082,6 +1060,17 @@
       }
     },
     {
+      "key": "id:01KHPREY171TGAJBD2NNB8SVFY",
+      "short": "ALT",
+      "name": "ALTERNATIVE",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Alternative Gaming",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
       "key": "id:01KHPREY2Q30PNMWXNRJF2KSSZ",
       "short": "FNC",
       "name": "FNATIC",
@@ -1089,17 +1078,6 @@
       "src": "lp",
       "lp": {
         "name": "Fnatic",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KTSJNA3H7NEGVZK3D60YX1PB",
-      "short": "XECT",
-      "name": "XECT",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "XECT",
         "by": "이름 같음 · 선수 3명 겹침"
       }
     },
@@ -1138,6 +1116,17 @@
       }
     },
     {
+      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
+      "short": "HEAD",
+      "name": "Headglytch",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Headglytch",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
       "key": "id:01KTSJN918EBK3C0ZF95Y79R47",
       "short": "PRES",
       "name": "W Press",
@@ -1146,6 +1135,17 @@
       "lp": {
         "name": "W PRESS",
         "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA3H7NEGVZK3D60YX1PB",
+      "short": "XECT",
+      "name": "XECT",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "XECT",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {

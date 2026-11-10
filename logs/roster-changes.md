@@ -128,7 +128,7 @@
 | FCN (FCN YAMABUN) | APAC North | chikochandao | Tico |
 | NE (noEND) | APAC North | c4lmerq | kota |
 | TEC (TitanEsportsClub) | APAC South | Arm | Honeypie |
-| 7VEN | APAC South | hannzi, W-L-A2 | Walking L |
+| 7VEN |  | hannzi, W-L-A2 | Walking L |
 | DOG (Dogred) | APAC South | yanlys |  |
 | BH (black hole) | APAC South | xxfps | XX |
 | KRS (Kirisame) | APAC South | xinhai |  |
@@ -164,3 +164,4 @@
 | HAB | APAC South | Nonameguy |  |
 | DF (DreamFire) | APAC South | thurston, AceGod | Sid0o, 3Mz |
 | PF2 (PlayFor2nd) | EMEA | Faenex, Nono, Feuda | Hiarka, Slab |
+| DLS (Daylight Savings) | APAC South | W-L-A2 | Walking L |
