@@ -1,5 +1,60 @@
 [
  {
+  "at": "2026-11-10T04:00:36.827Z",
+  "kind": "auto-end",
+  "team": "TLNP",
+  "teamName": "TLN PIRATES",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "Nono"
+  ]
+ },
+ {
+  "at": "2026-11-10T04:00:36.827Z",
+  "kind": "auto-end",
+  "team": "D4C",
+  "out": [
+   "Nono"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T04:00:36.827Z",
+  "kind": "auto-end",
+  "team": "HABN",
+  "out": [
+   "Nonameguy"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-10T04:00:36.827Z",
+  "kind": "auto",
+  "team": "TLNP",
+  "teamName": "TLN PIRATES",
+  "region": "emea",
+  "out": [
+   "Hiarka"
+  ],
+  "in": [
+   "Nono"
+  ]
+ },
+ {
+  "at": "2026-11-10T04:00:36.827Z",
+  "kind": "auto",
+  "team": "PF2",
+  "teamName": "PlayFor2nd",
+  "region": "emea",
+  "out": [
+   "Nono"
+  ],
+  "in": [
+   "Hiarka"
+  ]
+ },
+ {
   "at": "2026-11-09T13:00:24.112Z",
   "kind": "auto",
   "team": "XECT",

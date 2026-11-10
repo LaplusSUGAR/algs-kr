@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-08T11:31:35.695Z",
+  "at": "2026-11-10T04:00:30.438Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -357,18 +357,6 @@
       }
     },
     {
-      "key": "id:01KHPREYPK26VSEXTX14Y1H1GT",
-      "short": "DKF",
-      "name": "DKF",
-      "region": "americas",
-      "src": "official",
-      "lp": {
-        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
-        "name": "Geekay Esports",
-        "overlap": 3
-      }
-    },
-    {
       "key": "id:01KHPREW40F3JGV2MKBYXYW5RK",
       "short": "MIH",
       "name": "Made In Heaven",
@@ -481,6 +469,17 @@
       }
     },
     {
+      "key": "id:01KHPREX931TTBJDXH1AN6D121",
+      "short": "JDG",
+      "name": "JD GAMING",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "JD Gaming",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
       "key": "id:01KHPREXR9RN3TFMXM8PE4MRB7",
       "short": "RID1",
       "name": "RIDDLEORDER ONE",
@@ -492,14 +491,15 @@
       }
     },
     {
-      "key": "id:01KHPREWZZYVXJSJ489BJRNRR9",
-      "short": "TIE",
-      "name": "TIE",
-      "region": "apac-n",
-      "src": "lp",
+      "key": "id:01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+      "short": "VEXX",
+      "name": "VexX Gaming",
+      "region": "americas",
+      "src": "official",
       "lp": {
-        "name": "TIE",
-        "by": "이름 같음 · 선수 3명 겹침"
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "VexX Gaming",
+        "overlap": 0
       }
     },
     {
@@ -558,15 +558,14 @@
       }
     },
     {
-      "key": "id:01KHPREZCQZ8Z8DHDM6AR3ZT5N",
-      "short": "VEXX",
-      "name": "VexX Gaming",
-      "region": "americas",
-      "src": "official",
+      "key": "id:01KHPREWZZYVXJSJ489BJRNRR9",
+      "short": "TIE",
+      "name": "TIE",
+      "region": "apac-n",
+      "src": "lp",
       "lp": {
-        "why": "이름은 같지만 선수가 겹치지 않음",
-        "name": "VexX Gaming",
-        "overlap": 0
+        "name": "TIE",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -581,6 +580,18 @@
       }
     },
     {
+      "key": "id:01KHPREYPK26VSEXTX14Y1H1GT",
+      "short": "DKF",
+      "name": "DKF",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Geekay Esports",
+        "overlap": 3
+      }
+    },
+    {
       "key": "id:01KHPREXNNT22QYHC28MBPEAT8",
       "short": "RIG",
       "name": "REIGNITE",
@@ -592,17 +603,6 @@
       }
     },
     {
-      "key": "id:01KHPREVKC6EEY344B6ENY3GHM",
-      "short": "SWQ",
-      "name": "SaWeiQi",
-      "region": "apac-s",
-      "src": "lp",
-      "lp": {
-        "name": "DaBing SaWeiQi",
-        "by": "약자·같은 조직 이름 · 선수 2명 겹침"
-      }
-    },
-    {
       "key": "id:01KTSJN9FCV6Q57S7410RHJC1Z",
       "short": "NE",
       "name": "noEND",
@@ -611,6 +611,17 @@
       "lp": {
         "name": "noEND",
         "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREVKC6EEY344B6ENY3GHM",
+      "short": "SWQ",
+      "name": "SaWeiQi",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "DaBing SaWeiQi",
+        "by": "약자·같은 조직 이름 · 선수 2명 겹침"
       }
     },
     {
@@ -649,24 +660,26 @@
     },
     {
       "key": "id:01KHPREVYF1NA2MVWBPZDR7J23",
-      "short": "D4C",
-      "name": "D4C",
+      "short": "PF2",
+      "name": "PlayFor2nd",
       "region": "emea",
       "src": "official",
       "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "D4C",
-        "by": "이름 같음 · 선수 3명 겹침"
+        "overlap": 3
       }
     },
     {
       "key": "id:01KHPREVNDKME8CCMTZ5K982KG",
-      "short": "FIN",
-      "name": "Finishers",
+      "short": "KKOI",
+      "name": "KAKKOII",
       "region": "apac-s",
-      "src": "lp",
+      "src": "official",
       "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "Finishers Esports",
-        "by": "이름 같음 · 선수 3명 겹침"
+        "overlap": 3
       }
     },
     {
@@ -723,17 +736,6 @@
       "lp": {
         "name": "FUL",
         "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREV4ZS8N3WZ0D5ACHCJ37",
-      "short": "CPR",
-      "name": "CPR",
-      "region": "apac-s",
-      "src": "official",
-      "lp": {
-        "name": "CPR",
-        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
@@ -814,17 +816,6 @@
       }
     },
     {
-      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
-      "short": "HEAD",
-      "name": "Headglytch",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Headglytch",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREWQ7ZZGP8S40W48MFHF9",
       "short": "BLSD",
       "name": "Blessed",
@@ -859,13 +850,14 @@
     },
     {
       "key": "id:01KME2AH0B3CKM5VXXCHSH3G3M",
-      "short": "HABN",
-      "name": "HABNW",
+      "short": "HAB",
+      "name": "HAB",
       "region": "apac-s",
-      "src": "lp",
+      "src": "official",
       "lp": {
+        "why": "선수 4명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "HABNW",
-        "by": "이름 같음 · 선수 4명 겹침"
+        "overlap": 4
       }
     },
     {
@@ -902,17 +894,6 @@
       }
     },
     {
-      "key": "id:01KME2AHCFT4C53BNA6E2Z9FD6",
-      "short": "ARAM",
-      "name": "ARAM",
-      "region": "apac-s",
-      "src": "official",
-      "lp": {
-        "name": "ARAM",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
       "key": "id:01KME84BNZF9VA8WAKE2K048P4",
       "short": "3MEN",
       "name": "3 MEN",
@@ -921,6 +902,17 @@
       "lp": {
         "name": "3 MEN",
         "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREV4ZS8N3WZ0D5ACHCJ37",
+      "short": "CPR",
+      "name": "CPR",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "name": "CPR",
+        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
@@ -1012,24 +1004,13 @@
       }
     },
     {
-      "key": "id:01KHPREY2Q30PNMWXNRJF2KSSZ",
-      "short": "FNC",
-      "name": "FNATIC",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "Fnatic",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KME2AH4NG8W8G65J2H899XP4",
-      "short": "GT",
-      "name": "GoaT",
+      "key": "id:01KME2AHCFT4C53BNA6E2Z9FD6",
+      "short": "ARAM",
+      "name": "ARAM",
       "region": "apac-s",
-      "src": "lp",
+      "src": "official",
       "lp": {
-        "name": "GoaT",
+        "name": "ARAM",
         "by": "이름 같음 · 선수 4명 겹침"
       }
     },
@@ -1045,18 +1026,6 @@
       }
     },
     {
-      "key": "id:01KME2AGN68R686YAX6GHNHJHX",
-      "short": "FCN",
-      "name": "FCN YAMABUN",
-      "region": "apac-n",
-      "src": "official",
-      "lp": {
-        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
-        "name": "Function Kyoto",
-        "overlap": 3
-      }
-    },
-    {
       "key": "id:01KHPREZ2JRAK2RGDG62J3AEEW",
       "short": "PXL",
       "name": "Pixel Lumina",
@@ -1068,6 +1037,29 @@
       }
     },
     {
+      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
+      "short": "HEAD",
+      "name": "Headglytch",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Headglytch",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AH4NG8W8G65J2H899XP4",
+      "short": "DF",
+      "name": "DreamFire",
+      "region": "apac-s",
+      "src": "official",
+      "lp": {
+        "why": "선수 4명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "GoaT",
+        "overlap": 4
+      }
+    },
+    {
       "key": "id:01KTSJN9J6TVW8D1T8J1BS4MS0",
       "short": "MAJN",
       "name": "Majin",
@@ -1075,17 +1067,6 @@
       "src": "lp",
       "lp": {
         "name": "Majin Club",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREWEXHYMAN629M2QBZTB8",
-      "short": "ALX",
-      "name": "AELIX",
-      "region": "apac-s",
-      "src": "lp",
-      "lp": {
-        "name": "Aelix",
         "by": "이름 같음 · 선수 3명 겹침"
       }
     },
@@ -1101,14 +1082,14 @@
       }
     },
     {
-      "key": "id:01KTSJN918EBK3C0ZF95Y79R47",
-      "short": "PRES",
-      "name": "W Press",
-      "region": "americas",
-      "src": "official",
+      "key": "id:01KHPREY2Q30PNMWXNRJF2KSSZ",
+      "short": "FNC",
+      "name": "FNATIC",
+      "region": "apac-n",
+      "src": "lp",
       "lp": {
-        "name": "W PRESS",
-        "by": "이름 같음 · 선수 4명 겹침"
+        "name": "Fnatic",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1123,35 +1104,13 @@
       }
     },
     {
-      "key": "id:01KHPREX931TTBJDXH1AN6D121",
-      "short": "JDG",
-      "name": "JD GAMING",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "JD Gaming",
-        "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
-      "key": "id:01KME84BM2K6S5120YXYV4NZ75",
-      "short": "GCR",
-      "name": "Glacier",
-      "region": "emea",
-      "src": "official",
-      "lp": {
-        "name": "Glacier",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
-      "key": "id:01KTSJN9HSBXC8Y8JF0FW1WHGC",
-      "short": "VOID",
-      "name": "Void Esports OCE",
+      "key": "id:01KHPREWEXHYMAN629M2QBZTB8",
+      "short": "ALX",
+      "name": "AELIX",
       "region": "apac-s",
       "src": "lp",
       "lp": {
-        "name": "Void Esports OCE",
+        "name": "Aelix",
         "by": "이름 같음 · 선수 3명 겹침"
       }
     },
@@ -1164,6 +1123,41 @@
       "lp": {
         "name": "Team Darkspire",
         "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREXBTGD37GD3ZJ25R7ABW",
+      "short": "VR",
+      "name": "EBOYS",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KTSJN918EBK3C0ZF95Y79R47",
+      "short": "PRES",
+      "name": "W Press",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "W PRESS",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KME2AGN68R686YAX6GHNHJHX",
+      "short": "FCN",
+      "name": "FCN YAMABUN",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "Function Kyoto",
+        "overlap": 3
       }
     },
     {
@@ -1201,14 +1195,25 @@
       }
     },
     {
-      "key": "id:01KTSJN9JW27TZSF9G5810CXTY",
-      "short": "BPR",
-      "name": "BPR",
-      "region": "emea",
-      "src": null,
+      "key": "id:01KTSJN99S5QCPQBZDYKH7A37X",
+      "short": "SO",
+      "name": "Sesame oil",
+      "region": "americas",
+      "src": "official",
       "lp": {
-        "name": "BPR",
-        "by": "이름 같음 · 선수 4명 겹침"
+        "name": "Sesame oil",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9HSBXC8Y8JF0FW1WHGC",
+      "short": "VOID",
+      "name": "Void Esports OCE",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Void Esports OCE",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1235,30 +1240,6 @@
       }
     },
     {
-      "key": "id:01KHPREXBTGD37GD3ZJ25R7ABW",
-      "short": "VR",
-      "name": "EBOYS",
-      "region": "americas",
-      "src": "official",
-      "lp": {
-        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
-        "name": null,
-        "overlap": null
-      }
-    },
-    {
-      "key": "id:01KTSJNA2Y21PNF3VHANB97EMK",
-      "short": "UFZ",
-      "name": "UNFAZED",
-      "region": "apac-n",
-      "src": "official",
-      "lp": {
-        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
-        "name": "REIGA",
-        "overlap": 3
-      }
-    },
-    {
       "key": "id:01KTSJNA9YTACQ35510GKMSRK2",
       "short": "BCL",
       "name": "Bacalhau",
@@ -1266,17 +1247,6 @@
       "src": "lp",
       "lp": {
         "name": "Bacalhau",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KTSJN9FK1SE98BD2N5JM97ZZ",
-      "short": "4QUA",
-      "name": "4QuattroFormaggi",
-      "region": "apac-n",
-      "src": "official",
-      "lp": {
-        "name": "4QuattroFormaggi",
         "by": "이름 같음 · 선수 3명 겹침"
       }
     },
@@ -1293,26 +1263,36 @@
       }
     },
     {
-      "key": "id:01KTSJNA15N4JQB8DG7ZYXK4VR",
-      "short": "SHIN",
-      "name": "Shinobi",
-      "region": "americas",
+      "key": "id:01KTSJN9JW27TZSF9G5810CXTY",
+      "short": "BPR",
+      "name": "BPR",
+      "region": "emea",
       "src": null,
       "lp": {
-        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
-        "name": "STORM",
-        "overlap": 3
+        "name": "BPR",
+        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
-      "key": "id:01KTSJNAA5CR05C7HPH72X4AEM",
-      "short": "SO9",
-      "name": "Shadows Of Nine",
+      "key": "id:01KME84BM2K6S5120YXYV4NZ75",
+      "short": "GCR",
+      "name": "Glacier",
       "region": "emea",
-      "src": "lp",
+      "src": "official",
       "lp": {
-        "name": "Shadows of Nine",
-        "by": "이름 같음 · 선수 2명 겹침"
+        "name": "Glacier",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9FK1SE98BD2N5JM97ZZ",
+      "short": "4QUA",
+      "name": "4QuattroFormaggi",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "name": "4QuattroFormaggi",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1327,14 +1307,38 @@
       }
     },
     {
-      "key": "id:01KTSJN99S5QCPQBZDYKH7A37X",
-      "short": "SO",
-      "name": "Sesame oil",
-      "region": "americas",
+      "key": "id:01KTSJNAA5CR05C7HPH72X4AEM",
+      "short": "SO9",
+      "name": "Shadows Of Nine",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Shadows of Nine",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJNA2Y21PNF3VHANB97EMK",
+      "short": "UFZ",
+      "name": "UNFAZED",
+      "region": "apac-n",
       "src": "official",
       "lp": {
-        "name": "Sesame oil",
-        "by": "이름 같음 · 선수 3명 겹침"
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "REIGA",
+        "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KTSJNA15N4JQB8DG7ZYXK4VR",
+      "short": "SHIN",
+      "name": "Shinobi",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
+        "name": "STORM",
+        "overlap": 3
       }
     },
     {

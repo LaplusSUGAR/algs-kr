@@ -4,6 +4,11 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-10 13:00 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | EMEA | TLNP (TLN PIRATES) |  | Nono |
+| 2026-11-10 13:00 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) |  | D4C | Nono |  |
+| 2026-11-10 13:00 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) |  | HABN | Nonameguy |  |
+| 2026-11-10 13:00 | 자동 반영 (Liquipedia) | EMEA | TLNP (TLN PIRATES) | Hiarka | Nono |
+| 2026-11-10 13:00 | 자동 반영 (Liquipedia) | EMEA | PF2 (PlayFor2nd) | Nono | Hiarka |
 | 2026-11-09 22:00 | 자동 반영 (Liquipedia) | APAC North | XECT | Onnelu | kanata |
 | 2026-11-09 20:01 | 2부 팀 이름 변경 | APAC South | SLG APAC S |  | 구 High Kill Ratio |
 | 2026-11-09 20:01 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | VOID (Void Esports OCE) |  | aflow |
@@ -121,7 +126,7 @@
 | UBI (UBI CILEMBU) | APAC South | Aviisan |  |
 | WAR (Team WaR) | EMEA | ihtw-www- | Rename |
 | TLNP (TLN PIRATES) | EMEA | Hiarka, Esteves33 | nono |
-| D4C | EMEA | Faenex, Nono |  |
+| D4C |  | Faenex, Nono |  |
 | MIH (Made In Heaven) | EMEA | Yanzz |  |
 | SH (Summer Haze) | EMEA | CalamityVX | Calamitous |
 | MAJN (Majin) | EMEA | Ixren |  |
@@ -140,3 +145,6 @@
 | SO (Sesame oil) | Americas |  | Brick |
 | URNM (Unreal Nightmare) | Americas | MaliceMamba |  |
 | DKF | Americas | DROPPED, Jxmo |  |
+| HAB | APAC South | Nonameguy |  |
+| DF (DreamFire) | APAC South | thurston, AceGod | Sid0o, 3Mz |
+| PF2 (PlayFor2nd) | EMEA | Faenex, Nono, Feuda | Hiarka, Slab |
