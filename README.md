@@ -29,7 +29,7 @@ ALGS(Apex Legends Global Series) 결과를 한국 팀 중심으로 보여주는 
 
 ```
 fetch-liquipedia.mjs  → raw/lp/        (1순위, API 키 필요)
-fetch-algs.mjs        → raw/algs/      (공식 API: CP, 국적, 경기별 결과. 요청은 3개씩 동시에, 끝난 지 하루 넘은 시리즈·로고는 매시 한 번만 다시 받음)
+fetch-algs.mjs        → raw/algs/      (공식 API: 메인 시즌 고르기, CP, 국적, 경기별 결과. 요청은 3개씩 동시에, 끝난 지 하루 넘은 시리즈·로고는 매시 한 번만 다시 받음)
 fetch-lcq-lp.mjs      → raw/lp/lcq.json        (Liquipedia 위키 원문: LCQ 참가 명단, Challenger Circuit 순위)
 fetch-lp-teams.mjs    → raw/lp/teams-src.json  (Liquipedia 팀 표: 팀·선수·로고 아이콘)
 fetch-lp-squads.mjs   → raw/lp/squads.json     (Liquipedia 팀 페이지 현재 로스터·들어온 날·나간 날, 선수 페이지 넘겨주기. 7일에 1회)
@@ -38,6 +38,17 @@ build-data.mjs        → site/data/algs-data.js + ver.json (26자 공식 ID는 
 브라우저 실시간 조회    → 경기 중 진행 중인 시리즈만 공식 API에서 10초(+0~3초)마다 직접 확인
 worker/live-worker.js → /live.json     (선택: 방문자가 많아지면 서버 한 곳에서 조회하도록 전환)
 ```
+
+## 시즌 전환 (자동)
+
+사이트는 한 번에 한 시즌(메인 시즌)을 보여 주고, 메인 시즌은 공식 API의 시즌 목록에서 스스로 고른다(`scripts/season.mjs`).
+
+- 고르는 규칙: 프로리그 일정이 있는 시즌 가운데 첫 프로리그 시작 14일 전을 지난 가장 늦은 시즌. 그 시즌의 프로리그 팀·로스터가 아직 없으면(한 지역 20팀 미만) 지난 시즌을 그대로 둔다.
+- 챔피언십이 끝나면: 순위 탭 기본 화면이 챔피언십 최종 결과가 되고, 홈 맨 위에 시즌 결과(우승·준우승·3위·관심 팀 순위)가 남는다. 새 시즌이 공식 목록에 보이면 '다음 시즌' 첫 일정을 함께 보여 준다.
+- 메인 시즌이 바뀌는 순간: 지난 시즌의 원본·설정·기록을 `archive/<시즌>/`에 복사하고, 마지막 화면 데이터를 `site/data/seasons/<시즌>.js`로 얼린다. 주소에 `?y=year-6`을 붙이면 그 시즌 화면이 그대로 열린다(홈의 '지난 시즌' 링크). 시즌에 묶인 작업 파일(`raw/lp/*.json`, `raw/rosters/state.json`, 출전 경기 수, 로스터 변경 기록)은 비우고 새로 시작한다.
+- 시즌에 묶인 설정은 그 시즌에만 쓴다: `config/season.json`은 `slug`가 메인 시즌과 같을 때만 이름·일정표 장소·규정 링크를 쓰고, 다르면 일정표를 공식 대회 목록에서 만든다(날짜·이름·공식 링크). `config/overrides.json`은 `season`이 같을 때만 로스터 이동·대체 출전·LCQ 시각 보정·2부 팀 이름 변경을 쓴다. 점수표·방송·직행 자리 수는 그대로 쓰므로 새 시즌 규정이 바뀌면 고친다.
+- Split도 스스로 넘어간다: 시작 14일 전을 지난 가장 늦은 Split을 최신으로 쓰고(출전 팀 명단이 아직 없으면 앞 Split 유지), CP 순위·동률 기준·프로리그 일정·Liquipedia 페이지 이름(`Apex_Legends_Global_Series/<연도>/Split_<n>/…`)이 그 Split을 따른다.
+- 강제로 고르기: 저장소 Settings → Variables에 `ALGS_SEASON = year-6`(시즌 slug). 전환 시점을 바꾸려면 `ALGS_SEASON_LEAD_DAYS`(기본 14).
 
 ## 갱신 주기
 

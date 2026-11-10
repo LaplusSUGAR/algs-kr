@@ -11,6 +11,7 @@ import path from 'node:path';
 import { ROOT, readJson, writeText, hash, normRegion, REGION_LABEL, nameKey } from './lib.mjs';
 import { nk as logoKey } from './lp-teams-parse.mjs';
 import { createRosterWatch } from './rosters.mjs';
+import { seasonName, buildTimeline, lpYear, lpSeasonPage } from './season.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -28,8 +29,38 @@ stampAssets();
 const algs = readJson('raw/algs/snapshot.json');
 if (!algs) throw new Error('raw/algs/snapshot.json 이 없습니다. 먼저 npm run fetch:algs');
 const lpPlacements = readJson('raw/lp/placements.json');
-const ov = readJson('config/overrides.json', {});
-const season = readJson('config/season.json');
+
+// ---------- 시즌 ----------
+// 메인 시즌은 공식 스냅샷이 정한다(scripts/season.mjs). 설정 파일 가운데 시즌에 묶인 값은 그 시즌 것일 때만 쓴다:
+//   config/season.json    slug가 같을 때만 name·timeline(장소·링크)·rulesLinks 사용. 점수표·방송·갱신 주기·직행 자리 수는 시즌이 바뀌어도 기본값으로 쓴다
+//   config/overrides.json season이 같을 때만 SEASON_KEYS(로스터 이동·대체 출전·LCQ 시각 보정·2부 팀 이름 변경) 사용. 팀 표시·방송 채널 보정은 계속 쓴다
+//   raw/lp/*.json         season 표시가 다르면 쓰지 않는다 (지난 시즌 LCQ 명단으로 새 시즌 로스터를 바꾸지 않게)
+const seasonCfg = readJson('config/season.json');
+const seasonSlug = algs.seasonSlug || seasonCfg.slug || 'year-6';
+const cfgMine = !seasonCfg.slug || seasonCfg.slug === seasonSlug;
+const splits = [...new Set(Object.keys(algs.pl).map((k) => Number(k.slice(1, 2))))].sort();
+const lastSplit = splits.at(-1) || 1;
+// CP 동률을 가르는 대회: CP 내역에 있는 가장 최근 플레이오프 → 가장 최근 Split 프로리그 (Year 6 규정 C7.3은 Split 2 기준)
+const tieSlug = (algs.cpEvents || []).map(([, slug]) => slug).filter((x) => /^split-\d-playoffs/.test(x)).sort().at(-1) || null;
+const lpSeasonUrl = `https://liquipedia.net/apexlegends/${lpSeasonPage(seasonSlug)}`;
+const seasonBase = Object.fromEntries(Object.entries(seasonCfg).filter(([k]) => !k.startsWith('_')));
+const season = {
+  ...seasonBase, slug: seasonSlug,
+  name: cfgMine && seasonCfg.name ? seasonCfg.name : algs.seasonName || seasonName(seasonSlug),
+  // 일정표: 공식 대회 목록에서 만들고(날짜·이름·공식 링크), 설정 파일의 같은 줄이 장소·링크를 덮어쓴다
+  timeline: buildTimeline(algs.events, seasonSlug, cfgMine ? seasonCfg.timeline : []),
+  ...(cfgMine ? {} : { rulesLinks: [['ALGS 대회 구성 안내 (algs.ea.com)', 'https://algs.ea.com/en/competition-overview'], [`Liquipedia ${lpSeasonPage(seasonSlug).replace('/', ' ')}`, lpSeasonUrl]] }),
+};
+const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine };
+const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'ccRenames'];
+const ovRaw = readJson('config/overrides.json', {});
+const ovMine = !ovRaw.season || ovRaw.season === seasonSlug;
+const ov = ovMine ? ovRaw : Object.fromEntries(Object.entries(ovRaw).filter(([k]) => !SEASON_KEYS.includes(k)));
+if (!cfgMine) console.log(`[build] config/season.json은 ${seasonCfg.slug} 것: ${seasonSlug} 일정은 공식 API에서 만들고 장소는 비워 둠`);
+if (!ovMine) console.log(`[build] config/overrides.json의 시즌 보정(${SEASON_KEYS.join(', ')})은 ${ovRaw.season} 것이라 쓰지 않음`);
+const lpMine = (x) => (x && (!x.season || x.season === seasonSlug) ? x : null);
+const lpLcq = lpMine(readJson('raw/lp/lcq.json', null));
+const lpTeamsSrc = lpMine(readJson('raw/lp/teams-src.json', null)) || { pages: {} };
 
 const conflicts = [];
 const evByIdEarly = Object.fromEntries(algs.events.map(([id, , , , start]) => [id, { start }]));
@@ -101,21 +132,24 @@ RW.official(teams, currentIds);
 // 자동 이동을 막을 선수: config/overrides.json rosterAutoIgnore [{ team, player }] (team을 비우면 모든 팀)
 const autoIgnore = (ov.rosterAutoIgnore || []).map((x) => [x.team || '', nameKey(x.player || '')]);
 const ignored = (team, n) => autoIgnore.some(([t, k]) => (!t || t === team) && k === nameKey(n));
-const autoMoves = RW.lcq(readJson('raw/lp/lcq.json', null))
+const autoMoves = RW.lcq(lpLcq)
   .map((m) => ({ ...m, out: m.out.filter((n) => !ignored(m.team, n)), in: m.in.filter((n) => !ignored(m.team, n)) })).filter((m) => m.out.length || m.in.length);
 RW.manual(ov.rosterMoves);
 
 // 로스터 이동 (config/overrides.json rosterMoves + 자동 이동): 공식 API에 반영되기 전의 이적을 팀 로스터에 먼저 반영한다.
 //   out = 빠진 선수, in = 들어온 선수. 들어온 선수의 국적·역할은 다른 팀 공식 로스터에서 찾고, 없으면 players.json(country) 또는 미상
 //   팀 CP(현재 로스터 상위 3인)는 화면이 cpRosterOut·cpRosterAdd로 다시 계산한다
-const rosterMoves = [...(ov.rosterMoves || []).filter((m) => m.team), ...autoMoves];
+const rosterMoves = [...(ov.rosterMoves || []).filter((m) => m.team).map((m) => ({ ...m })), ...autoMoves];
+const unresolved = []; // 팀을 찾지 못해 반영하지 못한 이동 (빌드 기록과 logs/에 남김)
 const cpRosterOut = {}, cpRosterAdd = Object.fromEntries(Object.entries(ov.cpRosterAdd || {}).map(([k, v]) => [k, [...v]]));
 {
   const known = new Map();
   for (const t of Object.values(teams)) for (const p of t.roster) if (!known.has(nameKey(p.n))) known.set(nameKey(p.n), p);
   for (const m of rosterMoves) {
-    const t = Object.values(teams).find((x) => x.short === m.team && x.roster.length);
-    if (!t) { console.log(`[build] 로스터 이동: ${m.team} 팀을 찾지 못함`); continue; }
+    // 약칭으로 찾고, 없으면 그 약칭을 쓰던 팀 ID로 찾는다(공식 약칭 변경). 찾은 팀의 지금 약칭으로 바꿔 적는다
+    const t = Object.values(teams).find((x) => x.short === m.team && x.roster.length) || [teams[RW.idOf(m.team)]].find((x) => x?.roster.length);
+    if (!t) { console.log(`[build] 로스터 이동: ${m.team} 팀을 찾지 못함`); unresolved.push(m.team); continue; }
+    if (t.short !== m.team) { console.log(`[build] 로스터 이동: ${m.team} → 지금 약칭 ${t.short}`); m.team = t.short; }
     const outK = new Set((m.out || []).map(nameKey));
     t.roster = t.roster.filter((p) => !outK.has(nameKey(p.n)));
     for (const n of m.in || []) {
@@ -159,8 +193,8 @@ const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => 
 //   (A) Split 2 플레이오프 최종 순위 (미출전은 뒤) → (B) 프로리그 Split 2 최종 순위
 //   → C7.2(프로리그 Split 2 세부 기준)는 정규 시즌 포인트 → 킬 순으로 근사 → 마지막은 공식 순위
 {
-  const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === 'split-2-playoffs')?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
-  const pl2 = new Map(Object.entries(algs.pl).filter(([k]) => k.startsWith('s2:')).flatMap(([, rows]) => rows.map((r) => [r[3], { pos: r[0], rs: r[6] ?? 0, kills: r[8] ?? 0 }])));
+  const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === tieSlug)?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
+  const pl2 = new Map(Object.entries(algs.pl).filter(([k]) => k.startsWith(`s${lastSplit}:`)).flatMap(([, rows]) => rows.map((r) => [r[3], { pos: r[0], rs: r[6] ?? 0, kills: r[8] ?? 0 }])));
   cpRows.sort((a, b) => b.total - a.total || (po.get(a.id) ?? 999) - (po.get(b.id) ?? 999)
     || (pl2.get(a.id)?.pos ?? 99) - (pl2.get(b.id)?.pos ?? 99) || (pl2.get(b.id)?.rs ?? 0) - (pl2.get(a.id)?.rs ?? 0) || (pl2.get(b.id)?.kills ?? 0) - (pl2.get(a.id)?.kills ?? 0) || a.rank - b.rank);
   cpRows.forEach((r, i) => (r.rank = i + 1));
@@ -297,10 +331,8 @@ const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) 
 // ---------- LCQ 챌린저 서킷 팀 (Liquipedia) ----------
 // 공식 명단이 나오기 전 LCQ의 2부(챌린저 서킷) 자리를 채우는 순서: 서킷 우승팀(초록) → 종합 포인트 순.
 // 지역마다 '40 − 직행권 밖 프로리그 팀 수'만큼 화면이 위에서부터 잘라 쓴다 (직행 수는 정산 순위에 따라 바뀌므로)
-const lpLcq = readJson('raw/lp/lcq.json', null);
 const nk = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const unent = (x) => String(x).replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#160;/g, ' ');
-const lpTeamsSrc = readJson('raw/lp/teams-src.json', { pages: {} });
 const ccOf = (region) => {
   const html = lpLcq?.cc?.[region]?.html || '';
   const rows = [...html.matchAll(/<tr><td class="([^"]*)">(\d+)<\/td><td[^>]*>[\s\S]*?team-template-text"><a[^>]*>([^<]+)<\/a>[\s\S]*?<\/td><td[^>]*><b>([\d,]+)<\/b>/g)]
@@ -365,9 +397,10 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
 
 // ---------- 한국 팀 요약 ----------
 const now = new Date(algs.fetchedAt);
-const kr = Object.values(teams).filter((t) => t.krLevel !== 'none' && (t.cp || pl['s2:apac-n']?.rows.some((r) => r.id === t.id)))
+const plKr = pl[`s${lastSplit}:apac-n`];
+const kr = Object.values(teams).filter((t) => t.krLevel !== 'none' && (t.cp || plKr?.rows.some((r) => r.id === t.id) || !cpRows.length))
   .map((t) => {
-    const s2 = pl['s2:apac-n']?.rows.find((r) => r.id === t.id) || Object.values(pl).filter((p) => p.split === 2).flatMap((p) => p.rows).find((r) => r.id === t.id);
+    const s2 = plKr?.rows.find((r) => r.id === t.id) || Object.values(pl).filter((p) => p.split === lastSplit).flatMap((p) => p.rows).find((r) => r.id === t.id);
     const ir = intl?.rows.find((r) => r.id === t.id);
     const next = ir ? series.find((s) => s.eventId === intl.eventId && s.status !== 'completed' && s.name === ir.next) : null;
     const cpr = cpRows.find((r) => r.id === t.id);
@@ -418,7 +451,10 @@ const data = {
   generated: new Date().toISOString(),
   sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
   seasonId: algs.seasonId,
-  season,
+  season, meta,
+  // 지난 시즌(얼려 둔 화면 데이터, 주소 ?y=<slug>)과 다음 시즌 예고
+  seasons: readJson('site/data/seasons/index.json', []).map(({ slug, name, from, to }) => ({ slug, name, from, to })),
+  next: algs.nextSeason ? { slug: algs.nextSeason.slug, name: algs.nextSeason.name, timeline: buildTimeline(algs.nextSeason.events, algs.nextSeason.slug, []) } : null,
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
   teams: Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])),
   cp: cpRows, cpEvents, pl,
@@ -432,7 +468,7 @@ const data = {
   mc: (() => { const m = {}; for (const { e, c } of Object.values(readJson('raw/algs/matchcounts.json', { series: {} }).series)) { const t = (m[e] ||= {}); for (const [pid, n] of Object.entries(c)) t[pid] = (t[pid] || 0) + n; } return m; })(), series, intl, past, lcq, xteams, kr, streams, conflicts,
   // 브라우저가 공식 API에서 확정값을 직접 다시 받을 때 쓰는 값
   api: {
-    cpEventIds: algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
+    cpEventIds: algs.cpEventIds || algs.events.filter((e) => /^split-\d-pro-league-/.test(e[1])).map((e) => [e[1], e[0]]).filter(([sl]) => sl.startsWith(`split-${latestSplit.slice(1)}-`)).map(([, id]) => id),
     intlEventId: intlEv?.id || null,
     groupPhaseId: intlEv ? algs.events.find((e) => e[0] === intlEv.id)?.[6]?.[0]?.[0] || null : null,
   },
@@ -472,4 +508,5 @@ const body = JSON.stringify(packIds(data));
 writeText('site/data/algs-data.js', `// generated by scripts/build-data.mjs - do not edit\nwindow.ALGS = ${body};\n`);
 { const idx = path.join(ROOT, 'site/index.html'); const html = fs.readFileSync(idx, 'utf8').replace(/data\/algs-data\.js(\?v=\w+)?"/, `data/algs-data.js?v=${v}"`); fs.writeFileSync(idx, html); }
 writeText('site/data/ver.json', JSON.stringify({ v, built: data.generated, sources: data.sources }));
+if (unresolved.length) console.log(`[build] 반영하지 못한 로스터 이동(팀 약칭 확인 필요): ${unresolved.join(', ')}`);
 console.log(`[build] v=${v} teams ${Object.keys(data.teams).length}, cp ${cpRows.length}, pl ${Object.keys(pl).length}, series ${series.length}, kr ${kr.length}, conflicts ${conflicts.length}, ${(body.length / 1024).toFixed(0)}KB`);

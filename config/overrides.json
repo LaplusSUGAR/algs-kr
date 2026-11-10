@@ -1,5 +1,7 @@
 {
   "_comment": "운영자 수동 보정. teams 키는 팀 약칭(short)이며 출처 데이터보다 우선 적용된다. 예: \"E36\": { \"ko\": \"한글 팀명\", \"color\": \"#RRGGBB\", \"krLevel\": \"team\" }",
+  "_season": "아래 시즌 보정(rosterMoves, rosterAutoIgnore, cpSubs, cpRosterAdd, lcqSchedule, ccRenames)이 어느 시즌 것인지. 메인 시즌이 이 값과 다르면 빌드가 그 보정들을 쓰지 않는다(지난 시즌 이적을 새 시즌 로스터에 적용하지 않게). 새 시즌에 보정을 적기 시작할 때 이 값을 바꾸고 지난 시즌 줄은 지운다(사본은 archive/<시즌>/config/ 에 남아 있다). teams·streams는 시즌과 상관없이 쓴다.",
+  "season": "year-6",
   "teams": {},
   "streams": [],
   "_cpSubs": "국제전 대체 출전(비자 문제 등). 빠진 선수(out)는 그 대회 CP를 받지 않고, 대체 선수(in)가 출전 팀 순위의 CP를 받아 원래 소속팀(home) 합계에 반영된다. 이름은 공식 API 표기. 키는 이벤트 슬러그.",
@@ -101,7 +103,7 @@
     {"team":"O2","out":["ibayann"],"in":[],"date":"2026-10-29"},
     {"team":"DOG","out":["Killoposz","yanlys"],"in":[],"date":"2026-10-26"},
     {"team":"TEC","out":["Arm"],"in":["Killoposz"],"date":"2026-10-26"},
-    {"team":"GT","out":["CAIGOU"],"in":[],"date":"2026-05-30"},
+    {"team":"DF","out":["CAIGOU"],"in":[],"date":"2026-05-30"},
     {"team":"VOID","out":["Swarkst3r"],"in":[],"date":"2026-09-17"},
     {"team":"SWQ","out":["Moku"],"in":[],"date":"2026-01-18"},
     {"team":"VKG","out":["Lqdud"],"in":[],"date":"2026-07-11"},

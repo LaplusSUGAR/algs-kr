@@ -49,7 +49,11 @@ jobs:
         env:
           LIQUIPEDIA_API_KEY: ${{ secrets.LIQUIPEDIA_API_KEY }}
         run: node scripts/fetch-liquipedia.mjs
-      - name: ALGS 공식 API
+      # 메인 시즌은 공식 시즌 목록에서 스스로 고른다(scripts/season.mjs). 강제로 고르려면 저장소 변수 ALGS_SEASON = year-6 처럼 적는다
+      - name: ALGS 공식 API (메인 시즌 고르기, 시즌이 바뀌면 지난 시즌 보관)
+        env:
+          ALGS_SEASON: ${{ vars.ALGS_SEASON }}
+          ALGS_SEASON_LEAD_DAYS: ${{ vars.ALGS_SEASON_LEAD_DAYS }}
         run: node scripts/fetch-algs.mjs
       - name: LCQ 출전 팀 (Liquipedia 위키 원문, 매시 1회)
         run: node scripts/fetch-lcq-lp.mjs ${{ inputs.refresh == '1' && '--force' || '' }}
@@ -69,6 +73,7 @@ jobs:
           git config user.name "algs-kr-bot"
           git config user.email "actions@users.noreply.github.com"
           git add raw logs site/data site/index.html site/logos
+          if [ -d archive ]; then git add archive; fi   # 지난 시즌 보관본 (시즌이 바뀔 때 한 번 생김)
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else

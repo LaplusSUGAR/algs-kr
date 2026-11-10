@@ -57,9 +57,13 @@ export function createRosterWatch(nowIso) {
   const add = (e) => log.unshift({ at: nowIso, ...e });
   const names = (arr) => arr.map((x) => (typeof x === 'string' ? x : x.n));
   const W = {};
+  W.idOf = (short) => st.ids?.[short] || null;
 
   // 1) 공식 로스터 비교. teams = build-data의 팀(로스터 이동 전), ids = 현재 팀 id
   W.official = (teams, ids) => {
+    // 약칭 → 팀 ID 기억: 공식 약칭이 바뀌어도(예: GT → DF) 옛 약칭으로 적은 로스터 이동이 같은 팀을 찾게
+    st.ids ||= {};
+    for (const t of Object.values(teams)) if (ids.has(t.id) && t.short) st.ids[t.short] = t.id;
     const cur = {};
     for (const t of Object.values(teams)) if (ids.has(t.id) && t.roster?.length) cur[t.short] = { region: t.region, name: t.name, players: t.roster.filter((p) => p.r !== 'k').map((p) => p.n), coaches: t.roster.filter((p) => p.r === 'k').map((p) => p.n) };
     W.changedTeams = new Set();

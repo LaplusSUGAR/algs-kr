@@ -6,10 +6,12 @@
 //   HTML은 저장하지 않고 뽑은 값만 둔다 (뽑는 방법은 lp-teams-parse.mjs)
 import { UA, readJson, writeJson, sleep } from './lib.mjs';
 import { plCards, ccRows, original } from './lp-teams-parse.mjs';
+import { seasonCtx, REGION_PAGE } from './season.mjs';
 
 const API = 'https://liquipedia.net/apexlegends/api.php';
-const BASE = 'Apex_Legends_Global_Series/2026/Split_2';
-const REGION_PAGE = { 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' };
+// 메인 시즌의 가장 최근 Split 페이지 (Year 6 Split 2 = Apex_Legends_Global_Series/2026/Split_2)
+const CTX = seasonCtx();
+const BASE = `${CTX?.base}/Split_${CTX?.split}`;
 export const PAGES = Object.fromEntries(Object.entries(REGION_PAGE).flatMap(([r, p]) => [
   [`pl:${r}`, `${BASE}/Pro_League/${p}`],
   [`cc:${r}`, `${BASE}/Challenger_Circuits/${p}`],
@@ -25,7 +27,10 @@ const slim = (html) => html
   .replace(/\n\s*\n/g, '\n');
 
 async function main() {
-  const cur = readJson(OUT, { pages: {} });
+  if (!CTX) { console.log('[lp-teams] 공식 스냅샷이 없어 건너뜀'); return; }
+  let cur = readJson(OUT, { pages: {} });
+  if (cur.season && cur.season !== CTX.slug) cur = { pages: {} }; // 지난 시즌 표는 쓰지 않는다
+  cur.season = CTX.slug;
   // 예전 형식(HTML 통째)이면 뽑은 값으로 바꾼다
   let migrated = false;
   for (const [k, pg] of Object.entries(cur.pages)) if (pg.html) { pg.teams = k.startsWith('pl:') ? plCards(pg.html) : ccRows(pg.html); delete pg.html; migrated = true; }

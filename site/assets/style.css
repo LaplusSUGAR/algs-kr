@@ -855,3 +855,9 @@ time.tbd { font-size: 12px; color: var(--steel); }
 :root[lang='ja'] { --body: 'Pretendard Variable', Pretendard, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', 'Yu Gothic', Meiryo, system-ui, sans-serif; --display: 'Big Shoulders Display', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, system-ui, sans-serif; }
 .lang-seg { margin: 4px 0 6px; }
 .lang-seg button[aria-current='true'] { background: var(--apex); color: #fff; }
+
+/* 지난 시즌 기록을 볼 때 본문 위 띠, 홈의 시즌 결과·지난 시즌 링크 */
+.season-bar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; margin: 12px 0 0; padding: 10px 12px; font-size: 13px; background: var(--card); border-left: 4px solid var(--brass); border-radius: var(--r-sm); }
+.season-bar a { font-weight: 700; white-space: nowrap; }
+.season-end .lead { margin-top: 10px; }
+.past-seasons { margin-top: 10px; }

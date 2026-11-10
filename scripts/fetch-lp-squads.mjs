@@ -95,7 +95,7 @@ async function main() {
   for (const r of snap.cp || []) if (r[2]) teamTitles.add(String(r[2]).trim());
   // 선수 페이지: 공식 현재 로스터 선수 + LCQ 참가 명단 선수
   const playerTitles = new Set(opp);
-  for (const ps of Object.values(snap.rosters || {})) for (const p of ps) playerTitles.add(String(p[1]).trim());
+  for (const ps of Object.values(snap.rosters || {})) for (const x of String(ps).split(';')) { const n = x.split('|')[0].trim(); if (n) playerTitles.add(n); }
   const T = await texts([...teamTitles].filter(Boolean));
   // 최근 1년 안에 나간 선수의 새 팀(newteam=팀 틀 이름, 소문자일 때가 많음)도 받는다: 조직 이적·이름 변경을 따라가려고
   const yearAgo = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);

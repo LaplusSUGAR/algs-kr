@@ -1,4 +1,6 @@
 {
+  "_slug": "이 파일이 어느 시즌 것인지(공식 API 시즌 slug). 메인 시즌이 이 값과 같을 때만 name·timeline(장소·링크)·rulesLinks를 쓴다. 다르면 일정표는 공식 대회 목록에서 자동으로 만들고 장소는 비워 둔다. 점수표·방송·직행 자리 수는 시즌이 바뀌어도 그대로 쓰므로, 새 시즌 규정이 바뀌면 고쳐야 한다.",
+  "slug": "year-6",
   "name": "ALGS Year 6",
   "cpDirectSlots": 32,
   "lcqSlots": 8,
@@ -283,7 +285,7 @@
     "liveSeconds": 10,
     "note": "GitHub Actions 예약 실행은 지연될 수 있음"
   },
-  "_timelineUrls": "공식 페이지가 있는 일정은 algs.ea.com, 없는 일정(Online Open, LCQ, 챔피언십)은 Liquipedia 시즌 페이지. 공식 페이지가 생기면 url만 바꾸면 된다.",
+  "_timeline": "일정표는 공식 대회 목록에서 자동으로 만든다(이름·날짜·공식 링크). 여기 timeline의 같은 key 줄(s1pl, s1po, s2pl, s2po, lcq, champs)은 장소(where)·링크(url)·이름을 덮어쓰고, 공식 목록에 없는 일정(Online Open)은 이 줄 그대로 넣는다.",
   "rulesVideos": [
     {
       "id": "u_8oTFzPJ_I",

@@ -8,7 +8,23 @@ function unpack(d) {
   const { _u, ...rest } = d;
   return dec(rest);
 }
+// 지난 시즌 보기: 주소에 ?y=year-6 처럼 시즌이 있으면 얼려 둔 그 시즌의 화면 데이터(data/seasons/<시즌>.js)를 대신 읽는다.
+// 목록(seasons)에 없는 값이거나 파일을 못 읽으면 현재 시즌 그대로 연다
+{
+  const y = new URLSearchParams(location.search).get('y'), cur = window.ALGS;
+  if (y && (cur?.seasons || []).some((x) => x.slug === y)) {
+    const ok = await new Promise((res) => { const el = document.createElement('script'); el.src = `data/seasons/${y}.js`; el.onload = () => res(true); el.onerror = () => res(false); document.head.appendChild(el); });
+    if (!ok || !window.ALGS?.archived) window.ALGS = cur;
+  }
+}
 let A = unpack(window.ALGS);
+const FROZEN = !!A.archived; // 지난 시즌 기록: 새 데이터 확인·실시간 조회를 하지 않는다
+// 시즌 값: 빌드가 meta로 넣어 준다 (가장 최근 Split, CP 동률을 가르는 플레이오프, Liquipedia 시즌 주소)
+const lastSplit = () => A.meta?.lastSplit || Math.max(1, ...Object.values(A.pl || {}).map((p) => p.split || 1));
+const tieSlug = () => (A.meta ? A.meta.tieSlug : 'split-2-playoffs');
+const tieN = () => Number(/split-(\d)/.exec(tieSlug() || '')?.[1]) || lastSplit();
+const seasonSlug = () => A.meta?.slug || 'year-6';
+const yearLabel = () => String(A.season?.name || 'ALGS').replace(/^ALGS\s+/, '');
 const C = window.ALGS_CONFIG || {};
 const app = document.getElementById('app');
 
@@ -126,7 +142,14 @@ const PHASE_KO = {
   'Regional Finals': '리전 결승', 'Split 2 Pro League': '정규 시즌', 'Split 1 Pro League': '정규 시즌',
 };
 const EVENT_KO = { 'Split 2 Playoffs': 'Split 2 플레이오프', 'Split 1 Playoffs at EWC': 'Split 1 플레이오프', 'Split 2 Pro League': 'Split 2 프로리그', 'Split 1 Pro League': 'Split 1 프로리그', 'Last Chance Qualifier': 'LCQ', Championship: '챔피언십' };
-const ko = (s, map) => map[s] || (s || '').replace(/^Group ([A-D]) vs ([A-D])$/, '$1조 vs $2조');
+// 사전에 없는 이름은 규칙으로: 'Split N Pro League'(단계 이름이면 정규 시즌), 'Split N Playoffs …'
+const ko = (s, map) => {
+  s = s || '';
+  if (map[s]) return map[s];
+  if (map === PHASE_KO && /^Split \d Pro League$/.test(s)) return '정규 시즌';
+  if (map === EVENT_KO) s = s.replace(/^Split (\d) Playoffs.*$/, 'Split $1 플레이오프').replace(/^Split (\d) Pro League$/, 'Split $1 프로리그');
+  return s.replace(/^Group ([A-D]) vs ([A-D])$/, '$1조 vs $2조');
+};
 const team = (short) => A.teams[short];
 // 프로리그 밖 팀(LCQ 챌린저 서킷 팀): 이름·로고만 있고 팀 페이지는 없다
 const xteam = (short) => A.teams[short] || A.xteams?.[short];
@@ -142,9 +165,9 @@ const krDot = (lvl0, short) => {
 };
 const rowCls = (r) => { const l = r.short ? lvlOf(r.short) : r.kr; return l && l !== 'none' ? `kr ${CAT[l]}${mainId() && A.teams[r.short]?.id === mainId() ? ' main' : ''}` : ''; };
 const coachBadge = () => '';
-const LP_SEASON = 'https://liquipedia.net/apexlegends/ALGS/2026-27';
+const LP_SEASON = () => A.meta?.lpSeason || 'https://liquipedia.net/apexlegends/ALGS';
 // 공식 경기 페이지가 있는 이벤트(슬러그가 사람이 읽는 이름)는 algs.ea.com, 없으면(LCQ 등) Liquipedia 시즌 페이지
-const officialUrl = (s) => (/^[a-z][a-z0-9-]+$/.test(s.eventSlug || '') && s.eventSlug !== 'last-chance-qualifier' ? `https://algs.ea.com/en/year-6/${s.eventSlug}/match/${s.id}` : LP_SEASON);
+const officialUrl = (s) => (/^[a-z][a-z0-9-]+$/.test(s.eventSlug || '') && s.eventSlug !== 'last-chance-qualifier' ? `https://algs.ea.com/en/${seasonSlug()}/${s.eventSlug}/match/${s.id}` : LP_SEASON());
 const olink = (url, label) => `<a class="olink" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
 // 팀 로고 (없으면 약칭 상자). dark: 어두운 배경 위에 놓일 때
 // LOGO_PX: 크기별 화면 표시 너비(CSS px). 큰 로고(xl)는 큰 화면 확대(zoom)까지 생각해 넉넉히
@@ -189,7 +212,9 @@ function render() {
   document.querySelectorAll('.tabbar a').forEach((a) => { if (a.dataset.tab === navTab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   board();
   const view = { home, schedule, standings, points, teams, streams, rules, players: playerView }[tab] || home;
-  app.innerHTML = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + view(parts, q);
+  // 지난 시즌 기록을 볼 때: 본문 맨 위에 어느 시즌인지와 돌아가는 링크
+  const bar = FROZEN ? `<div class="season-bar" id="seasonBar"><span><b>${esc(A.season.name)}</b> <span>지난 시즌 기록을 보고 있습니다.</span></span> <a href="./">현재 시즌으로</a></div>` : '';
+  app.innerHTML = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + bar + view(parts, q);
   bind();
   I.tree(app);
   // 가로로 넘치는 LCQ 경기 탭: 고른 탭이 보이게
@@ -203,7 +228,7 @@ function subtabs(tab, parts, q) {
   const g = q.get('g') || 'all', sv = q.get('s') || 'all';
   const SUB = {
     schedule: [['예정 경기', '#/schedule', parts[1] !== 'replay' && q.get('view') !== 'results'], ['지난 결과', '#/schedule?view=results', parts[1] !== 'replay' && q.get('view') === 'results'], ['게임 다시보기', '#/schedule/replay', parts[1] === 'replay']],
-    standings: champsNow()
+    standings: champsMain()
       ? [['챔피언십', '#/standings', parts[1] !== 'past'], ['이전 결과', '#/standings/past', parts[1] === 'past']]
       : intlCurrent()
       ? [['결승', '#/standings/finals', parts[1] === 'finals'], ['브래킷', '#/standings/bracket', parts[1] === 'bracket' || (!parts[1] && !finalsFirstTab())], ['조별 리그', '#/standings/group', parts[1] === 'group'],
@@ -319,7 +344,7 @@ function eventHome() {
   let B, base, q, title, L, key;
   const C = champsTimeline() ? champsBracket() : null;
   if (C?.started && recent(C, C.tl.end)) {
-    B = C; base = champsNow() ? '/standings' : '/standings/champs'; q = new URLSearchParams(); title = '챔피언십'; L = CH_FLOW_L; key = `ev:${C.ss[0].eventId}`;
+    B = C; base = champsMain() ? '/standings' : '/standings/champs'; q = new URLSearchParams(); title = '챔피언십'; L = CH_FLOW_L; key = `ev:${C.ss[0].eventId}`;
   } else if (lcqEvents().length && !intlCurrent()) {
     const ev = lcqEvents().find((e) => e.region === lcqRegionDefault()) || lcqEvents()[0];
     const X = lcqBracket(ev);
@@ -345,7 +370,7 @@ function home() {
   const upList = `<div class="up-list">${upcoming.slice(0, 3).map(matchItem).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
-  return `${modeBar}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
+  return `${modeBar}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
       <div class="sec-head"><h2 class="h2" id="h-up">${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/standings">전체 순위</a></div>
       <div class="flow-grid"><div>${spoil(bracketFlow(B), intlKey(), '진출 결과')}</div><div><h3 class="h3 up-h">다가오는 경기</h3>${upList}<a class="more" href="#/schedule">경기 전체</a></div></div>
     </section>` : ''}
@@ -354,7 +379,7 @@ function home() {
     ${others.length ? krStrip(others) : ''}
     </div><div class="col-b">
     ${lcqHome()}
-    ${A.intl ? `<section class="sec" aria-labelledby="h-now">
+    ${A.intl && !(champsDone() && /^champs/.test(A.intl.slug || '')) ? `<section class="sec" aria-labelledby="h-now">
       <div class="sec-head"><h2 class="h2" id="h-now">${intlCurrent() ? '지금 순위' : `${esc(ko(A.intl.name, EVENT_KO))} 결과`}</h2><a class="more" href="${intlCurrent() ? '#/standings' : '#/standings/past'}">자세히 보기</a></div>
       ${spoil(B?.started ? stageMini(B) : intlMini(), intlKey(), '순위')}
     </section>` : ''}
@@ -424,7 +449,31 @@ function krStrip(list) {
     ${krLegend()}
   </section>`;
 }
-// 홈: 시즌 일정은 지금·다음 일정 한 줄만
+// 챔피언십 최종 순위 40팀: 결승 1~20위, 패자부활 2라운드 탈락 21~30위, 패자부활 1라운드 탈락 31~40위
+function champsFinal() {
+  const B = champsBracket();
+  if (!B.done) return null;
+  const rows = (B.f.s?.results || []).map((r) => ({ pos: r.pos, short: r.short, won: !!r.won, label: r.pos === 1 ? '우승' : r.pos === 2 ? '준우승' : `${r.pos}위` }));
+  const out = (st, label) => (st.s?.results || []).filter((r) => r.pos > st.cut).map((r) => ({ pos: null, short: r.short, label }));
+  return [...rows, ...out(B.er2, '21–30위'), ...out(B.er1, '31–40위')];
+}
+// 홈: 시즌이 끝나면(챔피언십 결승 종료) 최종 결과를 맨 위에 둔다. 다음 시즌이 메인이 될 때까지, 그리고 지난 시즌 보기에서 계속 보인다
+function seasonEnd() {
+  const fin = champsDone() ? champsFinal() : null;
+  if (!fin?.length) return '';
+  const B = champsBracket();
+  const rows = [...fin.slice(0, 3), ...fin.slice(3).filter((r) => isF(r.short))];
+  const key = now() - new Date(B.f.start || B.tl.end) < 7 * 864e5 && B.ss[0] ? `ev:${B.ss[0].eventId}` : null;
+  const nx = !FROZEN && A.next?.timeline?.[0];
+  return `<section class="sec season-end" aria-labelledby="h-end">
+    <div class="sec-head"><h2 class="h2" id="h-end">${esc(yearLabel())} 챔피언십 결과</h2><a class="more" href="#/standings">전체 결과</a></div>
+    ${spoil(`<div class="tbl-wrap"><table class="tbl"><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${krDot(null, r.short)}${teamLink(r.short, xteam(r.short)?.name || r.short)}</td><td class="r small">${r.won || r.pos === 1 ? '<span class="tag mpe">우승</span>' : esc(r.label)}</td></tr>`).join('')}</tbody></table></div>`, key, '챔피언십 결과')}
+    <p class="lead">${esc(A.season.name)} 시즌이 끝났습니다.${nx ? ` <span>다음 시즌 ${esc(A.next.name)}: ${esc(nx.name)} ${esc(nx.start.slice(5).replace('-', '.'))} 시작.</span>` : FROZEN ? '' : ' <span>다음 시즌 일정이 공식 발표되면 여기에 표시됩니다.</span>'}</p>
+  </section>`;
+}
+// 지난 시즌 기록으로 가는 링크 (현재 시즌 화면에서만)
+const pastSeasons = () => (!FROZEN && A.seasons?.length ? `<p class="caption past-seasons">지난 시즌: ${A.seasons.map((x) => `<a href="?y=${encodeURIComponent(x.slug)}#/">${esc(x.name)}</a>`).join(' · ')}</p>` : '');
+// 홈: 시즌 일정은 지금·다음 일정 한 줄만. 이번 시즌 일정이 모두 끝났으면 다음 시즌 첫 일정을 보여 준다
 function seasonNext() {
   const t = now();
   const tl = A.season.timeline;
@@ -432,7 +481,7 @@ function seasonNext() {
   const nx = tl.find((e) => new Date(e.start + 'T00:00:00+09:00') > t);
   const row = (e, tag) => e ? `<li><span class="tag ${tag === '진행 중' ? 'live' : ''}">${tag}</span> ${e.url ? olink(e.url, esc(e.name)) : esc(e.name)} <span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')} · ${esc(e.where)}</span></li>` : '';
   return `<section class="sec" aria-labelledby="h-season"><div class="sec-head"><h2 class="h2" id="h-season">${esc(A.season.name)} 일정</h2><a class="more" href="#/rules?s=format">전체 일정</a></div>
-    <ul class="season-next">${row(cur, '진행 중')}${row(nx, '다음')}</ul></section>`;
+    <ul class="season-next">${row(cur, '진행 중')}${row(nx, '다음')}${!cur && !nx && !FROZEN && A.next?.timeline?.length ? A.next.timeline.slice(0, 2).map((e) => row(e, '다음 시즌')).join('') : ''}${!cur && !nx && (FROZEN || !A.next?.timeline?.length) ? '<li><span class="tag">종료</span> 이번 시즌 일정이 모두 끝났습니다.</li>' : ''}</ul>${pastSeasons()}</section>`;
 }
 const krLegendKr = () => `<p class="legend"><span><span class="krdot k-team"></span>한국 팀 (한국 선수 2명 이상)</span><span><span class="krdot k-member"></span>한국 선수 소속 (1명)</span><span><span class="krdot k-coach"></span>한국 코치 팀 (선수 없이 코치만)</span></p>`;
 const krLegend = () => (opt.mode === 'kr' ? krLegendKr() : `<p class="legend"><span><span class="krdot k-team"></span>${ML().label}</span>${opt.mode === 'custom' ? ' <a class="more" href="#/teams/pick">응원 팀 고르기</a>' : ''}</p>`);
@@ -533,7 +582,7 @@ function eventNow(short) {
   // 챔피언십
   if (champsTimeline()) {
     const C = champsBracket();
-    if (recent(C, C.tl.end)) { const x = stage(C, '챔피언십', `ev:${C.ss[0].eventId}`, champsNow() ? '/standings' : '/standings/champs', new URLSearchParams()); if (x) return x; }
+    if (recent(C, C.tl.end)) { const x = stage(C, '챔피언십', `ev:${C.ss[0].eventId}`, champsMain() ? '/standings' : '/standings/champs', new URLSearchParams()); if (x) return x; }
   }
   // LCQ
   for (const e of lcqEvents()) {
@@ -581,7 +630,7 @@ function heroCard(k) {
     stats = `<div class="kr-stats">
       ${box({ big: cp ? `${cp.rank}위` : '–', label: `챔피언십 포인트<br>${cp ? `${fmt(cp.total)} CP` : ''}` })}
       ${box({ big: li?.pos ? `${li.pos}위` : '–', label: li ? `${esc(li.name)}<br>${li.pos ? (li.cp ? `+${fmt(li.cp)} CP` : '최종 순위') : '미출전'}` : '국제전 기록 없음' })}
-      ${box({ big: ll?.pos ? `${ll.pos}위` : '–', label: ll ? `${esc(ll.name)}<br>${ll.pos ? (ll.cp ? `+${fmt(ll.cp)} CP` : '최종 순위') : '미출전'}` : '지역 리그 기록 없음' })}
+      ${box({ big: ll?.pos ? `${ll.pos}위` : '–', label: ll ? `${esc(ll.name)}<br>${ll.pos ? (ll.cp ? `+${fmt(ll.cp)} CP` : plOpen() ? '현재 순위' : '최종 순위') : '미출전'}` : '지역 리그 기록 없음' })}
     </div>`;
     key = intlKey();
   }
@@ -798,13 +847,13 @@ function intlCurrent() { if (!A.intl?.eventId) return false; return bracket()?.f
 function standings(parts, q) {
   if (parts[1] === 'past') return pastView(q);
   if (parts[1] === 'champs' && champsTab()) return `<h1 class="title">순위</h1>${champsView(q, '/standings/champs')}`;
-  if (champsNow()) return `<h1 class="title">순위</h1>${champsView(q, '/standings')}`;
+  if (champsMain()) return `<h1 class="title">순위</h1>${champsView(q, '/standings')}`;
   if (intlCurrent()) {
     const view = ['finals', 'bracket', 'group'].includes(parts[1]) ? parts[1] : finalsFirstTab() ? 'finals' : 'bracket';
     return `<h1 class="title">순위</h1>${intlBody(A.intl, view, (v) => `#/standings/${v}`, intlKey())}`;
   }
   if (lcqEvents().length) return `<h1 class="title">순위</h1>${lcqBody(q, '/standings')}`;
-  return `<h1 class="title">순위</h1><p class="empty">진행 중인 대회가 없습니다. <a href="#/standings/past">이전 결과</a>에서 지난 대회를 볼 수 있습니다.</p>`;
+  return `<h1 class="title">순위</h1><p class="empty">진행 중인 대회가 없습니다. ${(A.past || []).length ? '<a href="#/standings/past">이전 결과</a>에서 지난 대회를 볼 수 있습니다.' : '<span>이번 시즌 국제전이 열리면 여기에 표시됩니다.</span>'}</p>${pastSeasons()}`;
 }
 
 // 국제전(플레이오프·챔피언십) 결승·브래킷·조별 리그. L(view) = 그 화면 주소
@@ -948,9 +997,9 @@ function lcqGroups(B) {
   };
   // 문장마다 <span>: 번역 사전이 문장 단위로 맞춘다
   const basis = E.src === 'official' ? '<span>공식 API가 공개한 출전 명단입니다(공식 시드 순).</span>'
-    : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split 2 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}`;
+    : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split ${lastSplit()} 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}`;
   const grp = E.groupSrc === 'official' ? '<span>그룹은 공식 배정입니다.</span>' : '<span>그룹은 시드 지그재그 배정(A: 1·4·5·8·9…, B: 2·3·6·7·10…)이며, 공식 배정이 나오면 바뀝니다.</span>';
-  const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
+  const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/${A.meta?.year || 2026}/Split_${lastSplit()}/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
   const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2>${stageFlow(B, LCQ_FLOW_L, (k) => qsLink(B.base, B.q, { m: k }), 'LCQ 진행 방식')}</section>`;
   return `${how}${schedTable(B)}<p class="caption">${basis} ${grp}</p><div class="lcq-gcols">${col('a')}${col('b')}</div>${src}`;
 }
@@ -1085,8 +1134,13 @@ function lcqBody(q, base) {
 // 직행 32팀을 CP 순위대로 A→B→C→D→D→C→B→A→A→B… 지그재그로 4개 조(10팀씩)에 넣는다.
 // 33~40번 자리는 LCQ 8팀(지역별 2팀). 네 지역 LCQ가 모두 끝나면 그 8팀을 CP 순서대로 같은 방식으로 이어 넣는다.
 const champsTimeline = () => A.season.timeline.find((t) => t.key === 'champs');
-// 챔피언십이 시작되기 전까지 (시작하면 순위 탭의 진행 중 국제전 화면이 대신한다)
-const champsTab = () => !!champsTimeline() && !champsNow();
+// 챔피언십 탭: 시작되기 전까지 (시작하면 순위 탭의 기본 화면이 된다). CP 순위가 아직 없는 시즌 초에는 감춘다
+const champsTab = () => !!champsTimeline() && !champsMain() && A.cp.length > 0;
+// 챔피언십이 끝났는가 (시즌 종료). 끝난 뒤에도 순위 탭 기본 화면과 홈의 시즌 결과로 계속 남는다
+const champsDone = () => !!champsTimeline() && champsSeries().some((x) => x.phase === 'Match Point Finals' && x.status === 'completed');
+const champsMain = () => champsNow() || champsDone();
+// 가장 최근 Split 프로리그가 아직 끝나지 않았는가 (시즌 일정표 기준). 끝나기 전의 순위는 '현재 순위'로 적는다
+const plOpen = () => { const r = (A.season.timeline || []).find((x) => x.key === `s${lastSplit()}pl`); return !!r?.end && new Date(r.end + 'T23:59:59-08:00') > now(); };
 const GROUPS = ['A', 'B', 'C', 'D'];
 const snakeGroup = (i) => { const r = Math.floor(i / 4), k = i % 4; return GROUPS[r % 2 ? 3 - k : k]; };
 const REGION_S = { 'apac-n': 'APN', 'apac-s': 'APS', emea: 'EMEA', americas: 'AMER' };
@@ -1129,18 +1183,27 @@ const champsNow = () => intlCurrent() && /champs/.test(A.intl?.slug || '');
 function champsBracket() {
   const tl = champsTimeline();
   const ss = champsSeries();
-  const off = champsNow() ? A.intl.rows : null; // 공식 조별 리그 누적 (공식 조 배정 포함)
+  // 공식 조별 리그 누적 (공식 조 배정 포함): 진행 중에는 실시간 값, 끝난 뒤에는 보관된 값
+  const pastCh = (A.past || []).find((e) => /^champs/.test(e.slug || ''));
+  const off = champsNow() ? A.intl.rows : pastCh?.rows?.length ? pastCh.rows : null;
   const { seeds: raw, Q, allDone } = champsSeeds();
-  const offG = (sh) => off?.find((r) => r.short === sh)?.group;
+  // 조별 리그 시리즈 (공식 일정이 나왔으면 공식 이름·순서)
+  const offGs = ss.filter((x) => /^Group [A-D] vs [A-D]$/.test(x.name)).sort((a, b) => a.start.localeCompare(b.start));
+  // 시작 전: 조별 리그 시리즈마다 공식 출전 명단이 나와 있으면 거기서 조를 읽는다 (A조 팀 = 'A vs …' 경기에만 나오는 팀)
+  const lineG = (() => {
+    if (off || offGs.length < 3 || offGs.some((x) => !x.lineup?.length)) return null;
+    const m = new Map();
+    for (const x of offGs) { const gs = x.name.match(/^Group ([A-D]) vs ([A-D])$/).slice(1); for (const sh of x.lineup) m.set(sh, (m.get(sh) || GROUPS).filter((g) => gs.includes(g))); }
+    return [...m.values()].every((g) => g.length === 1) ? m : null;
+  })();
+  const offG = (sh) => off?.find((r) => r.short === sh)?.group || lineG?.get(sh)?.[0];
   const seeds = raw.map((t) => (t.tbd ? t : { ...t, group: offG(t.short) || t.group }));
   const bySh = new Map(seeds.filter((t) => !t.tbd).map((t) => [t.short, t]));
   const seed = (sh) => { const t = bySh.get(sh), g = offG(sh) || t?.group; return t ? { n: t.seed, label: `${g}조 · ${t.seed}번 시드` } : g ? { n: 999, label: `${g}조` } : null; };
   const slotOfSeed = (t) => ({ short: t.tbd ? null : t.short, label: t.tbd ? `${t.group}조 · LCQ 진출 팀` : `${t.group}조 · ${t.seed}번 시드` });
-  const B = { kind: 'champs', FLOW: CH_FLOW, seed, seeds, Q, allDone, tl, ss };
+  const B = { kind: 'champs', FLOW: CH_FLOW, seed, seeds, Q, allDone, tl, ss, official: !!off || !!lineG };
   const day = (i) => (tl ? addDay(tl.start, i) : null);
   const stOf = (S, x) => ({ ...S, s: x, start: x?.start, tbd: !!x?.timeTbd, status: !x ? 'none' : x.status === 'completed' ? 'completed' : x.live || x.status === 'live' ? 'live' : 'pending' });
-  // 조별 리그 시리즈
-  const offGs = ss.filter((x) => /^Group [A-D] vs [A-D]$/.test(x.name)).sort((a, b) => a.start.localeCompare(b.start));
   const pairs = offGs.length ? offGs.map((x) => x.name.match(/^Group ([A-D]) vs ([A-D])$/).slice(1)) : CH_GS;
   const gsl = pairs.map(([g1, g2], i) => {
     const st = stOf({ key: `g${i + 1}`, ko: `조별 리그 ${g1}조 vs ${g2}조`, tab: `${g1} vs ${g2}`, n: 20, date: day(i < pairs.length / 2 ? 0 : 1) }, offGs[i]);
@@ -1210,7 +1273,7 @@ function champsView(q, base) {
     <p class="caption">${allDone ? 'LCQ 진출 8팀을 CP 순서대로 33~40번 자리에 넣었습니다. CP가 같으면 LCQ 결승 순위가 높은 팀이 앞입니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</p></section>`;
   const how = `<section class="sec" aria-labelledby="h-ch-how"><h2 class="h2" id="h-ch-how">진행 방식</h2>${stageFlow(B, CH_FLOW_L, (k) => qsLink(base, q, { m: k }), '챔피언십 진행 방식')}</section>`;
   const groupsTab = `${how}${schedTable(B)}
-    <section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${champsNow() ? '공식 조 배정입니다.' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}</p>${groupsHtml}</section>${qBox}`;
+    <section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.official ? '공식 조 배정입니다.' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}</p>${groupsHtml}</section>${qBox}`;
   return `<section class="sec past-ev"><h2 class="h2">챔피언십</h2><p class="lead">${tl ? `${esc(tl.start.slice(0, 4))}.${esc(tl.start.slice(5).replace('-', '.'))} – ${esc(tl.end.slice(5).replace('-', '.'))} · ${esc(tl.where)}` : ''}</p></section>
     ${B.started && !B.done ? refreshNote() : ''}
     ${tabBar}
@@ -1219,9 +1282,9 @@ function champsView(q, base) {
 
 /* ---------- 이전 결과: 끝난 대회 ---------- */
 function pastEvents() {
-  const list = (A.past || []).filter((e) => !(intlCurrent() && e.eventId === A.intl.eventId));
-  // 다음 국제전이 진행 중이면 끝난 LCQ도 이전 결과로 간다
-  if (intlCurrent() && lcqEvents().some((e) => A.series.some((s) => s.eventId === e.eventId && s.results))) list.unshift({ eventId: 'lcq', kind: 'lcq', name: 'Last Chance Qualifier', start: lcqEvents()[0].start, end: lcqEvents()[0].end });
+  const list = (A.past || []).filter((e) => !(intlCurrent() && e.eventId === A.intl.eventId) && !(champsMain() && /^champs/.test(e.slug || '')));
+  // 다음 국제전이 진행 중이거나 챔피언십이 끝났으면 LCQ도 이전 결과로 간다
+  if ((intlCurrent() || champsDone()) && lcqEvents().some((e) => A.series.some((s) => s.eventId === e.eventId && s.results))) list.unshift({ eventId: 'lcq', kind: 'lcq', name: 'Last Chance Qualifier', start: lcqEvents()[0].start, end: lcqEvents()[0].end });
   return list;
 }
 const evPlace = (ev) => A.season.timeline.find((t) => ev.start.slice(0, 10) <= t.end && ev.end.slice(0, 10) >= t.start);
@@ -1500,15 +1563,14 @@ function settleRows(ST) {
 // CP 동률 (공식 규정 부록 C7.3): (A) Split 2 플레이오프 최종 순위가 좋은 팀 → (B) 프로리그 Split 2 최종 순위가 좋은 팀
 // → 그래도 같으면 C7.2(프로리그 Split 2 안의 세부 기준). C7.2는 프로리그 Split 2 정규 시즌 포인트 → 킬 순으로 근사하고, 마지막은 공식 순위.
 // (A)는 대회 최종 순위, 진행 중이면 정산표의 확정·결승 실시간 순위. 플레이오프 미출전은 출전 팀보다 뒤
-const TIE_EVENT = 'split-2-playoffs';
 let POIX = null;
 function poPos(r) {
-  if (!POIX || POIX.src !== A.cpEvents) { const e = (A.cpEvents || []).find((x) => x.slug === TIE_EVENT); POIX = { src: A.cpEvents, m: new Map((e?.rows || []).filter((x) => x.id).map((x) => [x.id, x.pos])) }; }
+  if (!POIX || POIX.src !== A.cpEvents) { const e = (A.cpEvents || []).find((x) => x.slug === tieSlug()); POIX = { src: A.cpEvents, m: new Map((e?.rows || []).filter((x) => x.id).map((x) => [x.id, x.pos])) }; }
   return POIX.m.get(r.id) ?? r.donePos ?? r.livePos ?? 999;
 }
 let PLIX = null;
 function plS2(r) {
-  if (!PLIX || PLIX.src !== A.pl) { const m = new Map(); for (const p of Object.values(A.pl || {})) if (p.split === 2) for (const x of p.rows) m.set(x.id, x); PLIX = { src: A.pl, m }; }
+  if (!PLIX || PLIX.src !== A.pl) { const m = new Map(); for (const p of Object.values(A.pl || {})) if (p.split === lastSplit()) for (const x of p.rows) m.set(x.id, x); PLIX = { src: A.pl, m }; }
   return PLIX.m.get(r.id);
 }
 const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || (pb?.rs ?? 0) - (pa?.rs ?? 0) || (pb?.kills ?? 0) - (pa?.kills ?? 0); };
@@ -1604,8 +1666,8 @@ const tieNote = (rows, i, k) => {
   const p = poPos(r), pl = plS2(r);
   const byPo = new Set(tied.map(poPos)).size === tied.length;
   const samePl = tied.filter((x) => poPos(x) === p && plS2(x)?.pos === pl?.pos).length > 1;
-  const why = p < 999 && (byPo || tied.filter((x) => poPos(x) === p).length === 1) ? `S2 PO ${p}위` : `PL S2 ${pl?.pos ?? '–'}위${samePl ? ` · ${pl?.rs ?? 0}점` : ''}`;
-  return `<small class="tie" title="동률 기준: S2 플레이오프 순위 → 프로리그 S2 순위 → 프로리그 S2 포인트">동률 · ${why}</small>`;
+  const why = p < 999 && (byPo || tied.filter((x) => poPos(x) === p).length === 1) ? `S${tieN()} PO ${p}위` : `PL S${lastSplit()} ${pl?.pos ?? '–'}위${samePl ? ` · ${pl?.rs ?? 0}점` : ''}`;
+  return `<small class="tie" title="동률 기준: S${tieN()} 플레이오프 순위 → 프로리그 S${lastSplit()} 순위 → 프로리그 S${lastSplit()} 포인트">동률 · ${why}</small>`;
 };
 const qualTag = (direct) => direct ? '<span class="tag ok">직행권</span>' : '<span class="tag lcq">LCQ</span>';
 const QUAL_REGIONS = ['apac-n', 'apac-s', 'emea', 'americas'];
@@ -1623,6 +1685,8 @@ function qualStrip(q, region) {
 }
 
 function cpView(q) {
+  // 시즌 초: 첫 프로리그가 끝나기 전에는 챔피언십 포인트가 없다
+  if (!A.cp.length) return `<p class="empty">아직 챔피언십 포인트가 없습니다. 첫 프로리그가 끝나면 순위가 표시됩니다.</p><p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>`;
   const mode = q.get('m') === 'players' ? 'players' : 'teams';
   const region = q.get('r') || 'all';
   const cut = A.season.cpDirectSlots;
@@ -1665,7 +1729,7 @@ function cpView(q) {
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
   const cpKey = BD.state === 'live' || BD.state === 'pending' ? intlKey() : null;
-  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split 2 플레이오프 최종 순위, 그다음 프로리그 Split 2 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
+  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split ${tieN()} 플레이오프 최종 순위, 그다음 프로리그 Split ${lastSplit()} 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
     ${spoil(`<div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">${ML().title}</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>`, cpKey, '챔피언십 포인트 순위')}
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
@@ -1699,7 +1763,7 @@ function plView(q) {
   const seg = (name, cur, items) => `<div class="seg" role="group" aria-label="${name}">${items.map(([v, l, patch]) => `<a href="${qsLink('/points/pl', q, patch)}" aria-current="${cur === v}">${l}</a>`).join('')}</div>`;
   const controls = `<div class="controls">
     ${seg('지역', region, ['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [r, REGION[r], { r }]))}
-    ${seg('스플릿', split, [['1', 'Split 1', { s: '1' }], ['2', 'Split 2', { s: '2' }]])}
+    ${seg('스플릿', split, [...new Set(keys.map((k) => k.slice(1, 2)))].sort().map((n) => [n, `Split ${n}`, { s: n }]))}
   </div>`;
   if (!P) return controls + '<p class="empty">이 지역·스플릿 데이터가 아직 없습니다.</p>';
   // 한 표: 정규 시즌 순위로 줄 세우고(진출 컷이 정규 시즌 기준), 리전 결승까지 반영한 최종 순위를 옆 칸에
@@ -1708,6 +1772,10 @@ function plView(q) {
   if (opt.krOnly) rows = rows.filter((r) => isF(r.short));
   const lines = !opt.krOnly ? { [P.playoffsLine]: `여기까지 정규 시즌 순위로 플레이오프 진출 (리전 결승 우승팀 1자리 추가)`, [P.rfLine]: '여기까지 리전 결승 진출' } : {};
   const krHere = rows.filter((r) => isF(r.short));
+  // 시작 전(아무도 시리즈를 치르지 않음): 표는 출전 팀 명단이고 순서는 순위가 아니다
+  const pre = P.rows.every((r) => !r.sp && !r.rs && !r.cpPP);
+  if (pre) return `${controls}<p class="lead">${esc(P.label)}. <span>아직 시작 전입니다. 아래는 출전 팀 명단이며 순서는 순위가 아닙니다.</span></p>
+    <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>팀</th><th class="c">조</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}</td><td class="c">${esc(r.group || '–')}</td></tr>`).join('')}</tbody></table></div></section>`;
   const fin = (r) => (r.pos !== r._rk ? `<b>${r.pos}</b><small class="mv">${r.pos < r._rk ? '▲' + (r._rk - r.pos) : '▼' + (r.pos - r._rk)}</small>` : `<b>${r.pos}</b>`);
   return `${controls}
     <p class="lead">${esc(P.label)}. 시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다. 진출 컷은 정규 시즌 순위 기준이고, 오른쪽 최종 순위는 리전 결승까지 반영한 값(챔피언십 포인트 기준)입니다.</p>
@@ -1800,7 +1868,7 @@ function krTeams() {
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
     return `<a class="kcard ${CAT[k.level]}" href="#/teams/${encodeURIComponent(k.short)}">
       <span class="kcard-id">${logo(k.short, 'lg')}<span><b>${esc(k.name)}</b><small>${esc(opt.mode === 'kr' ? KR_LABEL[k.level] : ML().label)} · ${esc(REGION[t.region] || '')}</small></span></span>
-      <span class="kcard-stats"><span><b>${k.cp ? k.cp.rank + '위' : '–'}</b><small>CP</small></span><span><b>${k.pl ? k.pl.pos + '위' : '–'}</b><small>Split 2 PL</small></span><span><b>${k.intl ? k.intl.pos + '위' : '–'}</b><small>조별 리그</small></span></span>
+      <span class="kcard-stats"><span><b>${k.cp ? k.cp.rank + '위' : '–'}</b><small>CP</small></span><span><b>${k.pl ? k.pl.pos + '위' : '–'}</b><small>Split ${lastSplit()} PL</small></span><span><b>${k.intl ? k.intl.pos + '위' : '–'}</b><small>조별 리그</small></span></span>
       ${si.text ? `<span class="kcard-now">지금 · ${esc(si.text)}</span>` : ''}
       <span class="kcard-roster">${ps.map(pName).join(', ')}${cs.length ? ` · 코치 ${cs.map(pName).join(', ')}` : ''}</span>
     </a>`;
@@ -1829,10 +1897,10 @@ function playerView(parts) {
     <div class="detail-id">${cur ? logo(cur.short, 'xl') : ''}<h1 class="title">${esc(name)}</h1></div>
     <p class="lead">${cur ? `${teamLink(cur.short, cur.name)} · ${esc(REGION[cur.region] || '')}` : '현재 소속 정보 없음'}${rp ? ` · ${esc(rp.c || '')}${rp.rep ? ` (대표 ${esc(rp.rep)})` : ''} · ${esc(rp.title || roleKo[rp.r] || '')}` : ''}${rp?.mix ? ' · <span class="tag kr k-member">한국계</span>' : rp && isKrP(rp) ? ' · <span class="tag kr k-team">한국</span>' : ''}</p>
     ${spoil(`<section class="sec"><h2 class="h2">챔피언십 포인트</h2>${cpP ? `<p class="lead">${esc(cpRow.name)}의 팀 CP 합산에 들어가는 상위 3인입니다.</p>` : '<p class="lead">현재 팀 CP 합산(상위 3인)에는 들어가지 않는 선수입니다.</p>'}${cpBreak(pid, name, cpP ? cpP[1] : null, cur?.short)}</section>
-    <section class="sec"><h2 class="h2">Year 6 대회 기록</h2>${h.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th>팀</th><th class="r">순위</th><th class="r">CP</th></tr></thead><tbody>
+    <section class="sec"><h2 class="h2">${esc(yearLabel())} 대회 기록</h2>${h.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th>팀</th><th class="r">순위</th><th class="r">CP</th></tr></thead><tbody>
       ${h.slice().reverse().map(({ e, r }) => `<tr><td><span class="lg-only">${esc(e.label)}</span><span class="sm-inline">${esc(e.short)}</span></td><td class="team">${r.short ? teamLink(r.short, r.name) : esc(r.name || '')}</td><td class="r num">${r.pos}</td><td class="r num">${fmt(r.cp)}</td></tr>`).join('')}
-    </tbody></table></div>` : '<p class="empty">Year 6 공식 대회 기록이 없습니다.</p>'}</section>`, intlKey(), '대회 기록')}
-    ${teamsSeen.length > 1 ? `<p class="lead">Year 6 소속 팀: ${teamsSeen.map((x) => esc(x.r.short || x.r.name)).join(' → ')}. 챔피언십 포인트는 팀을 옮겨도 선수에게 남습니다.</p>` : ''}
+    </tbody></table></div>` : '<p class="empty">${esc(yearLabel())} 공식 대회 기록이 없습니다.</p>'}</section>`, intlKey(), '대회 기록')}
+    ${teamsSeen.length > 1 ? `<p class="lead">${esc(yearLabel())} 소속 팀:${teamsSeen.map((x) => esc(x.r.short || x.r.name)).join(' → ')}. 챔피언십 포인트는 팀을 옮겨도 선수에게 남습니다.</p>` : ''}
     ${st ? `<section class="sec"><h2 class="h2">방송</h2>${streamRow(st)}</section>` : ''}
     <section class="sec"><h2 class="h2">이전 시즌</h2><p class="lead">Year 5 이전 기록은 Liquipedia 연동 후 이곳에 표시됩니다. 지금은 <a href="https://liquipedia.net/apexlegends/index.php?search=${encodeURIComponent(name)}" target="_blank" rel="noopener">Liquipedia에서 ${esc(name)} 검색</a>으로 볼 수 있습니다.</p></section>
     <p class="lead" style="margin-top:20px">${fbLink('데이터 오류', `선수 ${name}`, '이 선수 정보 고치기')} · ${fbLink('채널 제보', `선수 ${name}`, '방송 채널 제보하기')}</p>`;
@@ -1873,6 +1941,7 @@ function rules(parts, q) {
   const place = [12, 9, 7, 5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1];
   const html = `<h1 class="title">규칙</h1>
     <p class="lead">ALGS를 처음 보는 사람도 경기를 따라갈 수 있도록 핵심 규칙만 모았습니다. 자세한 기준은 맨 아래 공식 규정이 우선합니다.</p>
+    ${A.meta?.cfgMine === false ? '<p class="board-note now">점수표와 진행 방식 설명은 지난 시즌 규정 기준입니다. 새 시즌 규정이 확인되면 바뀝니다.</p>' : ''}
     ${vids.length && (sv === 'all' || sv === 'video') ? `<section class="sec" aria-labelledby="h-vid"><h2 class="h2" id="h-vid">영상으로 보기</h2><div class="vid-grid">${vids.map(vid).join('')}</div></section>` : ''}
     <div class="rules-grid">
     <section class="sec rule-card" data-k="format"><h2 class="h2">한 시즌의 흐름</h2>
@@ -1895,7 +1964,7 @@ function rules(parts, q) {
       <li>결승 20팀은 매치 포인트 방식으로 우승을 가립니다.</li></ul>
       <p class="lead"><a href="#/standings">순위 탭</a>에서 지금 진행 상황을 승자조·패자조로 볼 수 있습니다.</p></section>
     <section class="sec rule-card" data-k="format"><h2 class="h2">LCQ (Last Chance Qualifier)</h2>
-      <p>챔피언십 포인트로 직행하지 못한 프로리그 팀과 Split 2 챌린저 서킷 상위 팀이 지역마다 40팀씩 나와 마지막 ${S.lcqSlots}자리(지역별 2팀)를 겨룹니다.</p>
+      <p>챔피언십 포인트로 직행하지 못한 프로리그 팀과 Split ${lastSplit()} 챌린저 서킷 상위 팀이 지역마다 40팀씩 나와 마지막 ${S.lcqSlots}자리(지역별 2팀)를 겨룹니다.</p>
       <ul><li>시드 순서대로 지그재그로 나눠 승자 1라운드 그룹 A·B(각 20팀)</li>
       <li>그룹별 상위 10팀 → 승자 2라운드, 하위 10팀 → 패자부활 1라운드</li>
       <li>승자 2라운드 상위 10팀 → 결승, 하위 10팀 → 패자부활 2라운드 / 패자부활 1라운드 상위 10팀 → 패자부활 2라운드</li>
@@ -1907,7 +1976,7 @@ function rules(parts, q) {
       <p>CP는 <b>선수 개인</b>이 받습니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 선수가 팀을 옮기면 CP도 따라갑니다.</p>
       <ul><li>프로리그 최종 순위별(1인): ${sc.cpProLeague.slice(0, 6).join(', ')} …</li><li>플레이오프 최종 순위별(1인): ${sc.cpPlayoffs.slice(0, 6).join(', ')} …</li>
       <li>CP 상위 ${S.cpDirectSlots}팀은 챔피언십 직행, 나머지 ${S.lcqSlots}자리는 LCQ(지역별 2팀)에서 정합니다.</li>
-      <li>CP가 같으면 ① Split 2 플레이오프 최종 순위 ② 프로리그 Split 2 최종 순위 ③ 프로리그 Split 2 세부 기준 순으로 가립니다 (공식 규정 C7.3).</li></ul>
+      <li>CP가 같으면 ① Split ${tieN()} 플레이오프 최종 순위 ② 프로리그 Split ${lastSplit()} 최종 순위 ③ 프로리그 Split ${lastSplit()} 세부 기준 순으로 가립니다 (공식 규정 C7.3).</li></ul>
       <p class="lead"><a href="#/points/cp">포인트 탭</a>에서 현재 순위를 볼 수 있습니다.</p></section>
     <section class="sec rule-card" data-k="format"><h2 class="h2">레전드 밴 · POI 드래프트</h2>
       <p>경기 전 일부 레전드를 쓸 수 없게 막는 <b>레전드 밴</b>과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 <b>POI 드래프트</b>가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p></section>
@@ -2056,6 +2125,7 @@ function updatePill() {
   if (!pill) return;
   const on = LIVE.active.length > 0 && A.series.some((s) => s.live);
   pill.classList.toggle('is-live', on);
+  if (FROZEN) { pill.classList.remove('is-live'); txt.textContent = I.t('지난 시즌 기록'); return; }
   txt.textContent = I.t(on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`);
 }
 // 진행 중이거나 5분 안에 시작하는 시리즈 (시작 후 10시간까지)
@@ -2063,6 +2133,7 @@ const liveCandidates = () => A.series.filter((s) => s.status !== 'completed' && 
 let liveTimer = null;
 async function pollDirect() {
   clearTimeout(liveTimer);
+  if (FROZEN) return;
   const cands = liveCandidates();
   LIVE.active = cands.map((s) => s.id);
   if (!cands.length || document.hidden) { updatePill(); liveTimer = setTimeout(pollDirect, 60000); return; }
@@ -2095,7 +2166,7 @@ async function pollDirect() {
 const OFF = { lastAt: 0, ms: C.officialPollMs || 60000 };
 const regionOf = (id, raw) => A.cp.find((r) => r.id === id)?.region || ({ 'asia-pacific-north': 'apac-n', 'asia-pacific-south': 'apac-s', 'europe-middle-east-and-africa': 'emea', americas: 'americas' }[raw] || raw);
 async function refreshOfficial() {
-  if (document.hidden || LIVE.mode !== 'direct') return;
+  if (FROZEN || document.hidden || LIVE.mode !== 'direct') return;
   const api = LIVE.api, j = (u) => fetch(api + u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   let changed = false;
   const jobs = [];
@@ -2150,7 +2221,7 @@ document.addEventListener('visibilitychange', () => {
 });
 let curVer = null;
 async function pollVer() {
-  if (document.hidden) return;
+  if (FROZEN || document.hidden) return;
   try {
     const r = await fetch(`${C.verUrl}?t=${Date.now()}`, { cache: 'no-store' });
     if (!r.ok) return;
@@ -2194,6 +2265,7 @@ function applyLive() {
 
 /* ---------- 시작 ---------- */
 I.chrome();
+
 window.addEventListener('hashchange', () => { render(); app.focus({ preventScroll: true }); window.scrollTo(0, 0); });
 setupSettings();
 setupFeedback();

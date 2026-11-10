@@ -273,11 +273,19 @@ function writeIndex(entries) {
 function prune(entries) {
   const index = readJson('raw/logos/index.json', {});
   const keep = new Set(allBases(entries).flatMap((b) => SIZES.map((s) => path.basename(`${b}-${s}.webp`))));
+  // 지난 시즌 화면 데이터(site/data/seasons/*.js)가 쓰는 로고는 지우지 않는다
+  let archPng = false;
+  const arch = path.join(ROOT, 'site/data/seasons');
+  if (fs.existsSync(arch)) for (const f of fs.readdirSync(arch).filter((x) => x.endsWith('.js'))) {
+    const body = fs.readFileSync(path.join(arch, f), 'utf8');
+    for (const m of body.matchAll(/logos\/t\/([0-9a-z]+)/g)) for (const sz of SIZES) keep.add(`${m[1]}-${sz}.webp`);
+    if (/logos\/[0-9a-f]{8}\.png/.test(body)) archPng = true;
+  }
   const dir = path.join(ROOT, OUT);
   let n = 0;
   if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir)) if (!keep.has(f)) { fs.unlinkSync(path.join(dir, f)); n++; }
   const teams = ourTeams().filter((t) => snap.logos?.[t.id]);
-  if (teams.every((t) => index[t.key])) {
+  if (!archPng && teams.every((t) => index[t.key])) {
     const old = path.join(ROOT, 'site/logos');
     for (const f of fs.readdirSync(old)) if (f.endsWith('.png')) { fs.unlinkSync(path.join(old, f)); n++; }
   }

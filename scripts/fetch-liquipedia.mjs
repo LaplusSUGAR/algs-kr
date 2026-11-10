@@ -9,24 +9,15 @@
 // 주의: 엔드포인트·필드 이름과 대회 페이지 이름은 Liquipedia API 문서로 반드시 확인한다. (이 스크립트는 연결 확인 전 상태)
 // 이용 규칙: 식별 가능한 User-Agent, gzip, 요청 간격 준수. 결과는 CC-BY-SA로 출처 표기.
 import { fetchJson, writeJson, sleep } from './lib.mjs';
+import { seasonCtx, REGION_PAGE } from './season.mjs';
 
 const KEY = process.env.LIQUIPEDIA_API_KEY;
 const BASE = 'https://api.liquipedia.net/api/v3';
 const WIKI = 'apexlegends';
 
-// 수집 대상 대회 페이지 (Liquipedia 페이지 이름). 시즌이 바뀌면 여기만 고친다.
-const PAGES = [
-  'Apex_Legends_Global_Series/2026/Split_1/Pro_League/APAC_North',
-  'Apex_Legends_Global_Series/2026/Split_2/Pro_League/APAC_North',
-  'Apex_Legends_Global_Series/2026/Split_1/Pro_League/APAC_South',
-  'Apex_Legends_Global_Series/2026/Split_2/Pro_League/APAC_South',
-  'Apex_Legends_Global_Series/2026/Split_1/Pro_League/EMEA',
-  'Apex_Legends_Global_Series/2026/Split_2/Pro_League/EMEA',
-  'Apex_Legends_Global_Series/2026/Split_1/Pro_League/Americas',
-  'Apex_Legends_Global_Series/2026/Split_2/Pro_League/Americas',
-  'Apex_Legends_Global_Series/2026/Split_1/Playoffs',
-  'Apex_Legends_Global_Series/2026/Split_2/Playoffs',
-];
+// 수집 대상 대회 페이지 (Liquipedia 페이지 이름): 메인 시즌의 Split마다 프로리그 네 지역과 플레이오프
+const CTX = seasonCtx();
+const PAGES = CTX ? Array.from({ length: CTX.split }, (_, i) => i + 1).flatMap((sp) => [...Object.values(REGION_PAGE).map((pg) => `${CTX.base}/Split_${sp}/Pro_League/${pg}`), `${CTX.base}/Split_${sp}/Playoffs`]) : [];
 
 async function lpdb(table, params) {
   const qs = new URLSearchParams({ wiki: WIKI, limit: '500', ...params });

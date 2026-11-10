@@ -13,12 +13,16 @@
 //   poGroups: { eventId: [poGroup 행...] }  국제전마다 조별 리그 누적 (이전 결과 보기용, 끝난 대회도 보관)
 //   lcq    : { eventId: { teams: [[teamId, short, name, seed]], lineups: { seriesId: [short...] } } }  LCQ 지역별 출전 팀·로비 배정
 //
+//   seasonSlug·seasonName: 메인 시즌 (scripts/season.mjs가 시즌 목록에서 고른다. 강제: ALGS_SEASON=year-6)
+//   seasons: [[slug, 이름, 첫 대회 시작, 마지막 대회 끝]]  공식 API에 있는 시즌 전체
+//   nextSeason: { slug, name, events } | null  목록에는 있지만 아직 메인이 아닌 다음 시즌 (예고용)
+//
 // 사용: node scripts/fetch-algs.mjs            (전체)
-//       node scripts/fetch-algs.mjs --live-only (진행 중 시리즈 결과만 갱신; Worker와 같은 용도)
 import { fetchJson, writeJson, readJson } from './lib.mjs';
+import { pickSeason, nextTeaser, archiveSeason } from './season.mjs';
 
 const API = process.env.ALGS_API || 'https://prod-api.algstools.com/v1';
-const SEASON_SLUG = process.env.ALGS_SEASON || 'year-6';
+const FORCE_SEASON = process.env.ALGS_SEASON || null;
 const KR = 'KR';
 const roleCode = (r) => ({ player: 'p', captain: 'c', coach: 'k' }[r] || '?');
 const get = (p) => fetchJson(API + p);
@@ -37,17 +41,64 @@ const FULL = process.argv.includes('--full') || (!process.argv.includes('--quick
 
 async function main() {
   const structure = await get('/seasons/structure');
-  const season = structure.seasons.find((s) => s.slug === SEASON_SLUG);
-  if (!season) throw new Error(`시즌 ${SEASON_SLUG}을 찾지 못함`);
+  const prevSnap = readJson('raw/algs/snapshot.json', {});
+  // 지난번 메인 시즌 (seasonSlug가 없던 예전 스냅샷은 시즌 ID로 찾는다)
+  const prevSlug = prevSnap.seasonSlug || (structure.seasons || []).find((s) => s.id && s.id === prevSnap.seasonId)?.slug || null;
+  const pick = pickSeason(structure.seasons, { force: FORCE_SEASON, prevSlug });
+  if (!pick.cur) throw new Error(`메인 시즌을 고르지 못함: ${pick.why}`);
+  const prevInfo = pick.list.find((x) => x.slug === prevSlug) || null;
+  const same = (x) => !prevSlug || x.slug === prevSlug;
+  // 시즌이 바뀔 때 새 시즌으로 넘겨 주는 값: 팀 로고·방송 채널만 (순위·시리즈·LCQ는 시즌마다 새로)
+  const carry = { logos: prevSnap.logos, partnerStreams: prevSnap.partnerStreams, officialStreams: prevSnap.officialStreams };
+  // 새 시즌으로 넘어갈 조건: 프로리그 한 지역 이상에 20팀 이상이 있고 로스터가 있다 (아직이면 지난 시즌을 메인으로 둔다)
+  const ready = (n) => Object.values(n.pl).some((rows) => rows.length >= 20) && Object.keys(n.rosters).length >= 20;
+  let info = pick.cur, body = null;
+  try { body = await collect(info.s, same(info) ? prevSnap : carry); } catch (e) { if (same(info) || !prevInfo) throw e; console.log(`[algs] 새 시즌 ${info.slug} 수집 실패: ${e.message}`); }
+  if (!same(info) && (!body || !ready(body))) {
+    console.log(`[algs] 새 시즌 ${info.slug}: 프로리그 팀·로스터가 아직 없어 ${prevSlug}을 메인으로 유지`);
+    if (!prevInfo) throw new Error(`이전 시즌 ${prevSlug}이 공식 목록에 없음`);
+    info = prevInfo;
+    body = await collect(info.s, prevSnap);
+  }
+  const key = (x) => x.plStart || x.first || '';
+  const upcoming = pick.list.find((x) => key(x) > key(info)) || null;
+  const next = { seasonId: info.id, seasonSlug: info.slug, seasonName: info.name, seasons: pick.list.map((x) => [x.slug, x.name, x.first, x.last]), nextSeason: nextTeaser(upcoming), ...body };
+  // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
+  const { fetchedAt: _f, _schema: _s, ...prevBody } = prevSnap;
+  if (JSON.stringify(prevBody) === JSON.stringify(next)) { console.log('[algs] 변경 없음'); return; }
+  // 메인 시즌이 바뀌는 순간: 지난 시즌을 얼려 두고 새 시즌을 쓴다
+  if (prevSlug && info.slug !== prevSlug) {
+    console.log(`[algs] 메인 시즌 변경: ${prevSlug} → ${info.slug} (${pick.why})`);
+    archiveSeason({ ...prevSnap, seasonSlug: prevSlug });
+  }
+  writeJson('raw/algs/snapshot.json', { fetchedAt: new Date().toISOString(), ...next });
+  console.log(`[algs] ${info.slug}: events ${next.events.length}, cp ${next.cp.length}, pl ${Object.keys(next.pl).length}, series ${next.series.length}, poGroup ${next.poGroup.length}${upcoming ? `, 다음 시즌 ${upcoming.slug}` : ''}`);
+}
 
+// 한 시즌의 데이터를 모두 받아 스냅샷 본문을 만든다. prev: 같은 시즌의 지난 스냅샷(다시 쓸 값), 시즌이 바뀌면 로고·채널만 든 값
+async function collect(season, prev) {
   const events = season.tournaments.flatMap((t) =>
     t.events.map((e) => [e.id, e.slug, t.publicNameOverride || t.name, e.region?.slug || null, e.startDate, e.endDate,
       e.phases.map((p) => [p.id, p.name, p.standingsCalculationMethod, p.qualificationThreshold])]));
 
-  // Pro League 이벤트 (지역별)
-  const plEvents = season.tournaments.flatMap((t) => t.events.map((e) => ({ t, e })))
-    .filter(({ e }) => /^split-\d-pro-league-/.test(e.slug));
-
+  // Pro League 이벤트 (지역별). 단계(phase)가 아직 없는 대회는 일정만 잡힌 것이라 뺀다
+  const plAll = season.tournaments.flatMap((t) => t.events.map((e) => ({ t, e })))
+    .filter(({ e }) => /^split-\d-pro-league-/.test(e.slug) && e.phases?.length);
+  if (!plAll.length) throw new Error(`${season.slug}: 프로리그 대회가 없음`);
+  const splitOf = ({ e }) => +e.slug.match(/^split-(\d)/)[1];
+  // 가장 최근 Split: 시작 14일 전을 지난 Split 가운데 가장 늦은 것 (시즌 초에는 첫 Split). CP 순위·동률 기준·프로리그 경기 일정·로스터가 이 Split 기준이다.
+  // 그 Split의 출전 팀 명단이 아직 없으면(새 Split 준비 중) 앞 Split을 그대로 최신으로 쓴다
+  const open = [...new Set(plAll.filter(({ e }) => new Date(e.startDate) - Date.now() < 14 * 864e5).map(splitOf))].sort((a, b) => a - b);
+  let latestSplit = open.at(-1) ?? Math.min(...plAll.map(splitOf));
+  let latestPl, latestRes;
+  for (;;) {
+    latestPl = plAll.filter((x) => splitOf(x) === latestSplit);
+    latestRes = await pmap(latestPl, ({ e }) => get(`/phases/${e.phases[0].id}/teams`));
+    if (latestRes.every((r) => (r?.teams || []).length >= 10) || !open.includes(latestSplit - 1)) break;
+    console.log(`[algs] Split ${latestSplit} 출전 팀 명단이 아직 없어 Split ${latestSplit - 1} 기준으로 진행`);
+    latestSplit--;
+  }
+  const plEvents = plAll.filter((x) => splitOf(x) <= latestSplit);
   const pl = {};
   const rosters = {};
   const plRes = await pmap(plEvents, ({ e }) => Promise.all([get(`/events/${e.id}/standings`), get(`/stats/phases/${e.phases[0].id}/standings`)]));
@@ -67,9 +118,15 @@ async function main() {
   }
 
   // 챔피언십 포인트 (공식 페이지와 같은 파라미터: 현재 Split Pro League 이벤트, 최소 12경기)
-  const lastPl = plEvents.filter(({ e }) => e.slug.startsWith('split-2-')).map(({ e }) => e.id);
-  const cpRes = await get(`/seasons/${season.id}/standings/teams?eventIds=${encodeURIComponent(lastPl.join(','))}&minAmountOfMatches=12`);
-  const cp = cpRes.standings.map((s) => [s.rank, s.teamId, s.teamName, s.shortName, s.region, s.totalPoints, s.players.map((p) => [p.name.trim(), p.points, p.id])]);
+  //   새 Split 초반에 그 Split 대회로는 순위가 비어 나오면 앞 Split 대회로 다시 받는다
+  const idsOf = (sp) => plEvents.filter((x) => splitOf(x) === sp).map(({ e }) => e.id);
+  const cpGet = (ids) => get(`/seasons/${season.id}/standings/teams?eventIds=${encodeURIComponent(ids.join(','))}&minAmountOfMatches=12`);
+  let cpRes = { standings: [] }, cpEventIds = idsOf(latestSplit);
+  try {
+    cpRes = await cpGet(cpEventIds);
+    if (!(cpRes.standings || []).length && idsOf(latestSplit - 1).length) { cpEventIds = idsOf(latestSplit - 1); cpRes = await cpGet(cpEventIds); }
+  } catch (e) { if (prev.cp?.length) throw e; console.log('[algs] 챔피언십 포인트 순위가 아직 없음 (시즌 초)'); } // 받던 값이 있는데 실패하면 예전처럼 전체 실패 → 이전 스냅샷 유지
+  const cp = (cpRes.standings || []).map((s) => [s.rank, s.teamId, s.teamName, s.shortName, s.region, s.totalPoints, s.players.map((p) => [p.name.trim(), p.points, p.id])]);
 
   // 챔피언십 포인트를 주는 대회별 결과: 누가 어느 대회에서 몇 CP를 받았는지
   //   cpEvents: [[eventId, slug, rows[[순위, 1인당CP, teamId, 팀이름, "선수ID|이름;..."(코치 제외)]]]]  아직 정해지지 않은 순위는 teamId null
@@ -93,11 +150,10 @@ async function main() {
   const krShorts = new Set();
   for (const rows of Object.values(pl)) for (const r of rows) if (r[10]) krShorts.add(r[1]);
   const isWanted = (s) => /playoffs|last-chance|lcq|champs/i.test(s.event?.slug || '') || /Last Chance|Playoffs|Championship/.test(s.tournament?.name || '')
-    || (s.event?.slug || '').startsWith('split-2-pro-league-apac-north');
+    || (s.event?.slug || '').startsWith(`split-${latestSplit}-pro-league-apac-north`);
   const series = [];
   // 끝난 지 하루가 넘은 시리즈의 결과는 바뀌지 않으므로 이전 스냅샷 값을 쓴다 (매시 한 번은 모두 다시 받음)
-  const prevSnap = readJson('raw/algs/snapshot.json', {});
-  const prevRes = new Map((prevSnap.series || []).filter((r) => r[4] === 'completed' && r[9]).map((r) => [r[0], r[9]]));
+  const prevRes = new Map((prev.series || []).filter((r) => r[4] === 'completed' && r[9]).map((r) => [r[0], r[9]]));
   const wanted = allSeries.filter(isWanted);
   const reuse = (s) => !FULL && s.status === 'completed' && prevRes.has(s.id) && Date.now() - new Date(s.startsAt) > 864e5;
   const stats = await pmap(wanted, (s) => ((s.status === 'completed' || s.status === 'live') && !reuse(s) ? get(`/stats/series/${s.id}`) : null));
@@ -116,7 +172,6 @@ async function main() {
   // 가장 최근 국제전(Playoffs/Championship)의 첫 단계 누적 순위
   const intlEvent = season.tournaments.flatMap((t) => t.events).filter((e) => /playoffs|champs/.test(e.slug) && e.phases.length)
     .sort((a, b) => b.startDate.localeCompare(a.startDate)).find((e) => new Date(e.startDate) <= new Date());
-  const prev = readJson('raw/algs/snapshot.json', {});
   let poGroup = [];
   // 국제전 출전 로스터 (대체 선수 포함, 비자 문제 등으로 바뀐 실제 명단): { teamId: [[선수ID, 이름, 역할]] }
   const poRosters = {};
@@ -127,12 +182,9 @@ async function main() {
   }
 
   // 최신 Split Pro League 4개 지역 로스터 (전 팀). 대표 국가가 국적과 다르면 함께 저장 (한국계 선수 표시용)
-  const latestSplit = Math.max(...plEvents.map(({ e }) => +e.slug.match(/^split-(\d)/)[1]));
-  const latestPl = plEvents.filter(({ e }) => e.slug.startsWith(`split-${latestSplit}-`));
   const krStreams = [];
   const logos = {}; // teamId: [logoLight(흰 로고, 어두운 배경용), logoDark(어두운 로고, 밝은 배경용)] 공식 팀 로고 URL. 없는 쪽은 null
   const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
-  const latestRes = await pmap(latestPl, ({ e }) => get(`/phases/${e.phases[0].id}/teams`));
   for (const [k, { e }] of latestPl.entries()) {
     if (!latestRes[k]) throw new Error(`로스터를 받지 못함: ${e.slug}`);
     const teams = latestRes[k].teams || [];
@@ -143,6 +195,12 @@ async function main() {
         return `${p.name.trim()}|${p.country || ''}|${roleCode(p.role)}${rep ? '|' + rep : ''}`;
       }).join(';');
       for (const p of tm.players.filter(isKr)) krStreams.push([tm.shortName, p.name.trim(), p.role, p.streamProvider, p.channelName]);
+    }
+    // 시즌 초: 순위표가 아직 비어 있으면 출전 팀 명단 순서로 프로리그 표를 채운다 (팀 목록·로스터가 먼저 보이게)
+    const plKey = `s${latestSplit}:${e.slug.replace(/^split-\d-pro-league-/, '')}`;
+    if (!pl[plKey]?.length && teams.length) {
+      pl[plKey] = teams.map((tm, i) => [i + 1, String(tm.shortName || '').trim(), String(tm.name || tm.teamName || tm.shortName || '').trim(), tm.teamId, 0, 0, null, tm.group || '', null, null,
+        tm.players.filter((x) => x.country === KR && x.role !== 'coach').map((x) => x.name.trim()).join(',')]);
     }
   }
 
@@ -174,8 +232,21 @@ async function main() {
     console.log(`[algs] 출전 경기 수: 시리즈 ${todo.length}개, 게임 ${jobs.length}개 확인`);
   } catch (e) { console.error('[algs] 출전 경기 수 실패:', e.message); }
 
+  // 아직 없을 수 있는 값은 재시도 없이 한 번만 확인한다 (명단이 나오기 전에는 404)
+  const peek = async (p) => { try { const r = await fetch(API + p, { headers: { Accept: 'application/json' } }); return r.ok ? await r.json() : null; } catch { return null; } };
   // 진행 중 국제전의 남은 시리즈 출전 팀 (브래킷 표시용)
   const lineups = {};
+  // 7일 안에 시작하는 국제전: 공식 출전 명단이 나오는 대로 받아 둔다 (시작 전에 조 편성을 공식 값으로 보여 주려고). 받은 명단은 매시 한 번만 다시 확인
+  const upEvent = season.tournaments.flatMap((t) => t.events).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.startDate) > new Date() && new Date(e.startDate) - Date.now() < 7 * 864e5)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
+  if (upEvent) {
+    const ss = allSeries.filter((x) => x.event?.id === upEvent.id && x.status !== 'completed');
+    const res = await pmap(ss, (s) => (!FULL && prev.lineups?.[s.id] ? null : peek(`/series/${s.id}/teams`)));
+    for (const [k, s] of ss.entries()) {
+      const shorts = (res[k]?.teams || []).map((t) => String(t.shortName || '').trim()).filter(Boolean);
+      if (shorts.length) lineups[s.id] = shorts; else if (prev.lineups?.[s.id]) lineups[s.id] = prev.lineups[s.id];
+    }
+  }
   if (intlEvent) {
     const left = allSeries.filter((x) => x.event?.id === intlEvent.id && x.status !== 'completed');
     const res = await pmap(left, (s) => get(`/series/${s.id}/teams`));
@@ -197,7 +268,6 @@ async function main() {
 
   // LCQ (지역별 40팀): 공식 출전 명단과 시리즈별 출전 팀(승자 1R 로비 배정). 명단이 나오기 전에는 404라서 재시도 없이 한 번만 확인한다
   //   대회 2일 전부터는 모든 라운드, 그 전에는 승자 1R 로비 A·B만 (나머지 라운드는 앞 라운드 결과로 화면이 계산)
-  const peek = async (p) => { try { const r = await fetch(API + p, { headers: { Accept: 'application/json' } }); return r.ok ? await r.json() : null; } catch { return null; } };
   const lcq = {};
   const lcqLogos = [];
   const nm = (t) => String(t.name || t.teamName || t.displayName || '').trim();
@@ -247,13 +317,8 @@ async function main() {
     for (const v of tvRes[k]?.versions || []) addLogo(id, v.logoLight, v.logoDark);
   }
 
-  const next = { seasonId: season.id, events, cp, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, partnerStreams,
+  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
-  // 내용이 같으면 파일을 건드리지 않는다 (5분 주기 빌드에서 불필요한 커밋·배포 방지)
-  const { fetchedAt: _f, _schema: _s, ...prevBody } = prev;
-  if (JSON.stringify(prevBody) === JSON.stringify(next)) { console.log('[algs] 변경 없음'); return; }
-  writeJson('raw/algs/snapshot.json', { fetchedAt: new Date().toISOString(), ...next });
-  console.log(`[algs] events ${events.length}, cp ${cp.length}, pl ${Object.keys(pl).length}, series ${series.length}, poGroup ${poGroup.length}`);
 }
 
 main().catch((e) => {

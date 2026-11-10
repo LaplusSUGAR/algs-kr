@@ -5,29 +5,30 @@
 // 결과(CC-BY-SA, 출처 표기): raw/lp/lcq.json
 //   { fetchedAt, pages: { region: { title, rev, text } } }
 import { UA, readJson, writeJson } from './lib.mjs';
+import { seasonCtx, REGION_PAGE } from './season.mjs';
 
 const API = 'https://liquipedia.net/apexlegends/api.php';
-const PAGES = {
-  'apac-n': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_North',
-  'apac-s': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_South',
-  emea: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/EMEA',
-  americas: 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/Americas',
+// 페이지 이름은 메인 시즌에서 만든다 (Year 6 = 2026, 챌린저 서킷은 가장 최근 Split)
+const CTX = seasonCtx();
+const LCQ_BASE = `${CTX?.base}/Championship/Last_Chance_Qualifier`;
+const PAGES = Object.fromEntries([
+  ...Object.entries(REGION_PAGE).map(([r, pg]) => [r, `${LCQ_BASE}/${pg}`]),
   // 브래킷 페이지: 진행 방식(Format)과 조 배정(Group Layout)
-  'bk:apac-n': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_North/Bracket',
-  'bk:apac-s': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/APAC_South/Bracket',
-  'bk:emea': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/EMEA/Bracket',
-  'bk:americas': 'Apex_Legends_Global_Series/2026/Championship/Last_Chance_Qualifier/Americas/Bracket',
+  ...Object.entries(REGION_PAGE).map(([r, pg]) => [`bk:${r}`, `${LCQ_BASE}/${pg}/Bracket`]),
   // 챌린저 서킷 종합 순위 (LCQ 남은 자리를 채우는 순서)
-  'cc:apac-n': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_North',
-  'cc:apac-s': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/APAC_South',
-  'cc:emea': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/EMEA',
-  'cc:americas': 'Apex_Legends_Global_Series/2026/Split_2/Challenger_Circuits/Americas',
-};
-const LCQ_START = new Date('2026-11-20T00:00:00Z');
-const LCQ_END = new Date('2026-11-23T00:00:00Z');
+  ...Object.entries(REGION_PAGE).map(([r, pg]) => [`cc:${r}`, `${CTX?.base}/Split_${CTX?.split}/Challenger_Circuits/${pg}`]),
+]);
+// LCQ 날짜는 공식 일정에서 (시작 45일 전부터 끝난 뒤 7일까지만 받는다)
+const LCQ_START = new Date(CTX?.lcq?.start || 0);
+const LCQ_END = new Date(Date.parse(CTX?.lcq?.end || 0) + 864e5);
+const OUT = 'raw/lp/lcq.json';
+// 다른 시즌 것이면 버리고 새로 시작한다
+const load = () => { const x = readJson(OUT, null); return x && x.season && x.season !== CTX?.slug ? null : x; };
 
 async function main() {
-  const prev = readJson('raw/lp/lcq.json', null);
+  if (!CTX?.lcq) { console.log('[lp-lcq] 이번 시즌 LCQ 일정이 아직 없음 → 건너뜀'); return false; }
+  if (Date.now() < LCQ_START - 45 * 864e5) { console.log('[lp-lcq] LCQ 45일 전부터 받음 → 건너뜀'); return false; }
+  const prev = load();
   const near = Date.now() > LCQ_START - 3 * 864e5 && Date.now() < LCQ_END;
   const m = new Date().getUTCMinutes();
   const sameSet = JSON.stringify(prev?.titles || []) === JSON.stringify(Object.values(PAGES)); // 받을 페이지 목록이 바뀌면 바로 받는다
@@ -48,14 +49,14 @@ async function main() {
   const same = prev && sameSet && JSON.stringify(Object.fromEntries(Object.entries(prev.pages || {}).map(([k, v]) => [k, v.rev]))) === JSON.stringify(Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, v.rev])));
   // 내용이 그대로면 받은 시각만 기억하고(파일은 그대로) 넘어간다 → 불필요한 커밋 방지
   if (same) { console.log('[lp-lcq] 변경 없음'); return; }
-  writeJson('raw/lp/lcq.json', { ...(prev || {}), fetchedAt: new Date().toISOString(), titles: Object.values(PAGES), pages });
+  writeJson(OUT, { ...(prev || {}), season: CTX.slug, fetchedAt: new Date().toISOString(), titles: Object.values(PAGES), pages });
   console.log(`[lp-lcq] ${Object.keys(pages).length}개 지역 페이지 저장`);
 }
 
 // 챌린저 서킷 종합 순위표: 위키 원문에는 없고(Lua 모듈이 그림) 그려진 HTML에만 있어서 action=parse로 받는다.
 // 10월 12일에 끝난 순위라 바뀌지 않으므로 지역마다 한 번만 받는다. parse 요청은 30초 간격 (Liquipedia 규칙)
-async function ccStandings() {
-  const cur = readJson('raw/lp/lcq.json', null);
+async function ccStandings(ok) {
+  const cur = ok === false ? null : load();
   if (!cur) return;
   const cc = cur.cc || {};
   const todo = Object.entries(PAGES).filter(([k]) => k.startsWith('cc:') && cc[k.slice(3)]?.v !== 2);
@@ -74,7 +75,7 @@ async function ccStandings() {
       console.log(`[lp-lcq] ${k} 종합 순위 ${t.length}자`);
     } catch (e) { console.error(`[lp-lcq] ${k} 실패`, e.message); }
   }
-  writeJson('raw/lp/lcq.json', { ...cur, cc });
+  writeJson(OUT, { ...cur, cc });
 }
 
 main().then(ccStandings).catch((e) => { console.error('[lp-lcq] 실패:', e.message); process.exitCode = 0; });
