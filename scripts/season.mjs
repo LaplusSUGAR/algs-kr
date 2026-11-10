@@ -11,7 +11,8 @@ import { ROOT, readJson, writeJson } from './lib.mjs';
 
 export const LEAD_DAYS = Number(process.env.ALGS_SEASON_LEAD_DAYS) || 14;
 export const REGIONS = ['apac-n', 'apac-s', 'emea', 'americas'];
-export const yearNo = (slug) => { const m = /(\d+)/.exec(String(slug || '')); return m ? Number(m[1]) : null; };
+// 'year-6' 꼴만 리그 시즌 번호로 읽는다 (공식 목록에는 'enc-2026' 같은 별도 대회 묶음도 시즌으로 들어 있다)
+export const yearNo = (slug) => { const m = /^year-(\d+)$/.exec(String(slug || '')); return m ? Number(m[1]) : null; };
 // Liquipedia는 시즌을 시작 연도로 부른다 (Year 6 = 2026, 시즌 페이지는 ALGS/2026-27)
 export const lpYear = (slug) => (yearNo(slug) ? 2020 + yearNo(slug) : null);
 export const lpSeasonPage = (slug) => { const y = lpYear(slug); return y ? `ALGS/${y}-${String((y + 1) % 100).padStart(2, '0')}` : 'ALGS'; };
@@ -29,7 +30,9 @@ export function seasonInfo(s) {
 // 메인 시즌과 다음 시즌. prevSlug: 지난번에 메인이던 시즌 (뒤로 돌아가지 않게 하는 기준)
 export function pickSeason(seasons, { now = Date.now(), force = null, prevSlug = null, leadDays = LEAD_DAYS } = {}) {
   const key = (x) => x.plStart || x.first || '';
-  const list = (seasons || []).map(seasonInfo).filter((x) => x.events).sort((a, b) => key(a).localeCompare(key(b)));
+  // 리그 시즌만 본다: 프로리그 일정이 있거나 slug가 year-N인 시즌. 프로리그가 없는 별도 대회 묶음(예: enc-2026 국가 대항전 예선)은 메인·다음 시즌 후보가 아니다
+  const league = (x) => !!x.plStart || yearNo(x.slug) != null;
+  const list = (seasons || []).map(seasonInfo).filter((x) => x.events && (league(x) || x.slug === force || x.slug === prevSlug)).sort((a, b) => key(a).localeCompare(key(b)));
   if (!list.length) return { cur: null, next: null, list, why: '시즌 목록이 비어 있음' };
   let cur = null, why = '';
   if (force) { cur = list.find((x) => x.slug === force) || null; why = cur ? `ALGS_SEASON=${force}` : ''; }
@@ -92,7 +95,8 @@ export function seasonCtx() {
   const snap = readJson('raw/algs/snapshot.json', null);
   if (!snap) return null;
   const slug = snap.seasonSlug || 'year-6';
-  const y = lpYear(slug);
+  // slug가 year-N 꼴이 아니면 첫 대회가 열린 해를 쓴다
+  const y = lpYear(slug) || Number(String(minIso((snap.events || []).map((e) => e[4])) || '').slice(0, 4)) || new Date().getFullYear();
   const split = Math.max(0, ...Object.keys(snap.pl || {}).map((k) => Number(k.slice(1, 2)) || 0)) || 1;
   const lcqEv = (snap.events || []).filter((e) => /^last-chance-qualifier/.test(e[1]));
   return { slug, y, split, base: `Apex_Legends_Global_Series/${y}`,
