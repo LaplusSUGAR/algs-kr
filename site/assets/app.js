@@ -1127,6 +1127,7 @@ function lcqBody(q, base) {
     ${!B.done ? refreshNote() : ''}
     <div class="controls">${seg}</div>${focusLine}
     ${tabBar}
+    ${!B.done && B.list.some((st) => st.s?.startFix === 'rules') ? '<p class="caption">경기 시각은 공식 규정의 지역별 일정표(현지 시각) 기준입니다. 공식 페이지에는 아직 임시 시각이 들어 있어 실제 시작 시각은 달라질 수 있습니다.</p>' : ''}
     ${spoil(m === 'groups' ? lcqGroups(B) : stageMatch(B, B[m]), key, 'LCQ 결과')}`;
 }
 
@@ -1139,6 +1140,20 @@ const champsTab = () => !!champsTimeline() && !champsMain() && A.cp.length > 0;
 // 챔피언십이 끝났는가 (시즌 종료). 끝난 뒤에도 순위 탭 기본 화면과 홈의 시즌 결과로 계속 남는다
 const champsDone = () => !!champsTimeline() && champsSeries().some((x) => x.phase === 'Match Point Finals' && x.status === 'completed');
 const champsMain = () => champsNow() || champsDone();
+// 시즌 일정표 한 줄의 상태(끝남·진행 중·예정)와 사이트 안에서 그 단계를 보는 곳
+const tlState = (e) => { const t = new Date(now()).toLocaleDateString('sv-SE', { timeZone: 'America/Los_Angeles' }); return t > e.end ? 'done' : t >= e.start ? 'now' : 'next'; };
+function stageHref(e) {
+  let m;
+  if ((m = /^s(\d)pl$/.exec(e.key))) return A.pl && Object.values(A.pl).some((p) => p.split === +m[1]) ? `#/points/pl?s=${m[1]}` : null;
+  if ((m = /^s(\d)po$/.exec(e.key))) {
+    if (A.intl && new RegExp(`^split-${m[1]}-playoffs`).test(A.intl.slug || '') && intlCurrent()) return '#/standings';
+    const ev = (A.past || []).find((x) => new RegExp(`^split-${m[1]}-playoffs`).test(x.slug || ''));
+    return ev ? `#/standings/past?e=${ev.eventId}` : null;
+  }
+  if (e.key === 'lcq') return !lcqEvents().length ? null : intlCurrent() || champsDone() ? '#/standings/past?e=lcq' : '#/standings';
+  if (e.key === 'champs') return champsMain() ? '#/standings' : champsTab() ? '#/standings/champs' : null;
+  return null;
+}
 // 가장 최근 Split 프로리그가 아직 끝나지 않았는가 (시즌 일정표 기준). 끝나기 전의 순위는 '현재 순위'로 적는다
 const plOpen = () => { const r = (A.season.timeline || []).find((x) => x.key === `s${lastSplit()}pl`); return !!r?.end && new Date(r.end + 'T23:59:59-08:00') > now(); };
 const GROUPS = ['A', 'B', 'C', 'D'];
@@ -1294,7 +1309,9 @@ function pastView(q) {
   const ev = list.find((e) => e.eventId === q.get('e')) || list[0];
   const tl = evPlace(ev);
   const evSeg = list.length > 1 ? `<div class="seg" role="group" aria-label="대회">${list.map((e) => `<a href="#/standings/past?e=${e.eventId}" aria-current="${e === ev}">${esc(ko(e.name, EVENT_KO))}</a>`).join('')}</div>` : '';
-  const head = `<h1 class="title">순위</h1>${evSeg ? `<div class="controls">${evSeg}</div>` : ''}
+  const plSplits = [...new Set(Object.values(A.pl || {}).map((p) => p.split))].sort();
+  const plLine = plSplits.length ? `<p class="caption">지역 프로리그 결과: ${plSplits.map((n) => `<a href="#/points/pl?s=${n}">Split ${n} 프로리그</a>`).join(' · ')}</p>` : '';
+  const head = `<h1 class="title">순위</h1>${evSeg ? `<div class="controls">${evSeg}</div>` : ''}${plLine}
     <section class="sec past-ev"><h2 class="h2">${esc(ko(ev.name, EVENT_KO))}</h2><p class="lead">${esc(dayLabel(dayKey(ev.start)))} – ${esc(dayLabel(dayKey(ev.end)))}${tl ? ` · ${esc(tl.where)}` : ''}${tl?.url ? ` · ${olink(tl.url, '공식 페이지')}` : ''}</p></section>`;
   if (ev.kind === 'lcq') return head + lcqBody(q, '/standings/past');
   const key = now() - new Date(ev.end) < 7 * 864e5 ? `ev:${ev.eventId}` : null;
@@ -1574,7 +1591,11 @@ function plS2(r) {
   return PLIX.m.get(r.id);
 }
 const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || (pb?.rs ?? 0) - (pa?.rs ?? 0) || (pb?.kills ?? 0) - (pa?.kills ?? 0); };
-const cpOrder = (a, b) => b.total - a.total || cpTie(a, b) || a.rank - b.rank;
+// 직행 확정(빌드가 meta.cpLock으로 알려 줌, 규정 3.6.3): 확정된 32팀은 항상 직행권 안, 나머지는 항상 밖. 그 안에서만 CP 순으로 줄을 세운다
+let LOCKIX = null;
+const cpLock = () => { const ids = A.meta?.cpLock; if (!ids?.length) return null; if (!LOCKIX || LOCKIX.src !== ids) LOCKIX = { src: ids, set: new Set(ids) }; return LOCKIX.set; };
+const lockSide = (r) => { const L = cpLock(); return L && !L.has(r.id) ? 1 : 0; };
+const cpOrder = (a, b) => lockSide(a) - lockSide(b) || b.total - a.total || cpTie(a, b) || a.rank - b.rank;
 
 // 운영자 로스터 보정 (config overrides: rosterMoves → cpRosterOut·cpRosterAdd, 그리고 cpRosterAdd):
 // 공식 현재 로스터에 아직 반영되지 않은 이적을 팀 CP에 반영하고 순위를 다시 매긴다.
@@ -1677,9 +1698,10 @@ function qualStrip(q, region) {
   const src = BD.state === 'live' || BD.state === 'pending' ? BD.rows.map((r) => ({ g: r.region, d: r.pstatus === 'direct' })) : A.cp.map((r) => ({ g: r.region, d: r.status === 'direct' }));
   const lcq = Math.round(A.season.lcqSlots / QUAL_REGIONS.length);
   const n = (g) => src.filter((x) => x.g === g && x.d).length;
-  const basis = BD.state === 'live' ? (finalsLivePos() ? '결승 실시간 정산 기준' : '최소 보장 정산 기준') : BD.state === 'pending' ? '최종 순위 정산 기준' : '현재 순위 기준';
+  const lcqOver = lcqEvents().length > 0 && lcqEvents().every((e) => A.series.some((x) => x.eventId === e.eventId && x.phase === 'Match Point Finals' && x.status === 'completed'));
+  const basis = BD.state === 'live' ? (finalsLivePos() ? '결승 실시간 정산 기준' : '최소 보장 정산 기준') : BD.state === 'pending' ? '최종 순위 정산 기준' : cpLock() ? '확정' : '현재 순위 기준';
   return `<section class="qual" aria-label="지역별 챔피언십 직행권 팀 수">
-    <div class="qual-h"><b>챔피언십 직행권 ${src.filter((x) => x.d).length}팀</b><span>${basis} · 나머지 팀은 지역별 LCQ에서 ${lcq}자리씩</span></div>
+    <div class="qual-h"><b>챔피언십 직행권 ${src.filter((x) => x.d).length}팀</b><span>${basis} · ${lcqOver ? `<span>LCQ에서 지역별 ${lcq}팀이 더해져 ${A.season.cpDirectSlots + A.season.lcqSlots}팀 확정</span>` : `나머지 팀은 지역별 LCQ에서 ${lcq}자리씩`}</span></div>
     <div class="qual-g">${QUAL_REGIONS.map((g) => `<a class="qual-c${region === g ? ' on' : ''}" href="${qsLink('/points/cp', q, { r: region === g ? 'all' : g })}" aria-current="${region === g}"><span class="qual-r">${REGION[g]}</span><b class="num">${n(g)}<small>팀</small></b><span class="qual-s">LCQ ${lcq}팀 더해 챔피언십 ${n(g) + lcq}팀</span></a>`).join('')}</div>
   </section>`;
 }
@@ -1729,7 +1751,7 @@ function cpView(q) {
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
   const cpKey = BD.state === 'live' || BD.state === 'pending' ? intlKey() : null;
-  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split ${tieN()} 플레이오프 최종 순위, 그다음 프로리그 Split ${lastSplit()} 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
+  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${cpLock() ? '<p class="board-note">직행 32팀은 Split 2 플레이오프가 끝난 시점의 CP로 확정되었습니다. 이후의 로스터 변경은 LCQ·챔피언십 시드에만 반영되고 직행 여부는 바꾸지 않습니다 (공식 규정 3.6.3, C6.5).</p>' : ''}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split ${tieN()} 플레이오프 최종 순위, 그다음 프로리그 Split ${lastSplit()} 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
     ${spoil(`<div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">${ML().title}</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>`, cpKey, '챔피언십 포인트 순위')}
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
@@ -1945,7 +1967,7 @@ function rules(parts, q) {
     ${vids.length && (sv === 'all' || sv === 'video') ? `<section class="sec" aria-labelledby="h-vid"><h2 class="h2" id="h-vid">영상으로 보기</h2><div class="vid-grid">${vids.map(vid).join('')}</div></section>` : ''}
     <div class="rules-grid">
     <section class="sec rule-card" data-k="format"><h2 class="h2">한 시즌의 흐름</h2>
-      <ol class="timeline">${S.timeline.map((e) => `<li><span>${e.url ? olink(e.url, esc(e.name)) : esc(e.name)}<br><span class="when">${esc(e.where)}</span></span><span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}</span></li>`).join('')}</ol>
+      <ol class="timeline">${S.timeline.map((e) => { const st = tlState(e), h = stageHref(e); return `<li class="${st === 'done' ? 'done' : st === 'now' ? 'now' : ''}"><span>${h ? `<a href="${h}">${esc(e.name)}</a>` : esc(e.name)}${st === 'done' ? ' <span class="tag">종료</span>' : st === 'now' ? ' <span class="tag live">진행 중</span>' : ''}<br><span class="when">${esc(e.where)}${e.url ? `${e.where ? ' · ' : ''}${olink(e.url, '공식 페이지')}` : ''}</span></span><span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}</span></li>`; }).join('')}</ol>
       <p class="lead">지역별 프로리그에서 성적을 내 플레이오프(국제전)에 나가고, 시즌 내내 모은 챔피언십 포인트로 챔피언십 직행 여부가 정해집니다.</p></section>
     <section class="sec rule-card" data-k="points"><h2 class="h2">게임 점수</h2>
       <p>한 게임 점수 = <b>순위 점수 + 킬 1점</b>. 보통 한 시리즈는 6게임이고, 점수를 모두 더해 시리즈 순위를 정합니다.</p>

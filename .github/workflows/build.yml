@@ -67,6 +67,8 @@ jobs:
         run: node scripts/logos.mjs --plan || (npm i --no-save --no-package-lock sharp@0.33 playwright-core@1.47.2 && node scripts/logos.mjs)
       - name: 병합·빌드
         run: node scripts/build-data.mjs
+      - name: 규칙 파일(config/rules)과 실제 데이터 대조 (어긋나도 멈추지 않고 경고만)
+        run: node scripts/check-rules.mjs || true
       - name: 바뀐 데이터만 커밋
         id: commit
         run: |

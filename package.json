@@ -9,6 +9,7 @@
     "fetch:algs": "node scripts/fetch-algs.mjs",
     "fetch": "npm run fetch:lp && npm run fetch:algs",
     "build": "node scripts/build-data.mjs",
+    "check:rules": "node scripts/check-rules.mjs",
     "all": "npm run fetch && npm run build",
     "serve": "npx --yes serve site -l 5173",
     "worker:dev": "cd worker && npx --yes wrangler dev",

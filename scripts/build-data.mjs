@@ -12,6 +12,7 @@ import { ROOT, readJson, writeText, hash, normRegion, REGION_LABEL, nameKey } fr
 import { nk as logoKey } from './lp-teams-parse.mjs';
 import { createRosterWatch } from './rosters.mjs';
 import { seasonName, buildTimeline, lpYear, lpSeasonPage } from './season.mjs';
+import { loadRules, scoringOf, lcqRuleStart, LCQ_ORDER, lcqStage } from './rules.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -44,14 +45,18 @@ const lastSplit = splits.at(-1) || 1;
 const tieSlug = (algs.cpEvents || []).map(([, slug]) => slug).filter((x) => /^split-\d-playoffs/.test(x)).sort().at(-1) || null;
 const lpSeasonUrl = `https://liquipedia.net/apexlegends/${lpSeasonPage(seasonSlug)}`;
 const seasonBase = Object.fromEntries(Object.entries(seasonCfg).filter(([k]) => !k.startsWith('_')));
+// 규칙 파일(config/rules/<시즌>.json): 점수표·자리 수·LCQ 일정·직행 확정 시점의 기준. 그 시즌 파일이 없으면 가장 최근 것을 쓴다
+const { rules, file: rulesFile, mine: rulesMine } = loadRules(seasonSlug);
+if (!rulesMine) console.log(`[build] 규칙 파일은 ${rules.season} 것(${rulesFile}): ${seasonSlug} 규정이 확인되면 config/rules/${seasonSlug}.json을 추가`);
 const season = {
   ...seasonBase, slug: seasonSlug,
+  cpDirectSlots: rules.championship.direct, lcqSlots: rules.championship.fromLcq, scoring: scoringOf(rules),
   name: cfgMine && seasonCfg.name ? seasonCfg.name : algs.seasonName || seasonName(seasonSlug),
   // 일정표: 공식 대회 목록에서 만들고(날짜·이름·공식 링크), 설정 파일의 같은 줄이 장소·링크를 덮어쓴다
   timeline: buildTimeline(algs.events, seasonSlug, cfgMine ? seasonCfg.timeline : []),
   ...(cfgMine ? {} : { rulesLinks: [['ALGS 대회 구성 안내 (algs.ea.com)', 'https://algs.ea.com/en/competition-overview'], [`Liquipedia ${lpSeasonPage(seasonSlug).replace('/', ' ')}`, lpSeasonUrl]] }),
 };
-const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine };
+const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine: cfgMine && rulesMine, rules: { season: rules.season, edition: rules.source?.edition || null } };
 const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'ccRenames'];
 const ovRaw = readJson('config/overrides.json', {});
 const ovMine = !ovRaw.season || ovRaw.season === seasonSlug;
@@ -199,6 +204,14 @@ const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => 
     || (pl2.get(a.id)?.pos ?? 99) - (pl2.get(b.id)?.pos ?? 99) || (pl2.get(b.id)?.rs ?? 0) - (pl2.get(a.id)?.rs ?? 0) || (pl2.get(b.id)?.kills ?? 0) - (pl2.get(a.id)?.kills ?? 0) || a.rank - b.rank);
   cpRows.forEach((r, i) => (r.rank = i + 1));
 }
+// 챔피언십 직행 확정 (규정 3.6.3·C6.5): 직행 32팀은 Split 2 플레이오프가 끝난 시점의 CP로 정해지고,
+//   그 뒤에 들어온 선수의 CP는 그 팀에서 프로리그 Split 2를 12게임 이상 뛰지 않았으므로 직행 계산에 들어가지 않는다.
+//   그래서 마지막 플레이오프가 끝나면 공식 순위의 상위 32팀을 고정해 두고, 화면의 로스터 반영(팀 CP 재계산)은 이 선을 넘나들지 못하게 한다
+{
+  const lockEv = algs.events.find((e) => e[1] === (rules.championship.directDecidedAt || '') || (e[1] || '').startsWith(`${rules.championship.directDecidedAt}-`));
+  const decided = lockEv && new Date(lockEv[5]) < new Date(algs.fetchedAt) && (algs.cpEvents || []).some(([id, , rows]) => id === lockEv[0] && rows.length && rows.every((r) => r[2]));
+  meta.cpLock = rulesMine && decided && cpRows.length > CP_DIRECT ? cpRows.filter((r) => r.rank <= CP_DIRECT).map((r) => r.id) : null;
+}
 const cp32 = cpRows.find((r) => r.rank === CP_DIRECT)?.total ?? 0;
 const cp33 = cpRows.find((r) => r.rank === CP_DIRECT + 1)?.total ?? 0;
 for (const r of cpRows) {
@@ -265,28 +278,31 @@ const series = algs.series.map(([id, eventId, phase, name, status, start, region
   return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
 });
-// LCQ 시각 보정 (config/overrides.json lcqSchedule)
-//   공식 API가 네 지역 LCQ의 같은 단계에 똑같은 시각을 넣어 둔 동안은 지역 구분 없는 임시값으로 본다
-//   (공식 사이트는 태평양 시간 기준으로 입력: 토 01:00 UTC = 금 17:00 PT).
-//   보정 시각이 있으면 그 시각, keep이면 공식 값 그대로, 둘 다 없으면 '시각 미정'(timeTbd).
-//   공식 값이 지역마다 달라지면 보정 없이 공식 값을 쓴다.
+// LCQ 시각: 규정 부록 D4(지역 현지 시각)를 기준으로 공식 API 값을 가려 쓴다
+//   공식 사이트는 일정을 태평양 시간으로 먼저 넣어 두고 지역별 시각은 나중에 고친다. 그래서 단계마다:
+//   1) 운영자가 적은 시각(config/overrides.json lcqSchedule[지역][단계])이 있으면 그 시각
+//   2) 공식 값이 규정 시각과 같으면 공식 값
+//   3) 미주가 아닌 지역의 공식 값이 미주 값과 같으면(태평양 시간 임시값) 규정 시각
+//   4) 공식 값이 앞 단계보다 먼저 시작하면(입력 오류) 규정 시각
+//   5) 그 밖에는 공식 값 (규정도 실제 시작 시각은 달라질 수 있다고 적는다)
 {
-  const lcqIds = new Set(Object.values(evById).filter((e) => e.slug.startsWith('last-chance-qualifier')).map((e) => e.id));
-  const lcqS = series.filter((x) => lcqIds.has(x.eventId));
+  const lcqEvs = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-qualifier'));
   const fix = ov.lcqSchedule || {};
-  // 먼저 단계별로 임시값인지 판단 (보정하면서 시각이 바뀌기 전에)
-  const temp = new Set([...new Set(lcqS.map((x) => x.name))].filter((n) => {
-    const same = lcqS.filter((y) => y.name === n);
-    return new Set(same.map((y) => y.region)).size >= 3 && new Set(same.map((y) => y.start)).size === 1;
-  }));
-  for (const x of lcqS) {
-    if (!temp.has(x.name)) continue; // 지역별 공식 시각이 있음
-    const f = fix[x.region] || {};
-    x.startOfficial = x.start;
-    if (f[x.name]) { x.start = new Date(f[x.name]).toISOString(); x.startFix = 'site'; }
-    else if (f.keep) x.startFix = 'keep';
-    else x.timeTbd = true;
-    if (f.note) x.startNote = f.note;
+  const amer = new Map();
+  for (const e of lcqEvs.filter((x) => x.region === 'americas')) for (const x of series.filter((y) => y.eventId === e.id)) amer.set(x.name, x.start);
+  for (const e of lcqEvs) {
+    const ss = series.filter((x) => x.eventId === e.id && x.status !== 'completed' && !x.live);
+    const official = new Map(series.filter((x) => x.eventId === e.id).map((x) => [x.name, x.start]));
+    for (const x of ss) {
+      const rule = lcqRuleStart(rules, e.region, x.name, e.start), st = lcqStage(x.name);
+      const set = (iso, how, note) => { if (iso !== x.start) { x.startOfficial = x.start; x.start = iso; } x.startFix = how; if (note) x.startNote = note; };
+      const manual = fix[e.region]?.[x.name] || fix[e.region]?.[st];
+      if (manual) { set(new Date(manual).toISOString(), 'site', fix[e.region].note); continue; }
+      if (!rule || x.start === rule) continue;
+      const placeholder = e.region !== 'americas' && amer.get(x.name) === x.start;
+      const early = [...official].some(([n, t]) => (LCQ_ORDER[lcqStage(n)] || 0) < (LCQ_ORDER[st] || 0) && t >= x.start);
+      if (placeholder || early) set(rule, 'rules', placeholder ? '공식 페이지에는 아직 태평양 시간 임시값이 들어 있어, 공식 규정 부록 D4의 지역 현지 시각으로 표시합니다.' : '공식 페이지의 시각이 앞 단계보다 일러, 공식 규정 부록 D4의 지역 현지 시각으로 표시합니다.');
+    }
   }
 }
 series.sort((a, b) => a.start.localeCompare(b.start));
