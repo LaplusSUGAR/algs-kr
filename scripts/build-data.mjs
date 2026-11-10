@@ -264,6 +264,8 @@ for (const [key, rows] of Object.entries(algs.pl)) {
     return { pos: finalPos, short: teams[id]?.short || short, name, id, cpPP, cpTeam: cpPP * 3, qualified: !!qualified, rs, group, kills, sp, src, kr: teams[id]?.krLevel || 'none' };
   }).sort((a, b) => a.pos - b.pos);
   const nr = normRegion(region);
+  // 공식 팀 이름이 바뀐 팀(예: O2esports → SLEEPY): 가장 최근 Split 프로리그 순위표의 이름을 '구 이름'으로 남긴다
+  if (Number(s.slice(1)) === lastSplit) for (const r of out) { const t = teams[r.id]; if (t?.name && r.name && nameKey(r.name) !== nameKey(t.name)) t.was = r.name; }
   pl[`${s}:${nr}`] = { split: Number(s.slice(1)), region: nr, label: `Split ${s.slice(1)} · ${REGION_LABEL[nr]}`, playoffsLine: phaseQ[key] ?? null, rfLine: 20, rows: out };
 }
 

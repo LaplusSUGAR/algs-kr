@@ -861,3 +861,7 @@ time.tbd { font-size: 12px; color: var(--steel); }
 .season-bar a { font-weight: 700; white-space: nowrap; }
 .season-end .lead { margin-top: 10px; }
 .past-seasons { margin-top: 10px; }
+
+/* 팀 이름 변경(구 이름), LCQ 시드 CP와 변경 뒤 CP */
+.detail-id .was { color: var(--muted, #6b6e75); font-size: 13px; align-self: flex-end; margin-bottom: 6px; }
+.seedcp { display: block; font-size: 11px; color: var(--muted, #6b6e75); font-weight: 400; }

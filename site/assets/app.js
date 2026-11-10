@@ -899,7 +899,7 @@ function cpStanding() {
   const BD = board();
   return BD.state === 'live' || BD.state === 'pending'
     ? BD.rows.map((r) => ({ id: r.id, short: r.short, name: r.name, region: r.region, rank: r.prank, total: r.min, direct: r.pstatus === 'direct' }))
-    : A.cp.map((r) => ({ id: r.id, short: r.short, name: r.name, region: r.region, rank: r.rank, total: r.total, direct: r.status === 'direct' }));
+    : A.cp.map((r) => ({ id: r.id, short: r.short, name: r.name, region: r.region, rank: r.rank, total: r.total, total0: r.total0 ?? r.total, direct: r.status === 'direct' }));
 }
 // 시드 순번(0부터) → 그룹: 지그재그
 const lcqGroupOf = (i) => (Math.floor(i / 2) % 2 ? (i % 2 ? 'a' : 'b') : (i % 2 ? 'b' : 'a'));
@@ -916,7 +916,10 @@ function lcqEntrants(ev) {
       .sort((a, b) => (a.seed ?? 999) - (b.seed ?? 999) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
     E = { src: 'official', list, pl: list.filter((t) => t.pl).length, ccN: list.filter((t) => !t.pl).length };
   } else {
-    const pl = cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r }));
+    // 시드 CP (규정 3.7.1): 선수를 넣거나 빼서 시드가 올라가지는 않는다 → 로스터 반영 전 공식 값과 반영 후 값 중 낮은 쪽
+    const seedCp = (r) => Math.min(r.total, r.total0 ?? r.total);
+    const pl = cp.filter((r) => r.region === ev.region && !r.direct).sort((a, b) => seedCp(b) - seedCp(a) || a.rank - b.rank)
+      .map((r) => ({ id: r.id, short: r.short, name: r.name, pl: true, cp: r, seedCp: seedCp(r) }));
     const cc = ev.cc || [];
     const n = Math.max(0, 40 - pl.length);
     const order = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)];
@@ -986,7 +989,7 @@ function rosterLine(t, ev) {
 }
 function lcqGroups(B) {
   const E = B.E;
-  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was ? `<small>구 ${esc(t.cc.was)}</small>` : ''}${rosterLine(t, B.ev)}</td><td class="r num">${t.cp ? `${fmt(t.cp.total)}<small class="unit">CP</small>` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
+  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was || team(t.short)?.was ? `<small>구 ${esc(t.cc?.was || team(t.short).was)}</small>` : ''}${rosterLine(t, B.ev)}</td><td class="r num">${t.cp ? `${fmt(t.seedCp ?? t.cp.total)}<small class="unit">CP</small>${t.seedCp != null && t.seedCp !== t.cp.total ? `<small class="seedcp" title="로스터 변경 뒤 팀 CP">변경 뒤 ${fmt(t.cp.total)}</small>` : ''}` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
   const col = (g) => {
     const st = B[g];
     let ts = E.list.filter((t) => t.group === g);
@@ -997,7 +1000,7 @@ function lcqGroups(B) {
   };
   // 문장마다 <span>: 번역 사전이 문장 단위로 맞춘다
   const basis = E.src === 'official' ? '<span>공식 API가 공개한 출전 명단입니다(공식 시드 순).</span>'
-    : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split ${lastSplit()} 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}`;
+    : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split ${lastSplit()} 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}${E.list.some((t) => t.seedCp != null && t.seedCp !== t.cp?.total) ? ' <span>선수를 넣거나 빼서 시드가 올라가지는 않으므로(공식 규정 3.7.1), 로스터 변경으로 CP가 오른 팀은 변경 전 CP로 시드를 정했습니다.</span>' : ''}`;
   const grp = E.groupSrc === 'official' ? '<span>그룹은 공식 배정입니다.</span>' : '<span>그룹은 시드 지그재그 배정(A: 1·4·5·8·9…, B: 2·3·6·7·10…)이며, 공식 배정이 나오면 바뀝니다.</span>';
   const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/${A.meta?.year || 2026}/Split_${lastSplit()}/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
   const how = `<section class="sec" aria-labelledby="h-lcq-how"><h2 class="h2" id="h-lcq-how">진행 방식</h2>${stageFlow(B, LCQ_FLOW_L, (k) => qsLink(B.base, B.q, { m: k }), 'LCQ 진행 방식')}</section>`;
@@ -1938,7 +1941,7 @@ function teamDetail(short) {
   const roleKo = { p: '선수', c: '주장', k: '코치' };
   const si = ir ? krStageInfo(short) : null;
   return `<p style="margin:14px 0 0"><a class="more" href="#/teams">팀 목록</a></p>
-    <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1><span class="fav-btns"><button type="button" class="fav-btn${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${opt.fav.includes(t.id) ? '★ 응원 중' : '☆ 응원하기'}</button><button type="button" class="fav-btn main${opt.main === t.id ? ' on' : ''}" data-main="${esc(t.id)}" aria-pressed="${opt.main === t.id}">${opt.main === t.id ? '대표 팀' : '대표 팀으로'}</button></span></div>
+    <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1>${t.was ? `<small class="was">구 ${esc(t.was)}</small>` : ''}<span class="fav-btns"><button type="button" class="fav-btn${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${opt.fav.includes(t.id) ? '★ 응원 중' : '☆ 응원하기'}</button><button type="button" class="fav-btn main${opt.main === t.id ? ' on' : ''}" data-main="${esc(t.id)}" aria-pressed="${opt.main === t.id}">${opt.main === t.id ? '대표 팀' : '대표 팀으로'}</button></span></div>
     <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr ${CAT[t.krLevel]}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}</p>
     ${si?.text ? spoil(`<p class="lead"><b>${esc(ko(A.intl.name, EVENT_KO))}</b> · ${esc(si.text)}</p>`, intlKey(), '대회 성적') : ''}
     ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${playerLink(p.n, pName(p))}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + (p.title || roleKo[p.r]) : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
