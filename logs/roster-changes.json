@@ -1,5 +1,18 @@
 [
  {
+  "at": "2026-11-10T14:04:08.857Z",
+  "kind": "auto",
+  "team": "RIG",
+  "teamName": "REIGNITE",
+  "region": "apac-n",
+  "out": [
+   "Lully"
+  ],
+  "in": [
+   "Deathtenys"
+  ]
+ },
+ {
   "at": "2026-11-10T04:00:36.827Z",
   "kind": "auto-end",
   "team": "TLNP",
