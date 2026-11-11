@@ -44,3 +44,14 @@ export function lcqRuleStart(rules, region, stageName, eventStart) {
 // LCQ 단계 순서 (앞 단계보다 먼저 시작할 수 없다)
 export const LCQ_ORDER = { 'Winners Round 1': 1, 'Winners Round 2': 2, 'Elimination Round 1': 2, 'Elimination Round 2': 3, 'Match Point Finals': 4 };
 export const lcqStage = (name) => String(name).replace(/ Lobby [A-Z]$/, '');
+
+// 규칙 탭 그림이 쓰는 요약 값 (규칙 파일에서 뽑음)
+export const rulesBrief = (r) => ({
+  mp: r.matchPoint.threshold, lobby: r.match.teamsPerLobby, kill: r.match.kill,
+  pl: { teams: r.proLeague.teamsPerRegion, groups: r.proLeague.groups, size: r.proLeague.groupSize, series: r.proLeague.seriesPerTeam, games: r.proLeague.matchesPerSeries, rf: r.proLeague.regionalFinals.teams },
+  po: { teams: r.playoffs['split-2'].teams, groups: r.playoffs['split-2'].groups, s1: { finals: r.playoffs['split-1'].groupStage.toFinals, survivor: r.playoffs['split-1'].groupStage.toSurvivor, out: r.playoffs['split-1'].groupStage.out, games: r.playoffs['split-1'].survivor.matches, up: r.playoffs['split-1'].survivor.toFinals } },
+  champ: { teams: r.championship.teams, direct: r.championship.direct, lcq: r.championship.fromLcq, per: r.championship.lcqPerRegion },
+  lcq: { teams: r.lcq.teamsPerRegion, adv: r.lcq.advance },
+  cpMin: r.championshipPoints.minMatches,
+  prize: { champs: [r.prizes.championship.pool, ...r.prizes.championship.byRank.slice(0, 3)], po: [r.prizes['split-2-playoffs'].pool, r.prizes['split-2-playoffs'].byRank[0]], pl: r.prizes.proLeaguePerSplit.pool },
+});

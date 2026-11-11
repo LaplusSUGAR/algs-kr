@@ -12,7 +12,7 @@ import { ROOT, readJson, writeText, hash, normRegion, REGION_LABEL, nameKey } fr
 import { nk as logoKey } from './lp-teams-parse.mjs';
 import { createRosterWatch } from './rosters.mjs';
 import { seasonName, buildTimeline, lpYear, lpSeasonPage } from './season.mjs';
-import { loadRules, scoringOf, lcqRuleStart, LCQ_ORDER, lcqStage } from './rules.mjs';
+import { loadRules, scoringOf, rulesBrief, lcqRuleStart, LCQ_ORDER, lcqStage } from './rules.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -50,7 +50,7 @@ const { rules, file: rulesFile, mine: rulesMine } = loadRules(seasonSlug);
 if (!rulesMine) console.log(`[build] 규칙 파일은 ${rules.season} 것(${rulesFile}): ${seasonSlug} 규정이 확인되면 config/rules/${seasonSlug}.json을 추가`);
 const season = {
   ...seasonBase, slug: seasonSlug,
-  cpDirectSlots: rules.championship.direct, lcqSlots: rules.championship.fromLcq, scoring: scoringOf(rules),
+  cpDirectSlots: rules.championship.direct, lcqSlots: rules.championship.fromLcq, scoring: scoringOf(rules), brief: rulesBrief(rules),
   name: cfgMine && seasonCfg.name ? seasonCfg.name : algs.seasonName || seasonName(seasonSlug),
   // 일정표: 공식 대회 목록에서 만들고(날짜·이름·공식 링크), 설정 파일의 같은 줄이 장소·링크를 덮어쓴다
   timeline: buildTimeline(algs.events, seasonSlug, cfgMine ? seasonCfg.timeline : []),

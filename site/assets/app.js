@@ -334,7 +334,7 @@ function bracketFlow(B) {
   };
   return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
     <defs><marker id="bfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
-    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div>`;
+    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div><p class="caption swipe-hint" aria-hidden="true">옆으로 밀어서 보기</p>`;
 }
 
 /* ---------- 홈 ---------- */
@@ -1060,7 +1060,7 @@ function stageFlow(B, L, href, label) {
   const note = ([k, t]) => { const [x, y] = L.nodes[k]; return `<text x="${x + 12}" y="${y + H + 16}" class="bf-note">${esc(t)}</text>`; };
   return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 ${L.h}" role="group" aria-label="${esc(label)}">
     <defs><marker id="sfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
-    ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div>`;
+    ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div><p class="caption swipe-hint" aria-hidden="true">옆으로 밀어서 보기</p>`;
 }
 // 홈 점수표: 지금(진행 중 → 마지막으로 끝난 → 출전 팀이 정해진 다음) 경기. 같은 시각에 함께 열리는 경기(예: 그룹 A·B)도 함께
 const homeStages = (B) => {
@@ -1958,60 +1958,144 @@ function teamDetail(short) {
 /* ---------- 규칙 ---------- */
 function rules(parts, q) {
   const sv = q.get('s') || 'all';
-  const S = A.season, sc = S.scoring;
+  const S = A.season, sc = S.scoring, B = S.brief || {};
+  const mp = B.mp || 50;
+  const PL = B.pl || { teams: 30, groups: 3, size: 10, series: 6, games: 6, rf: 20 };
+  const CH = B.champ || { teams: S.cpDirectSlots + S.lcqSlots, direct: S.cpDirectSlots, lcq: S.lcqSlots, per: 2 };
+  const LQ = B.lcq || { teams: 40, adv: 2 };
+  const PO = B.po || { teams: 40, groups: 4 };
+  const usd = (n) => '$' + Number(n).toLocaleString('en-US');
   const vids = S.rulesVideos || [];
   const vid = (v) => `<figure class="vid"><button class="yt" type="button" data-yt="${esc(v.id)}" aria-label="${esc(v.title)} 재생">
       <img src="https://i.ytimg.com/vi/${esc(v.id)}/hqdefault.jpg" alt="" loading="lazy" width="480" height="360"><span class="yt-play" aria-hidden="true"></span></button>
       <figcaption><b>${esc(v.title)}</b><span>${esc(v.channel)} · <a href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener">YouTube에서 보기</a></span></figcaption></figure>`;
-  const place = [12, 9, 7, 5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1];
+
+  // ── 그림 조각 ──
+  // 흐름 그림(SVG, 폭 360 기준 세로 배치: 휴대폰에서도 글자가 줄어들지 않는다)
+  const box = (x, y, w, h, title, sub, note, cls = '') => `<g class="rf-node ${cls}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/><text x="${x + w / 2}" y="${y + 21}" text-anchor="middle" class="rf-t">${title}</text>${sub ? `<text x="${x + w / 2}" y="${y + 38}" text-anchor="middle" class="rf-s">${sub}</text>` : ''}${note ? `<text x="${x + w / 2}" y="${y + 54}" text-anchor="middle" class="rf-o">${note}</text>` : ''}</g>`;
+  const arr = (d, label, lx, ly, cls = '', anchor = 'middle') => `<path d="${d}" class="rf-e ${cls}" marker-end="url(#rfA)"/>${label ? `<text x="${lx}" y="${ly}" text-anchor="${anchor}" class="rf-l ${cls}">${label}</text>` : ''}`;
+  const svg = (h, label, body) => `<svg class="rf" viewBox="0 0 360 ${h}" role="img" aria-label="${label}"><defs><marker id="rfA" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="rf-ah"/></marker></defs>${body}</svg>`;
+  const bracketFig = svg(372, '플레이오프와 챔피언십 진행 방식', `
+    ${box(70, 8, 220, 48, '조별 리그', `${PO.teams}팀 · ${PO.groups}개 조`)}
+    ${arr('M130 56 L92 102', '상위 20', 84, 84, 'up')}${arr('M230 56 L268 102', '하위 20', 278, 84, 'down')}
+    ${box(10, 104, 160, 48, '승자 라운드', '20팀 · 6게임')}
+    ${box(190, 104, 160, 62, '패자부활 1라운드', '20팀 · 6게임', '하위 10팀 탈락')}
+    ${arr('M270 166 V204', '상위 10', 302, 190, 'up')}
+    ${arr('M140 152 C140 186 214 172 222 204', '하위 10', 152, 190, 'down')}
+    ${box(190, 206, 160, 62, '패자부활 2라운드', '20팀 · 6게임', '하위 10팀 탈락')}
+    ${arr('M56 152 C56 250 104 250 108 304', '상위 10', 50, 240, 'up')}
+    ${arr('M270 268 L246 304', '상위 10', 292, 292, 'up')}
+    ${box(70, 306, 220, 56, '결승', '20팀 · 매치 포인트', '', 'final')}`);
+  const lcqFig = svg(470, 'LCQ 진행 방식', `
+    ${box(10, 8, 160, 48, '승자 1라운드 A', '20팀 · 6게임')}${box(190, 8, 160, 48, '승자 1라운드 B', '20팀 · 6게임')}
+    ${arr('M76 56 V108', '상위 10씩', 68, 88, 'up', 'end')}${arr('M230 56 C230 86 132 80 128 108', '', 0, 0, 'up')}
+    ${arr('M130 56 C130 86 228 80 232 108', '', 0, 0, 'down')}${arr('M284 56 V108', '하위 10씩', 292, 88, 'down', 'start')}
+    ${box(10, 110, 160, 48, '승자 2라운드', '20팀 · 6게임')}
+    ${box(190, 110, 160, 62, '패자부활 1라운드', '20팀 · 6게임', '하위 10팀 탈락')}
+    ${arr('M270 172 V214', '상위 10', 302, 198, 'up')}
+    ${arr('M140 158 C140 194 214 182 222 214', '하위 10', 152, 198, 'down')}
+    ${box(190, 216, 160, 62, '패자부활 2라운드', '20팀 · 6게임', '하위 10팀 탈락')}
+    ${arr('M56 158 C56 262 104 262 108 318', '상위 10', 50, 250, 'up')}
+    ${arr('M270 278 L246 318', '상위 10', 292, 304, 'up')}
+    ${box(70, 320, 220, 56, '결승', '20팀 · 매치 포인트', '', 'final')}
+    ${arr('M180 376 V418', `상위 ${LQ.adv}팀`, 214, 402, 'up')}
+    ${box(90, 420, 180, 40, '챔피언십 진출', '', '', 'goal')}`);
+
+  // 막대: 순위 점수
+  const place = (sc.game || []).map((x) => x[1]), top = place[0] || 12;
+  const placeBars = `<div class="rb" role="img" aria-label="순위 점수 막대 그림">${place.map((p, i) => `<span class="rb-c"><i style="height:${Math.round((p / top) * 100)}%"><b>${p}</b></i><em>${i + 1}</em></span>`).join('')}<span class="rb-c zero"><i style="height:0"><b>0</b></i><em>${place.length + 1}–${B.lobby || 20}</em></span></div>`;
+  // 두 줄 표: 순위별 포인트
+  const rankTbl = (rows, n, last) => `<div class="tbl-wrap"><table class="tbl compact rk"><thead><tr><th>순위</th>${Array.from({ length: n }, (_, i) => `<th class="c">${i + 1}</th>`).join('')}${last ? `<th class="c">${last[0]}</th>` : ''}</tr></thead><tbody>${rows.map(([name, a, tail]) => `<tr><td>${name}</td>${a.slice(0, n).map((v) => `<td class="c num">${fmt(v)}</td>`).join('')}${last ? `<td class="c num">${tail}</td>` : ''}</tr>`).join('')}</tbody></table></div>`;
+  // 시즌 흐름
+  const stepTag = (k) => (/^s\dp[lo]$/.test(k) ? ['cp', 'CP 적립'] : k === 'lcq' ? ['slot', `마지막 ${CH.lcq}자리`] : k === 'champs' ? ['goal', '시즌 우승 결정'] : ['', '']);
+  const steps = `<ol class="rs">${S.timeline.map((e, i) => { const st = tlState(e), h = stageHref(e), [tc, tt] = stepTag(e.key); return `<li class="${st}"><span class="rs-n">${i + 1}</span><span class="rs-b"><b>${h ? `<a href="${h}">${esc(e.name)}</a>` : esc(e.name)}</b><span class="rs-w">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}${e.where ? ` · ${esc(e.where)}` : ''}</span><span class="rs-tags">${st === 'done' ? '<span class="tag">종료</span>' : st === 'now' ? '<span class="tag live">진행 중</span>' : ''}${tt ? `<span class="tag ${tc}">${tt}</span>` : ''}${e.url ? `<span class="rs-o">${olink(e.url, '공식 페이지')}</span>` : ''}</span></span></li>`; }).join('')}</ol>`;
+  // 40팀 막대
+  const slotBar = `<div class="sb" role="img" aria-label="챔피언십 ${CH.teams}팀 구성"><span class="sb-a" style="flex:${CH.direct}"><b>${CH.direct}</b><em>CP 순위로 직행</em></span><span class="sb-b" style="flex:${CH.lcq}"><b>${CH.lcq}</b><em>LCQ</em></span></div><p class="caption">챔피언십 ${CH.teams}팀 = CP 상위 ${CH.direct}팀 + LCQ ${CH.lcq}팀 (지역마다 ${CH.per}팀)</p>`;
+  // 팀 CP 예시 (결과 가리기 중에는 숨김)
+  const exRow = !opt.spoiler && (A.cp.find((r) => r.short === focusList()[0]?.short && r.players?.length >= 3) || A.cp.find((r) => r.players?.length >= 3));
+  const exPs = exRow ? exRow.players.slice().sort((a, b) => b[1] - a[1]) : [];
+  const cpSum = exRow ? `<div class="cs"><span class="cs-h">예: ${esc(exRow.name)}</span><div class="cs-r">${exPs.slice(0, 3).map((p, i) => `${i ? '<i>+</i>' : ''}<span class="cs-p"><b>${fmt(p[1])}</b><em>${esc(p[0])}</em></span>`).join('')}<i>=</i><span class="cs-p sum"><b>${fmt(exPs.slice(0, 3).reduce((a, p) => a + p[1], 0))}</b><em>팀 CP</em></span></div>${exPs.length > 3 ? `<p class="caption">네 번째 선수부터는 더하지 않습니다.</p>` : ''}</div>` : '';
+  // 매치 포인트 그림
+  const mpFig = `<div class="mpg" role="img" aria-label="매치 포인트 진행 그림"><div class="mpg-bar"><span class="mpg-fill"></span><span class="mpg-line"><b>${mp}점</b></span></div><ol class="mpg-steps"><li><b>1</b><span>게임을 거듭하며 점수를 쌓습니다</span></li><li><b>2</b><span>${mp}점을 넘기면 매치 포인트</span></li><li><b>3</b><span>그다음 게임부터 1위를 하면 우승</span></li></ol></div>`;
+  const fact = (big, unit, label) => `<div class="rk-f"><b>${big}<small>${unit}</small></b><span>${label}</span></div>`;
+  const card = (k, title, body, cls = '') => `<section class="sec rule-card ${cls}" data-k="${k}"><h2 class="h2">${title}</h2>${body}</section>`;
+  const P = B.prize;
+
   const html = `<h1 class="title">규칙</h1>
-    <p class="lead">ALGS를 처음 보는 사람도 경기를 따라갈 수 있도록 핵심 규칙만 모았습니다. 자세한 기준은 맨 아래 공식 규정이 우선합니다.</p>
+    <p class="lead">ALGS를 처음 보는 사람도 경기를 따라갈 수 있도록 핵심만 그림으로 모았습니다. 자세한 기준은 맨 아래 공식 규정이 우선합니다.</p>
     ${A.meta?.cfgMine === false ? '<p class="board-note now">점수표와 진행 방식 설명은 지난 시즌 규정 기준입니다. 새 시즌 규정이 확인되면 바뀝니다.</p>' : ''}
+    ${sv === 'all' ? `<div class="rk-facts">${fact(B.lobby || 20, '팀', '한 게임에 함께 뛰는 팀')}${fact(PL.games, '게임', '한 시리즈 (점수 합산)')}${fact(mp, '점', '결승의 매치 포인트 기준')}${fact(CH.teams, '팀', '챔피언십에 나가는 팀')}</div>` : ''}
     ${vids.length && (sv === 'all' || sv === 'video') ? `<section class="sec" aria-labelledby="h-vid"><h2 class="h2" id="h-vid">영상으로 보기</h2><div class="vid-grid">${vids.map(vid).join('')}</div></section>` : ''}
     <div class="rules-grid">
-    <section class="sec rule-card" data-k="format"><h2 class="h2">한 시즌의 흐름</h2>
-      <ol class="timeline">${S.timeline.map((e) => { const st = tlState(e), h = stageHref(e); return `<li class="${st === 'done' ? 'done' : st === 'now' ? 'now' : ''}"><span>${h ? `<a href="${h}">${esc(e.name)}</a>` : esc(e.name)}${st === 'done' ? ' <span class="tag">종료</span>' : st === 'now' ? ' <span class="tag live">진행 중</span>' : ''}<br><span class="when">${esc(e.where)}${e.url ? `${e.where ? ' · ' : ''}${olink(e.url, '공식 페이지')}` : ''}</span></span><span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')}</span></li>`; }).join('')}</ol>
-      <p class="lead">지역별 프로리그에서 성적을 내 플레이오프(국제전)에 나가고, 시즌 내내 모은 챔피언십 포인트로 챔피언십 직행 여부가 정해집니다.</p></section>
-    <section class="sec rule-card" data-k="points"><h2 class="h2">게임 점수</h2>
-      <p>한 게임 점수 = <b>순위 점수 + 킬 1점</b>. 보통 한 시리즈는 6게임이고, 점수를 모두 더해 시리즈 순위를 정합니다.</p>
-      <p><span>이 사이트의 점수표는 모두 순위 / 킬 / 종합(순위 점수 / 킬 점수 / 종합 점수) 순서로 적습니다.</span> <span>등수는 # 칸입니다.</span></p>
-      <div class="tbl-wrap"><table class="tbl compact"><thead><tr><th>순위</th>${place.slice(0, 10).map((_, i) => `<th class="c">${i + 1}</th>`).join('')}<th class="c">11–15</th><th class="c">16–20</th></tr></thead>
-      <tbody><tr><td>점수</td>${place.slice(0, 10).map((p) => `<td class="c num">${p}</td>`).join('')}<td class="c num">1</td><td class="c num">0</td></tr></tbody></table></div></section>
-    <section class="sec rule-card" data-k="format"><h2 class="h2">프로리그</h2>
-      <p>지역마다 30팀이 A·B·C 세 조로 나뉘어 서로 돌아가며 붙습니다(시리즈 9번). 시리즈 순위마다 프로리그 포인트를 받고, 합계로 정규 시즌 순위를 냅니다.</p>
-      <ul><li>시리즈 순위별 포인트: ${sc.plRegular.slice(0, 5).join(', ')} … 20위 0</li><li>상위 20팀이 리전 결승(매치 포인트 방식)에 나갑니다.</li><li>정규 시즌 상위 팀과 리전 결승 우승팀이 플레이오프에 갑니다.</li></ul></section>
-    <section class="sec rule-card" data-k="format"><h2 class="h2">플레이오프·챔피언십 진행</h2>
-      <p>40팀이 조별 리그를 치른 뒤 브래킷으로 갈립니다.</p>
-      <ul><li>조별 리그 상위 20팀 → 승자 라운드, 하위 20팀 → 패자부활 1라운드</li>
-      <li>승자 라운드 상위 10팀 → 결승, 하위 10팀 → 패자부활 2라운드</li>
-      <li>패자부활 1라운드 상위 10팀 → 패자부활 2라운드, 하위 10팀 탈락</li>
-      <li>패자부활 2라운드 상위 10팀 → 결승, 하위 10팀 탈락</li>
-      <li>결승 20팀은 매치 포인트 방식으로 우승을 가립니다.</li></ul>
-      <p class="lead"><a href="#/standings">순위 탭</a>에서 지금 진행 상황을 승자조·패자조로 볼 수 있습니다.</p></section>
-    <section class="sec rule-card" data-k="format"><h2 class="h2">LCQ (Last Chance Qualifier)</h2>
-      <p>챔피언십 포인트로 직행하지 못한 프로리그 팀과 Split ${lastSplit()} 챌린저 서킷 상위 팀이 지역마다 40팀씩 나와 마지막 ${S.lcqSlots}자리(지역별 2팀)를 겨룹니다.</p>
-      <ul><li>시드 순서대로 지그재그로 나눠 승자 1라운드 그룹 A·B(각 20팀)</li>
-      <li>그룹별 상위 10팀 → 승자 2라운드, 하위 10팀 → 패자부활 1라운드</li>
-      <li>승자 2라운드 상위 10팀 → 결승, 하위 10팀 → 패자부활 2라운드 / 패자부활 1라운드 상위 10팀 → 패자부활 2라운드</li>
-      <li>패자부활 2라운드 상위 10팀 → 결승. 결승 20팀 매치 포인트, 상위 2팀이 챔피언십 진출</li></ul></section>
-    <section class="sec rule-card" data-k="format"><h2 class="h2">매치 포인트</h2>
-      <p>정해진 점수(보통 50점)를 넘긴 팀은 <b>매치 포인트</b> 상태가 됩니다. 그 뒤 게임에서 <b>1위(챔피언)</b>를 하면 그 즉시 우승입니다. 매치 포인트 팀이 없거나 1위를 못 하면 게임을 계속합니다.</p>
-      <p class="lead">경기 화면의 <span class="tag mpe">MP</span>는 매치 포인트 도달, <span class="tag mpe">우승</span>은 우승을 뜻합니다.</p></section>
-    <section class="sec rule-card" data-k="points"><h2 class="h2">챔피언십 포인트(CP)</h2>
-      <p>CP는 <b>선수 개인</b>이 받습니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 선수가 팀을 옮기면 CP도 따라갑니다.</p>
-      <ul><li>프로리그 최종 순위별(1인): ${sc.cpProLeague.slice(0, 6).join(', ')} …</li><li>플레이오프 최종 순위별(1인): ${sc.cpPlayoffs.slice(0, 6).join(', ')} …</li>
-      <li>CP 상위 ${S.cpDirectSlots}팀은 챔피언십 직행, 나머지 ${S.lcqSlots}자리는 LCQ(지역별 2팀)에서 정합니다.</li>
-      <li>CP가 같으면 ① Split ${tieN()} 플레이오프 최종 순위 ② 프로리그 Split ${lastSplit()} 최종 순위 ③ 프로리그 Split ${lastSplit()} 세부 기준 순으로 가립니다 (공식 규정 C7.3).</li></ul>
-      <p class="lead"><a href="#/points/cp">포인트 탭</a>에서 현재 순위를 볼 수 있습니다.</p></section>
-    <section class="sec rule-card" data-k="format"><h2 class="h2">레전드 밴 · POI 드래프트</h2>
-      <p>경기 전 일부 레전드를 쓸 수 없게 막는 <b>레전드 밴</b>과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 <b>POI 드래프트</b>가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p></section>
+    ${card('format', '한 시즌의 흐름', `
+      <p>지역 프로리그에서 성적을 내 플레이오프(국제전)에 나가고, 네 대회에서 모은 챔피언십 포인트(CP)로 챔피언십 출전이 정해집니다.</p>
+      ${steps}${slotBar}`, 'wide')}
+    ${card('points', '게임 점수', `
+      <div class="rc-2"><div>
+      <p class="rk-eq"><span>한 게임 점수</span><i>=</i><span>순위 점수</span><i>+</i><span>킬 1점씩</span></p>
+      <p>한 시리즈는 보통 ${PL.games}게임이고, 게임 점수를 모두 더해 시리즈 순위를 정합니다.</p>
+      <p class="rk-ex"><span>예: 3위로 끝내고 5킬</span> <b>${place[2] ?? 7} + 5 = ${(place[2] ?? 7) + 5}점</b></p>
+      <p class="caption"><span>이 사이트의 점수표는 모두 순위 / 킬 / 종합(순위 점수 / 킬 점수 / 종합 점수) 순서로 적습니다.</span> <span>등수는 # 칸입니다.</span></p>
+      </div><figure class="rfig">${placeBars}<figcaption>게임 순위별 순위 점수</figcaption></figure></div>`, 'wide')}
+    ${card('format', '매치 포인트', `
+      <div class="rc-2"><div>
+      <p>결승은 정해진 게임 수가 없습니다. ${mp}점을 넘긴 팀이 그다음 게임부터 1위(챔피언)를 하면 그 자리에서 우승입니다.</p>
+      <p class="caption"><span>매치 포인트 팀이 1위를 못 하면 게임이 계속됩니다.</span> <span>나머지 순위는 결승 점수 합계 순입니다.</span></p>
+      <p class="caption">경기 화면의 <span class="tag mpe">MP</span>는 매치 포인트 도달, <span class="tag mpe">우승</span>은 우승을 뜻합니다.</p>
+      </div>${mpFig}</div>`, 'wide')}
+    ${card('format', '프로리그', `
+      <div class="rc-2"><div>
+      <div class="grp" role="img" aria-label="프로리그 조 구성">${['A', 'B', 'C'].slice(0, PL.groups).map((g) => `<span class="grp-g"><b>${g}조</b><em>${PL.size}팀</em></span>`).join('<i>×</i>')}<i>→</i><span class="grp-g rf-go"><b>리전 결승</b><em>상위 ${PL.rf}팀</em></span></div>
+      <p>지역마다 ${PL.teams}팀이 ${PL.groups}개 조로 나뉩니다. 두 조씩 만나 ${PL.games}게임 시리즈를 치르고, 팀마다 시리즈를 ${PL.series}번 뜁니다.</p>
+      <p>시리즈 순위마다 프로리그 포인트를 받고, 상위 ${PL.rf}팀이 매치 포인트 방식의 리전 결승에 나갑니다.</p>
+      </div><div>
+      ${rankTbl([['정규 시리즈', sc.plRegular], ['리전 결승', sc.plFinals]], 10)}
+      <p class="caption">11위부터는 1~2점씩 줄어 20위는 0점입니다. 포인트 합계 상위 팀과 리전 결승 우승팀이 플레이오프에 갑니다.</p>
+      </div></div>`, 'wide')}
+    ${card('format', '플레이오프·챔피언십', `
+      <div class="rc-2"><div>
+      <p>${PO.teams}팀이 조별 리그를 치른 뒤 승자조와 패자조로 갈립니다.</p>
+      <ul><li>조별 리그 상위 20팀은 승자 라운드, 하위 20팀은 패자부활 1라운드로 갑니다.</li>
+      <li>승자 라운드 상위 10팀은 결승에 직행합니다.</li>
+      <li>패자부활 라운드는 하위 10팀이 탈락하고, 2라운드 상위 10팀이 결승에 합류합니다.</li>
+      <li>결승 20팀이 매치 포인트 방식으로 우승을 가립니다.</li></ul>
+      ${PO.s1 ? `<p class="caption">Split 1 플레이오프만 방식이 다릅니다. 조별 리그 상위 ${PO.s1.finals}팀이 결승에 직행하고, 다음 ${PO.s1.survivor}팀이 서바이버 스테이지(${PO.s1.games}게임)에서 남은 ${PO.s1.up}자리를 겨룹니다.</p>` : ''}
+      <p class="lead"><a href="#/standings">순위 탭</a>에서 지금 진행 상황을 승자조·패자조로 볼 수 있습니다.</p>
+      </div><figure class="rfig">${bracketFig}<figcaption>Split 2 플레이오프·챔피언십 진행 방식</figcaption></figure></div>`, 'wide')}
+    ${card('format', 'LCQ (Last Chance Qualifier)', `
+      <div class="rc-2"><div>
+      <p>챔피언십에 직행하지 못한 프로리그 팀과 2부(챌린저 서킷) 상위 팀이 지역마다 ${LQ.teams}팀씩 나와, 지역별 ${LQ.adv}자리를 겨루는 마지막 기회입니다.</p>
+      <ul><li>시드 순서대로 지그재그로 나눠 승자 1라운드 A·B를 치릅니다.</li>
+      <li>로비마다 상위 10팀은 승자 2라운드, 하위 10팀은 패자부활 1라운드로 갑니다.</li>
+      <li>이후는 플레이오프와 같습니다. 결승 상위 ${LQ.adv}팀이 챔피언십에 갑니다.</li>
+      <li>시드는 CP 순서입니다. 선수를 바꿔도 시드는 올라가지 않습니다.</li></ul>
+      </div><figure class="rfig">${lcqFig}<figcaption>지역별 LCQ 진행 방식</figcaption></figure></div>`, 'wide')}
+    ${card('points', '챔피언십 포인트 (CP)', `
+      <div class="rc-2"><div>
+      <p>CP는 선수 개인이 받습니다. 팀 CP는 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
+      ${cpSum}
+      <ul><li>프로리그와 플레이오프, 네 대회의 최종 순위로 받습니다.</li>
+      <li>프로리그는 ${B.cpMin || 12}게임 이상 뛴 선수만 받습니다.</li>
+      <li>Split ${tieN()} 플레이오프가 끝난 시점의 CP 상위 ${CH.direct}팀이 챔피언십에 직행합니다. 그 뒤의 이적은 직행 여부를 바꾸지 않습니다.</li></ul>
+      </div><div>
+      ${rankTbl([['프로리그', sc.cpProLeague], ['플레이오프', sc.cpPlayoffs]], 8)}
+      <p class="caption">선수 1명이 받는 CP입니다. 3명이 함께 받으면 팀 CP는 3배가 됩니다.</p>
+      <p class="caption">CP가 같으면 ① Split ${tieN()} 플레이오프 최종 순위 ② 프로리그 Split ${lastSplit()} 최종 순위 ③ 프로리그 Split ${lastSplit()} 세부 기준 순으로 가립니다 (공식 규정 C7.3).</p>
+      <p class="lead"><a href="#/points/cp">포인트 탭</a>에서 현재 순위를 볼 수 있습니다.</p>
+      </div></div>`, 'wide')}
+    ${P ? card('points', '상금', `
+      <div class="pz"><div class="pz-main"><span>챔피언십 총상금</span><b>${usd(P.champs[0])}</b></div>
+      <ol class="pz-top">${P.champs.slice(1).map((v, i) => `<li><span>${i === 0 ? '우승' : i === 1 ? '준우승' : '3위'}</span><b>${usd(v)}</b></li>`).join('')}</ol></div>
+      <p class="caption">플레이오프는 대회마다 총상금 ${usd(P.po[0])}(우승 ${usd(P.po[1])}), 프로리그는 Split마다 네 지역 합계 ${usd(P.pl)}입니다.</p>`) : ''}
+    ${card('format', '레전드 밴 · POI 드래프트', `
+      <p>경기 전 일부 레전드를 쓸 수 없게 막는 레전드 밴과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 POI 드래프트가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p>`)}
     </div>
-    <section class="sec"><h2 class="h2">공식 규정과 참고 자료</h2><div class="chips" style="margin-top:10px">${(S.rulesLinks || []).map(([n, u]) => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div></section>`;;
+    <section class="sec"><h2 class="h2">공식 규정과 참고 자료</h2><div class="chips" style="margin-top:10px">${(S.rulesLinks || []).map(([n, u]) => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div></section>`;
   if (sv === 'all') return html;
-  const box = document.createElement('div'); box.innerHTML = html;
-  box.querySelectorAll('[data-k]').forEach((el) => { if (el.dataset.k !== sv) el.remove(); });
-  if (sv === 'video') box.querySelector('.rules-grid')?.remove();
-  return box.innerHTML;
+  const el = document.createElement('div'); el.innerHTML = html;
+  el.querySelectorAll('[data-k]').forEach((x) => { if (x.dataset.k !== sv) x.remove(); });
+  if (sv === 'video') el.querySelector('.rules-grid')?.remove();
+  return el.innerHTML;
 }
 
 /* ---------- 방송 ---------- */
