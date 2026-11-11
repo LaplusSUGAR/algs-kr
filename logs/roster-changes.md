@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-11 20:04 | 자동 반영 (Liquipedia) | APAC North | FL (FENNEL) | NefuDoll | Lully |
 | 2026-11-11 09:04 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | APAC South | ARAM |  | refra1nnn |
 | 2026-11-11 09:04 | 자동 반영 (Liquipedia) | APAC South | ARAM | Normal | refra1nnn |
 | 2026-11-11 01:03 | 자동 반영 (Liquipedia) | Americas | DRK (Team Darkspire) | 777Fuhhnq |  |

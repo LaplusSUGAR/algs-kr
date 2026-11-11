@@ -1,5 +1,18 @@
 [
  {
+  "at": "2026-11-11T11:04:13.921Z",
+  "kind": "auto",
+  "team": "FL",
+  "teamName": "FENNEL",
+  "region": "apac-n",
+  "out": [
+   "NefuDoll"
+  ],
+  "in": [
+   "Lully"
+  ]
+ },
+ {
   "at": "2026-11-11T00:04:17.954Z",
   "kind": "auto-end",
   "team": "ARAM",
