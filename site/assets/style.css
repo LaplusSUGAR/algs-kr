@@ -883,7 +883,7 @@ time.tbd { font-size: 12px; color: var(--steel); }
   --fs-h3: clamp(15.5px, 15px + .15vw, 17.5px);
   --display: var(--body);
 }
-body { font-size: var(--fs-body); line-height: 1.6; letter-spacing: -.008em; word-break: keep-all; overflow-wrap: anywhere; text-rendering: optimizeLegibility; }
+body { font-size: var(--fs-body); line-height: 1.6; letter-spacing: -.008em; word-break: keep-all; overflow-wrap: break-word; text-rendering: optimizeLegibility; }
 :lang(ja) body, :lang(ja) { word-break: normal; line-break: strict; }
 @media (min-width: 720px) { body { font-size: var(--fs-body); } }
 
@@ -1120,3 +1120,20 @@ table.rk td.num, table.rk th.c { font-size: 12px; }
 .tag.xk { border-color: var(--brass); color: var(--brass); }
 .xnote { margin: 10px 0 0; font-size: var(--fs-sm); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .xnote .when { color: var(--steel); }
+
+/* 로스터 변경 기록: 넓으면 표, 좁으면 한 건씩 카드 (팀 · 종류 / 빠진 선수 / 들어온 선수 / 시각) */
+table.rl td.rl-out:not(.none)::before { content: '−'; color: var(--apex); font-weight: 800; margin-right: 6px; }
+table.rl td.rl-in:not(.none)::before { content: '+'; color: var(--ok); font-weight: 800; margin-right: 6px; }
+table.rl td.rl-out, table.rl td.rl-in { white-space: normal; }
+table.rl td.rl-at { white-space: nowrap; }
+@media (max-width: 760px) {
+  table.rl, table.rl tbody { display: block; width: 100%; }
+  table.rl thead { display: none; }
+  table.rl tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "team kind" "out out" "in in" "at at"; gap: 3px 10px; padding: 11px 2px; border-bottom: 1px solid var(--rule); align-items: center; }
+  table.rl td { display: block; padding: 0; border: 0; font-size: 13.5px; }
+  table.rl td.team { grid-area: team; white-space: normal; min-width: 0; font-size: 15px; }
+  table.rl td.rl-kind { grid-area: kind; }
+  table.rl td.rl-out { grid-area: out; } table.rl td.rl-in { grid-area: in; }
+  table.rl td.rl-at { grid-area: at; color: var(--steel); font-size: var(--fs-xs); font-weight: 500; }
+  table.rl td.none { display: none; }
+}

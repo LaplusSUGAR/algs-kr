@@ -1857,11 +1857,11 @@ function rosterLogView(q) {
   if (opt.krOnly) list = list.filter((e) => isF(e.team));
   const seg = `<div class="seg" role="group" aria-label="지역">${[['all', '전체'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((x) => [x, REGION[x]])].map(([k, n]) => `<a href="${qsLink('/teams', q, { g: 'moves', r: k })}" aria-current="${k === r}">${esc(n)}</a>`).join('')}</div>`;
   const who = (e) => e.team ? (team(e.team) || A.xteams?.[e.team] ? teamLink(e.team, e.teamName || undefined) : esc(e.team)) : '';
-  const rows = list.map((e) => `<tr class="${e.team ? rowCls({ short: e.team }) : ''}"><td class="num small">${esc(dayLabel(dayKey(e.at)))} ${esc(hhmm(e.at))}</td><td class="small"><span class="tag ${e.kind === 'auto' ? 'kr' : e.kind === 'official' ? 'ok' : ''}">${esc(ROSTER_KIND[e.kind] || e.kind)}</span></td><td class="team">${who(e)}${e.region ? `<small>${esc(REGION[e.region] || '')}</small>` : ''}</td><td class="small">${e.was ? `<span>구 ${esc(e.was)}</span>` : (e.out || []).map(esc).join(', ')}</td><td class="small">${(e.in || []).map(esc).join(', ')}</td></tr>`).join('');
+  const rows = list.map((e) => `<tr class="${e.team ? rowCls({ short: e.team }) : ''}"><td class="num small rl-at">${esc(dayLabel(dayKey(e.at)))} ${esc(hhmm(e.at))}</td><td class="small rl-kind"><span class="tag ${e.kind === 'auto' ? 'kr' : e.kind === 'official' ? 'ok' : ''}">${esc(ROSTER_KIND[e.kind] || e.kind)}</span></td><td class="team">${who(e)}${e.region ? `<small>${esc(REGION[e.region] || '')}</small>` : ''}</td><td class="small rl-out${e.was || (e.out || []).length ? '' : ' none'}">${e.was ? `<span>구 ${esc(e.was)}</span>` : (e.out || []).map(esc).join(', ')}</td><td class="small rl-in${(e.in || []).length ? '' : ' none'}">${(e.in || []).map(esc).join(', ')}</td></tr>`).join('');
   return `<h1 class="title">로스터 변경</h1>
     <p class="lead">빌드(약 5분마다)가 공식 API 로스터와 Liquipedia LCQ 참가 명단을 확인해 남기는 기록입니다. 공식 로스터보다 Liquipedia에 먼저 올라온 이적은 자동으로 팀 로스터와 팀 CP에 반영하고, 공식 로스터가 같아지면 거둡니다.</p>
     <div class="controls">${seg}</div>
-    ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>시각</th><th>종류</th><th>팀</th><th>빠진 선수</th><th>들어온 선수</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p class="empty">기록이 없습니다.</p>'}
+    ${list.length ? `<div class="tbl-wrap"><table class="tbl rl"><thead><tr><th>시각</th><th>종류</th><th>팀</th><th>빠진 선수</th><th>들어온 선수</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p class="empty">기록이 없습니다.</p>'}
     <p class="caption"><a href="https://github.com/LaplusSUGAR/algs-kr/blob/main/logs/roster-changes.md" target="_blank" rel="noopener">전체 기록 (GitHub)</a></p>`;
 }
 function teams(parts, q) {
