@@ -1,5 +1,29 @@
 [
  {
+  "at": "2026-11-11T00:04:17.954Z",
+  "kind": "auto-end",
+  "team": "ARAM",
+  "teamName": "ARAM",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "refra1nnn"
+  ]
+ },
+ {
+  "at": "2026-11-11T00:04:17.954Z",
+  "kind": "auto",
+  "team": "ARAM",
+  "teamName": "ARAM",
+  "region": "apac-s",
+  "out": [
+   "Normal"
+  ],
+  "in": [
+   "refra1nnn"
+  ]
+ },
+ {
   "at": "2026-11-10T16:03:44.554Z",
   "kind": "auto",
   "team": "DRK",
