@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-10T18:08:07.780Z",
+  "at": "2026-11-11T18:08:19.227Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -468,17 +468,6 @@
       }
     },
     {
-      "key": "id:01KHPREX931TTBJDXH1AN6D121",
-      "short": "JDG",
-      "name": "JD GAMING",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "JD Gaming",
-        "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREXR9RN3TFMXM8PE4MRB7",
       "short": "RID1",
       "name": "RIDDLEORDER ONE",
@@ -487,6 +476,17 @@
       "lp": {
         "name": "RIDDLE ONE",
         "by": "약자·같은 조직 이름 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX931TTBJDXH1AN6D121",
+      "short": "JDG",
+      "name": "JD GAMING",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "JD Gaming",
+        "by": "이름 같음 · 선수 2명 겹침"
       }
     },
     {
@@ -772,17 +772,6 @@
       }
     },
     {
-      "key": "id:01KHPREXVANAQTNCBJWW7TNBY1",
-      "short": "FL",
-      "name": "FENNEL",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "FENNEL",
-        "by": "이름 같음 · 선수 2명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREYN75Y400N800M8NCTSV",
       "short": "RON",
       "name": "Ronin",
@@ -872,6 +861,17 @@
       }
     },
     {
+      "key": "id:01KHPREXVANAQTNCBJWW7TNBY1",
+      "short": "FL",
+      "name": "FENNEL",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "FENNEL",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
       "key": "id:01KME84BNZF9VA8WAKE2K048P4",
       "short": "3MEN",
       "name": "3 MEN",
@@ -902,17 +902,6 @@
       "lp": {
         "name": "MaMa Clubs",
         "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
-      "key": "id:01KHPREX1EC5Z0DQ4472BPDS5H",
-      "short": "BB",
-      "name": "Buckle Boys",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Buckle Boys",
-        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {
@@ -1068,6 +1057,17 @@
       "lp": {
         "name": "Alternative Gaming",
         "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KHPREX1EC5Z0DQ4472BPDS5H",
+      "short": "BB",
+      "name": "Buckle Boys",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Buckle Boys",
+        "by": "이름 같음 · 선수 4명 겹침"
       }
     },
     {

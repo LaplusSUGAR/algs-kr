@@ -510,18 +510,6 @@
     "Raygh"
    ]
   },
-  "JDG": {
-   "region": "americas",
-   "name": "JD GAMING",
-   "players": [
-    "Keon",
-    "gent",
-    "Naughty"
-   ],
-   "coaches": [
-    "Talmadge"
-   ]
-  },
   "RID1": {
    "region": "apac-n",
    "name": "RIDDLEORDER ONE",
@@ -532,6 +520,18 @@
    ],
    "coaches": [
     "MUSCLE"
+   ]
+  },
+  "JDG": {
+   "region": "americas",
+   "name": "JD GAMING",
+   "players": [
+    "Keon",
+    "gent",
+    "Naughty"
+   ],
+   "coaches": [
+    "Talmadge"
    ]
   },
   "VEXX": {
@@ -830,19 +830,6 @@
     "Burke"
    ]
   },
-  "FL": {
-   "region": "apac-n",
-   "name": "FENNEL",
-   "players": [
-    "izzxxv",
-    "NefuDoll",
-    "sumiyoshi"
-   ],
-   "coaches": [
-    "Yoshida",
-    "SYACHI"
-   ]
-  },
   "RON": {
    "region": "emea",
    "name": "Ronin",
@@ -936,6 +923,19 @@
     "BUSYJUSTIN"
    ]
   },
+  "FL": {
+   "region": "apac-n",
+   "name": "FENNEL",
+   "players": [
+    "izzxxv",
+    "NefuDoll",
+    "sumiyoshi"
+   ],
+   "coaches": [
+    "Yoshida",
+    "SYACHI"
+   ]
+  },
   "3MEN": {
    "region": "emea",
    "name": "3 MEN",
@@ -972,17 +972,6 @@
    "coaches": [
     "GPPPPP"
    ]
-  },
-  "BB": {
-   "region": "americas",
-   "name": "Buckle Boys",
-   "players": [
-    "CruelBuckle",
-    "ssirsay",
-    "mav",
-    "J"
-   ],
-   "coaches": []
   },
   "BEN": {
    "region": "emea",
@@ -1151,6 +1140,17 @@
    "coaches": [
     "sigluss"
    ]
+  },
+  "BB": {
+   "region": "americas",
+   "name": "Buckle Boys",
+   "players": [
+    "CruelBuckle",
+    "ssirsay",
+    "mav",
+    "J"
+   ],
+   "coaches": []
   },
   "FNC": {
    "region": "apac-n",
