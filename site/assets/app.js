@@ -195,6 +195,22 @@ function until(iso) {
   const h = Math.floor(ms / 3.6e6), m = Math.floor((ms % 3.6e6) / 6e4);
   return h >= 48 ? `${Math.floor(h / 24)}일 후` : h ? `${h}시간 ${m}분 후` : `${m}분 후`;
 }
+// 공식 API에 없는 일정 (config/overrides.json schedExtra → A.extras): POI 드래프트 등. 시작 3시간 뒤 '예정'에서 빠진다
+const XKIND = { 'poi-draft': ['POI 드래프트', '낙하 지점(POI) 선택 시작'] };
+const XEVENT = { lcq: 'LCQ', playoffs: '플레이오프', champs: '챔피언십' };
+const extrasUpcoming = () => (A.extras || []).filter((x) => now() - new Date(x.start) < 3 * 3600e3);
+const extraName = (x) => x.name || XKIND[x.kind]?.[0] || '일정';
+function isKrExtra(x) { if (!x.region) return true; const regions = new Set(focusList().map((k) => team(k.short)?.region)); return opt.mode === 'kr' ? x.region === 'apac-n' : regions.has(x.region); }
+function extraItem(x) {
+  const started = new Date(x.start) <= now();
+  return `<article class="match extra">
+    <time datetime="${x.start}">${hhmm(x.start)}</time>
+    <div><div class="what">${esc(extraName(x))} <span class="tag xk">${started ? '진행 중' : '경기 아님'}</span>${isKrExtra(x) && x.region ? ` <span class="tag kr">${ML().tag}</span>` : ''}</div>
+      <div class="meta">${esc([XEVENT[x.event], REGION[x.region], XKIND[x.kind]?.[1], started ? '' : until(x.start)].filter(Boolean).join(', '))}</div></div>
+  </article>`;
+}
+// 시리즈와 추가 일정을 시각 순으로 섞어 그린다
+const timedItems = (series, extras) => [...series.map((s) => ({ t: s.start, h: () => matchItem(s) })), ...extras.map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).map((o) => o.h()).join('');
 const seriesState = (s) => s.status === 'completed' ? '종료' : s.live || s.status === 'live' ? 'LIVE' : s.timeTbd ? '시각 미정' : until(s.start) || '시작 대기';
 
 /* ---------- 라우터 ---------- */
@@ -367,7 +383,8 @@ function home() {
   const B = bracket();
   const evHome = eventHome();
   const showFlow = !evHome && B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
-  const upList = `<div class="up-list">${upcoming.slice(0, 3).map(matchItem).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
+  const upMix = [...upcoming.map((s) => ({ t: s.start, h: () => matchItem(s) })), ...extrasUpcoming().filter(isKrExtra).map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).slice(0, 3);
+  const upList = `<div class="up-list">${upMix.map((o) => o.h()).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
   return `${modeBar}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
@@ -827,16 +844,17 @@ function schedule(parts, q) {
   let list = A.series.filter((s) => (view === 'results' ? s.status === 'completed' : s.status !== 'completed'));
   if (kronly) list = list.filter(isKrSeries);
   list.sort((a, b) => (view === 'results' ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start)));
-  const days = {};
+  const days = {}, xdays = {};
   for (const s of list) (days[s.timeTbd && view !== 'results' ? 'tbd' : dayKey(s.start)] ||= []).push(s);
+  if (view === 'upcoming') for (const x of extrasUpcoming().filter((x) => !kronly || isKrExtra(x))) { const d = dayKey(x.start); (xdays[d] ||= []).push(x); days[d] ||= []; }
+  const order = Object.keys(days).filter((d) => d !== 'tbd').sort(); if (days.tbd) order.push('tbd');
   // 공식 시각이 임시값인 시리즈(LCQ 일부 지역)는 날짜도 확실하지 않아 맨 뒤 '시각 미정'에 모은다
-  if (days.tbd) { const t = days.tbd; delete days.tbd; days.tbd = t; }
   return `<h1 class="title">경기</h1><p class="lead">모든 시간은 한국 시간(KST)입니다. 한 시리즈는 보통 6게임입니다.</p>
     ${refreshNote(true)}
     <div class="controls">
       <div class="seg"><a href="${qsLink('/schedule', q, { kr: kronly ? '0' : '1' })}" aria-current="${kronly}">${ML().only}</a></div>
     </div>
-    <div class="days">${Object.entries(days).map(([d, ss]) => `<section class="day"><h2 class="day-h">${d === 'tbd' ? '시각 미정' : dayLabel(d)}<small>${ss.length}시리즈</small></h2>${ss.map(matchItem).join('')}</section>`).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}</div>`;
+    <div class="days">${(view === 'results' ? Object.keys(days) : order).map((d) => { const ss = days[d], xs = xdays[d] || []; return `<section class="day"><h2 class="day-h">${d === 'tbd' ? '시각 미정' : dayLabel(d)}<small>${[ss.length ? `${ss.length}시리즈` : '', xs.length ? `일정 ${xs.length}` : ''].filter(Boolean).join(' · ')}</small></h2>${timedItems(ss, xs)}</section>`; }).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}</div>`;
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */
@@ -1129,6 +1147,7 @@ function lcqBody(q, base) {
   return `<p class="lead">${esc(REGION[ev.region])} LCQ · ${esc(dayLabel(dayKey(B.a.start || ev.start)))} 시작. 지역마다 40팀이 겨뤄 상위 2팀이 챔피언십에 갑니다.</p>
     ${!B.done ? refreshNote() : ''}
     <div class="controls">${seg}</div>${focusLine}
+    ${(A.extras || []).filter((x) => x.eventId === ev.eventId && new Date(x.start) > now() - 3 * 3600e3).map((x) => `<p class="xnote"><span class="tag xk">${esc(extraName(x))}</span> <b>${esc(dayLabel(dayKey(x.start)))} ${hhmm(x.start)}</b> 시작 <span class="when">${esc(until(x.start) || '')}</span></p>`).join('')}
     ${tabBar}
     ${!B.done && B.list.some((st) => st.s?.startFix === 'rules') ? '<p class="caption">경기 시각은 공식 규정의 지역별 일정표(현지 시각) 기준입니다. 공식 페이지에는 아직 임시 시각이 들어 있어 실제 시작 시각은 달라질 수 있습니다.</p>' : ''}
     ${spoil(m === 'groups' ? lcqGroups(B) : stageMatch(B, B[m]), key, 'LCQ 결과')}`;

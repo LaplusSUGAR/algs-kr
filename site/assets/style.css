@@ -1113,3 +1113,10 @@ table.rk td.num, table.rk th.c { font-size: 12px; }
 .kr-hero h1 { max-width: 74%; }
 @container (max-width: 420px) { .kr-hero h1 { max-width: 88%; } }
 @container (min-width: 480px) { .kr-stats { padding-right: 13cqi; } }
+
+/* 경기가 아닌 일정 (POI 드래프트 등) */
+.match.extra time { color: var(--steel); }
+.match.extra .what { font-weight: 600; }
+.tag.xk { border-color: var(--brass); color: var(--brass); }
+.xnote { margin: 10px 0 0; font-size: var(--fs-sm); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.xnote .when { color: var(--steel); }

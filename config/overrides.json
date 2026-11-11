@@ -127,6 +127,13 @@
   ],
   "_lcqSchedule": "LCQ 시각을 손으로 정할 때만 쓴다. 평소에는 비워 둔다: 빌드가 공식 API 값을 규정 부록 D4(config/rules/<시즌>.json lcq.schedule, 지역 현지 시각)와 견줘 태평양 시간 임시값·순서가 어긋난 값을 규정 시각으로 바꾼다. 형식: 지역 → { 단계 이름: 시각(+시차), note: 화면에 적을 근거 }. 예: \"emea\": { \"Match Point Finals\": \"2026-11-22T18:00:00+00:00\" }",
   "lcqSchedule": {},
+  "_schedExtra": "공식 API에 없는 일정(경기가 아닌 것)을 손으로 넣는다. 경기 탭·홈 '다가오는 경기'·해당 대회 화면에 시리즈처럼 표시되고, 시작 3시간 뒤 '예정'에서 빠진다. kind: poi-draft(POI 드래프트) 등. event: lcq|playoffs|champs(그 대회 화면에 표시), region: apac-n|apac-s|emea|americas. start는 시차를 붙여 적는다. source에 근거를 적는다.",
+  "schedExtra": [
+    {"kind":"poi-draft","event":"lcq","region":"emea","start":"2026-11-16T12:00:00-05:00","source":"ALGS 공지 (LCQ POI 드래프트 개시, 12 Noon ET)"},
+    {"kind":"poi-draft","event":"lcq","region":"americas","start":"2026-11-16T20:00:00-05:00","source":"ALGS 공지 (LCQ POI 드래프트 개시, 8:00pm ET)"},
+    {"kind":"poi-draft","event":"lcq","region":"apac-n","start":"2026-11-16T20:30:00-05:00","source":"ALGS 공지 (LCQ POI 드래프트 개시, 8:30pm ET)"},
+    {"kind":"poi-draft","event":"lcq","region":"apac-s","start":"2026-11-16T21:00:00-05:00","source":"ALGS 공지 (LCQ POI 드래프트 개시, 9:00pm ET)"}
+  ],
   "_ccRenames": "2부(챌린저 서킷) 팀 이름 변경: 서킷 순위표 이름 → 새 이름. Liquipedia LCQ 참가 명단에서 선수 2명 이상이 같은 팀은 자동으로 바뀌므로, 자동으로 안 될 때 적는다. 화면에는 새 이름과 '구 옛 이름'이 함께 나온다",
   "ccRenames": {
     "Laugh Tale": "ORB GARDEN",

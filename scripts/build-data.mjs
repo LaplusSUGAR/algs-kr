@@ -57,7 +57,7 @@ const season = {
   ...(cfgMine ? {} : { rulesLinks: [['ALGS 대회 구성 안내 (algs.ea.com)', 'https://algs.ea.com/en/competition-overview'], [`Liquipedia ${lpSeasonPage(seasonSlug).replace('/', ' ')}`, lpSeasonUrl]] }),
 };
 const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine: cfgMine && rulesMine, rules: { season: rules.season, edition: rules.source?.edition || null } };
-const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'ccRenames'];
+const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'ccRenames', 'schedExtra'];
 const ovRaw = readJson('config/overrides.json', {});
 const ovMine = !ovRaw.season || ovRaw.season === seasonSlug;
 const ov = ovMine ? ovRaw : Object.fromEntries(Object.entries(ovRaw).filter(([k]) => !SEASON_KEYS.includes(k)));
@@ -476,6 +476,12 @@ const data = {
   // 약칭은 시즌마다 겹칠 수 있어 현재 팀만 약칭 키로 내보낸다 (지난 팀은 이름으로만 표시)
   teams: Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])),
   cp: cpRows, cpEvents, pl,
+  // 공식 API에 없는 일정(POI 드래프트 등, config/overrides.json schedExtra). 대회 화면과 묶으려고 그 지역 대회 ID를 붙인다
+  extras: (ov.schedExtra || []).filter((x) => x.start && !Number.isNaN(Date.parse(x.start))).map((x, i) => {
+    const pick = { lcq: /^last-chance-qualifier/, playoffs: /playoffs/, champs: /^(championship|champs)/ }[x.event];
+    const ev = pick && Object.values(evById).find((e) => pick.test(e.slug) && (!x.region || e.region === x.region || /playoffs|champ/.test(e.slug)));
+    return { id: `x${i}`, kind: x.kind || 'note', name: x.name || null, region: x.region || null, event: x.event || null, eventId: ev?.id || null, start: new Date(x.start).toISOString(), source: x.source || null };
+  }).sort((a, b) => a.start.localeCompare(b.start)),
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},

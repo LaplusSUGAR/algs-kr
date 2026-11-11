@@ -181,6 +181,13 @@
     ['대회별 CP 내역', '大会別CP内訳', 'CP by event'], ['프로리그 포인트', 'プロリーグポイント', 'Pro League points'], ['챔피언십 직행권 {n}팀', 'チャンピオンシップ直行 {1}チーム', '{1} direct Championship spots'],
     ['확정 · 나머지 팀은 지역별 LCQ에서 {n}자리씩', '確定 · 残りは地域ごとのLCQで{1}枠ずつ', 'Locked · the rest go to regional LCQs ({1} spots each)'], ['확정 · LCQ에서 지역별 {n}팀이 더해져 {n}팀 확정', '確定 · LCQから地域ごとに{1}チームが加わり{2}チーム確定', 'Locked · {1} more per region from LCQ, {2} teams confirmed'], ['{x} 기준 · 나머지 팀은 지역별 LCQ에서 {n}자리씩', '{1}基準 · 残りは地域ごとのLCQで{2}枠ずつ', 'by {1} · the rest go to regional LCQs ({2} spots each)'],
     ['최종 순위 정산 기준', '最終順位で試算', 'final standings'], ['결승 실시간 정산 기준', '決勝ライブ順位で試算', 'live Finals standings'], ['최소 보장 정산 기준', '最低保証で試算', 'minimum guarantee'], ['현재 순위 기준', '現在の順位', 'current standings'], ['현재 순위', '現在の順位', 'current standings'],
+    // 추가 일정 (POI 드래프트 등)
+    ['POI 드래프트', 'POIドラフト', 'POI Draft'],
+    ['낙하 지점(POI) 선택 시작', '降下地点（POI）の選択開始', 'landing spot (POI) picks begin'],
+    ['경기 아님', '試合ではありません', 'not a match'],
+    ['시작', '開始', 'start'],
+    ['일정 {n}', '予定 {1}', '{1} other'],
+    ['{t} 시작', '{1} 開始', 'starts {1}'],
     // 규칙 탭 (그림 설명)
     ['ALGS를 처음 보는 사람도 경기를 따라갈 수 있도록 핵심만 그림으로 모았습니다. 자세한 기준은 맨 아래 공식 규정이 우선합니다.', 'ALGSを初めて見る人でも試合を追えるように、要点だけを図でまとめました。詳しい基準は一番下の公式ルールが優先されます。', 'The essentials in pictures, so first-time viewers can follow ALGS. For exact wording, the official rules linked at the bottom take precedence.'],
     ['점', '点', 'pts'],
