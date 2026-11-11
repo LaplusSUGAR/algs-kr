@@ -1,5 +1,43 @@
 [
  {
+  "at": "2026-11-11T22:02:19.464Z",
+  "kind": "auto-end",
+  "team": "BB",
+  "teamName": "Buckle Boys",
+  "region": "americas",
+  "out": [
+   "ssirsay"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-11T22:02:19.464Z",
+  "kind": "auto-end",
+  "team": "JDG",
+  "teamName": "JD GAMING",
+  "region": "americas",
+  "out": [
+   "Keon",
+   "gent"
+  ],
+  "in": [
+   "Floating",
+   "Fuhhnq"
+  ]
+ },
+ {
+  "at": "2026-11-11T22:02:19.464Z",
+  "kind": "auto",
+  "team": "GCR",
+  "teamName": "Glacier",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "CAPO",
+   "jKillua"
+  ]
+ },
+ {
   "at": "2026-11-11T15:02:11.019Z",
   "kind": "auto-end",
   "team": "FURY",

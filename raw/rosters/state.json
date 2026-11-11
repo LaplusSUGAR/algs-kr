@@ -2194,23 +2194,20 @@
    "since": "2026-11-10T15:01:02.494Z"
   },
   {
+   "team": "GCR",
+   "out": [],
+   "in": [
+    "CAPO",
+    "jKillua"
+   ],
+   "since": "2026-11-11T22:02:19.464Z"
+  },
+  {
    "team": "DKF",
    "out": [
     "Floating"
    ],
    "in": [],
-   "since": "2026-11-10T15:01:02.494Z"
-  },
-  {
-   "team": "JDG",
-   "out": [
-    "Keon",
-    "gent"
-   ],
-   "in": [
-    "Floating",
-    "Fuhhnq"
-   ],
    "since": "2026-11-10T15:01:02.494Z"
   },
   {
@@ -2225,14 +2222,6 @@
    "team": "HEAD",
    "out": [
     "Rileymekinac"
-   ],
-   "in": [],
-   "since": "2026-11-10T15:01:02.494Z"
-  },
-  {
-   "team": "BB",
-   "out": [
-    "ssirsay"
    ],
    "in": [],
    "since": "2026-11-10T15:01:02.494Z"
