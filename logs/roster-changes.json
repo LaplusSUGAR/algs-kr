@@ -1,5 +1,53 @@
 [
  {
+  "at": "2026-11-11T15:02:11.019Z",
+  "kind": "auto-end",
+  "team": "FURY",
+  "teamName": "FURY",
+  "region": "apac-s",
+  "out": [
+   "Lochchan"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-11T15:02:11.019Z",
+  "kind": "auto-end",
+  "team": "ALX",
+  "teamName": "AELIX",
+  "region": "apac-s",
+  "out": [
+   "spades"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-11T15:02:11.019Z",
+  "kind": "auto",
+  "team": "FURY",
+  "teamName": "FURY",
+  "region": "apac-s",
+  "out": [
+   "Lochchan"
+  ],
+  "in": [
+   "TimmyTiiimE"
+  ]
+ },
+ {
+  "at": "2026-11-11T15:02:11.019Z",
+  "kind": "auto",
+  "team": "ALX",
+  "teamName": "AELIX",
+  "region": "apac-s",
+  "out": [
+   "spades"
+  ],
+  "in": [
+   "Swarkst3r"
+  ]
+ },
+ {
   "at": "2026-11-11T11:04:13.921Z",
   "kind": "auto",
   "team": "FL",
