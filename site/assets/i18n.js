@@ -191,6 +191,10 @@
     // 방송 상태 (지금 방송 중, 최근 영상)
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
+    ['중계 보기', '配信を見る', 'Watch'],
+    ['중계 채널', '配信チャンネル', 'Broadcast channels'],
+    ['다른 팀 선수 방송', '他チームの選手配信', 'Other players live'],
+    ['팀을 응원 팀(별표)으로 고르면 그 팀 선수 방송이 위 카드와 홈에 보입니다.', 'チームをお気に入り（★）にすると、その選手の配信が上のカードとホームに表示されます。', 'Star a team to see its players\' streams in the cards above and on Home.'],
     ['방송 상태를 확인하는 중입니다.', '配信状況を確認しています。', 'Checking who is live.'],
     ['지금 방송 중인 채널이 없습니다.', '現在配信中のチャンネルはありません。', 'No channels are live right now.'],
     ['마지막 확인 {t}', '最終確認 {1}', 'last checked {1}'],

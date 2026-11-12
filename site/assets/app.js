@@ -311,6 +311,21 @@ const advanced = (st, short) => {
   return st.key === 'f' ? !!r.won : r.pos <= st.cut;
 };
 
+// 휴대폰용 세로 진행 그림: 가로 그림을 옆으로 밀지 않아도 되게 같은 내용을 위→아래 카드로 보여 준다 (화면 폭 640px 이하에서 가로 그림 대신 보인다)
+//   items: [{ key, title, st(단계), cls, href, when, adv(short) → true|false|null, outs: [[라벨, 도착 단계 키]], note }]
+function flowV(items, label) {
+  const title = Object.fromEntries(items.map((n) => [n.key, n.title]));
+  return `<ol class="bfv" aria-label="${esc(label)}">${items.map((n) => {
+    const st = n.st, ks = krIn(st.teams || []);
+    const chips = ks.length ? ks.map((sh) => { const a = n.adv(sh); return `<span class="bfv-chip ${CAT[krOf(sh)]} ${a === false ? 'out' : a ? 'up' : ''}">${esc(sh)}</span>`; }).join('') : `<span class="bfv-none">${st.teams?.length ? esc(ML().none) : '출전 팀 미정'}</span>`;
+    const tag = st.status === 'live' ? '<span class="tag live">LIVE</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+    const ext = String(n.href).startsWith('http');
+    const outs = n.outs.map(([lab, to]) => `<li class="${/하위/.test(lab) ? 'down' : 'up'}"><b>${esc(lab)}</b><i aria-hidden="true">→</i><span>${esc(title[to] || '')}</span></li>`).join('') + (n.note ? `<li class="note"><span>${esc(n.note)}</span></li>` : '');
+    return `<li class="bfv-n ${n.cls}"><a class="bfv-a" href="${esc(n.href)}"${ext ? ' target="_blank" rel="noopener"' : ''}><span class="bfv-h"><b>${esc(n.title)}</b>${tag}</span><span class="bfv-s">${st.n}팀${n.when ? ' · ' + esc(n.when) : ''}</span><span class="bfv-c">${chips}</span></a>${outs ? `<ul class="bfv-o">${outs}</ul>` : ''}</li>`;
+  }).join('')}</ol>`;
+}
+const flowOrder = (keys, pos) => keys.slice().sort((a, b) => pos[a][0] - pos[b][0] || pos[a][1] - pos[b][1]);
+
 // 홈 진출 구조 그림. 각 단계를 누르면 공식 경기 페이지로 간다.
 function bracketFlow(B) {
   const W = 170, H = 96;
@@ -326,6 +341,10 @@ function bracketFlow(B) {
     const x1 = pos[a][0] + W, y1 = pos[a][1] + oy, x2 = pos[b][0], y2 = pos[b][1] + iy, mx = (x1 + x2) / 2;
     return `<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2 - 3} ${y2}" class="bf-edge" marker-end="url(#bfArrow)"/><text x="${lx}" y="${ly}" class="bf-elab" text-anchor="middle">${label}</text>`;
   };
+  const urlOf = (st) => (st.key === 'gs' ? (st.series?.[0] ? officialUrl(st.series[0]).replace(/\/match\/.*/, '/schedule') : '#/standings') : st.s ? officialUrl(st.s) : '#/standings');
+  const stCls = (st) => [st.status === 'completed' ? 'done' : '', st.status === 'live' ? 'live' : '', st.key === nextKey && st.status !== 'live' ? 'next' : ''].join(' ');
+  const by = Object.fromEntries(B.list.map((st) => [st.key, st]));
+  const vert = flowV(flowOrder(Object.keys(pos).filter((k) => by[k]), pos).map((k) => { const st = by[k]; return { key: k, title: st.ko, st, cls: stCls(st), href: urlOf(st), when: st.start ? `${dayLabel(dayKey(st.start)).slice(0, 5)} ${hhmm(st.start)}` : '', adv: (sh) => advanced(st, sh), outs: edges.filter((e) => e[0] === k).map((e) => [e[4], e[1]]) }; }), `${ko(A.intl.name, EVENT_KO)} 진출 구조`);
   const node = (st) => {
     const [x, y] = pos[st.key];
     const cls = ['bf-node', st.status === 'completed' ? 'done' : '', st.status === 'live' ? 'live' : '', st.key === nextKey && st.status !== 'live' ? 'next' : ''].join(' ');
@@ -338,7 +357,7 @@ function bracketFlow(B) {
       cx += w + 4; return out;
     }).join('') + (ks.length > 4 ? `<text x="${cx}" y="${y + 77}" class="bf-more" dy="2">+${ks.length - 4}</text>` : '');
     const when = st.start ? `${dayLabel(dayKey(st.start)).slice(0, 5)} ${hhmm(st.start)}` : '';
-    const url = st.key === 'gs' ? (st.series?.[0] ? officialUrl(st.series[0]).replace(/\/match\/.*/, '/schedule') : '#/standings') : st.s ? officialUrl(st.s) : '#/standings';
+    const url = urlOf(st);
     const ext = url.startsWith('http');
     return `<a href="${esc(url)}" ${ext ? 'target="_blank" rel="noopener"' : ''} class="${cls}" aria-label="${esc(st.ko)} ${esc(stageState(st))}${ks.length ? ', 한국 관련 ' + ks.join(' ') : ''}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10" class="bf-box"/>
@@ -348,9 +367,9 @@ function bracketFlow(B) {
       ${ks.length ? '' : `<text x="${x + 12}" y="${y + 79}" class="bf-sub2">${st.teams?.length ? ML().none : '출전 팀 미정'}</text>`}
       ${chips}</a>`;
   };
-  return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
+  return `<div class="bf-both"><div class="bf-wrap"><svg class="bf" viewBox="0 0 880 232" role="group" aria-label="${esc(ko(A.intl.name, EVENT_KO))} 진출 구조">
     <defs><marker id="bfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
-    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div><p class="caption swipe-hint" aria-hidden="true">옆으로 밀어서 보기</p>`;
+    ${edges.map(edge).join('')}${B.list.map(node).join('')}</svg></div>${vert}</div>`;
 }
 
 /* ---------- 홈 ---------- */
@@ -717,7 +736,7 @@ function isKrSeries(s) {
 
 function matchItem(s) {
   const state = seriesState(s);
-  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE${s.games ? ` ${s.games}/${s.matches || '?'}게임` : ''}</span>` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
+  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE${s.games ? ` ${s.games}/${s.matches || '?'}게임` : ''}</span>${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
   let res = '';
   if (s.results?.length) {
     const top = s.results[0];
@@ -1076,9 +1095,11 @@ function stageFlow(B, L, href, label) {
       ${ks.length ? chips : `<text x="${x + 12}" y="${y + 79}" class="bf-sub2">${x0.teams?.length ? esc(ML().none) : '출전 팀 미정'}</text>`}</a>`;
   };
   const note = ([k, t]) => { const [x, y] = L.nodes[k]; return `<text x="${x + 12}" y="${y + H + 16}" class="bf-note">${esc(t)}</text>`; };
-  return `<div class="bf-wrap"><svg class="bf" viewBox="0 0 880 ${L.h}" role="group" aria-label="${esc(label)}">
+  const notes = Object.fromEntries(L.notes || []);
+  const vert = flowV(flowOrder(Object.keys(L.nodes).filter((k) => st(k)), L.nodes).map((k) => { const x0 = st(k); return { key: k, title: L.nodes[k][2], st: x0, cls: [x0.status === 'completed' ? 'done' : '', x0.status === 'live' ? 'live' : '', k === nextKey && x0.status !== 'live' ? 'next' : ''].join(' '), href: href(k), when: stTab(x0), adv: (sh) => adv(x0, sh), outs: L.edges.filter((e) => e[0] === k).map((e) => [e[4], e[1]]), note: notes[k] }; }), label);
+  return `<div class="bf-both"><div class="bf-wrap"><svg class="bf" viewBox="0 0 880 ${L.h}" role="group" aria-label="${esc(label)}">
     <defs><marker id="sfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
-    ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div><p class="caption swipe-hint" aria-hidden="true">옆으로 밀어서 보기</p>`;
+    ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div>${vert}</div>`;
 }
 // 홈 점수표: 지금(진행 중 → 마지막으로 끝난 → 출전 팀이 정해진 다음) 경기. 같은 시각에 함께 열리는 경기(예: 그룹 A·B)도 함께
 const homeStages = (B) => {
@@ -1119,7 +1140,7 @@ const stTab = (st) => (st.tabText != null ? st.tabText : st.start && !st.tbd ? `
 // 경기 탭 머리 (LCQ·챔피언십 공통): 이름·상태·시각, 출전과 진출 규칙 한 줄, 점수표
 function stageMatch(B, st) {
   const x = st.s;
-  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
   const flow = B.FLOW[st.key];
   const from = st.from || (flow ? flow.map(([k, a, b]) => `<span>${esc(`${B[k].tab} ${a}~${b}위`)}</span>`).join(' + ') : '');
   const rule = st.key === 'f' ? `매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승${st.top ? ` · 상위 ${st.top}팀 챔피언십 진출` : ''}` : st.cut ? `1~${st.cut}위 → ${st.up} · ${st.cut + 1}~${st.n}위 → ${st.down}` : '';
@@ -1392,7 +1413,7 @@ function groupTable(ev) {
 // 브래킷 한 단계: 결과가 있으면 점수표, 없으면 출전 명단(확정 또는 예상)
 function stageTable(st) {
   const x = st.s;
-  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
   const top = `<div class="bk-stage-h"><h3 class="h3">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h3> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? dateTime(st.start) + ' ' + TZL : ''}</span></div>`;
   const res = x?.results;
   let body;
@@ -1940,6 +1961,7 @@ function playerView(parts) {
   return `<p style="margin:14px 0 0"><a class="more" href="${cur ? `#/teams/${encodeURIComponent(cur.short)}` : '#/teams'}">${cur ? esc(cur.name) : '팀 목록'}</a></p>
     <div class="detail-id">${cur ? logo(cur.short, 'xl') : ''}<h1 class="title">${esc(name)}</h1></div>
     <p class="lead">${cur ? `${teamLink(cur.short, cur.name)} · ${esc(REGION[cur.region] || '')}` : '현재 소속 정보 없음'}${rp ? ` · ${esc(rp.c || '')}${rp.rep ? ` (대표 ${esc(rp.rep)})` : ''} · ${esc(rp.title || roleKo[rp.r] || '')}` : ''}${rp?.mix ? ' · <span class="tag kr k-member">한국계</span>' : rp && isKrP(rp) ? ' · <span class="tag kr k-team">한국</span>' : ''}</p>
+    ${liveFor((l) => l.who.toLowerCase() === name.toLowerCase() && (!cur || !l.team || l.team === cur.short))}
     ${spoil(`<section class="sec"><h2 class="h2">챔피언십 포인트</h2>${cpP ? `<p class="lead">${esc(cpRow.name)}의 팀 CP 합산에 들어가는 상위 3인입니다.</p>` : '<p class="lead">현재 팀 CP 합산(상위 3인)에는 들어가지 않는 선수입니다.</p>'}${cpBreak(pid, name, cpP ? cpP[1] : null, cur?.short)}</section>
     <section class="sec"><h2 class="h2">${esc(yearLabel())} 대회 기록</h2>${h.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th>팀</th><th class="r">순위</th><th class="r">CP</th></tr></thead><tbody>
       ${h.slice().reverse().map(({ e, r }) => `<tr><td><span class="lg-only">${esc(e.label)}</span><span class="sm-inline">${esc(e.short)}</span></td><td class="team">${r.short ? teamLink(r.short, r.name) : esc(r.name || '')}</td><td class="r num">${r.pos}</td><td class="r num">${fmt(r.cp)}</td></tr>`).join('')}
@@ -1963,7 +1985,8 @@ function teamDetail(short) {
     <div class="detail-id">${logo(short, 'xl')}<h1 class="title">${esc(t.name)}</h1>${t.was ? `<small class="was">구 ${esc(t.was)}</small>` : ''}<span class="fav-btns"><button type="button" class="fav-btn${opt.fav.includes(t.id) ? ' on' : ''}" data-fav="${esc(t.id)}" aria-pressed="${opt.fav.includes(t.id)}">${opt.fav.includes(t.id) ? '★ 응원 중' : '☆ 응원하기'}</button><button type="button" class="fav-btn main${opt.main === t.id ? ' on' : ''}" data-main="${esc(t.id)}" aria-pressed="${opt.main === t.id}">${opt.main === t.id ? '대표 팀' : '대표 팀으로'}</button></span></div>
     <p class="lead">${esc(REGION[t.region] || '')}${t.krLevel !== 'none' ? ` <span class="tag kr ${CAT[t.krLevel]}">${KR_LABEL[t.krLevel]}</span>` : ''}${t.cp ? `, 챔피언십 포인트 ${t.cp.rank}위 (${fmt(t.cp.total)} CP)` : ''}</p>
     ${si?.text ? spoil(`<p class="lead"><b>${esc(ko(A.intl.name, EVENT_KO))}</b> · ${esc(si.text)}</p>`, intlKey(), '대회 성적') : ''}
-    ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${playerLink(p.n, pName(p))}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + (p.title || roleKo[p.r]) : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
+    ${liveFor((l) => l.team === short)}
+    ${t.roster?.length ? `<section class="sec"><h2 class="h2">로스터</h2><ul class="roster-list">${t.roster.map((p) => `<li><span>${isKrP(p) ? `<span class="krdot ${p.r === 'k' ? 'k-coach' : 'k-team'}"></span>` : ''}${playerLink(p.n, pName(p))}${liveTag(p.n, short)}</span><span class="muted small">${esc(p.c || '')}${p.rep ? ` (대표 ${esc(p.rep)})` : ''}${roleKo[p.r] ? ', ' + (p.title || roleKo[p.r]) : ''}${p.mix ? ', 한국계' : ''}</span></li>`).join('')}</ul></section>` : ''}
     ${spoil(`${(() => { const c = A.cp.find((r) => r.id === t.id); return c ? `<section class="sec"><h2 class="h2">챔피언십 포인트 내역</h2><p class="lead">팀 CP ${fmt(c.total)} = 상위 3인 합</p>${c.players.map(([n, p, id]) => cpBreak(id, n, p, t.short)).join('')}</section>` : ''; })()}
     <section class="sec"><h2 class="h2">시즌 성적</h2><div class="tbl-wrap"><table class="tbl"><thead><tr><th>대회</th><th class="r">#</th>${PTS_TH}</tr></thead><tbody>
       ${ir ? `<tr><td>${esc(ko(A.intl.name, EVENT_KO))} 조별 리그</td><td class="r num">${ir.pos}</td>${ptsTd(ir.pts, ir.kills)}</tr>` : ''}
@@ -2126,14 +2149,26 @@ const FIND = {
   youtube: (n) => `https://www.youtube.com/results?search_query=${encodeURIComponent(n + ' 에이펙스')}`,
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
-const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveOf(p.name) ? ' <span class="tag live">LIVE</span>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
+const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveTag(p.name, p.team)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
 /* ---------- 방송 상태 (worker/streams → C.streamsUrl) ---------- */
 // ST = { at, ok, live: [...], videos: [...] } | null(아직 못 받음). 60초마다 다시 받는다(화면이 보일 때만)
-let ST = null, stSig = '';
+let ST = null, stSig = '', stOSig = '';
 const vidSeen0 = store.get('vidSeen', null); // 이번 방문 전에 방송 탭을 마지막으로 본 시각 (새 영상 표시 기준)
-const liveRank = (l) => (l.kind === 'player' && isF(l.team) && focusList().some((k) => k.short === l.team) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : 3);
-const liveList = () => (ST?.live || []).slice().sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
-const liveOf = (name) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase());
+// 내가 별표(응원)한 팀인지 (보기 모드와 상관없이)
+const starred = (short) => { const t = team(short); return !!t && opt.fav.includes(t.id); };
+// 해외 선수 방송(l.intl: 전 팀 선수의 Twitch)은 별표한 팀·관심 팀 선수만 카드로 보여 준다. 나머지는 방송 탭 아래 목록과 팀·선수 화면의 LIVE 표시로
+const liveShown = (l) => !l.intl || starred(l.team) || isF(l.team) || liveId(l) === parseHash().q.get('play');
+const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : 3);
+const liveList = () => (ST?.live || []).filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
+const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
+const playHref = (l) => (l.embed ? `#/streams?play=${encodeURIComponent(liveId(l))}` : esc(l.url));
+// 이름 옆 LIVE 표시: 누르면 그 방송으로
+const liveTag = (name, short) => { const l = liveOf(name, short); return l ? ` <a class="tag live" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'} aria-label="${esc(name)} 방송 중, 방송 보기">LIVE</a>` : ''; };
+// 팀·선수 화면 맨 위: 그 팀(선수)이 방송 중이면 카드로
+const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => l.kind === 'player' && pick(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0)); return L.length ? `<section class="sec lv lv-home"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2><div class="lv-grid">${L.slice(0, 6).map((l, i) => liveCard(l, i, true)).join('')}</div></section>` : ''; };
+// 진행 중인 경기 옆 '중계 보기': 공식 중계가 켜져 있으면 그 방송을 방송 탭에서 바로 열고, 켜진 중계를 못 찾으면 공식 중계 채널 목록으로
+const officialLive = () => { const L = (ST?.live || []).filter((l) => l.kind === 'official'); const pref = I.lang === 'ja' ? 'o:ja' : 'o:en'; return L.find((l) => l.key === pref && l.embed) || L.find((l) => l.embed) || L[0] || null; };
+const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive(); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
 const newVideos = () => (ST?.videos || []).filter((v) => vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
@@ -2144,7 +2179,7 @@ function liveCard(l, i, asLink) {
   const inner = `<span class="lv-thumb">${l.thumb && !hide ? `<img src="${esc(l.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="tag live">LIVE</span>${l.embed ? '<span class="yt-play" aria-hidden="true"></span>' : ''}</span>
     <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title">${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(l.title || '')}</span>
     <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
-  if (asLink && l.embed) return `<a class="lv-card" href="#/streams?play=${encodeURIComponent(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
+  if (asLink && l.embed) return `<a class="lv-card" href="${playHref(l)}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
   return l.embed
     ? `<button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
     : `<a class="lv-card" href="${esc(l.url)}" target="_blank" rel="noopener">${inner}<span class="lv-ext">${PLAT[l.platform]}에서 보기</span></a>`;
@@ -2153,12 +2188,15 @@ function liveSection() {
   if (!C.streamsUrl) return '';
   if (!ST) return '<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="lead">방송 상태를 확인하는 중입니다.</p></section>';
   const L = liveList();
+  const rest = ST.live.filter((l) => !liveShown(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
+  const others = rest.length ? `<details class="lv-rest"><summary>다른 팀 선수 방송 <small class="muted">${rest.length}</small></summary><p class="caption">팀을 응원 팀(별표)으로 고르면 그 팀 선수 방송이 위 카드와 홈에 보입니다.</p>
+    <ul>${rest.map((l) => `<li><a href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}><b>${esc(l.who)}</b></a>${team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
   const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
   const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
-  if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p>${foot}</section>`;
+  if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p><div class="lv-player" id="lvPlayer" hidden></div>${others}${foot}</section>`;
   return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2>
     <div class="lv-player" id="lvPlayer" hidden></div>
-    <div class="lv-grid">${L.map((l, i) => liveCard(l, i)).join('')}</div>${foot}</section>`;
+    <div class="lv-grid">${L.map((l, i) => liveCard(l, i)).join('')}</div>${others}${foot}</section>`;
 }
 function videoSection(q) {
   if (!C.streamsUrl || !ST) return '';
@@ -2184,7 +2222,7 @@ function liveStrip() {
 function liveBadge() {
   const a = document.querySelector('.tabbar a[data-tab="streams"]'); if (!a) return;
   a.querySelector('.nav-badge')?.remove();
-  const n = (ST?.live || []).length, nv = newVideos().length;
+  const n = liveList().length, nv = newVideos().length;
   if (!n && !nv) return;
   const b = document.createElement('span'); b.className = `nav-badge${n ? '' : ' dot'}`; b.textContent = n ? String(n) : ''; b.setAttribute('aria-label', n ? `방송 중 ${n}` : '새 영상'); a.appendChild(b);
 }
@@ -2196,11 +2234,16 @@ async function pollStreams() {
     const first = !ST; ST = j;
     const sig = JSON.stringify([j.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
     liveBadge();
+    const osig = JSON.stringify(j.live.filter((l) => l.kind === 'official').map((l) => [l.key, l.platform]));
+    const oChanged = osig !== stOSig; stOSig = osig;
     if (sig === stSig && !first) return;
     stSig = sig;
-    const tab = parseHash().parts[0] || 'home';
+    const { parts } = parseHash(), tab = parts[0] || 'home';
+    // 방송 목록이 보이는 화면(홈·방송·팀/선수 상세)만 다시 그린다. 경기·순위 화면은 공식 중계가 켜지거나 꺼질 때만 ('중계 보기' 버튼)
+    if (!(tab === 'home' || tab === 'streams' || (tab === 'teams' && parts[1]) || tab === 'players' || oChanged)) return;
+    if (document.activeElement?.matches?.('input, textarea, select')) return;
     // 재생 중인 플레이어가 있으면 화면을 다시 그리지 않는다(영상이 끊기지 않게). 다음 이동 때 새 목록이 보인다
-    if ((tab === 'streams' && !document.querySelector('#lvPlayer iframe, .yt-frame')) || tab === 'home') render();
+    if (!document.querySelector('#lvPlayer iframe, iframe.yt-frame, dialog[open]')) render(); // 팀·경기 화면의 LIVE 표시·중계 보기도 함께 바뀐다
   } catch { /* 다음 주기에 다시 */ }
 }
 function streams(parts, q) {
@@ -2267,7 +2310,7 @@ function bind() {
   if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
   app.querySelectorAll('button.lv-card').forEach((b) => b.addEventListener('click', () => {
-    const l = liveList()[+b.dataset.lv], box = document.getElementById('lvPlayer'); if (!l?.embed || !box) return;
+    const l = (ST?.live || []).find((x) => liveId(x) === b.dataset.lvid), box = document.getElementById('lvPlayer'); if (!l?.embed || !box) return;
     box.hidden = false;
     box.innerHTML = `<div class="lv-bar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-close" type="button" aria-label="플레이어 닫기">닫기</button></div>
       <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>

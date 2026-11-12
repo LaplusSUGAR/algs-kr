@@ -469,12 +469,30 @@ const chanId = {
   chzzk: (u) => (/chzzk\.naver\.com\/(?:live\/)?([0-9a-f]{32})/.exec(u || '') || [])[1] || null,
 };
 const streamChannels = [];
+const streamIntl = []; // [twitch 로그인, 선수, 팀 약칭]
 {
   const add = (key, who, kind, links, extra = {}) => { const c = { key, who, kind, ...extra }; for (const p of ['twitch', 'youtube', 'chzzk']) { const id = chanId[p](links[p]); if (id) c[p] = id; } if (c.twitch || c.youtube || c.chzzk) streamChannels.push(c); };
   for (const b of streams.broadcasts) add(`o:${b.key}`, b.label, 'official', Object.fromEntries((b.links || []).map(([n, u]) => [String(n).toLowerCase(), u])), b.apexOnly ? { apexOnly: true } : {});
   const seen = new Set(streamChannels.flatMap((c) => [c.twitch?.toLowerCase()].filter(Boolean)));
   for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }, { apexOnly: true }); } }
   for (const p of streams.players) add(`p:${nameKey(p.name)}`, p.name, 'player', p.links || {}, { team: p.team, role: p.role });
+  // 그 밖의 선수(해외 팀 포함, 현재 로스터 기준): 방송 중 여부만 본다. 화면에는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시로 쓰인다
+  //   채널: config/players.json 수동 입력 > 공식 사이트에 선수가 등록한 채널. YouTube·치지직을 수동으로 넣은 선수는 위 목록처럼 전부 확인하고, 나머지는 Twitch만 묶어서 확인한다
+  const have = new Set(streams.players.map((p) => nameKey(p.name)));
+  const reg = algs.allStreams || [];
+  const regOf = (short, name) => { const k = nameKey(name); const hit = reg.filter((r) => nameKey(r[1]) === k); return hit.find((r) => r[0] === short) || (hit.length === 1 ? hit[0] : null); };
+  for (const t of Object.values(teams)) {
+    if (!t.current || !t.short) continue;
+    for (const rp of t.roster || []) {
+      if (have.has(nameKey(rp.n))) continue;
+      const m = manual(rp.n), r = regOf(t.short, rp.n);
+      const twitch = m.twitch || (r && r[2] === 'twitch' ? streamUrl('twitch', r[3]) : null);
+      const login = chanId.twitch(twitch);
+      if (m.youtube || m.chzzk) { add(`p:${nameKey(rp.n)}`, rp.n, 'player', { twitch, youtube: m.youtube, chzzk: m.chzzk }, { team: t.short, intl: true, apexOnly: true }); continue; }
+      if (login && !seen.has(login.toLowerCase())) { seen.add(login.toLowerCase()); streamIntl.push([login, rp.n, t.short]); }
+    }
+  }
+  streamIntl.sort((a, b) => a[2].localeCompare(b[2]) || a[1].localeCompare(b[1]));
 }
 
 // 2부 팀 명단·이름 변경 기록, 상태와 기록 파일 저장
@@ -542,7 +560,7 @@ function unpackIds(d) {
 }
 
 // 채널 목록 파일은 내용이 바뀔 때만 다시 쓴다 (본 데이터 버전과 따로)
-{ const txt = JSON.stringify({ channels: streamChannels }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
+{ const txt = JSON.stringify({ channels: streamChannels, intl: streamIntl }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
 const v = hash(JSON.stringify({ ...data, generated: null }));
 const prevVer = readJson('site/data/ver.json');
 if (prevVer?.v === v && !process.argv.includes('--force')) { console.log(`[build] 변경 없음 (v=${v})`); process.exit(0); }

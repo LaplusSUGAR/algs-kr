@@ -10,6 +10,7 @@
 //   series : [seriesId, eventId, phaseName, seriesName, status, startsAtISO, regionName, isMatchPoint, matchCount, results[[pos, short, pts, kills]] | null]
 //   poGroup: [pos, short, name, teamId, group, pts, kills, region]   (진행 중/최근 Playoffs 조별 리그 누적)
 //   krStreams: [short, player, role, provider, channel]
+//   allStreams: [short, player, provider, channel] 전 팀 선수
 //   poGroups: { eventId: [poGroup 행...] }  국제전마다 조별 리그 누적 (이전 결과 보기용, 끝난 대회도 보관)
 //   lcq    : { eventId: { teams: [[teamId, short, name, seed]], lineups: { seriesId: [short...] } } }  LCQ 지역별 출전 팀·로비 배정
 //
@@ -183,6 +184,7 @@ async function collect(season, prev) {
 
   // 최신 Split Pro League 4개 지역 로스터 (전 팀). 대표 국가가 국적과 다르면 함께 저장 (한국계 선수 표시용)
   const krStreams = [];
+  const allStreams = []; // 전 팀 선수가 공식 사이트에 등록한 방송 채널 [short, player, provider, channel] (팀·선수 화면의 LIVE 표시, 응원 팀 선수 방송용)
   const logos = {}; // teamId: [logoLight(흰 로고, 어두운 배경용), logoDark(어두운 로고, 밝은 배경용)] 공식 팀 로고 URL. 없는 쪽은 null
   const isKr = (p) => p.country === KR || p.countryOfRepresentation === KR;
   for (const [k, { e }] of latestPl.entries()) {
@@ -195,6 +197,7 @@ async function collect(season, prev) {
         return `${p.name.trim()}|${p.country || ''}|${roleCode(p.role)}${rep ? '|' + rep : ''}`;
       }).join(';');
       for (const p of tm.players.filter(isKr)) krStreams.push([tm.shortName, p.name.trim(), p.role, p.streamProvider, p.channelName]);
+      for (const p of tm.players) if (p.streamProvider && p.channelName) allStreams.push([tm.shortName, p.name.trim(), p.streamProvider, String(p.channelName).trim()]);
     }
     // 시즌 초: 순위표가 아직 비어 있으면 출전 팀 명단 순서로 프로리그 표를 채운다 (팀 목록·로스터가 먼저 보이게)
     const plKey = `s${latestSplit}:${e.slug.replace(/^split-\d-pro-league-/, '')}`;
@@ -317,7 +320,7 @@ async function collect(season, prev) {
     for (const v of tvRes[k]?.versions || []) addLogo(id, v.logoLight, v.logoDark);
   }
 
-  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, partnerStreams,
+  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, allStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
 }
 

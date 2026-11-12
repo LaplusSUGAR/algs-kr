@@ -1182,3 +1182,42 @@ table.rl td.rl-at { white-space: nowrap; }
 .lv-home { margin-top: 14px; }
 .lv-home .lv-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
 @media (min-width: 900px) { .lv-home .lv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 980px; } }
+
+/* 세로 진행 그림 (휴대폰): 가로 그림 대신 */
+.bfv { display: none; list-style: none; margin: 0; padding: 0; gap: 0; }
+.bfv-n { position: relative; padding: 0 0 14px 22px; }
+.bfv-n::before { content: ''; position: absolute; left: 6px; top: 16px; bottom: -6px; width: 2px; background: var(--rule); }
+.bfv-n:last-child { padding-bottom: 0; } .bfv-n:last-child::before { display: none; }
+.bfv-n::after { content: ''; position: absolute; left: 0; top: 14px; width: 14px; height: 14px; border-radius: 50%; background: var(--card); border: 2px solid var(--steel); box-sizing: border-box; }
+.bfv-n.done::after { background: var(--steel); }
+.bfv-n.live::after { background: var(--ring); border-color: var(--ring); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 22%, transparent); }
+.bfv-n.next::after { border-color: var(--ring); }
+.bfv-a { display: grid; gap: 4px; padding: 10px 12px; background: var(--card); border-radius: var(--r-md, 10px); color: inherit; text-decoration: none; border: 1px solid transparent; }
+.bfv-n.live .bfv-a, .bfv-n.next .bfv-a { border-color: var(--ring); }
+.bfv-n.done .bfv-a { opacity: .82; }
+.bfv-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bfv-h b { font-size: var(--fs-md, 15px); }
+.bfv-s { font-size: var(--fs-sm, 13px); color: var(--steel); }
+.bfv-c { display: flex; flex-wrap: wrap; gap: 4px; }
+.bfv-chip { padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: #fff; background: var(--ring); }
+.bfv-chip.k-team { background: var(--kr-team); } .bfv-chip.k-member { background: var(--kr-member); } .bfv-chip.k-coach { background: var(--coach); }
+.bfv-chip.out { opacity: .4; text-decoration: line-through; } .bfv-chip.up { outline: 1.5px solid var(--ink); }
+.bfv-none { font-size: var(--fs-xs, 12px); color: var(--steel); }
+.bfv-o { list-style: none; margin: 6px 0 0; padding: 0 0 0 4px; display: grid; gap: 2px; font-size: var(--fs-xs, 12px); color: var(--steel); }
+.bfv-o li { display: flex; gap: 6px; align-items: baseline; }
+.bfv-o i { font-style: normal; }
+.bfv-o .up b { color: var(--ink); } .bfv-o .down b { color: var(--steel); font-weight: 600; }
+@media (max-width: 640px) { .bf-both > .bf-wrap { display: none; } .bf-both > .bfv { display: grid; } }
+
+/* 경기 옆 중계 보기 */
+a.watch { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; padding: 2px 9px; border-radius: 999px; background: var(--ring); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; vertical-align: middle; }
+a.watch::before { content: '▶'; font-size: 9px; }
+a.watch.off { background: transparent; color: var(--steel); border: 1px solid var(--rule); }
+a.watch.off::before { content: none; }
+a.tag.live { text-decoration: none; }
+/* 방송 탭: 다른 팀 선수 방송 목록 */
+.lv-rest { margin-top: 12px; }
+.lv-rest summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+.lv-rest ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
+.lv-rest li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 8px 10px; background: var(--card); border-radius: var(--r-md, 10px); }
+.lv-rest .lv-sub { margin-left: auto; }

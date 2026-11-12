@@ -11,16 +11,19 @@ const isApex = (...texts) => texts.some((t) => APEX.test(String(t || '')));
 
 export async function collect({ env, fetch: f, store, now }) {
   const out = { at: new Date(now).toISOString(), ok: { twitch: null, youtube: null, chzzk: null }, err: {}, live: [], videos: [] };
-  const [chs, chErr] = await safe(() => channels({ env, f, store }));
-  if (!chs) { out.err.channels = chErr; return out; }
-  const meta = (c) => ({ key: c.key, who: c.who, team: c.team || null, kind: c.kind });
+  const [got, chErr] = await safe(() => channels({ env, f, store }));
+  if (!got) { out.err.channels = chErr; return out; }
+  const chs = got.list;
+  // intl: 한국 관련이 아닌 선수. 사이트는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시에만 쓴다
+  const meta = (c) => ({ key: c.key, who: c.who, team: c.team || null, kind: c.kind, ...(c.intl ? { intl: true } : {}) });
   const jobs = [];
 
   // ── Twitch ──
-  const tw = chs.filter((c) => c.twitch);
+  // 그 밖의 선수(전 팀)는 Twitch만, Apex 방송일 때만
+  const tw = chs.filter((c) => c.twitch).concat(got.intl.map(([login, who, team]) => ({ key: `p:${String(who).toLowerCase()}`, who, team, kind: 'player', intl: true, apexOnly: true, twitch: login })));
   if (tw.length && env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET) jobs.push(safe(async () => {
     const token = await twitchToken({ env, f, store, now });
-    const byLogin = new Map(tw.map((c) => [c.twitch.toLowerCase(), c]));
+    const byLogin = new Map(); for (const c of tw) { const k = c.twitch.toLowerCase(); if (!byLogin.has(k)) byLogin.set(k, c); } // 같은 채널이면 앞(한국 관련·공식)이 우선
     for (const part of chunk([...byLogin.keys()], 100)) {
       const j = await getJson(f, `https://api.twitch.tv/helix/streams?first=100&${part.map((l) => `user_login=${encodeURIComponent(l)}`).join('&')}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': env.TWITCH_CLIENT_ID } });
       for (const s of j.data || []) {
@@ -83,11 +86,11 @@ export async function collect({ env, fetch: f, store, now }) {
 
 // 채널 목록 (사이트가 빌드 때 만든 파일, 10분 캐시)
 async function channels({ env, f, store }) {
-  const hit = await store.get('channels'); if (hit) return hit;
+  const hit = await store.get('channels2'); if (hit?.list) return hit;
   const j = await getJson(f, `${String(env.SITE_URL || '').replace(/\/$/, '')}/data/stream-channels.json`);
-  const list = (j.channels || []).slice(0, 80);
-  await store.put('channels', list, 600);
-  return list;
+  const got = { list: (j.channels || []).slice(0, 120), intl: (j.intl || []).filter((x) => Array.isArray(x) && /^[A-Za-z0-9_]{2,30}$/.test(x[0] || '')).slice(0, 800) };
+  await store.put('channels2', got, 600);
+  return got;
 }
 // Twitch 앱 토큰 (client credentials). 만료 하루 전까지 캐시한다
 async function twitchToken({ env, f, store, now }) {
