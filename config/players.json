@@ -3,12 +3,12 @@
   "players": {
     "Jusna": {
       "chzzk": null,
-      "youtube": https://www.youtube.com/@jusnapex,
+      "youtube": "https://www.youtube.com/@jusnapex",
       "soop": null
     },
     "Cinap": {
       "chzzk": null,
-      "youtube": https://www.youtube.com/@cinap7699,
+      "youtube": "https://www.youtube.com/@cinap7699",
       "soop": null
     },
     "obly": {
@@ -17,7 +17,7 @@
       "soop": null
     },
     "Aimbot": {
-      "chzzk": https://chzzk.naver.com/6409e8b0e890d79233c1a3e1d391bee8,
+      "chzzk": "https://chzzk.naver.com/6409e8b0e890d79233c1a3e1d391bee8",
       "youtube": null,
       "soop": null
     },
@@ -28,7 +28,7 @@
     },
     "ILY": {
       "chzzk": null,
-      "youtube": https://www.youtube.com/@ilyapex,
+      "youtube": "https://www.youtube.com/@ilyapex",
       "soop": null
     },
     "YunD": {
@@ -38,12 +38,12 @@
     },
     "egoist": {
       "chzzk": null,
-      "youtube": https://www.youtube.com/@egoist2227,
+      "youtube": "https://www.youtube.com/@egoist2227",
       "soop": null
     },
     "Dogma": {
       "role": "coach",
-      "chzzk": https://chzzk.naver.com/f2fa64948bfe6352bf52f3683deff5a1,
+      "chzzk": "https://chzzk.naver.com/f2fa64948bfe6352bf52f3683deff5a1",
       "youtube": null,
       "soop": null
     },
