@@ -4,6 +4,10 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-13 03:11 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) |  | ALX | spades | Swarkst3r |
+| 2026-11-13 03:11 | 자동 반영 (Liquipedia) | Americas | FFS |  | Floating |
+| 2026-11-13 03:11 | 자동 반영 (Liquipedia) | Americas | DKF | Floating |  |
+| 2026-11-13 03:11 | 자동 반영 (Liquipedia) | APAC South | ASC3 (ASC3NT) | spades | Swarkst3r |
 | 2026-11-13 02:03 | 2부 팀 이름 변경 | APAC North | Salmon and SANMA |  | 구 AstraNova |
 | 2026-11-12 23:02 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | EMEA | GCR (Glacier) |  | CAPO, jKillua |
 | 2026-11-12 23:02 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | EMEA | BPR |  | King Viktor |
@@ -178,7 +182,7 @@
 | WRLD (World Wide) | Americas | Winnie |  |
 | VEXX (VexX Gaming) | Americas | KIMCHI |  |
 | NICE (Nice Guys) | Americas | RamBeau |  |
-| JDG (JD GAMING) | Americas | Talmadge |  |
+| JDG |  | Talmadge |  |
 | PRES (W Press) | Americas | Charmander |  |
 | HEAD (Headglytch) | Americas | Zuni |  |
 | VR (EBOYS) | Americas | Hoplodamus |  |
@@ -189,3 +193,5 @@
 | DF (DreamFire) | APAC South | thurston, AceGod | Sid0o, 3Mz |
 | PF2 (PlayFor2nd) | EMEA | Faenex, Nono, Feuda | Hiarka, Slab |
 | DLS (Daylight Savings) | APAC South | W-L-A2 | Walking L |
+| ASC3 (ASC3NT) | APAC South | spades | Swarkst3r, Omegr |
+| FFS | Americas | Keon, gent | Floating, Fuhhnq |

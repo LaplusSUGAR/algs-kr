@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-11T18:08:19.227Z",
+  "at": "2026-11-12T18:10:58.629Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -480,13 +480,14 @@
     },
     {
       "key": "id:01KHPREX931TTBJDXH1AN6D121",
-      "short": "JDG",
-      "name": "JD GAMING",
+      "short": "FFS",
+      "name": "FFS",
       "region": "americas",
-      "src": "lp",
+      "src": "official",
       "lp": {
+        "why": "선수 2명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "JD Gaming",
-        "by": "이름 같음 · 선수 2명 겹침"
+        "overlap": 2
       }
     },
     {
@@ -905,6 +906,17 @@
       }
     },
     {
+      "key": "id:01KHPREX1EC5Z0DQ4472BPDS5H",
+      "short": "BB",
+      "name": "Buckle Boys",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Buckle Boys",
+        "by": "이름 같음 · 선수 4명 겹침"
+      }
+    },
+    {
       "key": "id:01KHPREW26WW7WFZ1H5YMJXWN2",
       "short": "BEN",
       "name": "Ben",
@@ -1060,17 +1072,6 @@
       }
     },
     {
-      "key": "id:01KHPREX1EC5Z0DQ4472BPDS5H",
-      "short": "BB",
-      "name": "Buckle Boys",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Buckle Boys",
-        "by": "이름 같음 · 선수 4명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREY2Q30PNMWXNRJF2KSSZ",
       "short": "FNC",
       "name": "FNATIC",
@@ -1083,13 +1084,14 @@
     },
     {
       "key": "id:01KHPREWEXHYMAN629M2QBZTB8",
-      "short": "ALX",
-      "name": "AELIX",
+      "short": "ASC3",
+      "name": "ASC3NT",
       "region": "apac-s",
-      "src": "lp",
+      "src": "official",
       "lp": {
+        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "Aelix",
-        "by": "이름 같음 · 선수 3명 겹침"
+        "overlap": 3
       }
     },
     {

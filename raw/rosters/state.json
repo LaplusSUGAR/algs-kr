@@ -522,9 +522,9 @@
     "MUSCLE"
    ]
   },
-  "JDG": {
+  "FFS": {
    "region": "americas",
-   "name": "JD GAMING",
+   "name": "FFS",
    "players": [
     "Keon",
     "gent",
@@ -973,6 +973,17 @@
     "GPPPPP"
    ]
   },
+  "BB": {
+   "region": "americas",
+   "name": "Buckle Boys",
+   "players": [
+    "CruelBuckle",
+    "ssirsay",
+    "mav",
+    "J"
+   ],
+   "coaches": []
+  },
   "BEN": {
    "region": "emea",
    "name": "Ben",
@@ -1141,17 +1152,6 @@
     "sigluss"
    ]
   },
-  "BB": {
-   "region": "americas",
-   "name": "Buckle Boys",
-   "players": [
-    "CruelBuckle",
-    "ssirsay",
-    "mav",
-    "J"
-   ],
-   "coaches": []
-  },
   "FNC": {
    "region": "apac-n",
    "name": "FNATIC",
@@ -1165,9 +1165,9 @@
     "YunD"
    ]
   },
-  "ALX": {
+  "ASC3": {
    "region": "apac-s",
-   "name": "AELIX",
+   "name": "ASC3NT",
    "players": [
     "Razi",
     "spades",
@@ -1963,6 +1963,25 @@
    "lp": [
     "Walking L"
    ]
+  },
+  "ASC3": {
+   "off": [
+    "spades"
+   ],
+   "lp": [
+    "Swarkst3r",
+    "Omegr"
+   ]
+  },
+  "FFS": {
+   "off": [
+    "Keon",
+    "gent"
+   ],
+   "lp": [
+    "Floating",
+    "Fuhhnq"
+   ]
   }
  },
  "moves": [
@@ -2049,14 +2068,14 @@
    "since": "2026-11-09T11:01:49.100Z"
   },
   {
-   "team": "ALX",
+   "team": "ASC3",
    "out": [
     "spades"
    ],
    "in": [
     "Swarkst3r"
    ],
-   "since": "2026-11-11T15:02:11.019Z"
+   "since": "2026-11-12T18:11:08.642Z"
   },
   {
    "team": "CPR",
@@ -2221,6 +2240,22 @@
     "jKillua"
    ],
    "since": "2026-11-12T14:02:19.608Z"
+  },
+  {
+   "team": "DKF",
+   "out": [
+    "Floating"
+   ],
+   "in": [],
+   "since": "2026-11-12T18:11:08.642Z"
+  },
+  {
+   "team": "FFS",
+   "out": [],
+   "in": [
+    "Floating"
+   ],
+   "since": "2026-11-12T18:11:08.642Z"
   },
   {
    "team": "HEAD",
@@ -2950,7 +2985,7 @@
   "SHIN|MikeJitsu,ImEurusk,khenzo|",
   "MTR|Maron|Lible Ace"
  ],
- "_mdBase": "{\"RID0\":{\"off\":[\"Assii\"],\"lp\":[]},\"LTX\":{\"off\":[\"Kontyan\"],\"lp\":[]},\"KN\":{\"off\":[],\"lp\":[]},\"NFX\":{\"off\":[\"Raygh\"],\"lp\":[]},\"RIG\":{\"off\":[\"Chanriyo\"],\"lp\":[]},\"O2\":{\"off\":[],\"lp\":[]},\"RR\":{\"off\":[\"Vulcan300\"],\"lp\":[]},\"ETS\":{\"off\":[],\"lp\":[]},\"BS\":{\"off\":[],\"lp\":[]},\"FL\":{\"off\":[\"SYACHI\"],\"lp\":[]},\"RID1\":{\"off\":[\"MUSCLE\"],\"lp\":[]},\"RRX\":{\"off\":[\"Mitarashi\"],\"lp\":[]},\"TIE\":{\"off\":[],\"lp\":[]},\"XECT\":{\"off\":[],\"lp\":[\"Mqty\"]},\"SBI\":{\"off\":[],\"lp\":[]},\"RLZ\":{\"off\":[\"Fzr\"],\"lp\":[\"inkya\"]},\"MTR\":{\"off\":[\"Anemone\"],\"lp\":[]},\"FNC\":{\"off\":[\"kisekiduck\",\"EIN\"],\"lp\":[\"Chrom\"]},\"SRL\":{\"off\":[\"Shohei\"],\"lp\":[]},\"UFZ\":{\"off\":[],\"lp\":[\"NIRU\"]},\"ALT\":{\"off\":[\"Lible Ace\",\"Mosh\"],\"lp\":[\"Ein\"]},\"4QUA\":{\"off\":[\"RingoOisi7\"],\"lp\":[\"Ria\",\"Nekuru\"]},\"FCN\":{\"off\":[\"chikochandao\"],\"lp\":[\"Tico\"]},\"NE\":{\"off\":[\"c4lmerq\"],\"lp\":[\"kota\"]},\"TEC\":{\"off\":[\"Arm\"],\"lp\":[\"Honeypie\"]},\"7VEN\":{\"off\":[\"hannzi\",\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"DOG\":{\"off\":[\"yanlys\"],\"lp\":[]},\"BH\":{\"off\":[\"xxfps\"],\"lp\":[\"XX\"]},\"CPR\":{\"off\":[],\"lp\":[]},\"KRS\":{\"off\":[\"xinhai\"],\"lp\":[]},\"SWQ\":{\"off\":[\"Lzoho\",\"Moku\"],\"lp\":[\"GuoZi\"]},\"TBSU\":{\"off\":[],\"lp\":[]},\"2C1M\":{\"off\":[],\"lp\":[]},\"OTS\":{\"off\":[\"aflow\"],\"lp\":[]},\"HABN\":{\"off\":[],\"lp\":[]},\"MAMA\":{\"off\":[],\"lp\":[]},\"TECA\":{\"off\":[\"KBBLANK\"],\"lp\":[\"Wang\"]},\"GT\":{\"off\":[],\"lp\":[]},\"VOID\":{\"off\":[],\"lp\":[\"aflow\"]},\"FIN\":{\"off\":[],\"lp\":[]},\"RDG\":{\"off\":[\"Salvatorez\"],\"lp\":[]},\"ORG\":{\"off\":[\"Max Verstappen\"],\"lp\":[\"跳跳loveJK\"]},\"ALX\":{\"off\":[],\"lp\":[]},\"ARAM\":{\"off\":[],\"lp\":[]},\"FURY\":{\"off\":[],\"lp\":[]},\"TECB\":{\"off\":[\"WWUUZZII\"],\"lp\":[\"Wuzi\"]},\"UBI\":{\"off\":[\"Aviisan\"],\"lp\":[]},\"WAR\":{\"off\":[\"ihtw-www-\"],\"lp\":[\"Rename\"]},\"ECL\":{\"off\":[],\"lp\":[]},\"TLNP\":{\"off\":[\"Hiarka\",\"Esteves33\"],\"lp\":[\"nono\"]},\"ZIP\":{\"off\":[],\"lp\":[]},\"D4C\":{\"off\":[\"Faenex\",\"Nono\"],\"lp\":[]},\"MIH\":{\"off\":[\"Yanzz\"],\"lp\":[]},\"FUL\":{\"off\":[],\"lp\":[]},\"SH\":{\"off\":[\"CalamityVX\"],\"lp\":[\"Calamitous\"]},\"DN\":{\"off\":[],\"lp\":[]},\"INF\":{\"off\":[],\"lp\":[]},\"MAJN\":{\"off\":[\"Ixren\"],\"lp\":[]},\"BEN\":{\"off\":[],\"lp\":[\"Zuni\"]},\"3MEN\":{\"off\":[\"tyhr\"],\"lp\":[]},\"RON\":{\"off\":[\"ChaoticMuch\"],\"lp\":[]},\"MAM\":{\"off\":[],\"lp\":[]},\"BLSD\":{\"off\":[],\"lp\":[]},\"RD\":{\"off\":[],\"lp\":[]},\"PXL\":{\"off\":[],\"lp\":[]},\"BPR\":{\"off\":[],\"lp\":[]},\"TF\":{\"off\":[\"henryojlk\"],\"lp\":[]},\"BCL\":{\"off\":[],\"lp\":[]},\"FTL\":{\"off\":[],\"lp\":[]},\"SO9\":{\"off\":[],\"lp\":[]},\"GCR\":{\"off\":[\"QPMS\"],\"lp\":[]},\"WRLD\":{\"off\":[\"Winnie\"],\"lp\":[]},\"VEXX\":{\"off\":[\"KIMCHI\"],\"lp\":[]},\"NICE\":{\"off\":[\"RamBeau\"],\"lp\":[]},\"FXI\":{\"off\":[],\"lp\":[]},\"JDG\":{\"off\":[\"Talmadge\"],\"lp\":[]},\"DRK\":{\"off\":[],\"lp\":[]},\"PRES\":{\"off\":[\"Charmander\"],\"lp\":[]},\"HEAD\":{\"off\":[\"Zuni\"],\"lp\":[]},\"BB\":{\"off\":[],\"lp\":[]},\"VR\":{\"off\":[\"Hoplodamus\"],\"lp\":[]},\"SO\":{\"off\":[],\"lp\":[\"Brick\"]},\"SLG\":{\"off\":[],\"lp\":[]},\"FISH\":{\"off\":[],\"lp\":[]},\"URNM\":{\"off\":[\"MaliceMamba\"],\"lp\":[]},\"FREE\":{\"off\":[],\"lp\":[]},\"DKF\":{\"off\":[\"DROPPED\",\"Jxmo\"],\"lp\":[]},\"HAB\":{\"off\":[\"Nonameguy\"],\"lp\":[]},\"DF\":{\"off\":[\"thurston\",\"AceGod\"],\"lp\":[\"Sid0o\",\"3Mz\"]},\"KKOI\":{\"off\":[],\"lp\":[]},\"PF2\":{\"off\":[\"Faenex\",\"Nono\",\"Feuda\"],\"lp\":[\"Hiarka\",\"Slab\"]},\"SLP\":{\"off\":[],\"lp\":[]},\"DLS\":{\"off\":[\"W-L-A2\"],\"lp\":[\"Walking L\"]}}",
+ "_mdBase": "{\"RID0\":{\"off\":[\"Assii\"],\"lp\":[]},\"LTX\":{\"off\":[\"Kontyan\"],\"lp\":[]},\"KN\":{\"off\":[],\"lp\":[]},\"NFX\":{\"off\":[\"Raygh\"],\"lp\":[]},\"RIG\":{\"off\":[\"Chanriyo\"],\"lp\":[]},\"O2\":{\"off\":[],\"lp\":[]},\"RR\":{\"off\":[\"Vulcan300\"],\"lp\":[]},\"ETS\":{\"off\":[],\"lp\":[]},\"BS\":{\"off\":[],\"lp\":[]},\"FL\":{\"off\":[\"SYACHI\"],\"lp\":[]},\"RID1\":{\"off\":[\"MUSCLE\"],\"lp\":[]},\"RRX\":{\"off\":[\"Mitarashi\"],\"lp\":[]},\"TIE\":{\"off\":[],\"lp\":[]},\"XECT\":{\"off\":[],\"lp\":[\"Mqty\"]},\"SBI\":{\"off\":[],\"lp\":[]},\"RLZ\":{\"off\":[\"Fzr\"],\"lp\":[\"inkya\"]},\"MTR\":{\"off\":[\"Anemone\"],\"lp\":[]},\"FNC\":{\"off\":[\"kisekiduck\",\"EIN\"],\"lp\":[\"Chrom\"]},\"SRL\":{\"off\":[\"Shohei\"],\"lp\":[]},\"UFZ\":{\"off\":[],\"lp\":[\"NIRU\"]},\"ALT\":{\"off\":[\"Lible Ace\",\"Mosh\"],\"lp\":[\"Ein\"]},\"4QUA\":{\"off\":[\"RingoOisi7\"],\"lp\":[\"Ria\",\"Nekuru\"]},\"FCN\":{\"off\":[\"chikochandao\"],\"lp\":[\"Tico\"]},\"NE\":{\"off\":[\"c4lmerq\"],\"lp\":[\"kota\"]},\"TEC\":{\"off\":[\"Arm\"],\"lp\":[\"Honeypie\"]},\"7VEN\":{\"off\":[\"hannzi\",\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"DOG\":{\"off\":[\"yanlys\"],\"lp\":[]},\"BH\":{\"off\":[\"xxfps\"],\"lp\":[\"XX\"]},\"CPR\":{\"off\":[],\"lp\":[]},\"KRS\":{\"off\":[\"xinhai\"],\"lp\":[]},\"SWQ\":{\"off\":[\"Lzoho\",\"Moku\"],\"lp\":[\"GuoZi\"]},\"TBSU\":{\"off\":[],\"lp\":[]},\"2C1M\":{\"off\":[],\"lp\":[]},\"OTS\":{\"off\":[\"aflow\"],\"lp\":[]},\"HABN\":{\"off\":[],\"lp\":[]},\"MAMA\":{\"off\":[],\"lp\":[]},\"TECA\":{\"off\":[\"KBBLANK\"],\"lp\":[\"Wang\"]},\"GT\":{\"off\":[],\"lp\":[]},\"VOID\":{\"off\":[],\"lp\":[\"aflow\"]},\"FIN\":{\"off\":[],\"lp\":[]},\"RDG\":{\"off\":[\"Salvatorez\"],\"lp\":[]},\"ORG\":{\"off\":[\"Max Verstappen\"],\"lp\":[\"跳跳loveJK\"]},\"ALX\":{\"off\":[],\"lp\":[]},\"ARAM\":{\"off\":[],\"lp\":[]},\"FURY\":{\"off\":[],\"lp\":[]},\"TECB\":{\"off\":[\"WWUUZZII\"],\"lp\":[\"Wuzi\"]},\"UBI\":{\"off\":[\"Aviisan\"],\"lp\":[]},\"WAR\":{\"off\":[\"ihtw-www-\"],\"lp\":[\"Rename\"]},\"ECL\":{\"off\":[],\"lp\":[]},\"TLNP\":{\"off\":[\"Hiarka\",\"Esteves33\"],\"lp\":[\"nono\"]},\"ZIP\":{\"off\":[],\"lp\":[]},\"D4C\":{\"off\":[\"Faenex\",\"Nono\"],\"lp\":[]},\"MIH\":{\"off\":[\"Yanzz\"],\"lp\":[]},\"FUL\":{\"off\":[],\"lp\":[]},\"SH\":{\"off\":[\"CalamityVX\"],\"lp\":[\"Calamitous\"]},\"DN\":{\"off\":[],\"lp\":[]},\"INF\":{\"off\":[],\"lp\":[]},\"MAJN\":{\"off\":[\"Ixren\"],\"lp\":[]},\"BEN\":{\"off\":[],\"lp\":[\"Zuni\"]},\"3MEN\":{\"off\":[\"tyhr\"],\"lp\":[]},\"RON\":{\"off\":[\"ChaoticMuch\"],\"lp\":[]},\"MAM\":{\"off\":[],\"lp\":[]},\"BLSD\":{\"off\":[],\"lp\":[]},\"RD\":{\"off\":[],\"lp\":[]},\"PXL\":{\"off\":[],\"lp\":[]},\"BPR\":{\"off\":[],\"lp\":[]},\"TF\":{\"off\":[\"henryojlk\"],\"lp\":[]},\"BCL\":{\"off\":[],\"lp\":[]},\"FTL\":{\"off\":[],\"lp\":[]},\"SO9\":{\"off\":[],\"lp\":[]},\"GCR\":{\"off\":[\"QPMS\"],\"lp\":[]},\"WRLD\":{\"off\":[\"Winnie\"],\"lp\":[]},\"VEXX\":{\"off\":[\"KIMCHI\"],\"lp\":[]},\"NICE\":{\"off\":[\"RamBeau\"],\"lp\":[]},\"FXI\":{\"off\":[],\"lp\":[]},\"JDG\":{\"off\":[\"Talmadge\"],\"lp\":[]},\"DRK\":{\"off\":[],\"lp\":[]},\"PRES\":{\"off\":[\"Charmander\"],\"lp\":[]},\"HEAD\":{\"off\":[\"Zuni\"],\"lp\":[]},\"BB\":{\"off\":[],\"lp\":[]},\"VR\":{\"off\":[\"Hoplodamus\"],\"lp\":[]},\"SO\":{\"off\":[],\"lp\":[\"Brick\"]},\"SLG\":{\"off\":[],\"lp\":[]},\"FISH\":{\"off\":[],\"lp\":[]},\"URNM\":{\"off\":[\"MaliceMamba\"],\"lp\":[]},\"FREE\":{\"off\":[],\"lp\":[]},\"DKF\":{\"off\":[\"DROPPED\",\"Jxmo\"],\"lp\":[]},\"HAB\":{\"off\":[\"Nonameguy\"],\"lp\":[]},\"DF\":{\"off\":[\"thurston\",\"AceGod\"],\"lp\":[\"Sid0o\",\"3Mz\"]},\"KKOI\":{\"off\":[],\"lp\":[]},\"PF2\":{\"off\":[\"Faenex\",\"Nono\",\"Feuda\"],\"lp\":[\"Hiarka\",\"Slab\"]},\"SLP\":{\"off\":[],\"lp\":[]},\"DLS\":{\"off\":[\"W-L-A2\"],\"lp\":[\"Walking L\"]},\"ASC3\":{\"off\":[\"spades\"],\"lp\":[\"Swarkst3r\",\"Omegr\"]},\"FFS\":{\"off\":[\"Keon\",\"gent\"],\"lp\":[\"Floating\",\"Fuhhnq\"]}}",
  "ids": {
   "VSN": "01KHPREWRGXCYNBGJVNSGD6ZBY",
   "AURA": "01KHPREW7EJXVPJCD4RCPQSZSE",
@@ -3073,6 +3108,8 @@
   "UFZ": "01KTSJNA2Y21PNF3VHANB97EMK",
   "SHIN": "01KTSJNA15N4JQB8DG7ZYXK4VR",
   "DLS": "01KHPREZ4208EN3K1VJB0G8S6N",
-  "SLP": "01KTSJN9E6HENNGMP9TC1HV5AA"
+  "SLP": "01KTSJN9E6HENNGMP9TC1HV5AA",
+  "FFS": "01KHPREX931TTBJDXH1AN6D121",
+  "ASC3": "01KHPREWEXHYMAN629M2QBZTB8"
  }
 }
