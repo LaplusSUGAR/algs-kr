@@ -776,6 +776,48 @@
       "logos/t/d4f4fc26"
     ]
   },
+  "id:01KHPREX4AXTSY2BEERS3NN8GQ": {
+    "src": "official",
+    "f": [
+      "logos/t/00592086",
+      "logos/t/28388094"
+    ]
+  },
+  "id:01M5TTC7HMZXNATARTFS45T9J2": {
+    "src": "lp",
+    "f": [
+      "logos/t/b60378c4",
+      "logos/t/b60378c4"
+    ]
+  },
+  "id:01KTSJN8PB2AZA3G55MWWNF7PT": {
+    "src": "lp",
+    "f": [
+      "logos/t/7fe54805",
+      "logos/t/7fe54805"
+    ]
+  },
+  "id:01M6ZJMQV7ABV0CBXGS2MKC2JV": {
+    "src": "lp",
+    "f": [
+      "logos/t/ce26ab2a",
+      "logos/t/ce26ab2a"
+    ]
+  },
+  "id:01KHPRETPJ9HJ2RJYZKCJJDMGS": {
+    "src": "official",
+    "f": [
+      "logos/t/64bbf5e3",
+      "logos/t/c69b2534"
+    ]
+  },
+  "id:01KTSJN9CEF1CC5V6WNR2NSHXX": {
+    "src": "lp",
+    "f": [
+      "logos/t/e3036224",
+      "logos/t/e3036224"
+    ]
+  },
   "cc:soten": {
     "src": "lp",
     "f": [
@@ -930,27 +972,6 @@
       "logos/t/3f7423be"
     ]
   },
-  "cc:lics": {
-    "src": "lp",
-    "f": [
-      "logos/t/7fe54805",
-      "logos/t/7fe54805"
-    ]
-  },
-  "cc:legiongaming": {
-    "src": "lp",
-    "f": [
-      "logos/t/b60378c4",
-      "logos/t/b60378c4"
-    ]
-  },
-  "cc:zestfest": {
-    "src": "lp",
-    "f": [
-      "logos/t/e3036224",
-      "logos/t/e3036224"
-    ]
-  },
   "cc:redeem": {
     "src": "lp",
     "f": [
@@ -963,13 +984,6 @@
     "f": [
       "logos/t/acb80173",
       "logos/t/acb80173"
-    ]
-  },
-  "cc:riqongaming": {
-    "src": "lp",
-    "f": [
-      "logos/t/ce26ab2a",
-      "logos/t/ce26ab2a"
     ]
   },
   "cc:gamblers": {

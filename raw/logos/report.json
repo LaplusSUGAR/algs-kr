@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-12T18:10:58.629Z",
+  "at": "2026-11-12T22:14:25.878Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1344,6 +1344,307 @@
       }
     },
     {
+      "key": "id:01M6ZJMR2KZAGVE05RJ6PFMJ3P",
+      "short": "AA",
+      "name": "Above All",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Above All",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQFWK606NZJSXB0F5YF7",
+      "short": "ASBG",
+      "name": "Asianbanger",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "AsianBanger",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+      "short": "AURA",
+      "name": "Aura",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Aura",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQ7PN60DGR2FC86Q2X9J",
+      "short": "CRNC",
+      "name": "chronic",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KHPREX4AXTSY2BEERS3NN8GQ",
+      "short": "HKW",
+      "name": "Connections",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "why": "이름은 같지만 선수가 겹치지 않음",
+        "name": "Connections",
+        "overlap": 0
+      }
+    },
+    {
+      "key": "id:01KTSJN9W1QPJFXEJBSC01R9W3",
+      "short": "CHUB",
+      "name": "Coughing Baby",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Coughing Baby",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M762GJ9TP7M1F8VTFGG3KZHG",
+      "short": "DGAP",
+      "name": "DGAP",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "DGAP",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9QA20EHN1JZT6EKQ2DQ",
+      "short": "RTD",
+      "name": "DURAGS",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "DURAGS",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M5WKA5RKG0DVP2RR80FGXFM4",
+      "short": "FS",
+      "name": "Full Send",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Full Send",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQZV75FWERKM1PFSPGYC",
+      "short": "GC8",
+      "name": "GC8",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "GC8",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQJXKRJTD6BC105CC7HK",
+      "short": "GRCE",
+      "name": "Grace",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Grace",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRFTHWS4Q1A7HWBCER32",
+      "short": "HBD",
+      "name": "Happy Birthday",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Happy Birthday",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M5TTC7HMZXNATARTFS45T9J2",
+      "short": "LGN",
+      "name": "Legion Gaming",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Legion Gaming",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN8PB2AZA3G55MWWNF7PT",
+      "short": "LIC",
+      "name": "LICS",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Lics",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSHV0VKS24G49BYEE07E",
+      "short": "MUG",
+      "name": "Mugs",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMRM1YGNAPJSS88W6QMJP",
+      "short": "NCHE",
+      "name": "Niche",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Niche",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+      "short": "PAW",
+      "name": "PawSocksUnited",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "PawSocksUnited",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQV7ABV0CBXGS2MKC2JV",
+      "short": "RIQ",
+      "name": "RIQON Gaming",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "RIQON Gaming",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M5TTC7HK8BB2CH9JAGEE7TH7",
+      "short": "RL",
+      "name": "RUNNING LATE",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Running Late",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRTNPZME85FY6RWHBTFJ",
+      "short": "SQ",
+      "name": "sequence",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "sequence",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M5TTC7HJYQ027D3W7BRR682K",
+      "short": "COOK",
+      "name": "The Cooks",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "The Cooks",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9R8X0TEGNTZCV5V57NT",
+      "short": "ZZZ",
+      "name": "Tired",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Tired",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KHPRETPJ9HJ2RJYZKCJJDMGS",
+      "short": "TWKA",
+      "name": "Twerkaholics",
+      "region": "americas",
+      "src": "official",
+      "lp": {
+        "name": "Twerkaholics",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN92PKS2AX6XM17PG7KS0",
+      "short": "UND",
+      "name": "Undecided",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "UnDeciDeD",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9CEF1CC5V6WNR2NSHXX",
+      "short": "ZEST",
+      "name": "Zest Fest",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Zest Fest",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+      "short": "ZB",
+      "name": "Zesty Besties",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KTSJN8Z8J301NM94Z8DZVCMZ",
+      "short": "ZQ7",
+      "name": "ZQ7",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "ZQ7",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
       "key": "cc:0nionz",
       "name": "0nionz",
       "region": "apac-n",
@@ -2544,66 +2845,6 @@
       }
     },
     {
-      "key": "cc:asianbanger",
-      "name": "AsianBanger",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "AsianBanger",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: 0zreign, Asianaimer0, Collin)"
-      }
-    },
-    {
-      "key": "cc:pawsocksunited",
-      "name": "PawSocksUnited",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "PawSocksUnited",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moonp0rtals, Immu, Vodery)"
-      }
-    },
-    {
-      "key": "cc:aboveall",
-      "name": "Above All",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Above All",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Delroar, Garyy7, Khenzo)"
-      }
-    },
-    {
-      "key": "cc:lics",
-      "name": "Lics",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Lics",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kriss, MAC, TayluSs)"
-      }
-    },
-    {
-      "key": "cc:zq7",
-      "name": "ZQ7",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "ZQ7",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: PANIC, Zillach, Wiz)"
-      }
-    },
-    {
-      "key": "cc:tired",
-      "name": "Tired",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Tired",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: MJ, UMI, Aeo)"
-      }
-    },
-    {
       "key": "cc:connections",
       "name": "Connections",
       "region": "americas",
@@ -2614,76 +2855,6 @@
       }
     },
     {
-      "key": "cc:aura",
-      "name": "Aura",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Aura",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Vudo, ImEurusk, Hach)"
-      }
-    },
-    {
-      "key": "cc:gc8",
-      "name": "GC8",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "GC8",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: KoZaGC8, Emcy, Anwsrrd)"
-      }
-    },
-    {
-      "key": "cc:happybirthday",
-      "name": "Happy Birthday",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Happy Birthday",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Syenth, Ezuom, P1tchey)"
-      }
-    },
-    {
-      "key": "cc:undecided",
-      "name": "UnDeciDeD",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "UnDeciDeD",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Renafying, Roxx, MikeJitsu)"
-      }
-    },
-    {
-      "key": "cc:legiongaming",
-      "name": "Legion Gaming",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Legion Gaming",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wishh3, Crizik, Teddy_(Canadian_player))"
-      }
-    },
-    {
-      "key": "cc:fullsend",
-      "name": "Full Send",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Full Send",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: MessiaH, IsWxGsI, Lauder)"
-      }
-    },
-    {
-      "key": "cc:thecooks",
-      "name": "The Cooks",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "The Cooks",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Iklipsa, Xetiq, Choppt)"
-      }
-    },
-    {
       "key": "cc:missionary",
       "name": "missionary",
       "region": "americas",
@@ -2691,86 +2862,6 @@
       "lp": {
         "name": "missionary",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Advrse, Titotheemu, Spazzapex)"
-      }
-    },
-    {
-      "key": "cc:sequence",
-      "name": "sequence",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "sequence",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: THaless, Pucaa, Reviriem)"
-      }
-    },
-    {
-      "key": "cc:twerkaholics",
-      "name": "Twerkaholics",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Twerkaholics",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Renzalations, Cates, Kjthepro)"
-      }
-    },
-    {
-      "key": "cc:durags",
-      "name": "DURAGS",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "DURAGS",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Eeth, Milez, Bofer)"
-      }
-    },
-    {
-      "key": "cc:zestfest",
-      "name": "Zest Fest",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Zest Fest",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Snipzylol, Aveckii, Eslopes)"
-      }
-    },
-    {
-      "key": "cc:grace",
-      "name": "Grace",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Grace",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: QuietApex, Errorist, Meltdown)"
-      }
-    },
-    {
-      "key": "cc:dgap",
-      "name": "DGAP",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "DGAP",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Golden, Avuhlie, Bokiiyu)"
-      }
-    },
-    {
-      "key": "cc:runninglate",
-      "name": "Running Late",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Running Late",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: KindlyMonkey, Double0negative, MelonGoddess)"
-      }
-    },
-    {
-      "key": "cc:coughingbaby",
-      "name": "Coughing Baby",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Coughing Baby",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: FluentTEG, PurrkourCat, ACEBGremZ)"
       }
     },
     {
@@ -2871,16 +2962,6 @@
       "lp": {
         "name": "Breakout",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Fikkax, Adondee, YCuzzo)"
-      }
-    },
-    {
-      "key": "cc:riqongaming",
-      "name": "RIQON Gaming",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "RIQON Gaming",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Leafays, Tempest, Charmander)"
       }
     },
     {
