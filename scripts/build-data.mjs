@@ -471,9 +471,9 @@ const chanId = {
 const streamChannels = [];
 {
   const add = (key, who, kind, links, extra = {}) => { const c = { key, who, kind, ...extra }; for (const p of ['twitch', 'youtube', 'chzzk']) { const id = chanId[p](links[p]); if (id) c[p] = id; } if (c.twitch || c.youtube || c.chzzk) streamChannels.push(c); };
-  for (const b of streams.broadcasts) add(`o:${b.key}`, b.label, 'official', Object.fromEntries((b.links || []).map(([n, u]) => [String(n).toLowerCase(), u])));
+  for (const b of streams.broadcasts) add(`o:${b.key}`, b.label, 'official', Object.fromEntries((b.links || []).map(([n, u]) => [String(n).toLowerCase(), u])), b.apexOnly ? { apexOnly: true } : {});
   const seen = new Set(streamChannels.flatMap((c) => [c.twitch?.toLowerCase()].filter(Boolean)));
-  for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }); } }
+  for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }, { apexOnly: true }); } }
   for (const p of streams.players) add(`p:${nameKey(p.name)}`, p.name, 'player', p.links || {}, { team: p.team, role: p.role });
 }
 

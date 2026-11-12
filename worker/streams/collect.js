@@ -5,6 +5,10 @@ const safe = async (fn) => { try { return [await fn(), null]; } catch (e) { retu
 const getJson = async (f, url, opt = {}) => { const r = await f(url, { ...opt, headers: { 'User-Agent': UA, Accept: 'application/json', ...(opt.headers || {}) } }); if (!r.ok) throw new Error(`${new URL(url).hostname} ${r.status}`); return r.json(); };
 const decode = (s) => String(s || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
+// 여러 게임을 다루는 채널(apexOnly)은 Apex 방송·영상만 내보낸다: Twitch는 게임 이름, YouTube는 제목·태그로 판단
+const APEX = /apex|algs|エーペックス|エペ|에이펙스|에펙/i;
+const isApex = (...texts) => texts.some((t) => APEX.test(String(t || '')));
+
 export async function collect({ env, fetch: f, store, now }) {
   const out = { at: new Date(now).toISOString(), ok: { twitch: null, youtube: null, chzzk: null }, err: {}, live: [], videos: [] };
   const [chs, chErr] = await safe(() => channels({ env, f, store }));
@@ -21,6 +25,7 @@ export async function collect({ env, fetch: f, store, now }) {
       const j = await getJson(f, `https://api.twitch.tv/helix/streams?first=100&${part.map((l) => `user_login=${encodeURIComponent(l)}`).join('&')}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': env.TWITCH_CLIENT_ID } });
       for (const s of j.data || []) {
         const c = byLogin.get(String(s.user_login).toLowerCase()); if (!c || s.type !== 'live') continue;
+        if (c.apexOnly && !isApex(s.game_name)) continue;
         out.live.push({ ...meta(c), platform: 'twitch', title: s.title || '', game: s.game_name || '', viewers: s.viewer_count ?? null, started: s.started_at || null, thumb: String(s.thumbnail_url || '').replace('{width}', '640').replace('{height}', '360'), url: `https://www.twitch.tv/${s.user_login}`, embed: { type: 'twitch', channel: s.user_login } });
       }
     }
@@ -35,7 +40,7 @@ export async function collect({ env, fetch: f, store, now }) {
     const cand = [];
     for (const { c, items } of feeds) {
       items.slice(0, 4).forEach((v) => cand.push({ c, v })); // 방송 중인 영상은 피드 맨 앞쪽에 온다
-      for (const v of items) if (Date.parse(v.published) >= since) out.videos.push({ ...meta(c), id: v.id, title: v.title, published: v.published, thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`, channel: v.channel });
+      for (const v of items) if (Date.parse(v.published) >= since && (!c.apexOnly || isApex(v.title))) out.videos.push({ ...meta(c), id: v.id, title: v.title, published: v.published, thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`, channel: v.channel });
     }
     if (!feeds.some((x) => x.id)) throw new Error('no channel id');
     if (env.YOUTUBE_API_KEY && cand.length) {
@@ -46,7 +51,8 @@ export async function collect({ env, fetch: f, store, now }) {
         for (const it of j.items || []) {
           const st = it.snippet?.liveBroadcastContent, { c } = byId.get(it.id) || {};
           if (!c) continue;
-          if (st === 'live') { liveIds.add(it.id); out.live.push({ ...meta(c), platform: 'youtube', title: it.snippet.title || '', viewers: it.liveStreamingDetails?.concurrentViewers != null ? Number(it.liveStreamingDetails.concurrentViewers) : null, started: it.liveStreamingDetails?.actualStartTime || null, thumb: `https://i.ytimg.com/vi/${it.id}/hqdefault.jpg`, url: `https://www.youtube.com/watch?v=${it.id}`, embed: { type: 'youtube', id: it.id } }); }
+          if (st === 'live') liveIds.add(it.id);
+          if (st === 'live' && (!c.apexOnly || isApex(it.snippet.title, (it.snippet.tags || []).join(' ')))) { out.live.push({ ...meta(c), platform: 'youtube', title: it.snippet.title || '', viewers: it.liveStreamingDetails?.concurrentViewers != null ? Number(it.liveStreamingDetails.concurrentViewers) : null, started: it.liveStreamingDetails?.actualStartTime || null, thumb: `https://i.ytimg.com/vi/${it.id}/hqdefault.jpg`, url: `https://www.youtube.com/watch?v=${it.id}`, embed: { type: 'youtube', id: it.id } }); }
           if (st === 'upcoming') short.add(it.id); // 예약만 된 방송은 최근 영상에서 뺀다
         }
       }

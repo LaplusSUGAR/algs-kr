@@ -89,7 +89,8 @@
           "YouTube",
           "https://www.youtube.com/@esports_rage"
         ]
-      ]
+      ],
+      "apexOnly": true
     }
   ],
   "multiview": {
@@ -135,5 +136,6 @@
       "Liquipedia ALGS 2026-27",
       "https://liquipedia.net/apexlegends/ALGS/2026-27"
     ]
-  ]
+  ],
+  "_broadcasts": "공식 중계 채널. apexOnly: true면 여러 게임을 다루는 채널이라 Apex 방송·영상만 방송 탭과 홈에 보인다(Twitch는 게임 이름, YouTube는 제목·태그에 Apex·ALGS가 있을 때)."
 }

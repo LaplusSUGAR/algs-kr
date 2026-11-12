@@ -1177,3 +1177,8 @@ table.rl td.rl-at { white-space: nowrap; }
   .lv-meta { padding: 8px 10px; }
   .lv-ext { position: static; grid-column: 2; justify-self: start; margin: 0 10px 8px; background: none; color: var(--steel); padding: 0; }
 }
+
+/* 홈의 방송 중 카드 */
+.lv-home { margin-top: 14px; }
+.lv-home .lv-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+@media (min-width: 900px) { .lv-home .lv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 980px; } }

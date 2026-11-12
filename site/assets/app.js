@@ -2138,13 +2138,15 @@ const newVideos = () => (ST?.videos || []).filter((v) => vidSeen0 && Date.parse(
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0`);
-function liveCard(l, i) {
+const liveId = (l) => `${l.key}|${l.platform}`;
+function liveCard(l, i, asLink) {
   const hide = opt.spoiler; // 결과 가리기: 제목과 미리보기에 결과가 드러날 수 있어 가린다
   const inner = `<span class="lv-thumb">${l.thumb && !hide ? `<img src="${esc(l.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="tag live">LIVE</span>${l.embed ? '<span class="yt-play" aria-hidden="true"></span>' : ''}</span>
     <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title">${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(l.title || '')}</span>
     <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
+  if (asLink && l.embed) return `<a class="lv-card" href="#/streams?play=${encodeURIComponent(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
   return l.embed
-    ? `<button class="lv-card" type="button" data-lv="${i}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
+    ? `<button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
     : `<a class="lv-card" href="${esc(l.url)}" target="_blank" rel="noopener">${inner}<span class="lv-ext">${PLAT[l.platform]}에서 보기</span></a>`;
 }
 function liveSection() {
@@ -2156,7 +2158,7 @@ function liveSection() {
   if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p>${foot}</section>`;
   return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2>
     <div class="lv-player" id="lvPlayer" hidden></div>
-    <div class="lv-grid">${L.map(liveCard).join('')}</div>${foot}</section>`;
+    <div class="lv-grid">${L.map((l, i) => liveCard(l, i)).join('')}</div>${foot}</section>`;
 }
 function videoSection(q) {
   if (!C.streamsUrl || !ST) return '';
@@ -2171,11 +2173,12 @@ function videoSection(q) {
     <div class="vid-grid">${list.map(card).join('')}</div>
     ${all.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${all.length}개 모두 보기</a></p>` : ''}</section>`;
 }
-// 홈: 응원 팀 선수나 공식 중계가 방송 중일 때 한 줄
+// 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다
 function liveStrip() {
-  const L = liveList().filter((l) => liveRank(l) <= 1);
+  const L = liveList().filter((l) => l.kind !== 'partner');
   if (!L.length) return '';
-  return `<a class="lv-strip" href="#/streams"><span class="tag live">LIVE</span><span class="lv-strip-t"><b>지금 방송 중</b> ${L.slice(0, 3).map((l) => `<span>${esc(l.who)}</span>`).join(', ')}${L.length > 3 ? ` <span>외 ${L.length - 3}</span>` : ''}</span><span class="more">방송 보기</span></a>`;
+  return `<section class="sec lv lv-home" aria-labelledby="h-lvh"><div class="sec-head"><h2 class="h2" id="h-lvh">지금 방송 중 <small class="muted">${L.length}</small></h2><a class="more" href="#/streams">방송 전체</a></div>
+    <div class="lv-grid">${L.slice(0, 3).map((l, i) => liveCard(l, i, true)).join('')}</div></section>`;
 }
 // 메뉴의 방송 탭: 방송 중 채널 수, 없으면 새 영상 점
 function liveBadge() {
@@ -2270,10 +2273,15 @@ function bind() {
       <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
       <p class="caption">선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>`;
     I.tree(box);
-    box.querySelector('.lv-close').addEventListener('click', () => { box.innerHTML = ''; box.hidden = true; });
+    box.querySelector('.lv-close').addEventListener('click', () => { box.innerHTML = ''; box.hidden = true;
+      if (parseHash().q.has('play')) history.replaceState(null, '', '#/streams'); }); // 닫은 뒤 새로고침 때 다시 열리지 않게
     app.querySelectorAll('.lv-card').forEach((c) => c.classList.toggle('on', c === b));
     box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }));
+  { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
+    const want = parseHash().q.get('play'), box = document.getElementById('lvPlayer');
+    if (want && box && !box.querySelector('iframe')) [...app.querySelectorAll('button.lv-card')].find((b) => b.dataset.lvid === want)?.click();
+  }
   app.querySelectorAll('button.yt').forEach((b) => b.addEventListener('click', () => {
     const f = document.createElement('iframe');
     f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
