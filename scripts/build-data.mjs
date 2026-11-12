@@ -461,6 +461,22 @@ const streams = {
   players: playerStreams.concat(ov.streams || []),
 };
 
+// 방송 상태 Worker(worker/streams)가 읽는 채널 목록: 공식 중계, 공식 파트너, 한국 관련 선수·코치
+//   주소에서 플랫폼별 ID를 뽑는다: Twitch 로그인, YouTube '@핸들' 또는 'UC…' 채널 ID, 치지직 채널 ID
+const chanId = {
+  twitch: (u) => (/twitch\.tv\/([A-Za-z0-9_]{2,30})\/?$/.exec(u || '') || [])[1] || null,
+  youtube: (u) => { const m = /youtube\.com\/(?:channel\/(UC[\w-]{22})|(@[^/?#\s]+))/.exec(u || ''); return m ? (m[1] || decodeURIComponent(m[2])) : null; },
+  chzzk: (u) => (/chzzk\.naver\.com\/(?:live\/)?([0-9a-f]{32})/.exec(u || '') || [])[1] || null,
+};
+const streamChannels = [];
+{
+  const add = (key, who, kind, links, extra = {}) => { const c = { key, who, kind, ...extra }; for (const p of ['twitch', 'youtube', 'chzzk']) { const id = chanId[p](links[p]); if (id) c[p] = id; } if (c.twitch || c.youtube || c.chzzk) streamChannels.push(c); };
+  for (const b of streams.broadcasts) add(`o:${b.key}`, b.label, 'official', Object.fromEntries((b.links || []).map(([n, u]) => [String(n).toLowerCase(), u])));
+  const seen = new Set(streamChannels.flatMap((c) => [c.twitch?.toLowerCase()].filter(Boolean)));
+  for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }); } }
+  for (const p of streams.players) add(`p:${nameKey(p.name)}`, p.name, 'player', p.links || {}, { team: p.team, role: p.role });
+}
+
 // 2부 팀 명단·이름 변경 기록, 상태와 기록 파일 저장
 RW.cc(lcq);
 const rosterLog = RW.save();
@@ -525,6 +541,8 @@ function unpackIds(d) {
   return dec(rest);
 }
 
+// 채널 목록 파일은 내용이 바뀔 때만 다시 쓴다 (본 데이터 버전과 따로)
+{ const txt = JSON.stringify({ channels: streamChannels }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
 const v = hash(JSON.stringify({ ...data, generated: null }));
 const prevVer = readJson('site/data/ver.json');
 if (prevVer?.v === v && !process.argv.includes('--force')) { console.log(`[build] 변경 없음 (v=${v})`); process.exit(0); }

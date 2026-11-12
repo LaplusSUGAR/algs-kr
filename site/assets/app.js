@@ -252,7 +252,7 @@ function subtabs(tab, parts, q) {
       : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
     teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
-    streams: [['전체', '#/streams', sv === 'all'], ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
+    streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live']] : []), ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
   if (!SUB) return '';
@@ -387,7 +387,7 @@ function home() {
   const upList = `<div class="up-list">${upMix.map((o) => o.h()).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
-  return `${modeBar}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
+  return `${modeBar}${liveStrip()}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
       <div class="sec-head"><h2 class="h2" id="h-up">${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/standings">전체 순위</a></div>
       <div class="flow-grid"><div>${spoil(bracketFlow(B), intlKey(), '진출 결과')}</div><div><h3 class="h3 up-h">다가오는 경기</h3>${upList}<a class="more" href="#/schedule">경기 전체</a></div></div>
     </section>` : ''}
@@ -2126,14 +2126,89 @@ const FIND = {
   youtube: (n) => `https://www.youtube.com/results?search_query=${encodeURIComponent(n + ' 에이펙스')}`,
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
-const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
+const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveOf(p.name) ? ' <span class="tag live">LIVE</span>' : ''}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
+/* ---------- 방송 상태 (worker/streams → C.streamsUrl) ---------- */
+// ST = { at, ok, live: [...], videos: [...] } | null(아직 못 받음). 60초마다 다시 받는다(화면이 보일 때만)
+let ST = null, stSig = '';
+const vidSeen0 = store.get('vidSeen', null); // 이번 방문 전에 방송 탭을 마지막으로 본 시각 (새 영상 표시 기준)
+const liveRank = (l) => (l.kind === 'player' && isF(l.team) && focusList().some((k) => k.short === l.team) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : 3);
+const liveList = () => (ST?.live || []).slice().sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
+const liveOf = (name) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase());
+const newVideos = () => (ST?.videos || []).filter((v) => vidSeen0 && Date.parse(v.published) > vidSeen0);
+const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
+const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
+const livePlayerSrc = (e) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0`);
+function liveCard(l, i) {
+  const hide = opt.spoiler; // 결과 가리기: 제목과 미리보기에 결과가 드러날 수 있어 가린다
+  const inner = `<span class="lv-thumb">${l.thumb && !hide ? `<img src="${esc(l.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="tag live">LIVE</span>${l.embed ? '<span class="yt-play" aria-hidden="true"></span>' : ''}</span>
+    <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title">${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(l.title || '')}</span>
+    <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
+  return l.embed
+    ? `<button class="lv-card" type="button" data-lv="${i}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
+    : `<a class="lv-card" href="${esc(l.url)}" target="_blank" rel="noopener">${inner}<span class="lv-ext">${PLAT[l.platform]}에서 보기</span></a>`;
+}
+function liveSection() {
+  if (!C.streamsUrl) return '';
+  if (!ST) return '<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="lead">방송 상태를 확인하는 중입니다.</p></section>';
+  const L = liveList();
+  const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
+  const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
+  if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p>${foot}</section>`;
+  return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2>
+    <div class="lv-player" id="lvPlayer" hidden></div>
+    <div class="lv-grid">${L.map(liveCard).join('')}</div>${foot}</section>`;
+}
+function videoSection(q) {
+  if (!C.streamsUrl || !ST) return '';
+  const all = ST.videos || [], more = q.get('v') === 'all';
+  if (!all.length) return '';
+  const list = more ? all : all.slice(0, 8);
+  const day = (iso) => dayLabel(dayKey(iso));
+  const card = (v) => { const isNew = vidSeen0 && Date.parse(v.published) > vidSeen0; return `<figure class="vid"><button class="yt" type="button" data-yt="${esc(v.id)}" aria-label="${esc(v.title)} 재생"><img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="360"><span class="yt-play" aria-hidden="true"></span></button>
+    <figcaption><b>${isNew ? '<span class="tag live">새 영상</span> ' : ''}${esc(v.title)}</b><span>${esc(v.kind === 'player' ? v.who : v.channel || v.who)} · ${esc(day(v.published))} · <a href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener">YouTube에서 보기</a></span></figcaption></figure>`; };
+  return `<section class="sec" id="vids"><h2 class="h2">최근 영상 <small class="muted">${all.length}</small></h2>
+    <p class="lead">등록된 YouTube 채널에 최근 3주 동안 올라온 영상입니다.</p>
+    <div class="vid-grid">${list.map(card).join('')}</div>
+    ${all.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${all.length}개 모두 보기</a></p>` : ''}</section>`;
+}
+// 홈: 응원 팀 선수나 공식 중계가 방송 중일 때 한 줄
+function liveStrip() {
+  const L = liveList().filter((l) => liveRank(l) <= 1);
+  if (!L.length) return '';
+  return `<a class="lv-strip" href="#/streams"><span class="tag live">LIVE</span><span class="lv-strip-t"><b>지금 방송 중</b> ${L.slice(0, 3).map((l) => `<span>${esc(l.who)}</span>`).join(', ')}${L.length > 3 ? ` <span>외 ${L.length - 3}</span>` : ''}</span><span class="more">방송 보기</span></a>`;
+}
+// 메뉴의 방송 탭: 방송 중 채널 수, 없으면 새 영상 점
+function liveBadge() {
+  const a = document.querySelector('.tabbar a[data-tab="streams"]'); if (!a) return;
+  a.querySelector('.nav-badge')?.remove();
+  const n = (ST?.live || []).length, nv = newVideos().length;
+  if (!n && !nv) return;
+  const b = document.createElement('span'); b.className = `nav-badge${n ? '' : ' dot'}`; b.textContent = n ? String(n) : ''; b.setAttribute('aria-label', n ? `방송 중 ${n}` : '새 영상'); a.appendChild(b);
+}
+async function pollStreams() {
+  if (!C.streamsUrl || document.hidden) return;
+  try {
+    const r = await fetch(C.streamsUrl, { cache: 'no-store' }); if (!r.ok) return;
+    const j = await r.json(); if (!j || !Array.isArray(j.live)) return;
+    const first = !ST; ST = j;
+    const sig = JSON.stringify([j.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
+    liveBadge();
+    if (sig === stSig && !first) return;
+    stSig = sig;
+    const tab = parseHash().parts[0] || 'home';
+    // 재생 중인 플레이어가 있으면 화면을 다시 그리지 않는다(영상이 끊기지 않게). 다음 이동 때 새 목록이 보인다
+    if ((tab === 'streams' && !document.querySelector('#lvPlayer iframe, .yt-frame')) || tab === 'home') render();
+  } catch { /* 다음 주기에 다시 */ }
+}
 function streams(parts, q) {
   const sv = q.get('s') || 'all';
   const S = A.streams, MV = A.season.multiview || {};
   const order = (focusList()).map((k) => k.short);
   const players = S.players.slice().sort((a, b) => (order.indexOf(a.team) + 99 * (order.indexOf(a.team) < 0)) - (order.indexOf(b.team) + 99 * (order.indexOf(b.team) < 0)) || (a.role === 'coach') - (b.role === 'coach'));
   const show = (k) => sv === 'all' || sv === k;
+  if (ST) store.set('vidSeen', Date.now());
   return `<h1 class="title">방송</h1>
+    ${sv === 'all' || sv === 'live' ? liveSection() + videoSection(q) : ''}
     ${show('mv') ? `<section class="sec mv" aria-labelledby="h-mv">
       <figure><img src="assets/multiview.svg" alt="멀티뷰 화면 예시: 메인 중계, 팀 시점 4개, 맵 시점, 실시간 순위가 한 화면에 배치된 모습" width="640" height="360"><figcaption>화면 구성을 설명하는 예시 그림입니다. 실제 화면과 다를 수 있습니다.</figcaption></figure>
       <div>
@@ -2188,6 +2263,17 @@ function bind() {
   const fs = document.getElementById('favSearch');
   if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
+  app.querySelectorAll('button.lv-card').forEach((b) => b.addEventListener('click', () => {
+    const l = liveList()[+b.dataset.lv], box = document.getElementById('lvPlayer'); if (!l?.embed || !box) return;
+    box.hidden = false;
+    box.innerHTML = `<div class="lv-bar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-close" type="button" aria-label="플레이어 닫기">닫기</button></div>
+      <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      <p class="caption">선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>`;
+    I.tree(box);
+    box.querySelector('.lv-close').addEventListener('click', () => { box.innerHTML = ''; box.hidden = true; });
+    app.querySelectorAll('.lv-card').forEach((c) => c.classList.toggle('on', c === b));
+    box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }));
   app.querySelectorAll('button.yt').forEach((b) => b.addEventListener('click', () => {
     const f = document.createElement('iframe');
     f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
@@ -2343,7 +2429,7 @@ setInterval(refreshOfficial, OFF.ms);
 // 탭을 다시 보면 밀린 확인을 바로 한다 (숨긴 동안에는 버전 확인·시계·홈 다시 그리기를 쉰다)
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
-  pollVer(); updatePill();
+  pollVer(); updatePill(); pollStreams();
   if (LIVE.mode === 'direct') { pollDirect(); if (Date.now() - OFF.lastAt > OFF.ms) refreshOfficial(); }
   if (!parseHash().parts[0]) render();
 });
@@ -2412,6 +2498,7 @@ footer();
 render();
 pollVer();
 setInterval(pollVer, C.verPollMs || 30000);
+if (C.streamsUrl) { pollStreams(); setInterval(pollStreams, C.streamsPollMs || 60000); }
 if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
 else if (LIVE.mode === 'direct') { pollDirect(); refreshOfficial(); }
 updatePill();

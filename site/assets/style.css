@@ -1137,3 +1137,43 @@ table.rl td.rl-at { white-space: nowrap; }
   table.rl td.rl-at { grid-area: at; color: var(--steel); font-size: var(--fs-xs); font-weight: 500; }
   table.rl td.none { display: none; }
 }
+
+/* ---------- 방송 탭: 지금 방송 중, 최근 영상 ---------- */
+.lv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; margin-top: 12px; }
+.lv-card { display: grid; grid-template-rows: auto 1fr; text-align: left; background: var(--card); border: 0; border-radius: var(--r-lg); overflow: hidden; padding: 0; color: inherit; font: inherit; cursor: pointer; text-decoration: none; position: relative; }
+.lv-card:hover .lv-thumb img { opacity: 1; }
+.lv-card.on { box-shadow: 0 0 0 2px var(--apex); }
+.lv-thumb { position: relative; display: block; aspect-ratio: 16 / 9; background: #101114; }
+.lv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .92; }
+.lv-thumb .tag.live { position: absolute; left: 8px; top: 8px; }
+.lv-meta { display: grid; gap: 3px; padding: 10px 12px 12px; align-content: start; min-width: 0; }
+.lv-meta b { font-size: 15.5px; } .lv-meta b small { font-weight: 500; color: var(--steel); margin-left: 4px; }
+.lv-title { font-size: var(--fs-sm); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lv-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: var(--fs-xs); color: var(--steel); margin-top: 2px; }
+.lv-ext { position: absolute; right: 8px; top: 8px; background: rgba(16, 17, 20, .82); color: #fff; font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+.chip.mini { padding: 2px 8px 2px 6px; font-size: 11.5px; min-height: 0; }
+.lv-player { margin-top: 12px; background: var(--card); border-radius: var(--r-lg); overflow: hidden; }
+.lv-player .yt-frame { cursor: default; max-height: 72vh; }
+.lv-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 9px 12px; }
+.lv-bar b small { font-weight: 500; color: var(--steel); margin-left: 4px; }
+.lv-bar .more { margin-left: auto; }
+.lv-close { border: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: var(--fs-sm); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.lv-player .caption { margin: 0; padding: 8px 12px 10px; }
+@media (min-width: 1100px) { .lv-player { max-width: 1100px; } }
+/* 홈: 방송 중 한 줄 */
+.lv-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 12px; padding: 10px 14px; background: var(--card); border-radius: var(--r-lg); text-decoration: none; color: inherit; box-shadow: inset 3px 0 0 var(--apex); }
+.lv-strip-t { flex: 1 1 200px; min-width: 0; font-size: var(--fs-sm); }
+.lv-strip-t b { margin-right: 6px; }
+/* 메뉴: 방송 중 채널 수, 새 영상 점 */
+.tabbar a { position: relative; }
+.nav-badge { display: inline-block; min-width: 17px; height: 17px; padding: 0 5px; margin-left: 5px; border-radius: 999px; background: var(--apex); color: #fff; font: 700 11px/17px var(--body); text-align: center; vertical-align: middle; }
+.nav-badge.dot { min-width: 8px; width: 8px; height: 8px; padding: 0; }
+@media (max-width: 767px) { .nav-badge { position: absolute; top: 4px; left: calc(50% + 6px); margin: 0; } .nav-badge.dot { top: 6px; left: calc(50% + 10px); } }
+@media (max-width: 520px) {
+  .lv-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .lv-card { grid-template-rows: none; grid-template-columns: 42% minmax(0, 1fr); align-items: stretch; }
+  .lv-thumb { aspect-ratio: auto; min-height: 84px; }
+  .lv-thumb .yt-play { transform: translate(-50%, -50%) scale(.62); }
+  .lv-meta { padding: 8px 10px; }
+  .lv-ext { position: static; grid-column: 2; justify-self: start; margin: 0 10px 8px; background: none; color: var(--steel); padding: 0; }
+}

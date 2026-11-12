@@ -13,6 +13,10 @@ window.ALGS_CONFIG = {
   liveUrl: '',
   livePollMs: 10_000, // 여기에 무작위 0~3초를 더해 요청이 한꺼번에 몰리지 않게 한다
 
+  // 방송 상태 (지금 방송 중, 최근 영상). worker/streams 를 배포한 주소 + /streams.json. 비워 두면 기능이 꺼진다
+  streamsUrl: '',
+  streamsPollMs: 60_000,
+
   siteName: 'EASY ALGS KR',
 
   // 문의·피드백을 받을 곳.

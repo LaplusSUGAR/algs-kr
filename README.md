@@ -39,6 +39,16 @@ build-data.mjs        → site/data/algs-data.js + ver.json (26자 공식 ID는 
 worker/live-worker.js → /live.json     (선택: 방문자가 많아지면 서버 한 곳에서 조회하도록 전환)
 ```
 
+## 방송 상태 (지금 방송 중, 최근 영상)
+
+방송 탭 맨 위의 '지금 방송 중'과 '최근 영상', 메뉴의 방송 중 채널 수, 홈의 방송 중 한 줄은 Cloudflare Worker(`worker/streams`)가 내주는 `streams.json`으로 그린다. `site/assets/config.js`의 `streamsUrl`이 비어 있으면 기능 전체가 꺼진다.
+
+- 채널 목록: 빌드가 `site/data/stream-channels.json`을 만든다(공식 중계, 공식 파트너, 한국 관련 선수·코치). 선수 채널은 공식 API → Liquipedia → `config/players.json`(`twitch`·`youtube`·`chzzk`에 채널 주소) 순으로 합친다. YouTube는 `@핸들` 또는 `/channel/UC…` 주소, 치지직은 32자리 채널 ID가 든 주소여야 한다.
+- Worker: 요청이 올 때만 플랫폼을 확인하고 60초 캐시한다(저장소·크론 없음). Twitch는 Helix Get Streams, YouTube는 채널 공개 피드로 최근 21일 영상과 방송 중 후보를 얻고 videos.list(1단위)로 방송 중을 확정, 치지직은 공개 채널 라이브 정보(비공식)다. 한 플랫폼이 실패하면 그 플랫폼만 `ok=false`.
+- 배포: Actions의 '방송 상태 Worker 배포'(`worker/streams/**`가 바뀌면 자동). 저장소 Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`, `YOUTUBE_API_KEY`.
+- 화면: 카드를 눌러야 플레이어를 불러온다(Twitch·YouTube). 치지직은 새 창. 결과 가리기 중에는 방송 제목과 미리보기를 숨긴다. 새 영상 표시는 방문자가 방송 탭을 마지막으로 본 시각(브라우저 저장) 기준이다.
+- 시험: `node /tmp/collect-test.mjs` 꼴로 `worker/streams/collect.js`의 `collect()`에 가짜 fetch를 넣어 돌릴 수 있다(fetch·저장소·시각을 밖에서 받는 순수 함수).
+
 ## 화면 배치 (반응형)
 
 `site/assets/style.css` 끝의 '화면 폭에 따라 끊김 없이 변하는 배치' 묶음이 기준이다.

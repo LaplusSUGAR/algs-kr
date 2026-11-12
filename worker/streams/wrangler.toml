@@ -1,0 +1,10 @@
+name = "algs-kr-streams"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+SITE_URL = "https://laplussugar.github.io/algs-kr"
+ALLOWED_ORIGIN = "https://laplussugar.github.io"
+VIDEO_DAYS = "21"
+LIVE_TTL = "60"
