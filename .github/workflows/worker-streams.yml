@@ -29,6 +29,20 @@ jobs:
         id: has
         run: |
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then echo "ok=1" >> "$GITHUB_OUTPUT"; else echo "::notice::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID 가 없어 배포를 건너뜁니다."; fi
+      - name: workers.dev 주소 이름 확인 (없으면 등록)
+        if: steps.has.outputs.ok == '1'
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain"
+          cur=$(curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$api" | jq -r '.result.subdomain // empty')
+          if [ -z "$cur" ]; then
+            for name in laplussugar laplussugar-algs; do
+              ok=$(curl -sS -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" -d "{\"subdomain\":\"$name\"}" "$api" | jq -r '.success')
+              if [ "$ok" = "true" ]; then cur=$name; break; fi
+            done
+          fi
+          if [ -z "$cur" ]; then echo "::error::workers.dev 주소 이름을 등록하지 못했습니다. Cloudflare 대시보드의 Workers & Pages에서 직접 만들어 주세요."; exit 1; fi
+          echo "workers.dev 이름: $cur"
+          echo "SUB=$cur" >> "$GITHUB_ENV"
       - name: 배포
         if: steps.has.outputs.ok == '1'
         working-directory: worker/streams
@@ -47,7 +61,12 @@ jobs:
           done
       - name: 동작 확인
         if: steps.has.outputs.ok == '1'
-        working-directory: worker/streams
         run: |
-          url=$(npx --yes wrangler@4 deployments list 2>/dev/null | grep -o 'https://[a-z0-9.-]*workers.dev' | head -1 || true)
-          echo "Worker 주소는 위 '배포' 단계 로그의 https://algs-kr-streams.<계정>.workers.dev 입니다. site/assets/config.js 의 streamsUrl 에 <주소>/streams.json 을 넣습니다."
+          url="https://algs-kr-streams.$SUB.workers.dev/streams.json"
+          echo "주소: $url"
+          for i in 1 2 3 4 5 6; do
+            body=$(curl -sS -m 20 "$url" || true)
+            if echo "$body" | jq -e '.live' >/dev/null 2>&1; then break; fi
+            sleep 10
+          done
+          echo "$body" | jq '{at, ok, err, live: [.live[] | {who, platform, viewers, title}], videos: (.videos | length), firstVideos: [.videos[:3][] | {who, title, published}]}'
