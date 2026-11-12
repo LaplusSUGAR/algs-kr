@@ -1,5 +1,55 @@
 [
  {
+  "at": "2026-11-12T14:02:19.608Z",
+  "kind": "auto-end",
+  "team": "GCR",
+  "teamName": "Glacier",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "CAPO",
+   "jKillua"
+  ]
+ },
+ {
+  "at": "2026-11-12T14:02:19.608Z",
+  "kind": "auto-end",
+  "team": "BPR",
+  "teamName": "BPR",
+  "region": "emea",
+  "out": [],
+  "in": [
+   "King Viktor"
+  ]
+ },
+ {
+  "at": "2026-11-12T14:02:19.608Z",
+  "kind": "auto",
+  "team": "GCR",
+  "teamName": "Glacier",
+  "region": "emea",
+  "out": [
+   "Temuchi"
+  ],
+  "in": [
+   "CAPO",
+   "jKillua"
+  ]
+ },
+ {
+  "at": "2026-11-12T14:02:19.608Z",
+  "kind": "auto",
+  "team": "BPR",
+  "teamName": "BPR",
+  "region": "emea",
+  "out": [
+   "fish"
+  ],
+  "in": [
+   "King Viktor"
+  ]
+ },
+ {
   "at": "2026-11-12T13:00:01.807Z",
   "kind": "auto",
   "team": "DF",
