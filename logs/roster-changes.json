@@ -1,5 +1,95 @@
 [
  {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "rename",
+  "team": "Zesty Besties",
+  "region": "americas",
+  "was": "Straight Geeked",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "cc",
+  "team": "DGAP",
+  "region": "americas",
+  "out": [
+   "Bokiiyu"
+  ],
+  "in": [
+   "SlowakinZ"
+  ]
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "rename",
+  "team": "EvolutionV",
+  "region": "apac-s",
+  "was": "Future Top Squad",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "cc",
+  "team": "EvolutionV",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "Cloudstar"
+  ]
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "cc",
+  "team": "EvolutionV",
+  "region": "apac-s",
+  "out": [
+   "killme",
+   "SKY WILL",
+   "OHH"
+  ],
+  "in": [
+   "Doro",
+   "inori",
+   "B8O0WW",
+   "Cloudstar"
+  ]
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "auto-end",
+  "team": "DRK",
+  "teamName": "Team Darkspire",
+  "region": "americas",
+  "out": [
+   "777Fuhhnq"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "auto-end",
+  "team": "DKF",
+  "teamName": "DKF",
+  "region": "americas",
+  "out": [
+   "Floating"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-12T12:03:27.281Z",
+  "kind": "auto",
+  "team": "RDG",
+  "teamName": "RENDANG",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "NanaXD"
+  ]
+ },
+ {
   "at": "2026-11-11T22:02:19.464Z",
   "kind": "auto-end",
   "team": "BB",

@@ -2097,6 +2097,14 @@
    "since": "2026-11-09T11:01:49.100Z"
   },
   {
+   "team": "RDG",
+   "out": [],
+   "in": [
+    "NanaXD"
+   ],
+   "since": "2026-11-12T12:03:27.281Z"
+  },
+  {
    "team": "SWQ",
    "out": [
     "refra1nnn"
@@ -2201,22 +2209,6 @@
     "jKillua"
    ],
    "since": "2026-11-11T22:02:19.464Z"
-  },
-  {
-   "team": "DKF",
-   "out": [
-    "Floating"
-   ],
-   "in": [],
-   "since": "2026-11-10T15:01:02.494Z"
-  },
-  {
-   "team": "DRK",
-   "out": [
-    "777Fuhhnq"
-   ],
-   "in": [],
-   "since": "2026-11-10T16:03:44.554Z"
   },
   {
    "team": "HEAD",
@@ -2487,14 +2479,16 @@
    "LeeAki"
   ],
   "apac-s:evolutionv": [
-   "killme",
-   "SKY WILL",
-   "OHH"
+   "Doro",
+   "inori",
+   "B8O0WW",
+   "Cloudstar"
   ],
   "apac-s:futuretopsquad": [
-   "Inori",
+   "Doro",
+   "inori",
    "B8O0WW",
-   "Doro"
+   "Cloudstar"
   ],
   "apac-s:hungkuangfalcon": [
    "Moe",
@@ -2828,9 +2822,9 @@
    "Xetiq"
   ],
   "americas:dgap": [
+   "SlowakinZ",
    "Golden",
-   "Avuhlie",
-   "Bokiiyu"
+   "Avuhlie"
   ],
   "americas:runninglate": [
    "KindlyMonkey",
@@ -2900,7 +2894,9 @@
   "americas:missionary": "chronic",
   "emea:throuple": "OnChikken",
   "apac-n:teamtomodachi": "VAMOS",
-  "apac-s:highkillratio": "SLG APAC S"
+  "apac-s:highkillratio": "SLG APAC S",
+  "apac-s:futuretopsquad": "EvolutionV",
+  "americas:straightgeeked": "Zesty Besties"
  },
  "manual": [
   "FNC|EIN|CHROM",

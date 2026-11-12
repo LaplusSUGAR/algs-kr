@@ -4,6 +4,14 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-12 21:03 | 2부 팀 이름 변경 | Americas | Zesty Besties |  | 구 Straight Geeked |
+| 2026-11-12 21:03 | 2부 팀 명단 변경 | Americas | DGAP | Bokiiyu | SlowakinZ |
+| 2026-11-12 21:03 | 2부 팀 이름 변경 | APAC South | EvolutionV |  | 구 Future Top Squad |
+| 2026-11-12 21:03 | 2부 팀 명단 변경 | APAC South | EvolutionV |  | Cloudstar |
+| 2026-11-12 21:03 | 2부 팀 명단 변경 | APAC South | EvolutionV | killme, SKY WILL, OHH | Doro, inori, B8O0WW, Cloudstar |
+| 2026-11-12 21:03 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | Americas | DRK (Team Darkspire) | 777Fuhhnq |  |
+| 2026-11-12 21:03 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | Americas | DKF | Floating |  |
+| 2026-11-12 21:03 | 자동 반영 (Liquipedia) | APAC South | RDG (RENDANG) |  | NanaXD |
 | 2026-11-12 07:02 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | Americas | BB (Buckle Boys) | ssirsay |  |
 | 2026-11-12 07:02 | 자동 반영 끝 (공식 반영 또는 Liquipedia 되돌림) | Americas | JDG (JD GAMING) | Keon, gent | Floating, Fuhhnq |
 | 2026-11-12 07:02 | 자동 반영 (Liquipedia) | EMEA | GCR (Glacier) |  | CAPO, jKillua |
