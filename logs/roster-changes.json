@@ -1,5 +1,16 @@
 [
  {
+  "at": "2026-11-12T13:00:01.807Z",
+  "kind": "auto",
+  "team": "DF",
+  "teamName": "DreamFire",
+  "region": "apac-s",
+  "out": [],
+  "in": [
+   "HHUY"
+  ]
+ },
+ {
   "at": "2026-11-12T12:03:27.281Z",
   "kind": "rename",
   "team": "Zesty Besties",

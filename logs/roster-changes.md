@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-12 22:00 | 자동 반영 (Liquipedia) | APAC South | DF (DreamFire) |  | HHUY |
 | 2026-11-12 21:03 | 2부 팀 이름 변경 | Americas | Zesty Besties |  | 구 Straight Geeked |
 | 2026-11-12 21:03 | 2부 팀 명단 변경 | Americas | DGAP | Bokiiyu | SlowakinZ |
 | 2026-11-12 21:03 | 2부 팀 이름 변경 | APAC South | EvolutionV |  | 구 Future Top Squad |
