@@ -1221,3 +1221,9 @@ a.tag.live { text-decoration: none; }
 .lv-rest ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
 .lv-rest li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 8px 10px; background: var(--card); border-radius: var(--r-md, 10px); }
 .lv-rest .lv-sub { margin-left: auto; }
+
+/* 최근 영상: 종류 고르기, Twitch 다시보기 */
+.vid-kind { margin-top: 10px; }
+.vid-kind small { opacity: .7; }
+.vid.tw .yt { background: #1f1b2e; }
+.tag.vk { background: transparent; border: 1px solid var(--rule); color: var(--steel); }

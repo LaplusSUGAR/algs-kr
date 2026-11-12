@@ -51,6 +51,7 @@ if (!rulesMine) console.log(`[build] 규칙 파일은 ${rules.season} 것(${rule
 const season = {
   ...seasonBase, slug: seasonSlug,
   cpDirectSlots: rules.championship.direct, lcqSlots: rules.championship.fromLcq, scoring: scoringOf(rules), brief: rulesBrief(rules),
+  brackets: rules.brackets, // LCQ·챔피언십·플레이오프 대진 구조 (규칙 파일). 화면의 탭·점수표 칸·진출 그림이 이 표로 만들어진다
   name: cfgMine && seasonCfg.name ? seasonCfg.name : algs.seasonName || seasonName(seasonSlug),
   // 일정표: 공식 대회 목록에서 만들고(날짜·이름·공식 링크), 설정 파일의 같은 줄이 장소·링크를 덮어쓴다
   timeline: buildTimeline(algs.events, seasonSlug, cfgMine ? seasonCfg.timeline : []),

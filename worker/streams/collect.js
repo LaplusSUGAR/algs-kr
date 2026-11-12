@@ -17,33 +17,67 @@ export async function collect({ env, fetch: f, store, now }) {
   // intl: 한국 관련이 아닌 선수. 사이트는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시에만 쓴다
   const meta = (c) => ({ key: c.key, who: c.who, team: c.team || null, kind: c.kind, ...(c.intl ? { intl: true } : {}) });
   const jobs = [];
+  const days = Number(env.VIDEO_DAYS || 21), since = now - days * 864e5;
+  let ytVideos = [], twVideos = []; // 최근 영상: YouTube 업로드 + Twitch 지난 방송(다시보기). 두 작업이 따로 모으고 끝에서 합친다
 
   // ── Twitch ──
   // 그 밖의 선수(전 팀)는 Twitch만, Apex 방송일 때만
   const tw = chs.filter((c) => c.twitch).concat(got.intl.map(([login, who, team]) => ({ key: `p:${String(who).toLowerCase()}`, who, team, kind: 'player', intl: true, apexOnly: true, twitch: login })));
   if (tw.length && env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET) jobs.push(safe(async () => {
     const token = await twitchToken({ env, f, store, now });
+    const liveStreamIds = new Set();
     const byLogin = new Map(); for (const c of tw) { const k = c.twitch.toLowerCase(); if (!byLogin.has(k)) byLogin.set(k, c); } // 같은 채널이면 앞(한국 관련·공식)이 우선
     for (const part of chunk([...byLogin.keys()], 100)) {
       const j = await getJson(f, `https://api.twitch.tv/helix/streams?first=100&${part.map((l) => `user_login=${encodeURIComponent(l)}`).join('&')}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': env.TWITCH_CLIENT_ID } });
       for (const s of j.data || []) {
         const c = byLogin.get(String(s.user_login).toLowerCase()); if (!c || s.type !== 'live') continue;
+        liveStreamIds.add(String(s.id));
         if (c.apexOnly && !isApex(s.game_name)) continue;
         out.live.push({ ...meta(c), platform: 'twitch', title: s.title || '', game: s.game_name || '', viewers: s.viewer_count ?? null, started: s.started_at || null, thumb: String(s.thumbnail_url || '').replace('{width}', '640').replace('{height}', '360'), url: `https://www.twitch.tv/${s.user_login}`, embed: { type: 'twitch', channel: s.user_login } });
       }
     }
+    // 지난 방송(다시보기): 한국 관련 선수 채널만. 채널마다 10분 캐시, 지금 방송 중인 회차는 뺀다
+    const [, vodErr] = await safe(async () => {
+      const H = { headers: { Authorization: `Bearer ${token}`, 'Client-Id': env.TWITCH_CLIENT_ID } };
+      const vc = chs.filter((c) => c.twitch && c.kind === 'player' && !c.intl);
+      // 캐시는 채널별이 아니라 한 덩어리로(요청당 캐시 호출 수를 줄인다): 사용자 ID 7일, 다시보기 목록 10분
+      const ids = (await store.get('tw-uids')) || {};
+      const need = vc.map((c) => c.twitch.toLowerCase()).filter((k) => !ids[k]);
+      if (need.length) {
+        for (const part of chunk(need, 100)) {
+          const j = await getJson(f, `https://api.twitch.tv/helix/users?${part.map((l) => `login=${encodeURIComponent(l)}`).join('&')}`, H);
+          for (const u of j.data || []) ids[String(u.login).toLowerCase()] = u.id;
+        }
+        await store.put('tw-uids', ids, 7 * 86400);
+      }
+      let vods = await store.get('tw-vods');
+      if (!vods || vc.some((c) => ids[c.twitch.toLowerCase()] && !vods[c.twitch.toLowerCase()])) {
+        vods = {};
+        await Promise.all(vc.map(async (c) => {
+          const k = c.twitch.toLowerCase(), uid = ids[k]; if (!uid) return;
+          const [j] = await safe(() => getJson(f, `https://api.twitch.tv/helix/videos?user_id=${uid}&type=archive&first=8`, H));
+          vods[k] = (j?.data || []).map((v) => ({ id: String(v.id), title: v.title || '', published: v.published_at || v.created_at, thumb: String(v.thumbnail_url || '').replace('%{width}', '640').replace('%{height}', '360'), dur: v.duration || '', stream: v.stream_id || null }));
+        }));
+        await store.put('tw-vods', vods, 600);
+      }
+      for (const c of vc) for (const v of vods[c.twitch.toLowerCase()] || []) if (v.published && Date.parse(v.published) >= since && !(v.stream && liveStreamIds.has(String(v.stream))))
+        twVideos.push({ ...meta(c), platform: 'twitch', id: v.id, title: v.title, published: v.published, thumb: v.thumb || null, channel: c.who, dur: v.dur });
+    });
+    if (vodErr) out.err.twitchVod = vodErr;
   }).then(([, e]) => { out.ok.twitch = !e; if (e) out.err.twitch = e; }));
   else if (tw.length) out.err.twitch = 'no key';
 
   // ── YouTube: 피드(무료) → 최근 영상 + 방송 중 후보, videos.list(1단위)로 방송 중 확정 ──
   const yt = chs.filter((c) => c.youtube);
   if (yt.length) jobs.push(safe(async () => {
-    const days = Number(env.VIDEO_DAYS || 21), since = now - days * 864e5;
+    // 쇼츠: 채널의 쇼츠 재생목록(UUSH…) 피드에 있는 영상, 또는 제목에 #shorts. 화면에서 따로 모아 보여 준다
     const feeds = await Promise.all(yt.map(async (c) => { const [id] = await safe(() => youtubeId({ c, env, f, store })); if (!id) return { c, items: [] }; const [items] = await safe(() => youtubeFeed({ id, f, store })); return { c, id, items: items || [] }; }));
+    const [shortsBy] = await safe(() => youtubeShorts({ ids: feeds.map((x) => x.id).filter(Boolean), f, store }));
+    for (const x of feeds) x.shorts = new Set(shortsBy?.[x.id] || []);
     const cand = [];
-    for (const { c, items } of feeds) {
+    for (const { c, items, shorts } of feeds) {
       items.slice(0, 4).forEach((v) => cand.push({ c, v })); // 방송 중인 영상은 피드 맨 앞쪽에 온다
-      for (const v of items) if (Date.parse(v.published) >= since && (!c.apexOnly || isApex(v.title))) out.videos.push({ ...meta(c), id: v.id, title: v.title, published: v.published, thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`, channel: v.channel });
+      for (const v of items) if (Date.parse(v.published) >= since && (!c.apexOnly || isApex(v.title))) ytVideos.push({ ...meta(c), platform: 'youtube', id: v.id, title: v.title, published: v.published, thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`, channel: v.channel, ...(shorts?.has(v.id) || /#shorts?\b/i.test(v.title) ? { short: true } : {}) });
     }
     if (!feeds.some((x) => x.id)) throw new Error('no channel id');
     if (env.YOUTUBE_API_KEY && cand.length) {
@@ -59,10 +93,8 @@ export async function collect({ env, fetch: f, store, now }) {
           if (st === 'upcoming') short.add(it.id); // 예약만 된 방송은 최근 영상에서 뺀다
         }
       }
-      out.videos = out.videos.filter((v) => !liveIds.has(v.id) && !short.has(v.id));
+      ytVideos = ytVideos.filter((v) => !liveIds.has(v.id) && !short.has(v.id));
     } else if (!env.YOUTUBE_API_KEY) out.err.youtubeLive = 'no key';
-    out.videos.sort((a, b) => b.published.localeCompare(a.published));
-    out.videos = out.videos.slice(0, 60);
   }).then(([, e]) => { out.ok.youtube = !e; if (e) out.err.youtube = e; }));
 
   // ── 치지직 (공개 채널 라이브 정보. 공식 문서에 없는 주소라 응답이 바뀌면 조용히 건너뛴다) ──
@@ -79,6 +111,10 @@ export async function collect({ env, fetch: f, store, now }) {
   }).then(([, e]) => { out.ok.chzzk = !e; if (e) out.err.chzzk = e; }));
 
   await Promise.all(jobs);
+  // 영상(긴 영상·다시보기)과 쇼츠를 따로 자른다: 쇼츠가 많은 채널이 목록을 밀어내지 않게
+  const byNew = (a, b) => Date.parse(b.published) - Date.parse(a.published);
+  const all = [...ytVideos, ...twVideos].sort(byNew);
+  out.videos = [...all.filter((v) => !v.short).slice(0, 60), ...all.filter((v) => v.short).slice(0, 30)].sort(byNew);
   out.live.sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
   if (!Object.keys(out.err).length) delete out.err;
   return out;
@@ -113,6 +149,18 @@ async function youtubeId({ c, env, f, store }) {
   const id = j.items?.[0]?.id; if (!id) throw new Error(`no channel for @${handle}`);
   await store.put(`yt-id:${handle.toLowerCase()}`, id, 7 * 86400);
   return id;
+}
+// 채널별 쇼츠 영상 ID (쇼츠 재생목록 'UUSH' + 채널 ID 뒷부분의 공개 피드, 전 채널 한 덩어리로 30분 캐시). 쇼츠가 없는 채널은 피드가 없어 빈 목록
+async function youtubeShorts({ ids, f, store }) {
+  const hit = await store.get('yt-shorts');
+  if (hit && ids.every((id) => hit[id])) return hit;
+  const out = {};
+  await Promise.all(ids.map(async (id) => {
+    const [r] = await safe(() => f(`https://www.youtube.com/feeds/videos.xml?playlist_id=UUSH${id.slice(2)}`, { headers: { 'User-Agent': UA } }));
+    out[id] = r?.ok ? [...(await r.text()).matchAll(/<yt:videoId>([^<]+)</g)].map((m) => m[1]) : [];
+  }));
+  await store.put('yt-shorts', out, 1800);
+  return out;
 }
 // YouTube 채널 공개 피드 (최근 영상 약 15개, 5분 캐시)
 async function youtubeFeed({ id, f, store }) {

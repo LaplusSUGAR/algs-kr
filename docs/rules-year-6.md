@@ -32,7 +32,7 @@
 | 매치 포인트 50점 | C5 | `matchPoint.threshold` | 결승 화면의 MP 표시, 규칙 탭 | 화면 코드에 50으로 적혀 있음 |
 | LCQ 출전 팀 | 3.2.5, 3.3.3(B) | `lcq.entry` | 직행권 밖 프로리그 팀 + 2부 우승팀·포인트 상위 팀(Liquipedia), 공식 명단이 나오면 공식 값 | 반영됨 |
 | LCQ 시드 | 3.7.1 | `lcq.seeding`, `lcq.seedNote` | CP 순, 그다음 2부 포인트 순. 두 로비에 지그재그. 로스터 변경으로 CP가 오른 팀은 변경 전(공식) CP로 시드 | 2026-11-11 반영 (그 전에는 ALTERNATIVE가 EIN 합류로 시드가 올라가 있었음) |
-| LCQ 진행 방식 | C4 | `lcq.bracket` | `LCQ_STAGES`, `LCQ_FLOW` (상위 10 / 하위 10) | 화면 코드에 적혀 있음, 규칙 파일과 같음 |
+| LCQ·챔피언십 진행 방식(단계·진출 팀 수·진행 그림) | C4, 3.7, 3.8 | `brackets.lcq`, `brackets.championship`, `brackets.playoffs` | 화면의 탭·점수표 칸·다음 경기 배정·진행 그림 | 규칙 파일에서 읽음. `check-rules`가 `lcq`·`championship` 숫자와 맞는지 검사 |
 | LCQ 일정(지역 현지 시각) | D1, D4 | `lcq.schedule`, `regions.*.tz` | 공식 API 값이 태평양 시간 임시값이거나 순서가 어긋나면 규정 시각으로 표시 | 2026-11-11 반영 |
 | 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 직행 32팀을 CP 순으로 1~32번, LCQ 8팀을 CP 순(같으면 LCQ 결승 순위)으로 33~40번에 놓고 지그재그(A→B→C→D→D→C→B→A). 공식 명단이 나오면 공식 조 | 근사. 규정은 40팀 전체를 CP 순으로 세우므로, LCQ 팀의 CP가 직행 팀보다 높으면 예상 조 편성이 공식과 다를 수 있음 |
 | 챔피언십 진행 방식 | C2, C4, D7 | `championship.bracket` | 챔피언십 단계 목록, `CH_FLOW` | 화면 코드에 적혀 있음, 규칙 파일과 같음 |
@@ -49,6 +49,6 @@
 
 1. `config/rules/year-7.json`을 이 파일과 같은 꼴로 만듭니다(바뀐 숫자만 고치면 됩니다).
 2. `node scripts/check-rules.mjs`로 실제 데이터와 맞는지 봅니다.
-3. 진행 방식 자체가 바뀌었으면(브래킷 단계·진출 팀 수) `site/assets/app.js`의 `LCQ_STAGES`·`LCQ_FLOW`·`CH_FLOW`와 챔피언십 단계 목록도 함께 고칩니다. 이 값들은 아직 규칙 파일에서 읽지 않습니다.
+3. 진행 방식 자체가 바뀌었으면(브래킷 단계·진출 팀 수) 규칙 파일의 `brackets`(단계 `stages`, 진출 규칙 `feeds`, 진행 그림 `flow`)를 고친다. 화면 코드는 고칠 필요가 없다. 단계가 늘거나 줄면 `flow.nodes`의 상자 위치([x, y])도 함께 정한다.
 
 규칙 파일이 없는 시즌은 가장 최근 시즌 파일을 쓰고, 규칙 탭에 지난 시즌 규정 기준이라고 안내합니다.

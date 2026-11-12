@@ -191,6 +191,9 @@
     // 방송 상태 (지금 방송 중, 최근 영상)
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
+    ['등록된 채널에 최근 3주 동안 올라온 YouTube 영상과 Twitch 지난 방송입니다. 쇼츠는 따로 모았습니다.', '登録チャンネルの直近3週間のYouTube動画とTwitchの過去配信です。ショートは別にまとめています。', 'YouTube videos and past Twitch broadcasts from the registered channels in the last three weeks. Shorts are listed separately.'],
+    ['다시보기', 'アーカイブ', 'Past broadcast'], ['쇼츠', 'ショート', 'Shorts'], ['Twitch에서 보기', 'Twitchで見る', 'Watch on Twitch'],
+    ['{n}시간 {n}분 방송', '{1}時間{2}分の配信', '{1}h {2}m stream'], ['{n}분 방송', '{1}分の配信', '{1}m stream'],
     ['중계 보기', '配信を見る', 'Watch'],
     ['중계 채널', '配信チャンネル', 'Broadcast channels'],
     ['다른 팀 선수 방송', '他チームの選手配信', 'Other players live'],

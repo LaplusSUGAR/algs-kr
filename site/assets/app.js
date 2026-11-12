@@ -18,6 +18,16 @@ function unpack(d) {
   }
 }
 let A = unpack(window.ALGS);
+// 대진 구조(단계·진출 규칙·진행 그림)는 규칙 파일(config/rules/<시즌>.json 의 brackets)에서 온다. 진행 방식이 바뀌면 그 파일만 고친다
+//   LCQ_STAGES·CH_BK: 단계 표 / LCQ_FLOW·CH_FLOW: 단계 ← [앞 단계, 몇 위부터, 몇 위까지] (다음 경기 점수표 칸) / *_FLOW_L: 진행 그림 / CH_GS: 조별 리그 대진 / PO_FLOW_L: 플레이오프 그림
+let LCQ_STAGES, LCQ_FLOW, LCQ_FLOW_L, CH_GS, CH_BK, CH_FLOW, CH_FLOW_L, PO_FLOW_L;
+function loadBrackets() {
+  const K = A.season?.brackets || {}, L = K.lcq || {}, H = K.championship || {};
+  LCQ_STAGES = L.stages || []; LCQ_FLOW = L.feeds || {}; LCQ_FLOW_L = L.flow || { h: 0, nodes: {}, edges: [] };
+  CH_GS = H.groupMatches || []; CH_BK = H.stages || []; CH_FLOW = H.feeds || {}; CH_FLOW_L = H.flow || { h: 0, nodes: {}, edges: [] };
+  PO_FLOW_L = K.playoffs?.flow || { nodes: {}, edges: [] };
+}
+loadBrackets();
 const FROZEN = !!A.archived; // 지난 시즌 기록: 새 데이터 확인·실시간 조회를 하지 않는다
 // 시즌 값: 빌드가 meta로 넣어 준다 (가장 최근 Split, CP 동률을 가르는 플레이오프, Liquipedia 시즌 주소)
 const lastSplit = () => A.meta?.lastSplit || Math.max(1, ...Object.values(A.pl || {}).map((p) => p.split || 1));
@@ -219,7 +229,7 @@ function parseHash() {
   const [path, qs] = raw.split('?');
   return { parts: path.split('/').filter(Boolean), q: new URLSearchParams(qs || '') };
 }
-const qsLink = (path, q, patch) => { const p = new URLSearchParams(q); for (const [k, v] of Object.entries(patch)) p.set(k, v); return `#${path}?${p}`; };
+const qsLink = (path, q, patch) => { const p = new URLSearchParams(q); for (const [k, v] of Object.entries(patch)) (v == null ? p.delete(k) : p.set(k, v)); const t = p.toString(); return `#${path}${t ? '?' + t : ''}`; }; // 값이 null이면 그 항목을 뺀다
 
 function render() {
   const { parts, q } = parseHash();
@@ -329,13 +339,8 @@ const flowOrder = (keys, pos) => keys.slice().sort((a, b) => pos[a][0] - pos[b][
 // 홈 진출 구조 그림. 각 단계를 누르면 공식 경기 페이지로 간다.
 function bracketFlow(B) {
   const W = 170, H = 96;
-  const pos = { gs: [10, 68], wr: [240, 8], er1: [240, 128], er2: [470, 128], f: [700, 68] };
-  // [from, to, 출발 y(노드 안 위치), 도착 y, 라벨, 라벨 x, 라벨 y]
-  const edges = [
-    ['gs', 'wr', 30, 48, '상위 20', 210, 70], ['gs', 'er1', 66, 48, '하위 20', 210, 160],
-    ['wr', 'f', 30, 30, '상위 10', 640, 74], ['wr', 'er2', 72, 26, '하위 10', 436, 112],
-    ['er1', 'er2', 48, 70, '상위 10', 440, 214], ['er2', 'f', 48, 72, '상위 10', 670, 196],
-  ];
+  // 상자 위치와 화살표 [from, to, 출발 y(노드 안 위치), 도착 y, 라벨, 라벨 x, 라벨 y]: 규칙 파일 brackets.playoffs.flow
+  const pos = PO_FLOW_L.nodes, edges = PO_FLOW_L.edges;
   const nextKey = B.list.find((st) => st.status === 'pending' || st.status === 'live')?.key;
   const edge = ([a, b, oy, iy, label, lx, ly]) => {
     const x1 = pos[a][0] + W, y1 = pos[a][1] + oy, x2 = pos[b][0], y2 = pos[b][1] + iy, mx = (x1 + x2) / 2;
@@ -919,17 +924,7 @@ function intlBody(ev, view, L, key) {
 // 승자 1R 그룹 A·B → 그룹별 상위 10 승자 2R, 하위 10 패자부활 1R
 // 승자 2R: 상위 10 결승, 하위 10 패자부활 2R / 패자부활 1R: 상위 10 패자부활 2R, 하위 10 탈락
 // 패자부활 2R: 상위 10 결승, 하위 10 탈락 / 매치 포인트 결승 20팀 중 상위 2팀 챔피언십
-// 진행 방식이 바뀌면 아래 두 표(LCQ_STAGES, LCQ_FLOW)만 고치면 탭·점수표·다음 경기 배정이 함께 바뀐다
-const LCQ_STAGES = [
-  { key: 'a', name: 'Winners Round 1 Lobby A', ko: '승자 1라운드 그룹 A', tab: '승자 1R A', n: 20, cut: 10, up: '승자 2R', down: '패자 1R' },
-  { key: 'b', name: 'Winners Round 1 Lobby B', ko: '승자 1라운드 그룹 B', tab: '승자 1R B', n: 20, cut: 10, up: '승자 2R', down: '패자 1R' },
-  { key: 'wr2', name: 'Winners Round 2', ko: '승자 2라운드', tab: '승자 2R', n: 20, cut: 10, up: '결승', down: '패자 2R' },
-  { key: 'er1', name: 'Elimination Round 1', ko: '패자부활 1라운드', tab: '패자 1R', n: 20, cut: 10, up: '패자 2R', down: '탈락' },
-  { key: 'er2', name: 'Elimination Round 2', ko: '패자부활 2라운드', tab: '패자 2R', n: 20, cut: 10, up: '결승', down: '탈락' },
-  { key: 'f', name: 'Match Point Finals', ko: '매치 포인트 결승', tab: '결승', n: 20, top: 2, up: '챔피언십' },
-];
-// 다음 경기로 올라가는 규칙: 단계 ← [앞 단계, 몇 위부터, 몇 위까지]. 이 순서대로 다음 경기 점수표의 칸이 만들어진다
-const LCQ_FLOW = { wr2: [['a', 1, 10], ['b', 1, 10]], er1: [['a', 11, 20], ['b', 11, 20]], er2: [['wr2', 11, 20], ['er1', 1, 10]], f: [['wr2', 1, 10], ['er2', 1, 10]] };
+// 단계 표(LCQ_STAGES)와 진출 규칙(LCQ_FLOW)은 규칙 파일 brackets.lcq 에 있다. 그 표를 고치면 탭·점수표·다음 경기 배정이 함께 바뀐다
 const lcqEvents = () => A.lcq || [];
 // CP 순위 (CP 탭과 같은 기준: 대회 중·직후는 정산 순위)
 function cpStanding() {
@@ -1052,19 +1047,6 @@ const schedTable = (B) => `<section class="sec" aria-labelledby="h-st-sch"><h2 c
 
 // 진행 방식 그림 (LCQ·챔피언십 공통). 상자 = 경기(상태·시각·관심 팀), 화살표 = 진출. 상자를 누르면 그 경기 탭
 //   L = { h: 그림 높이, nodes: { 단계: [x, y, 제목] }, edges: [[출발, 도착, 출발 y, 도착 y, 라벨]], notes: [[단계, 글]] (상자 아래 한 줄) }
-const LCQ_FLOW_L = {
-  h: 256,
-  nodes: { a: [10, 8, '승자 1R 그룹 A'], b: [10, 136, '승자 1R 그룹 B'], wr2: [240, 8, '승자 2라운드'], er1: [240, 136, '패자부활 1라운드'], er2: [470, 136, '패자부활 2라운드'], f: [700, 72, '매치 포인트 결승'] },
-  edges: [['a', 'wr2', 30, 30, '상위 10'], ['a', 'er1', 70, 30, '하위 10'], ['b', 'wr2', 30, 70, '상위 10'], ['b', 'er1', 70, 70, '하위 10'],
-    ['wr2', 'f', 30, 30, '상위 10'], ['wr2', 'er2', 70, 30, '하위 10'], ['er1', 'er2', 50, 70, '상위 10'], ['er2', 'f', 50, 70, '상위 10']],
-  notes: [['er1', '하위 10 탈락'], ['er2', '하위 10 탈락'], ['f', '상위 2팀 챔피언십 진출']],
-};
-const CH_FLOW_L = {
-  h: 256,
-  nodes: { gs: [10, 72, '조별 리그 (4개 조)'], wr: [240, 8, '승자 라운드'], er1: [240, 136, '패자부활 1라운드'], er2: [470, 136, '패자부활 2라운드'], f: [700, 72, '매치 포인트 결승'] },
-  edges: [['gs', 'wr', 30, 48, '상위 20'], ['gs', 'er1', 66, 48, '하위 20'], ['wr', 'f', 30, 30, '상위 10'], ['wr', 'er2', 70, 30, '하위 10'], ['er1', 'er2', 50, 70, '상위 10'], ['er2', 'f', 50, 70, '상위 10']],
-  notes: [['gs', '조마다 다른 세 조와 한 번씩 (6경기)'], ['er1', '하위 10 탈락'], ['er2', '하위 10 탈락'], ['f', '매치 포인트 우승']],
-};
 function stageFlow(B, L, href, label) {
   const W = 170, H = 96;
   const st = (k) => B[k] || B.list.find((x) => x.key === k);
@@ -1227,14 +1209,7 @@ function champsSeeds() {
 //   3일차 브래킷: 패자부활 1R(상위 10 → 패자 2R) · 승자 라운드(상위 10 → 결승, 하위 10 → 패자 2R) · 패자부활 2R(상위 10 → 결승)
 //   4일차 매치 포인트 결승 20팀
 // 공식 시리즈(Group X vs Y, Winners Round …)가 생기면 공식 이름·순서·시각·결과를 쓴다
-const CH_GS = [['A', 'B'], ['C', 'D'], ['B', 'D'], ['A', 'C'], ['B', 'C'], ['A', 'D']];
-const CH_BK = [
-  { key: 'er1', name: 'Elimination Round 1', ko: '패자부활 1라운드', tab: '패자 1R', n: 20, cut: 10, up: '패자 2R', down: '탈락', day: 2 },
-  { key: 'wr', name: 'Winners Round', ko: '승자 라운드', tab: '승자 라운드', n: 20, cut: 10, up: '결승', down: '패자 2R', day: 2 },
-  { key: 'er2', name: 'Elimination Round 2', ko: '패자부활 2라운드', tab: '패자 2R', n: 20, cut: 10, up: '결승', down: '탈락', day: 2 },
-  { key: 'f', name: 'Match Point Finals', ko: '매치 포인트 결승', tab: '결승', n: 20, day: 3 },
-];
-const CH_FLOW = { wr: [['gs', 1, 20]], er1: [['gs', 21, 40]], er2: [['wr', 11, 20], ['er1', 1, 10]], f: [['wr', 1, 10], ['er2', 1, 10]] };
+// 조별 리그 대진(CH_GS)·단계(CH_BK)·진출 규칙(CH_FLOW)은 규칙 파일 brackets.championship 에 있다
 const addDay = (ymd, n) => { const d = new Date(ymd + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const champsSeries = () => A.series.filter((s) => (s.eventSlug || '').startsWith('champs'));
 const champsNow = () => intlCurrent() && /champs/.test(A.intl?.slug || '');
@@ -2169,7 +2144,7 @@ const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => l.kind === 
 // 진행 중인 경기 옆 '중계 보기': 공식 중계가 켜져 있으면 그 방송을 방송 탭에서 바로 열고, 켜진 중계를 못 찾으면 공식 중계 채널 목록으로
 const officialLive = () => { const L = (ST?.live || []).filter((l) => l.kind === 'official'); const pref = I.lang === 'ja' ? 'o:ja' : 'o:en'; return L.find((l) => l.key === pref && l.embed) || L.find((l) => l.embed) || L[0] || null; };
 const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive(); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
-const newVideos = () => (ST?.videos || []).filter((v) => vidSeen0 && Date.parse(v.published) > vidSeen0);
+const newVideos = () => (ST?.videos || []).filter((v) => !v.short && vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0`);
@@ -2198,18 +2173,29 @@ function liveSection() {
     <div class="lv-player" id="lvPlayer" hidden></div>
     <div class="lv-grid">${L.map((l, i) => liveCard(l, i)).join('')}</div>${others}${foot}</section>`;
 }
+// 최근 영상: 영상(YouTube 긴 영상 + Twitch 다시보기) / 다시보기만 / 쇼츠. 쇼츠는 기본 목록에서 빼고 따로 모은다
+const durTxt = (d) => { const m = /^(?:(\d+)h)?(?:(\d+)m)?/.exec(d || ''), h = +(m?.[1] || 0), mi = +(m?.[2] || 0); return h ? `${h}시간 ${mi}분 방송` : mi ? `${mi}분 방송` : ''; };
 function videoSection(q) {
   if (!C.streamsUrl || !ST) return '';
   const all = ST.videos || [], more = q.get('v') === 'all';
   if (!all.length) return '';
-  const list = more ? all : all.slice(0, 8);
+  const G = { main: all.filter((v) => !v.short), vod: all.filter((v) => v.platform === 'twitch'), short: all.filter((v) => v.short) };
+  const kind = G[q.get('vk')]?.length ? q.get('vk') : G.main.length ? 'main' : 'short';
+  const cur = G[kind], list = more ? cur : cur.slice(0, 8);
   const day = (iso) => dayLabel(dayKey(iso));
-  const card = (v) => { const isNew = vidSeen0 && Date.parse(v.published) > vidSeen0; return `<figure class="vid"><button class="yt" type="button" data-yt="${esc(v.id)}" aria-label="${esc(v.title)} 재생"><img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="360"><span class="yt-play" aria-hidden="true"></span></button>
-    <figcaption><b>${isNew ? '<span class="tag live">새 영상</span> ' : ''}${esc(v.title)}</b><span>${esc(v.kind === 'player' ? v.who : v.channel || v.who)} · ${esc(day(v.published))} · <a href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener">YouTube에서 보기</a></span></figcaption></figure>`; };
-  return `<section class="sec" id="vids"><h2 class="h2">최근 영상 <small class="muted">${all.length}</small></h2>
-    <p class="lead">등록된 YouTube 채널에 최근 3주 동안 올라온 영상입니다.</p>
-    <div class="vid-grid">${list.map(card).join('')}</div>
-    ${all.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${all.length}개 모두 보기</a></p>` : ''}</section>`;
+  const card = (v) => {
+    const isNew = vidSeen0 && Date.parse(v.published) > vidSeen0, tw = v.platform === 'twitch';
+    const link = tw ? `<a href="https://www.twitch.tv/videos/${esc(v.id)}" target="_blank" rel="noopener">Twitch에서 보기</a>` : `<a href="${v.short ? `https://www.youtube.com/shorts/${esc(v.id)}` : `https://youtu.be/${esc(v.id)}`}" target="_blank" rel="noopener">YouTube에서 보기</a>`;
+    const kindTag = tw ? '<span class="tag vk">다시보기</span> ' : v.short ? '<span class="tag vk">쇼츠</span> ' : '';
+    return `<figure class="vid${tw ? ' tw' : ''}"><button class="yt" type="button" ${tw ? `data-tw="${esc(v.id)}"` : `data-yt="${esc(v.id)}"`} aria-label="${esc(v.title)} 재생">${v.thumb ? `<img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="${tw ? 270 : 360}">` : ''}<span class="yt-play" aria-hidden="true"></span></button>
+    <figcaption><b>${isNew ? '<span class="tag live">새 영상</span> ' : ''}${kindTag}${esc(v.title)}</b><span>${esc(v.kind === 'player' ? v.who : v.channel || v.who)} · ${esc(day(v.published))}${tw && durTxt(v.dur) ? ` · <span>${durTxt(v.dur)}</span>` : ''} · ${link}</span></figcaption></figure>`;
+  };
+  const tabs = [['main', '영상'], ['vod', '다시보기'], ['short', '쇼츠']].filter(([k]) => G[k].length);
+  const seg = tabs.length > 1 ? `<div class="seg vid-kind" role="group" aria-label="영상 종류">${tabs.map(([k, t]) => `<a href="${qsLink('/streams', q, { vk: k === 'main' ? null : k, v: null, play: null })}" aria-current="${k === kind}"><span>${t}</span> <small>${G[k].length}</small></a>`).join('')}</div>` : '';
+  return `<section class="sec" id="vids"><h2 class="h2">최근 영상 <small class="muted">${G.main.length}</small></h2>
+    <p class="lead">등록된 채널에 최근 3주 동안 올라온 YouTube 영상과 Twitch 지난 방송입니다. 쇼츠는 따로 모았습니다.</p>
+    ${seg}<div class="vid-grid">${list.map(card).join('')}</div>
+    ${cur.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${cur.length}개 모두 보기</a></p>` : ''}</section>`;
 }
 // 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다
 function liveStrip() {
@@ -2327,7 +2313,7 @@ function bind() {
   }
   app.querySelectorAll('button.yt').forEach((b) => b.addEventListener('click', () => {
     const f = document.createElement('iframe');
-    f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
+    f.src = b.dataset.tw ? `https://player.twitch.tv/?video=${encodeURIComponent(b.dataset.tw)}&parent=${location.hostname}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
     f.title = b.getAttribute('aria-label'); f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
     f.className = 'yt-frame'; b.replaceWith(f);
   }));
@@ -2499,7 +2485,7 @@ function reloadData(v) {
   return new Promise((res) => {
     const s = document.createElement('script');
     s.src = `data/algs-data.js?v=${v}`;
-    s.onload = () => { s.remove(); A = unpack(window.ALGS); applyLive(); footer(); render(); updatePill(); if (LIVE.mode === 'direct') pollDirect(); res(); };
+    s.onload = () => { s.remove(); A = unpack(window.ALGS); loadBrackets(); applyLive(); footer(); render(); updatePill(); if (LIVE.mode === 'direct') pollDirect(); res(); };
     s.onerror = () => { s.remove(); res(); };
     document.head.appendChild(s);
   });
