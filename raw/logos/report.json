@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-12T22:14:25.878Z",
+  "at": "2026-11-13T00:28:29.641Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1645,6 +1645,194 @@
       }
     },
     {
+      "key": "id:01KTSJNABRTD7BVQV2647Y9HHN",
+      "short": "ASD",
+      "name": "asd",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "ASD",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRRK8RDNMMCQRDMA485Y",
+      "short": "BALL",
+      "name": "Ball Busters",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Ball Busters",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQRZ0R5Z6319MXH7BB0T",
+      "short": "BB",
+      "name": "Burger Boys",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Burger Boys",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9K4MV4KZM8GE7E6566V",
+      "short": "CK",
+      "name": "Clocks",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Clocks",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQATFXKMNR48B08J3W41",
+      "short": "DKK",
+      "name": "Daikoku",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Daikoku",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMR6CEA2RTM8KNQHG1KWM",
+      "short": "FF",
+      "name": "ForFun",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "For Fun Esports",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMR7MF6NX3JBDGJA22YC3",
+      "short": "MEOW",
+      "name": "FORGED IN HELL",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "FORGED IN HELL",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRQVJFCGK0QD7RFQ602F",
+      "short": "GP",
+      "name": "GlamurniePadonki",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "GlamurniePadonki",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KME84BHFFPVPK9WN4TC9HC9Z",
+      "short": "HVC",
+      "name": "Havoc legends",
+      "region": "emea",
+      "src": "official",
+      "lp": {
+        "name": "Havoc Legends",
+        "by": "이름 같음 · 선수 1명 겹침"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQQT856Y37DX38KTDCCB",
+      "short": "KDV",
+      "name": "KDV",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "KDV",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9M6X8E7JR1A73R88E07",
+      "short": "MEOW",
+      "name": "MEOW",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "MEOW",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSCQ1R8NAE4XQ5XVTZRS",
+      "short": "NMS",
+      "name": "Nemesis",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Nemesis",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+      "short": "OC",
+      "name": "OnChikken",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KTSJNA93DA8WPMXGWNGH1ZNY",
+      "short": "QSM",
+      "name": "QSM",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "QSM",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS520CH2N35AXE21CZQW",
+      "short": "SVP",
+      "name": "Si Vis Pacem",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Si vis pacem",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSNJFMGSQXG1NC83J479",
+      "short": "BULL",
+      "name": "Toros",
+      "region": "emea",
+      "src": null,
+      "lp": {
+        "name": "Toros",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJNABFW0TWT5B8E9AW4X64",
+      "short": "VOID",
+      "name": "VOID ESPORTS",
+      "region": "emea",
+      "src": "lp",
+      "lp": {
+        "name": "Void Esports",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
       "key": "cc:0nionz",
       "name": "0nionz",
       "region": "apac-n",
@@ -2445,126 +2633,6 @@
       }
     },
     {
-      "key": "cc:havoclegends",
-      "name": "Havoc Legends",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Havoc Legends",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: XOSAM2-, Osamh_gun, IKrrio)"
-      }
-    },
-    {
-      "key": "cc:meow",
-      "name": "MEOW",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "MEOW",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: LotusNessu, Kuaksi, LukaQT)"
-      }
-    },
-    {
-      "key": "cc:glamurniepadonki",
-      "name": "GlamurniePadonki",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "GlamurniePadonki",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: 9impulse, Rxgve, Tokken)"
-      }
-    },
-    {
-      "key": "cc:qsm",
-      "name": "QSM",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "QSM",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Takami, RYoor1k, Mohapix)"
-      }
-    },
-    {
-      "key": "cc:clocks",
-      "name": "Clocks",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Clocks",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Paul_FpsTv, ISneax, Biohazardsv)"
-      }
-    },
-    {
-      "key": "cc:burgerboys",
-      "name": "Burger Boys",
-      "region": "emea",
-      "src": "lp",
-      "lp": {
-        "name": "Burger Boys",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Fabupapu, Alfnzy, Hamish)"
-      }
-    },
-    {
-      "key": "cc:nemesis",
-      "name": "Nemesis",
-      "region": "emea",
-      "src": "lp",
-      "lp": {
-        "name": "Nemesis",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: QPMS, Clone, BadSniper)"
-      }
-    },
-    {
-      "key": "cc:voidesports",
-      "name": "Void Esports",
-      "region": "emea",
-      "src": "lp",
-      "lp": {
-        "name": "Void Esports",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Luxr, Mesuko, RCreed)"
-      }
-    },
-    {
-      "key": "cc:sivispacem",
-      "name": "Si vis pacem",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Si vis pacem",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: IR-Matteo, Ti-mat06, KarnageSMG)"
-      }
-    },
-    {
-      "key": "cc:forgedinhell",
-      "name": "FORGED IN HELL",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "FORGED IN HELL",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Mayborn, Misfit, Nezedia)"
-      }
-    },
-    {
-      "key": "cc:toros",
-      "name": "Toros",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Toros",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nisa, Mox600, Red)"
-      }
-    },
-    {
-      "key": "cc:kdv",
-      "name": "KDV",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "KDV",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kylar, Dijai, Volgrath)"
-      }
-    },
-    {
       "key": "cc:forfunacademy",
       "name": "For Fun Academy",
       "region": "emea",
@@ -2572,36 +2640,6 @@
       "lp": {
         "name": "For Fun Academy",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Chxrge, Sweterflayer, Lunalj)"
-      }
-    },
-    {
-      "key": "cc:ballbusters",
-      "name": "Ball Busters",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Ball Busters",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kaido, Noiises, InSaNe)"
-      }
-    },
-    {
-      "key": "cc:asd",
-      "name": "ASD",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "ASD",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ss11, Fitoo, D0ubl3w)"
-      }
-    },
-    {
-      "key": "cc:daikoku",
-      "name": "Daikoku",
-      "region": "emea",
-      "src": null,
-      "lp": {
-        "name": "Daikoku",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Olal52, P3iro, LangerdJM)"
       }
     },
     {

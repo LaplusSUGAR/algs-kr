@@ -818,6 +818,41 @@
       "logos/t/e3036224"
     ]
   },
+  "id:01M6ZJMQRZ0R5Z6319MXH7BB0T": {
+    "src": "lp",
+    "f": [
+      "logos/t/9a64f378",
+      "logos/t/9a64f378"
+    ]
+  },
+  "id:01M6ZJMR6CEA2RTM8KNQHG1KWM": {
+    "src": "lp",
+    "f": [
+      "logos/t/f5a2b623",
+      "logos/t/f5a2b623"
+    ]
+  },
+  "id:01KME84BHFFPVPK9WN4TC9HC9Z": {
+    "src": "official",
+    "f": [
+      "logos/t/70eab94f",
+      "logos/t/89d50557"
+    ]
+  },
+  "id:01M6ZJMSCQ1R8NAE4XQ5XVTZRS": {
+    "src": "lp",
+    "f": [
+      "logos/t/c62858f2",
+      "logos/t/c62858f2"
+    ]
+  },
+  "id:01KTSJNABFW0TWT5B8E9AW4X64": {
+    "src": "lp",
+    "f": [
+      "logos/t/767d669c",
+      "logos/t/5716c6b5"
+    ]
+  },
   "cc:soten": {
     "src": "lp",
     "f": [
@@ -928,27 +963,6 @@
     "f": [
       "logos/t/ea358774",
       "logos/t/a41b4e67"
-    ]
-  },
-  "cc:burgerboys": {
-    "src": "lp",
-    "f": [
-      "logos/t/9a64f378",
-      "logos/t/9a64f378"
-    ]
-  },
-  "cc:nemesis": {
-    "src": "lp",
-    "f": [
-      "logos/t/c62858f2",
-      "logos/t/c62858f2"
-    ]
-  },
-  "cc:voidesports": {
-    "src": "lp",
-    "f": [
-      "logos/t/767d669c",
-      "logos/t/5716c6b5"
     ]
   },
   "cc:forfunacademy": {
