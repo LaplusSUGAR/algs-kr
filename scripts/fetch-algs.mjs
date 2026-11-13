@@ -78,6 +78,11 @@ async function main() {
 
 // 한 시즌의 데이터를 모두 받아 스냅샷 본문을 만든다. prev: 같은 시즌의 지난 스냅샷(다시 쓸 값), 시즌이 바뀌면 로고·채널만 든 값
 async function collect(season, prev) {
+  // LCQ에서 약칭이 겹치는 팀의 고친 약칭 (팀 ID → 약칭). 한 번 정하면 계속 쓴다: 조 편성·결과에서 두 팀이 섞이지 않게
+  const dupShort = { ...(prev?.lcqShortFix || {}) };
+  const dupName = { ...(prev?.lcqShortFixNames || {}) }; // '이벤트 ID|이름' → 약칭 (결과 표에 팀 ID가 없을 때 이름으로 찾는다)
+  const flatN = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  const resShort = (t, eid) => dupShort[t.teamId || t.id] || dupName[`${eid}|${flatN(t.name || t.teamName)}`] || t.shortName;
   const events = season.tournaments.flatMap((t) =>
     t.events.map((e) => [e.id, e.slug, t.publicNameOverride || t.name, e.region?.slug || null, e.startDate, e.endDate,
       e.phases.map((p) => [p.id, p.name, p.standingsCalculationMethod, p.qualificationThreshold])]));
@@ -165,7 +170,7 @@ async function collect(season, prev) {
       const st = stats[k] || {}; // 막 시작해 통계가 아직 없으면 빈 값
       const intl = !(s.event?.slug || '').includes('pro-league');
       // 5번째 값: 1 = 매치 포인트 도달, 2 = 매치 포인트 우승
-      res = (st.teams || []).filter((t) => intl || t.position <= 3 || krShorts.has(t.shortName)).map((t) => [t.position, t.shortName, t.points, t.kills, t.wonMatchPoint ? 2 : t.matchPointEligible ? 1 : 0]);
+      res = (st.teams || []).filter((t) => intl || t.position <= 3 || krShorts.has(t.shortName)).map((t) => [t.position, resShort(t, s.event?.id), t.points, t.kills, t.wonMatchPoint ? 2 : t.matchPointEligible ? 1 : 0]);
     }
     series.push([s.id, s.event?.id, s.phase?.name, s.name, s.status, s.startsAt, s.region?.name || '', s.isMatchPointFormat ? 1 : 0, (s.matches || []).length, res]);
   }
@@ -276,6 +281,7 @@ async function collect(season, prev) {
   const nm = (t) => String(t.name || t.teamName || t.displayName || '').trim();
   for (const e of season.tournaments.flatMap((t) => t.events).filter((x) => /^last-chance-qualifier/.test(x.slug))) {
     const out = { teams: [], lineups: { ...(prev.lcq?.[e.id]?.lineups || {}) } };
+    const lineIds = {}; // 시리즈 → 팀 ID (약칭이 같은 팀이 있어도 헷갈리지 않게 ID로 받아 둔다)
     const seen = new Set();
     const add = (t, seed = null) => {
       if (!t.teamId || seen.has(t.teamId)) return;
@@ -291,8 +297,26 @@ async function collect(season, prev) {
       const sT = await pmap(ss, (s) => peek(`/series/${s.id}/teams`));
       for (const [k, s] of ss.entries()) {
         const ts = (sT[k]?.teams || []).filter((t) => t.shortName);
-        if (ts.length) { out.lineups[s.id] = ts.map((t) => t.shortName.trim()); for (const t of ts) add(t); }
+        if (ts.length) { lineIds[s.id] = ts.map((t) => t.teamId); for (const t of ts) add(t); }
       }
+      // 같은 대회에 약칭이 같은 팀이 있으면(예: EMEA의 MEOW 두 팀) 이름이 약칭과 같은 팀만 그 약칭을 쓰고, 나머지는 이름 머리글자로 바꾼다
+      const taken = new Set(out.teams.map((t) => t[1])), flat = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+      const byShort = {};
+      for (const t of out.teams) (byShort[t[1]] ||= []).push(t);
+      for (const [sh, g] of Object.entries(byShort)) {
+        if (g.length < 2 || !sh) continue;
+        const keep = g.find((t) => !dupShort[t[0]] && flat(t[2]) === flat(sh)) || g.find((t) => !dupShort[t[0]]) || g[0];
+        for (const t of g) {
+          if (t === keep || dupShort[t[0]]) continue;
+          const words = String(t[2]).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+          let c = (words.length > 1 ? words.map((w) => w[0]).join('') : (words[0] || sh).slice(0, 4)).toUpperCase(), k = 2;
+          const base = c; while (taken.has(c)) c = `${base}${k++}`;
+          taken.add(c); dupShort[t[0]] = c;
+        }
+      }
+      for (const t of out.teams) if (dupShort[t[0]]) { t[1] = dupShort[t[0]]; dupName[`${e.id}|${flatN(t[2])}`] = t[1]; }
+      const shortOf = Object.fromEntries(out.teams.map((t) => [t[0], t[1]]));
+      for (const [sid, ids] of Object.entries(lineIds)) out.lineups[sid] = ids.map((id) => shortOf[id]).filter(Boolean);
     } else out.teams = prev.lcq?.[e.id]?.teams || [];
     lcq[e.id] = out;
   }
@@ -320,7 +344,7 @@ async function collect(season, prev) {
     for (const v of tvRes[k]?.versions || []) addLogo(id, v.logoLight, v.logoDark);
   }
 
-  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, krStreams, allStreams, partnerStreams,
+  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, lcqShortFix: dupShort, lcqShortFixNames: dupName, krStreams, allStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
 }
 

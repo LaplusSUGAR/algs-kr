@@ -964,7 +964,20 @@ function lcqEntrants(ev) {
     E = { src: 'projected', pl: pl.length, ccN: pick.length, tie, list: [...pl, ...ccSeeded.map((c) => ({ id: null, short: c.short, name: c.name, pl: false, cc: c }))] };
   }
   E.groupSrc = lobby.a?.length || lobby.b?.length ? 'official' : 'snake';
-  E.list = E.list.map((t, i) => ({ ...t, seedN: t.seed ?? i + 1, group: lobby.a?.includes(t.short) ? 'a' : lobby.b?.includes(t.short) ? 'b' : lcqGroupOf(i) }));
+  const off = E.groupSrc === 'official';
+  const gOf = (t, i) => { const a = !!lobby.a?.includes(t.short), b = !!lobby.b?.includes(t.short); return a !== b ? (a ? 'a' : 'b') : off ? null : lcqGroupOf(i); };
+  E.list = E.list.map((t, i) => ({ ...t, seedN: t.seed ?? i + 1, group: gOf(t, i) }));
+  if (off) { // 공식 조 명단에 두 조 모두 적혔거나 어느 조에도 없는 팀(공식 자료 오류): 자리가 남는 조에 넣고 표시한다
+    const half = Math.ceil(E.list.length / 2), n = { a: E.list.filter((t) => t.group === 'a').length, b: E.list.filter((t) => t.group === 'b').length };
+    for (const t of E.list) if (!t.group) { t.group = n.a < half && (n.a <= n.b || n.b >= half) ? 'a' : 'b'; n[t.group]++; t.groupGuess = true; }
+  }
+  // 공식 시드는 아직 없고 공식 조만 나온 경우: 조 안의 순서는 계산값을 쓰되, 시드 번호는 공식 조에 맞는 자리(A: 1·4·5·8…, B: 2·3·6·7…)로 매긴다
+  if (off && E.seedSrc === 'calc') {
+    const slots = { a: [], b: [] }, k = { a: 0, b: 0 };
+    E.list.forEach((_, i) => slots[lcqGroupOf(i)].push(i + 1));
+    for (const t of E.list) t.seedN = slots[t.group][k[t.group]++] ?? t.seedN;
+    E.list.sort((x, y) => x.seedN - y.seedN);
+  }
   return E;
 }
 const ccLabel = (c) => (c.win > 0 ? `CC #${c.win} 우승` : c.win ? 'CC 우승' : `CC 종합 ${c.rank}위`);
@@ -1024,7 +1037,7 @@ function rosterLine(t, ev) {
 }
 function lcqGroups(B) {
   const E = B.E;
-  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was || team(t.short)?.was ? `<small>구 ${esc(t.cc?.was || team(t.short).was)}</small>` : t.off ? `<small>공식 표기 ${esc(t.off)}</small>` : ''}${rosterLine(t, B.ev)}</td><td class="r num">${t.cp ? `${fmt(t.seedCp ?? t.cp.total)}<small class="unit">CP</small>${t.seedCp != null && t.seedCp !== t.cp.total ? `<small class="seedcp" title="로스터 변경 뒤 팀 CP">변경 뒤 ${fmt(t.cp.total)}</small>` : ''}` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
+  const row = (t) => `<tr class="${rowCls(t)}"><td class="rank">${t.seedN}</td><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}${t.cc?.was || team(t.short)?.was ? `<small>구 ${esc(t.cc?.was || team(t.short).was)}</small>` : t.off ? `<small>공식 표기 ${esc(t.off)}</small>` : ''}${t.groupGuess ? '<small class="warn">공식 조 표기 확인 필요</small>' : ''}${rosterLine(t, B.ev)}</td><td class="r num">${t.cp ? `${fmt(t.seedCp ?? t.cp.total)}<small class="unit">CP</small>${t.seedCp != null && t.seedCp !== t.cp.total ? `<small class="seedcp" title="로스터 변경 뒤 팀 CP">변경 뒤 ${fmt(t.cp.total)}</small>` : ''}` : t.cc ? `${fmt(t.cc.pts)}<small class="unit">CCP</small>` : '–'}</td><td class="r small muted">${esc(seedLabel(t))}</td></tr>`;
   const col = (g) => {
     const st = B[g];
     let ts = E.list.filter((t) => t.group === g);
@@ -1035,7 +1048,7 @@ function lcqGroups(B) {
   };
   // 문장마다 <span>: 번역 사전이 문장 단위로 맞춘다
   const basis = E.src === 'official' ? (E.seedSrc === 'fixed' ? '<span>공식 출전 명단이며, 시드는 주최 측이 확정한 조 편성 순서입니다.</span>' : E.seedSrc === 'official' ? '<span>공식 API가 공개한 출전 명단입니다(공식 시드 순).</span>'
-      : '<span>공식 API가 공개한 출전 명단입니다.</span> <span>시드는 공식 값이 나오기 전이라 계산한 순서입니다: 프로리그 팀은 시드 CP 순, 그다음 2부 팀은 챌린저 서킷 포인트 순.</span>') + (E.list.some((t) => t.seedCp != null && t.seedCp !== t.cp?.total) ? ' <span>선수가 빠지면 시드 CP가 그만큼 내려가고, 선수를 넣어서 오르지는 않습니다(공식 규정 3.7.1).</span>' : '')
+      : '<span>공식 API가 공개한 출전 명단입니다.</span> <span>시드 번호는 공식 값이 나오기 전이라 추정입니다: 공식 조 편성에 맞춰, 조 안에서는 프로리그 팀 시드 CP 순, 그다음 2부 팀 챌린저 서킷 포인트 순으로 매겼습니다.</span>') + (E.list.some((t) => t.seedCp != null && t.seedCp !== t.cp?.total) ? ' <span>선수가 빠지면 시드 CP가 그만큼 내려가고, 선수를 넣어서 오르지는 않습니다(공식 규정 3.7.1).</span>' : '')
     : `<span>시드는 프로리그 ${E.pl}팀(챔피언십 포인트 직행권 ${A.season.cpDirectSlots}위 밖, CP 순) 다음에 2부 ${E.ccN}팀(Split ${lastSplit()} 챌린저 서킷 우승팀과 종합 포인트 상위 팀, 서킷 포인트 CCP 순)입니다.</span>${E.tie ? ' <span>2부 마지막 자리는 포인트 동점 팀이 있어 바뀔 수 있습니다.</span>' : ''}${E.list.some((t) => t.seedCp != null && t.seedCp !== t.cp?.total) ? ' <span>선수를 넣거나 빼서 시드가 올라가지는 않으므로(공식 규정 3.7.1), 로스터 변경으로 CP가 오른 팀은 변경 전 CP로 시드를 정했습니다.</span>' : ''}`;
   const grp = E.groupSrc === 'official' ? '<span>그룹은 공식 배정입니다.</span>' : '<span>그룹은 시드 지그재그 배정(A: 1·4·5·8·9…, B: 2·3·6·7·10…)이며, 공식 배정이 나오면 바뀝니다.</span>';
   const src = E.src !== 'official' && E.ccN ? `<p class="caption">2부 팀 포인트는 챌린저 서킷 포인트(CCP)입니다. 출처: <a href="https://liquipedia.net/apexlegends/Apex_Legends_Global_Series/${A.meta?.year || 2026}/Split_${lastSplit()}/Challenger_Circuits/${{ 'apac-n': 'APAC_North', 'apac-s': 'APAC_South', emea: 'EMEA', americas: 'Americas' }[B.ev.region]}" target="_blank" rel="noopener">Liquipedia</a> (CC-BY-SA)</p>` : '';
