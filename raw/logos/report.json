@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-13T00:38:48.151Z",
+  "at": "2026-11-13T00:59:18.647Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -2014,6 +2014,195 @@
       }
     },
     {
+      "key": "id:01M6ZJMQWKMWSPYVMTYE44RFYZ",
+      "short": "BBZ",
+      "name": "BBZ",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "bbz",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS9T32QQSVS210XEDK5T",
+      "short": "BJ",
+      "name": "BlackJack",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "BlackJack",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9G77TZFPY7FCJFVA7TE",
+      "short": "DMA",
+      "name": "DMA",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "DMA",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9GDNKT7BSYE5DEMW1R4",
+      "short": "GENZ",
+      "name": "GenZ",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "GenZ",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M78QZ2RTDTZ8G4RVVGR5QZHS",
+      "short": "HKUF",
+      "name": "HKUF",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01KME2AH2D6TNG9D1321DKVFZ5",
+      "short": "ITR",
+      "name": "Inside The Ring",
+      "region": "apac-s",
+      "src": "lp",
+      "lp": {
+        "name": "Inside The Ring",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01M6ZJMQYM2BBN4D9T3ATT2XGM",
+      "short": "KMK",
+      "name": "KMK",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "KMK",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9GKA6D49D581M3M0BZ5",
+      "short": "KPY",
+      "name": "KOU PI YAN",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "KOU PI YAN",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJNA7ASK8GGCQ4N4CFD09G",
+      "short": "LS",
+      "name": "LAST STAND",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "LAST STAND",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9GTB6VQJBFKC8JQ3DB6",
+      "short": "MEOW",
+      "name": "MEOWERS",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "MEOWERS",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS3T4RR50CS7XQXRJ388",
+      "short": "MG",
+      "name": "mr greedy",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "mr greedy",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSBXJ15GZKXC8C14PPPM",
+      "short": "PKG",
+      "name": "PanCakeGaming",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "PanCakeGaming",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJNA8N6GKE7W1HAYG9JT14",
+      "short": "SAT",
+      "name": "SAT",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SAT",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSANF042KQ8AMEHKM7KX",
+      "short": "SNR",
+      "name": "SeNioR",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SeNioR",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMSM0BMV9APNHWQKHXV19",
+      "short": "HKR",
+      "name": "SLG APS",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMS7M3T9WTHE96QBKHT8J",
+      "short": "SOAI",
+      "name": "Sohai",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "SOHAI",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS1P3Z0N05FM3B8JY3TK",
+      "short": "3P",
+      "name": "TripleP",
+      "region": "apac-s",
+      "src": null,
+      "lp": {
+        "name": "TripleP",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
       "key": "cc:teamtomodachi",
       "name": "Team Tomodachi",
       "region": "apac-n",
@@ -2314,86 +2503,6 @@
       }
     },
     {
-      "key": "cc:senior",
-      "name": "SeNioR",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "SeNioR",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Niikoluas, RobinFTW, SillyStepSis)"
-      }
-    },
-    {
-      "key": "cc:koupiyan",
-      "name": "KOU PI YAN",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "KOU PI YAN",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moxi, MarkL1ly, Mtulc)"
-      }
-    },
-    {
-      "key": "cc:dma",
-      "name": "DMA",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "DMA",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: DiLu, Selka, ArHe111111)"
-      }
-    },
-    {
-      "key": "cc:insidethering",
-      "name": "Inside The Ring",
-      "region": "apac-s",
-      "src": "lp",
-      "lp": {
-        "name": "Inside The Ring",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Exitlifee, NEWKU, Peterseng6974)"
-      }
-    },
-    {
-      "key": "cc:meowers",
-      "name": "MEOWERS",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "MEOWERS",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Empire, ClaYoshi, Bakrryboo)"
-      }
-    },
-    {
-      "key": "cc:sat",
-      "name": "SAT",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "SAT",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Nonameguy, Intoyou, Zobo)"
-      }
-    },
-    {
-      "key": "cc:sohai",
-      "name": "SOHAI",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "SOHAI",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Wei, LUZIFER23, Sora)"
-      }
-    },
-    {
-      "key": "cc:genz",
-      "name": "GenZ",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "GenZ",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: XIAOQI, Xiago, Moses)"
-      }
-    },
-    {
       "key": "cc:highkillratio",
       "name": "High Kill Ratio",
       "region": "apac-s",
@@ -2401,76 +2510,6 @@
       "lp": {
         "name": "High Kill Ratio",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: StarB0tz, ToadMunch, KoBeNoOb)"
-      }
-    },
-    {
-      "key": "cc:mrgreedy",
-      "name": "mr greedy",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "mr greedy",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Malchowski, Okkkkkjoshh, Wey)"
-      }
-    },
-    {
-      "key": "cc:triplep",
-      "name": "TripleP",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "TripleP",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Fwadyy, KhunPond, LLLLRangoLLLL)"
-      }
-    },
-    {
-      "key": "cc:bbz",
-      "name": "bbz",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "bbz",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Dokiovo, Suibingbing, NotWinter)"
-      }
-    },
-    {
-      "key": "cc:laststand",
-      "name": "LAST STAND",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "LAST STAND",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Koyful_(Macau_player), LeGoP1G, 21Faker)"
-      }
-    },
-    {
-      "key": "cc:pancakegaming",
-      "name": "PanCakeGaming",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "PanCakeGaming",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Waff1e, LanCet, M3)"
-      }
-    },
-    {
-      "key": "cc:blackjack",
-      "name": "BlackJack",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "BlackJack",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: LokizZ, Yuri_(Hong_Kong_player), YC)"
-      }
-    },
-    {
-      "key": "cc:kmk",
-      "name": "KMK",
-      "region": "apac-s",
-      "src": null,
-      "lp": {
-        "name": "KMK",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Kikiki-w-, LeeAki, Evieee)"
       }
     },
     {
