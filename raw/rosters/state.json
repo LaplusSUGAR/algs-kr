@@ -2526,21 +2526,19 @@
    "LeeAki"
   ],
   "apac-s:evolutionv": [
-   "Doro",
-   "inori",
-   "B8O0WW",
-   "Cloudstar"
+   "OHH",
+   "SKY_WILL",
+   "Killme"
   ],
   "apac-s:futuretopsquad": [
-   "Doro",
-   "inori",
+   "Inori",
    "B8O0WW",
-   "Cloudstar"
+   "Doro"
   ],
   "apac-s:hungkuangfalcon": [
-   "Moe",
-   "Vicliao10q",
-   "Shuinyou"
+   "vicliao10q",
+   "Shuinyou",
+   "moe"
   ],
   "apac-s:ewh": [
    "Ecl",
@@ -2944,7 +2942,8 @@
   "apac-s:highkillratio": "SLG APAC S",
   "apac-s:futuretopsquad": "EvolutionV",
   "americas:straightgeeked": "Zesty Besties",
-  "apac-n:astranova": "Salmon and SANMA"
+  "apac-n:astranova": "Salmon and SANMA",
+  "apac-s:hungkuangfalcon": "HKUF"
  },
  "manual": [
   "FNC|EIN|CHROM",

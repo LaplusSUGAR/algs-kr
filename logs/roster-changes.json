@@ -1,5 +1,41 @@
 [
  {
+  "at": "2026-11-13T09:03:47.869Z",
+  "kind": "rename",
+  "team": "HKUF",
+  "region": "apac-s",
+  "was": "HungKuang Falcon",
+  "out": [],
+  "in": []
+ },
+ {
+  "at": "2026-11-13T09:03:47.869Z",
+  "kind": "cc",
+  "team": "Future Top Squad",
+  "region": "apac-s",
+  "out": [
+   "Cloudstar"
+  ],
+  "in": []
+ },
+ {
+  "at": "2026-11-13T09:03:47.869Z",
+  "kind": "cc",
+  "team": "EvolutionV",
+  "region": "apac-s",
+  "out": [
+   "Doro",
+   "inori",
+   "B8O0WW",
+   "Cloudstar"
+  ],
+  "in": [
+   "OHH",
+   "SKY_WILL",
+   "Killme"
+  ]
+ },
+ {
   "at": "2026-11-12T18:11:08.642Z",
   "kind": "auto-end",
   "team": "ALX",
