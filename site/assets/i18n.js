@@ -192,6 +192,7 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    ['실제 시드는 로스터 변경과 2부 팀의 챌린저 시리즈 포인트까지 반영해 정해지므로, 2부 팀이 프로리그 팀 사이에 들어가는 등 달라질 수 있습니다.', '実際のシードはロスター変更と2部チームのチャレンジャーシリーズポイントまで反映して決まるため、2部チームがプロリーグのチームの間に入るなど変わることがあります。', 'Actual seeds also reflect roster changes and Challenger teams\' series points, so they can differ — a Challenger team may be seeded among Pro League teams.'],
     ['오늘', '今日', 'Today'], ['경기 일정 보기', '試合日程を見る', 'See the schedule'], ['시간 미정', '時間未定', 'Time TBD'],
     ['공식 표기 {t}', '公式表記 {1}', 'Listed as {1}'],
     ['공식 조 표기 확인 필요', '公式の組表記は要確認', 'Group not clear in official data'],

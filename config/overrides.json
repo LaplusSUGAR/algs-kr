@@ -127,10 +127,10 @@
   ],
   "_lcqSchedule": "LCQ 시각을 손으로 정할 때만 쓴다. 평소에는 비워 둔다: 빌드가 공식 API 값을 규정 부록 D4(config/rules/<시즌>.json lcq.schedule, 지역 현지 시각)와 견줘 태평양 시간 임시값·순서가 어긋난 값을 규정 시각으로 바꾼다. 형식: 지역 → { 단계 이름: 시각(+시차), note: 화면에 적을 근거 }. 예: \"emea\": { \"Match Point Finals\": \"2026-11-22T18:00:00+00:00\" }",
   "lcqSchedule": {},
-  "_lcqSeeds": "LCQ 확정 시드(지역 → 1번 시드부터 팀 이름). 주최 측이 조 편성을 확정해 알렸을 때만 적는다. 비워 두면 빌드가 계산한다: 프로리그 팀은 시드 CP 순(선수가 빠지면 내려가고, 넣어서 오르지는 않는다), 그다음 2부 팀은 챌린저 서킷 포인트 순. 이름은 공식 이름·약칭·서킷 이름 어느 것이든 된다. 40팀이 모두 맞지 않으면 빌드가 경고하고 쓰지 않는다.",
+  "_lcqSeeds": "LCQ 확정 시드(지역 → 1번 시드부터 팀 이름). 주최 측이 조 편성을 확정해 알렸을 때만 적는다. 비워 두면 빌드가 계산한다: 프로리그 팀은 로스터 변경을 반영한 CP 순, 그다음 2부 팀은 챌린저 서킷 포인트 순(실제로는 2부 팀의 챌린저 시리즈 포인트도 반영돼 프로리그 팀 사이에 들어갈 수 있다). APAC North는 2026-11-14 재확정본. 이름은 공식 이름·약칭·서킷 이름 어느 것이든 된다. 40팀이 모두 맞지 않으면 빌드가 경고하고 쓰지 않는다.",
   "lcqSeeds": {
-    "apac-n": ["RIDDLEORDER ZERO", "LawsonTicketXone", "KINOTROPE gaming", "NOEZ FOXX", "RIDDLEORDER ONE", "SBI eSports", "TIE", "noEND", "REIGNITE", "SYRALE", "SLEEPY", "BLACK Sheeps", "RRX", "FENNEL", "RED Rams", "ETiAS", "Meteor", "REALIZE", "ALTERNATIVE", "FNATIC", "XECT", "FCN YAMABUN", "4QuattroFormaggi", "UNFAZED",
-      "waked", "0nionz", "SOTEN", "UNLIMIT ACADEMY", "rerereta", "NovaCroatia", "TIR GAMING", "SchweinRequiem", "Cuticle", "iAM", "RIGALRISEJYASHIN", "ORB GARDEN", "GROWGaming", "Salmon and SANMA", "GUNSO", "VAMOS"]
+    "apac-n": ["RIDDLEORDER ZERO", "LawsonTicketXone", "KINOTROPE gaming", "NOEZ FOXX", "RIDDLEORDER ONE", "SBI eSports", "TIE", "noEND", "REIGNITE", "FENNEL", "SYRALE", "SLEEPY", "BLACK Sheeps", "Meteor", "RRX", "RED Rams", "ALTERNATIVE", "ETiAS", "REALIZE", "FNATIC", "XECT", "FCN YAMABUN", "GUNSO", "4QuattroFormaggi",
+      "waked", "TIR GAMING", "UNFAZED", "Cuticle", "SOTEN", "0nionz", "UNLIMIT ACADEMY", "rerereta", "NovaCroatia", "SchweinRequiem", "iAM", "RIGALRISEJYASHIN", "ORB GARDEN", "GROWGaming", "Salmon and SANMA", "VAMOS"]
   },
   "_lcqCcAlias": "LCQ 공식 명단의 2부 팀 이름이 챌린저 서킷 순위표 이름과 달라 자동으로 못 맞출 때만 적는다(지역 → 공식 이름: 서킷 이름). 띄어쓰기·철자 한두 글자 차이, 이름 변경(ccRenames)은 자동으로 맞춘다.",
   "lcqCcAlias": { "apac-n": { "CAC_EST": "waked" } },

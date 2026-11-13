@@ -31,7 +31,7 @@
 | 시리즈 동률 | C7.1 | `tiebreakers.series` | 공식 순위를 그대로 씀 | 사이트가 다시 계산하지 않음 |
 | 매치 포인트 50점 | C5 | `matchPoint.threshold` | 결승 화면의 MP 표시, 규칙 탭 | 화면 코드에 50으로 적혀 있음 |
 | LCQ 출전 팀 | 3.2.5, 3.3.3(B) | `lcq.entry` | 직행권 밖 프로리그 팀 + 2부 우승팀·포인트 상위 팀(Liquipedia), 공식 명단이 나오면 공식 값 | 반영됨 |
-| LCQ 시드 | 3.7.1 | `lcq.seeding`, `lcq.seedNote` | CP 순, 그다음 2부 포인트 순. 두 로비에 지그재그. 로스터 변경으로 CP가 오른 팀은 변경 전(공식) CP로 시드 | 2026-11-11 반영 (그 전에는 ALTERNATIVE가 EIN 합류로 시드가 올라가 있었음) |
+| LCQ 시드 | 3.7.1 | `lcq.seeding`, `lcq.seedNote` | 로스터 변경을 반영한 CP 순, 그다음 2부 포인트 순. 두 로비에 지그재그. 확정 조 편성이 나오면 `overrides.json` 의 `lcqSeeds` 로 고정 | 2026-11-14: 주최 측 확정본이 영입으로 오른 CP와 2부 팀의 챌린저 시리즈 포인트를 반영해, '변경 전 CP' 규칙을 되돌림 |
 | LCQ·챔피언십 진행 방식(단계·진출 팀 수·진행 그림) | C4, 3.7, 3.8 | `brackets.lcq`, `brackets.championship`, `brackets.playoffs` | 화면의 탭·점수표 칸·다음 경기 배정·진행 그림 | 규칙 파일에서 읽음. `check-rules`가 `lcq`·`championship` 숫자와 맞는지 검사 |
 | LCQ 일정(지역 현지 시각) | D1, D4 | `lcq.schedule`, `regions.*.tz` | 공식 API 값이 태평양 시간 임시값이거나 순서가 어긋나면 규정 시각으로 표시 | 2026-11-11 반영 |
 | 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 직행 32팀을 CP 순으로 1~32번, LCQ 8팀을 CP 순(같으면 LCQ 결승 순위)으로 33~40번에 놓고 지그재그(A→B→C→D→D→C→B→A). 공식 명단이 나오면 공식 조 | 근사. 규정은 40팀 전체를 CP 순으로 세우므로, LCQ 팀의 CP가 직행 팀보다 높으면 예상 조 편성이 공식과 다를 수 있음 |
