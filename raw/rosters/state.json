@@ -644,17 +644,6 @@
     "iPN"
    ]
   },
-  "DKF": {
-   "region": "americas",
-   "name": "DKF",
-   "players": [
-    "DROPPED",
-    "knoqd",
-    "Floating",
-    "Jxmo"
-   ],
-   "coaches": []
-  },
   "NE": {
    "region": "apac-n",
    "name": "noEND",
@@ -1177,17 +1166,6 @@
     "ReZumi2"
    ]
   },
-  "DRK": {
-   "region": "americas",
-   "name": "Team Darkspire",
-   "players": [
-    "Lugenta",
-    "Why Envy",
-    "777Fuhhnq",
-    "entityracer"
-   ],
-   "coaches": []
-  },
   "VR": {
    "region": "americas",
    "name": "EBOYS",
@@ -1196,16 +1174,6 @@
     "JamesFearless",
     "LBux",
     "Hoplodamus"
-   ],
-   "coaches": []
-  },
-  "HEAD": {
-   "region": "americas",
-   "name": "Headglytch",
-   "players": [
-    "Zuni",
-    "Rileymekinac",
-    "Melloh"
    ],
    "coaches": []
   },
@@ -1424,6 +1392,38 @@
     "MikeJitsu",
     "ImEurusk",
     "khenzo"
+   ],
+   "coaches": []
+  },
+  "DKF": {
+   "region": "americas",
+   "name": "Geekay Esports",
+   "players": [
+    "DROPPED",
+    "knoqd",
+    "Floating",
+    "Jxmo"
+   ],
+   "coaches": []
+  },
+  "DRK": {
+   "region": "americas",
+   "name": "Team Darkspire",
+   "players": [
+    "Lugenta",
+    "Why Envy",
+    "777Fuhhnq",
+    "entityracer"
+   ],
+   "coaches": []
+  },
+  "HEAD": {
+   "region": "americas",
+   "name": "Headglytch",
+   "players": [
+    "Zuni",
+    "Rileymekinac",
+    "Melloh"
    ],
    "coaches": []
   }

@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-13T04:51:31.740Z",
+  "at": "2026-11-13T18:13:35.333Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -591,18 +591,6 @@
       }
     },
     {
-      "key": "id:01KHPREYPK26VSEXTX14Y1H1GT",
-      "short": "DKF",
-      "name": "DKF",
-      "region": "americas",
-      "src": "official",
-      "lp": {
-        "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
-        "name": "Geekay Esports",
-        "overlap": 3
-      }
-    },
-    {
       "key": "id:01KTSJN9FCV6Q57S7410RHJC1Z",
       "short": "NE",
       "name": "noEND",
@@ -1095,17 +1083,6 @@
       }
     },
     {
-      "key": "id:01KTSJN9MCZXCJV0JJSCS02MNR",
-      "short": "DRK",
-      "name": "Team Darkspire",
-      "region": "americas",
-      "src": null,
-      "lp": {
-        "name": "Team Darkspire",
-        "by": "이름 같음 · 선수 3명 겹침"
-      }
-    },
-    {
       "key": "id:01KHPREXBTGD37GD3ZJ25R7ABW",
       "short": "VR",
       "name": "EBOYS",
@@ -1115,17 +1092,6 @@
         "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
         "name": null,
         "overlap": null
-      }
-    },
-    {
-      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
-      "short": "HEAD",
-      "name": "Headglytch",
-      "region": "americas",
-      "src": "lp",
-      "lp": {
-        "name": "Headglytch",
-        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
@@ -1341,6 +1307,39 @@
         "why": "선수 3명이 겹치지만 이름이 다름 (팀 이름 변경 가능성)",
         "name": "STORM",
         "overlap": 3
+      }
+    },
+    {
+      "key": "id:01KHPREYPK26VSEXTX14Y1H1GT",
+      "short": "DKF",
+      "name": "Geekay Esports",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Geekay Esports",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KTSJN9MCZXCJV0JJSCS02MNR",
+      "short": "DRK",
+      "name": "Team Darkspire",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "Team Darkspire",
+        "by": "이름 같음 · 선수 3명 겹침"
+      }
+    },
+    {
+      "key": "id:01KMF09WJ9SD8N953QP9QBJECX",
+      "short": "HEAD",
+      "name": "Headglytch",
+      "region": "americas",
+      "src": "lp",
+      "lp": {
+        "name": "Headglytch",
+        "by": "이름 같음 · 선수 3명 겹침"
       }
     },
     {
