@@ -1241,3 +1241,38 @@ a.tag.live { text-decoration: none; }
   .tabbar .tab-more a[aria-current='page'] { background: rgba(255, 255, 255, .08); }
   .tabbar .tab-more a[aria-current='page']::before { display: none; }
 }
+
+/* ── 홈 개편 (2026-11): 밝은 바탕은 그대로, 큰 날짜 숫자와 둥근 묶음 탭 ── */
+:root { --r-lg: 16px; --r-sm: 10px; }
+/* 다음 경기 카드 */
+.nx { display: grid; gap: 12px; margin-top: 14px; padding: 18px; background: var(--card); border-radius: var(--r-lg); border-top: 3px solid var(--apex); container-type: inline-size; }
+.nx-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nx h2 { margin: 0; font-size: 13px; font-weight: 700; color: var(--steel); letter-spacing: 0; }
+.nx h2 span:first-child { color: var(--apex); }
+.nx-when { display: flex; align-items: flex-end; gap: 14px; }
+.nx-when strong { font-size: clamp(64px, 22cqw, 96px); font-weight: 800; line-height: .86; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.nx.live .nx-when strong { color: var(--apex); }
+.nx-when > span { display: grid; gap: 2px; padding-bottom: 2px; }
+.nx-when b { font-size: 17px; font-weight: 800; line-height: 1.2; }
+.nx-when b.tbd { color: var(--steel); font-weight: 600; font-size: 14px; }
+.nx-list { list-style: none; margin: 0; padding: 12px 0 0; display: grid; gap: 8px; border-top: 1px solid var(--rule); }
+.nx-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.nx-list li > b { font-size: 14px; }
+.nx-teams { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.nx-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 11px 0 9px; border-radius: 999px; background: var(--paper); font-size: 13px; font-weight: 700; text-decoration: none; color: inherit; }
+.nx-chip::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--steel); }
+.nx-chip.k-team::before { background: var(--kr-team); } .nx-chip.k-member::before { background: var(--kr-member); } .nx-chip.k-coach::before { background: var(--coach); border-radius: 2px; }
+.nx-go { display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: var(--r-sm); background: var(--paper); font-weight: 700; text-decoration: none; color: inherit; }
+.nx-go::after { content: '›'; margin-left: 6px; font-size: 18px; line-height: 1; }
+@media (min-width: 900px) { .nx { grid-template-columns: auto 1fr auto; align-items: center; column-gap: 28px; } .nx-top { grid-column: 1 / -1; } .nx-list { border-top: 0; border-left: 1px solid var(--rule); padding: 0 0 0 24px; } .nx-go { padding: 0 20px; } }
+/* 보기 모드: 칸이 같은 둥근 묶음 탭 */
+.mode-bar .mode-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; max-width: 460px; padding: 0; gap: 0; border-radius: 12px; border: 1px solid var(--rule); background: transparent; overflow: hidden; }
+.mode-bar .mode-seg button { min-height: 44px; padding: 0 6px; border-radius: 0; font-size: 14px; font-weight: 500; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mode-bar .mode-seg button + button { border-left: 1px solid var(--rule); }
+.mode-bar .mode-seg [aria-current='true'] { background: var(--ink); color: var(--paper); font-weight: 800; }
+/* 팀 칩: 둥근 카드 */
+.kchip { border-left: 0; border-radius: 12px; padding: 10px 14px 10px 12px; box-shadow: inset 4px 0 0 var(--kc-col); }
+.kchip:hover { box-shadow: inset 4px 0 0 var(--kc-col), 0 0 0 1.5px var(--kc-col); }
+@media (max-width: 360px) { .mode-bar .mode-seg button { font-size: 12.5px; letter-spacing: -.02em; } .nx { padding: 16px 14px; } }
+.nx-teams small { font-size: 12px; color: var(--steel); font-weight: 700; }
+.home-grid .tbl-wrap { border-radius: 12px; overflow: hidden; }

@@ -412,7 +412,7 @@ function home() {
   const upList = `<div class="up-list">${upMix.map((o) => o.h()).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
-  return `${modeBar}${liveStrip()}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
+  return `${modeBar}${liveStrip()}${nextCard(upcoming)}${seasonEnd()}${evHome}${showFlow ? `<section class="sec flow-sec" aria-labelledby="h-up">
       <div class="sec-head"><h2 class="h2" id="h-up">${esc(ko(A.intl.name, EVENT_KO))} 진출 구조</h2><a class="more" href="#/standings">전체 순위</a></div>
       <div class="flow-grid"><div>${spoil(bracketFlow(B), intlKey(), '진출 결과')}</div><div><h3 class="h3 up-h">다가오는 경기</h3>${upList}<a class="more" href="#/schedule">경기 전체</a></div></div>
     </section>` : ''}
@@ -451,6 +451,23 @@ function lcqState(short) {
   return null;
 }
 // 홈: LCQ에 나가는 관심 팀 (국제전이 진행 중이 아닐 때)
+// 홈 맨 위 '다음 경기' 카드: 관심 팀 경기가 있으면 그 경기, 없으면 가장 가까운 경기. 큰 글자로 남은 날(D-7 · 오늘 · LIVE)을 보여 준다
+//   같은 시각에 시작하는 같은 대회·지역 경기(그룹 A·B)는 한 카드에 묶고, 경기마다 출전하는 관심 팀을 적는다
+function nextCard(upcoming) {
+  const first = upcoming.find((s) => isKrSeries(s)) || upcoming[0];
+  if (!first) return '';
+  const set = upcoming.filter((s) => s.eventId === first.eventId && s.region === first.region && (s.start === first.start || (s.live && first.live))).slice(0, 3);
+  const live = set.some((s) => s.live);
+  const days = Math.round((Date.parse(dayKey(first.start)) - Date.parse(dayKey(new Date(now()).toISOString()))) / 864e5);
+  const big = live ? 'LIVE' : days <= 0 ? '오늘' : `D-${days}`;
+  const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
+  return `<section class="nx${live ? ' live' : ''}" aria-labelledby="h-nx">
+    <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn() : ''}</div>
+    <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : esc(hhmm(first.start))}</b></span></div>
+    <ul class="nx-list">${rows}</ul>
+    <a class="nx-go" href="#/schedule">경기 일정 보기</a>
+  </section>`;
+}
 function lcqHome() {
   const evs = lcqEvents();
   if (!evs.length || intlCurrent() || evs.every((e) => lcqBracket(e).done && now() - new Date(e.end) > 7 * 864e5)) return '';

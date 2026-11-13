@@ -192,6 +192,7 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    ['오늘', '今日', 'Today'], ['경기 일정 보기', '試合日程を見る', 'See the schedule'], ['시간 미정', '時間未定', 'Time TBD'],
     ['공식 표기 {t}', '公式表記 {1}', 'Listed as {1}'],
     ['공식 조 표기 확인 필요', '公式の組表記は要確認', 'Group not clear in official data'],
     ['공식 출전 명단이며, 시드는 주최 측이 확정한 조 편성 순서입니다.', '公式の出場チームで、シードは主催者が確定した組分けの順です。', 'Official entry list; seeds follow the group draw confirmed by the organizer.'],
