@@ -1227,3 +1227,17 @@ a.tag.live { text-decoration: none; }
 .vid-kind small { opacity: .7; }
 .vid.tw .yt { background: #1f1b2e; }
 .tag.vk { background: transparent; border: 1px solid var(--rule); color: var(--steel); }
+
+/* 주 메뉴: 휴대폰은 5개 + 더보기(포인트·규칙), 넓은 화면은 7개를 한 줄에 */
+.tab-more { display: contents; }
+#moreBtn { display: none; }
+@media (max-width: 767px) {
+  .tabbar { grid-template-columns: repeat(6, 1fr); }
+  #moreBtn { display: flex; }
+  #moreBtn.on { color: #fff; } #moreBtn.on svg { color: var(--apex-hot); }
+  .tab-more { display: none; position: absolute; right: 8px; bottom: calc(100% + 8px); min-width: 168px; padding: 6px; border-radius: 14px; background: var(--bar); box-shadow: 0 10px 30px rgba(0, 0, 0, .35); flex-direction: column; gap: 2px; }
+  .tabbar.more-open .tab-more { display: flex; }
+  .tabbar .tab-more a { flex-direction: row; justify-content: flex-start; gap: 10px; padding: 12px 14px; font-size: 14px; border-radius: 10px; }
+  .tabbar .tab-more a[aria-current='page'] { background: rgba(255, 255, 255, .08); }
+  .tabbar .tab-more a[aria-current='page']::before { display: none; }
+}

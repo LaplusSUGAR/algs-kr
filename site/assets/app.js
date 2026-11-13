@@ -236,6 +236,7 @@ function render() {
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
   document.querySelectorAll('.tabbar a').forEach((a) => { if (a.dataset.tab === navTab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  { const mb = document.getElementById('moreBtn'); mb?.classList.toggle('on', !!document.querySelector('#moreMenu a[aria-current]')); closeMore(); } // 더보기 안의 화면이면 더보기에 표시
   board();
   const view = { home, schedule, standings, points, teams, streams, rules, players: playerView }[tab] || home;
   // 지난 시즌 기록을 볼 때: 본문 맨 위에 어느 시즌인지와 돌아가는 링크
@@ -2222,6 +2223,14 @@ function liveStrip() {
     <div class="lv-grid">${L.slice(0, 3).map((l, i) => liveCard(l, i, true)).join('')}</div></section>`;
 }
 // 메뉴의 방송 탭: 방송 중 채널 수, 없으면 새 영상 점
+// 휴대폰 주 메뉴의 '더보기'(포인트·규칙): 누르면 탭 위에 작은 메뉴가 뜬다
+function closeMore() { const bar = document.querySelector('.tabbar'); if (!bar?.classList.contains('more-open')) return; bar.classList.remove('more-open'); document.getElementById('moreBtn')?.setAttribute('aria-expanded', 'false'); }
+function initMore() {
+  const bar = document.querySelector('.tabbar'), btn = document.getElementById('moreBtn'); if (!bar || !btn) return;
+  btn.addEventListener('click', (e) => { e.preventDefault(); const open = bar.classList.toggle('more-open'); btn.setAttribute('aria-expanded', String(open)); if (open) document.querySelector('#moreMenu a')?.focus(); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('#moreBtn, #moreMenu')) closeMore(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && bar.classList.contains('more-open')) { closeMore(); btn.focus(); } });
+}
 function liveBadge() {
   const a = document.querySelector('.tabbar a[data-tab="streams"]'); if (!a) return;
   a.querySelector('.nav-badge')?.remove();
@@ -2549,6 +2558,7 @@ function measureStick() {
 measureStick();
 addEventListener('resize', measureStick);
 footer();
+initMore();
 render();
 pollVer();
 setInterval(pollVer, C.verPollMs || 30000);

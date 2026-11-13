@@ -27,13 +27,14 @@ permissions:
   id-token: write
   actions: write   # next 작업이 다음 실행을 건다
 
-concurrency:
-  group: build-data
-  cancel-in-progress: false
-
+# 동시 실행 제한은 작업별로 둔다: 빌드끼리, 배포끼리만 차례를 지키고, 5분을 기다리는 'next' 작업은 줄을 막지 않는다.
+# (전에는 실행 전체가 한 줄이라, 코드를 올리거나 직접 실행해도 앞 실행의 대기가 끝날 때까지 최대 5분을 기다렸다)
 jobs:
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: build-data
+      cancel-in-progress: false
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
       t0: ${{ steps.t0.outputs.t0 }}
@@ -41,7 +42,10 @@ jobs:
       - name: 시작 시각
         id: t0
         run: echo "t0=$(date +%s)" >> "$GITHUB_OUTPUT"
+      # 실행이 걸린 시점의 커밋이 아니라 지금의 main 을 받는다: 줄을 서 있는 동안 앞 빌드가 데이터를 커밋했어도 그 위에서 이어 간다
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -92,6 +96,9 @@ jobs:
     needs: build
     if: needs.build.outputs.changed == 'true' || (github.event_name != 'schedule' && inputs.chain != '1')
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
     steps:
