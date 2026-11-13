@@ -58,7 +58,7 @@ const season = {
   ...(cfgMine ? {} : { rulesLinks: [['ALGS 대회 구성 안내 (algs.ea.com)', 'https://algs.ea.com/en/competition-overview'], [`Liquipedia ${lpSeasonPage(seasonSlug).replace('/', ' ')}`, lpSeasonUrl]] }),
 };
 const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine: cfgMine && rulesMine, rules: { season: rules.season, edition: rules.source?.edition || null } };
-const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'ccRenames', 'schedExtra'];
+const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'lcqSeeds', 'lcqCcAlias', 'ccRenames', 'schedExtra'];
 const ovRaw = readJson('config/overrides.json', {});
 const ovMine = !ovRaw.season || ovRaw.season === seasonSlug;
 const ov = ovMine ? ovRaw : Object.fromEntries(Object.entries(ovRaw).filter(([k]) => !SEASON_KEYS.includes(k)));
@@ -395,6 +395,9 @@ const ccOf = (region) => {
 // 공식 출전 명단이 나오면 그 팀들, 아직이면 빈 목록 (화면이 CP 순위로 예상 명단을 만든다)
 // 프로리그에 없는 팀(챌린저 서킷)은 xteams에 이름·로고만 둔다
 const xteams = {};
+// 이름 견주기: 글자·숫자만 남긴 소문자, 한두 글자 차이
+const flat = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+const near = (a, b) => { if (Math.abs(a.length - b.length) > 2) return false; const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length] <= 2; };
 const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-qualifier')).map((e) => {
   const raw = algs.lcq?.[e.id] || { teams: [] };
   const ts = raw.teams.map(([id, short, name, seed]) => {
@@ -411,6 +414,30 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
     if (!xteams[key]) xteams[key] = { id: null, short: key, name: c.name, region: e.region, logo: logoOf(`cc:${logoKey(c.name)}`), d2: 1 };
     return { ...c, short: key };
   });
+  // 공식 명단의 2부 팀 ↔ 챌린저 서킷 순위표 팀 (선수 명단·서킷 포인트·바뀐 이름을 붙이려고)
+  //   같은 이름(띄어쓰기·기호 무시) → 옛 이름 → 한두 글자 차이 → 운영자가 적은 짝(lcqCcAlias) → 양쪽에 하나씩만 남으면 그 둘
+  {
+    const alias = ov.lcqCcAlias?.[e.region] || {};
+    const d2 = ts.filter((t) => !t.pl), used = new Set();
+    const link = (t, c) => { if (!c || used.has(c.short)) return; used.add(c.short); t.ccKey = c.short; if (flat(c.name) !== flat(t.name)) { t.off = t.name; t.name = c.name; if (xteams[t.short]) xteams[t.short].name = c.name; } };
+    for (const t of d2) link(t, cc.find((c) => c.name === alias[t.name]));
+    for (const t of d2) if (!t.ccKey) link(t, cc.find((c) => !used.has(c.short) && (flat(c.name) === flat(t.name) || (c.was && flat(c.was) === flat(t.name)))));
+    for (const t of d2) if (!t.ccKey && flat(t.name).length >= 6) link(t, cc.find((c) => !used.has(c.short) && near(flat(c.name), flat(t.name))));
+    const restT = d2.filter((t) => !t.ccKey);
+    if (restT.length) {
+      const n = d2.length, order = [...cc.filter((c) => c.win), ...cc.filter((c) => !c.win)].slice(0, n).filter((c) => !used.has(c.short));
+      if (restT.length === 1 && order.length === 1) link(restT[0], order[0]);
+      else console.warn(`[build] LCQ ${e.region}: 서킷 순위표와 못 맞춘 2부 팀 ${restT.map((t) => t.name).join(', ')} (config/overrides.json lcqCcAlias)`);
+    }
+  }
+  // 확정 시드(운영자 입력): 40팀이 모두 맞을 때만 쓴다
+  const fixed = ov.lcqSeeds?.[e.region];
+  if (fixed?.length && ts.length) {
+    const find = (n) => ts.find((t) => t.short === n) || ts.find((t) => [t.name, t.off, t.ccKey].some((x) => x && flat(x) === flat(n)));
+    const hit = fixed.map(find), miss = fixed.filter((_, i) => !hit[i]);
+    if (!miss.length && new Set(hit).size === ts.length) hit.forEach((t, i) => { t.seed = i + 1; t.seedFixed = 1; });
+    else console.warn(`[build] LCQ ${e.region}: lcqSeeds 를 쓰지 않음 (명단 ${ts.length}팀, 입력 ${fixed.length}팀, 못 찾은 이름: ${miss.join(', ') || '없음'}${new Set(hit).size !== hit.length ? ', 겹친 팀 있음' : ''})`);
+  }
   return { eventId: e.id, slug: e.slug, name: e.name, region: e.region, start: e.start, end: e.end, teams: ts, cc };
 }).sort((a, b) => ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(a.region) - ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(b.region));
 

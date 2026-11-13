@@ -191,6 +191,11 @@
     // 방송 상태 (지금 방송 중, 최근 영상)
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
+    ['공식 표기 {t}', '公式表記 {1}', 'Listed as {1}'],
+    ['공식 출전 명단이며, 시드는 주최 측이 확정한 조 편성 순서입니다.', '公式の出場チームで、シードは主催者が確定した組分けの順です。', 'Official entry list; seeds follow the group draw confirmed by the organizer.'],
+    ['공식 API가 공개한 출전 명단입니다.', '公式APIが公開した出場チームです。', 'Entry list published by the official API.'],
+    ['시드는 공식 값이 나오기 전이라 계산한 순서입니다: 프로리그 팀은 시드 CP 순, 그다음 2부 팀은 챌린저 서킷 포인트 순.', 'シードは公式発表前のため計算した順です：プロリーグのチームはシードCP順、続いて2部チームはチャレンジャーサーキットポイント順。', 'Seeds are calculated until official ones are out: Pro League teams by seeding CP, then Challenger teams by Challenger Circuit points.'],
+    ['선수가 빠지면 시드 CP가 그만큼 내려가고, 선수를 넣어서 오르지는 않습니다(공식 규정 3.7.1).', '選手が抜けるとその分シードCPが下がり、選手を加えても上がりません（公式ルール3.7.1）。', 'Removing a player lowers seeding CP by that share; adding a player never raises it (rule 3.7.1).'],
     ['등록된 채널에 최근 3주 동안 올라온 YouTube 영상과 Twitch 지난 방송입니다. 쇼츠는 따로 모았습니다.', '登録チャンネルの直近3週間のYouTube動画とTwitchの過去配信です。ショートは別にまとめています。', 'YouTube videos and past Twitch broadcasts from the registered channels in the last three weeks. Shorts are listed separately.'],
     ['다시보기', 'アーカイブ', 'Past broadcast'], ['쇼츠', 'ショート', 'Shorts'], ['Twitch에서 보기', 'Twitchで見る', 'Watch on Twitch'],
     ['{n}시간 {n}분 방송', '{1}時間{2}分の配信', '{1}h {2}m stream'], ['{n}분 방송', '{1}分の配信', '{1}m stream'],
