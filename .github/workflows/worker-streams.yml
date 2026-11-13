@@ -69,4 +69,4 @@ jobs:
             if echo "$body" | jq -e '.live' >/dev/null 2>&1; then break; fi
             sleep 10
           done
-          echo "$body" | jq '{at, ok, err, calls, live: [.live[] | select(.intl | not) | {who, platform, viewers, title}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), twitchVods: ([.videos[] | select(.platform == "twitch")] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}], firstVods: ([.videos[] | select(.platform == "twitch")][:3] | map({who, title, dur, thumb: (.thumb != null)}))}'
+          echo "$body" | jq '{at, ok, err, calls, live: [.live[] | select(.intl | not) | {who, platform, viewers, title}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'

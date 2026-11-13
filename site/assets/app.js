@@ -2179,7 +2179,7 @@ const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => l.kind === 
 // 진행 중인 경기 옆 '중계 보기': 공식 중계가 켜져 있으면 그 방송을 방송 탭에서 바로 열고, 켜진 중계를 못 찾으면 공식 중계 채널 목록으로
 const officialLive = () => { const L = (ST?.live || []).filter((l) => l.kind === 'official'); const pref = I.lang === 'ja' ? 'o:ja' : 'o:en'; return L.find((l) => l.key === pref && l.embed) || L.find((l) => l.embed) || L[0] || null; };
 const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive(); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
-const newVideos = () => (ST?.videos || []).filter((v) => !v.short && vidSeen0 && Date.parse(v.published) > vidSeen0);
+const newVideos = () => (ST?.videos || []).filter((v) => !v.short && v.platform !== 'twitch' && vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0`);
@@ -2208,13 +2208,13 @@ function liveSection() {
     <div class="lv-player" id="lvPlayer" hidden></div>
     <div class="lv-grid">${L.map((l, i) => liveCard(l, i)).join('')}</div>${others}${foot}</section>`;
 }
-// 최근 영상: 영상(YouTube 긴 영상 + Twitch 다시보기) / 다시보기만 / 쇼츠. 쇼츠는 기본 목록에서 빼고 따로 모은다
+// 최근 영상: 영상(YouTube 긴 영상) / 쇼츠. 쇼츠는 기본 목록에서 빼고 따로 모은다
 const durTxt = (d) => { const m = /^(?:(\d+)h)?(?:(\d+)m)?/.exec(d || ''), h = +(m?.[1] || 0), mi = +(m?.[2] || 0); return h ? `${h}시간 ${mi}분 방송` : mi ? `${mi}분 방송` : ''; };
 function videoSection(q) {
   if (!C.streamsUrl || !ST) return '';
   const all = ST.videos || [], more = q.get('v') === 'all';
   if (!all.length) return '';
-  const G = { main: all.filter((v) => !v.short), vod: all.filter((v) => v.platform === 'twitch'), short: all.filter((v) => v.short) };
+  const G = { main: all.filter((v) => !v.short && v.platform !== 'twitch'), short: all.filter((v) => v.short) };
   const kind = G[q.get('vk')]?.length ? q.get('vk') : G.main.length ? 'main' : 'short';
   const cur = G[kind], list = more ? cur : cur.slice(0, 8);
   const day = (iso) => dayLabel(dayKey(iso));
@@ -2225,10 +2225,10 @@ function videoSection(q) {
     return `<figure class="vid${tw ? ' tw' : ''}"><button class="yt" type="button" ${tw ? `data-tw="${esc(v.id)}"` : `data-yt="${esc(v.id)}"`} aria-label="${esc(v.title)} 재생">${v.thumb ? `<img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="${tw ? 270 : 360}">` : ''}<span class="yt-play" aria-hidden="true"></span></button>
     <figcaption><b>${isNew ? '<span class="tag live">새 영상</span> ' : ''}${kindTag}${esc(v.title)}</b><span>${esc(v.kind === 'player' ? v.who : v.channel || v.who)} · ${esc(day(v.published))}${tw && durTxt(v.dur) ? ` · <span>${durTxt(v.dur)}</span>` : ''} · ${link}</span></figcaption></figure>`;
   };
-  const tabs = [['main', '영상'], ['vod', '다시보기'], ['short', '쇼츠']].filter(([k]) => G[k].length);
+  const tabs = [['main', '영상'], ['short', '쇼츠']].filter(([k]) => G[k].length);
   const seg = tabs.length > 1 ? `<div class="seg vid-kind" role="group" aria-label="영상 종류">${tabs.map(([k, t]) => `<a href="${qsLink('/streams', q, { vk: k === 'main' ? null : k, v: null, play: null })}" aria-current="${k === kind}"><span>${t}</span> <small>${G[k].length}</small></a>`).join('')}</div>` : '';
   return `<section class="sec" id="vids"><h2 class="h2">최근 영상 <small class="muted">${G.main.length}</small></h2>
-    <p class="lead">등록된 채널에 최근 3주 동안 올라온 YouTube 영상과 Twitch 지난 방송입니다. 쇼츠는 따로 모았습니다.</p>
+    <p class="lead">등록된 채널에 최근 3주 동안 올라온 YouTube 영상입니다. 쇼츠는 따로 모았습니다.</p>
     ${seg}<div class="vid-grid">${list.map(card).join('')}</div>
     ${cur.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${cur.length}개 모두 보기</a></p>` : ''}</section>`;
 }

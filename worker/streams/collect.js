@@ -11,7 +11,7 @@ const isApex = (...texts) => texts.some((t) => APEX.test(String(t || '')));
 
 // 호출 예산: Cloudflare 무료 요금제는 요청 하나에 외부 호출(fetch + 캐시 읽기·쓰기)이 50회까지다.
 //   그래서 (1) 기억해 둘 값은 전부 저장소 항목 하나('state')에 담아 읽기 1회·쓰기 1회로 끝내고,
-//   (2) 꼭 필요한 호출(방송 중 확인)을 먼저 셈한 뒤, 남는 횟수 안에서만 덜 급한 갱신(영상 피드 → 다시보기 → 쇼츠)을 오래된 것부터 한다.
+//   (2) 꼭 필요한 호출(방송 중 확인)을 먼저 셈한 뒤, 남는 횟수 안에서만 덜 급한 갱신(영상 피드 → 쇼츠)을 오래된 것부터 한다.
 //   이번에 못 한 갱신은 저장해 둔 값을 그대로 쓰고 다음 요청(약 1분 뒤)에서 이어서 한다.
 export async function collect({ env, fetch: rawFetch, store, now }) {
   const BUDGET = Number(env.SUBREQ_BUDGET || 40); // Worker 본체의 응답 캐시 읽기·쓰기 몫을 남겨 둔 값
@@ -20,7 +20,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   const out = { at: new Date(now).toISOString(), ok: { twitch: null, youtube: null, chzzk: null }, err: {}, live: [], videos: [] };
   used++;
   const S = (await safe(() => store.get('state')))[0] || {};
-  for (const k of ['ytIds', 'feeds', 'uids', 'vods', 'shorts']) S[k] = S[k] || {};
+  for (const k of ['ytIds', 'feeds', 'shorts']) S[k] = S[k] || {};
   let dirty = false;
   const stale = (at, sec) => !at || now - at > sec * 1000;
   const finish = async () => {
@@ -40,13 +40,12 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   // intl: 한국 관련이 아닌 선수. 사이트는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시에만 쓴다
   const meta = (c) => ({ key: c.key, who: c.who, team: c.team || null, kind: c.kind, ...(c.intl ? { intl: true } : {}) });
   const days = Number(env.VIDEO_DAYS || 21), since = now - days * 864e5;
-  let ytVideos = [], twVideos = []; // 최근 영상: YouTube 업로드 + Twitch 지난 방송(다시보기)
+  let ytVideos = []; // 최근 영상: YouTube 업로드
 
   // 그 밖의 선수(전 팀)는 Twitch만, Apex 방송일 때만
   const tw = chs.filter((c) => c.twitch).concat(S.channels.intl.map(([login, who, team]) => ({ key: `p:${String(who).toLowerCase()}`, who, team, kind: 'player', intl: true, apexOnly: true, twitch: login })));
   const twOn = !!(tw.length && env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET);
   const byLogin = new Map(); for (const c of tw) { const k = c.twitch.toLowerCase(); if (!byLogin.has(k)) byLogin.set(k, c); } // 같은 채널이면 앞(한국 관련·공식)이 우선
-  const vc = twOn ? chs.filter((c) => c.twitch && c.kind === 'player' && !c.intl) : []; // 다시보기를 모을 채널: 한국 관련 선수
   const yt = chs.filter((c) => c.youtube);
   const cz = chs.filter((c) => c.chzzk);
   const ytId = (c) => { const v = String(c.youtube); return /^UC[\w-]{22}$/.test(v) ? v : S.ytIds[v.replace(/^@/, '').toLowerCase()] || null; };
@@ -60,10 +59,6 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   const idNow = idTodo.slice(0, take(idTodo.length));
   const feedStale = oldest(yt.filter((c) => idNow.includes(c) || (ytId(c) && stale(S.feeds[ytId(c)]?.at, 300))), (c) => S.feeds[ytId(c)]?.at);
   const feedNow = new Set(feedStale.slice(0, take(feedStale.length)));
-  const uidTodo = vc.map((c) => c.twitch.toLowerCase()).filter((k) => !S.uids[k]);
-  const uidNow = uidTodo.length ? take(1) === 1 : false;
-  const vodStale = oldest(vc.filter((c) => (S.uids[c.twitch.toLowerCase()] || uidNow) && stale(S.vods[c.twitch.toLowerCase()]?.at, 600)), (c) => S.vods[c.twitch.toLowerCase()]?.at);
-  const vodNow = vodStale.slice(0, take(vodStale.length));
   const shortStale = oldest(yt.filter((c) => ytId(c) && stale(S.shorts[ytId(c)]?.at, 1800)), (c) => S.shorts[ytId(c)]?.at);
   const shortNow = shortStale.slice(0, take(shortStale.length));
   const jobs = [];
@@ -87,25 +82,6 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
         out.live.push({ ...meta(c), platform: 'twitch', title: s.title || '', game: s.game_name || '', viewers: s.viewer_count ?? null, started: s.started_at || null, thumb: String(s.thumbnail_url || '').replace('{width}', '640').replace('{height}', '360'), url: `https://www.twitch.tv/${s.user_login}`, embed: { type: 'twitch', channel: s.user_login } });
       }
     }));
-    // 지난 방송(다시보기): 채널마다 10분에 한 번, 지금 방송 중인 회차는 뺀다
-    const [, vodErr] = await safe(async () => {
-      if (uidNow) {
-        const j = await getJson(f, `https://api.twitch.tv/helix/users?${uidTodo.slice(0, 100).map((l) => `login=${encodeURIComponent(l)}`).join('&')}`, H);
-        for (const u of j.data || []) S.uids[String(u.login).toLowerCase()] = u.id;
-        dirty = true;
-      }
-      await Promise.all(vodNow.map(async (c) => {
-        const k = c.twitch.toLowerCase(), uid = S.uids[k];
-        if (!uid) { used++; return; } // 계획에 잡아 둔 한 번을 쓰지 않았지만 셈은 맞춘다(없는 채널)
-        const [j] = await safe(() => getJson(f, `https://api.twitch.tv/helix/videos?user_id=${uid}&type=archive&first=8`, H));
-        if (!j) return;
-        S.vods[k] = { at: now, items: (j.data || []).map((v) => ({ id: String(v.id), title: v.title || '', published: v.published_at || v.created_at, thumb: String(v.thumbnail_url || '').replace('%{width}', '640').replace('%{height}', '360'), dur: v.duration || '', stream: v.stream_id || null })) };
-        dirty = true;
-      }));
-    });
-    if (vodErr) out.err.twitchVod = vodErr;
-    for (const c of vc) for (const v of S.vods[c.twitch.toLowerCase()]?.items || []) if (v.published && Date.parse(v.published) >= since && !(v.stream && liveStreamIds.has(String(v.stream))))
-      twVideos.push({ ...meta(c), platform: 'twitch', id: v.id, title: v.title, published: v.published, thumb: v.thumb || null, channel: c.who, dur: v.dur });
   }).then(([, e]) => { out.ok.twitch = !e; if (e) out.err.twitch = e; }));
   else if (tw.length) out.err.twitch = 'no key';
 
@@ -171,15 +147,15 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   }).then(([, e]) => { out.ok.chzzk = !e; if (e) out.err.chzzk = e; }));
 
   await Promise.all(jobs);
-  // 영상(긴 영상·다시보기)과 쇼츠를 따로 자른다: 쇼츠가 많은 채널이 목록을 밀어내지 않게
+  // 영상과 쇼츠를 따로 자른다: 쇼츠가 많은 채널이 목록을 밀어내지 않게
   const byNew = (a, b) => Date.parse(b.published) - Date.parse(a.published);
-  const all = [...ytVideos, ...twVideos].sort(byNew);
+  const all = ytVideos.slice().sort(byNew);
   out.videos = [...all.filter((v) => !v.short).slice(0, 60), ...all.filter((v) => v.short).slice(0, 30)].sort(byNew);
   out.live.sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
   // 지금 목록에 없는 채널의 기억은 지운다
-  const keepYt = new Set(yt.map(ytId).filter(Boolean)), keepTw = new Set(vc.map((c) => c.twitch.toLowerCase()));
+  const keepYt = new Set(yt.map(ytId).filter(Boolean));
   for (const k of Object.keys(S.feeds)) if (!keepYt.has(k)) { delete S.feeds[k]; delete S.shorts[k]; dirty = true; }
-  if (twOn) for (const k of Object.keys(S.vods)) if (!keepTw.has(k)) { delete S.vods[k]; dirty = true; }
+  if (S.vods || S.uids) { delete S.vods; delete S.uids; dirty = true; } // 예전 Twitch 다시보기 기억은 지운다
   return finish();
 }
 
