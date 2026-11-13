@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-13T00:28:29.641Z",
+  "at": "2026-11-13T00:38:48.151Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1645,6 +1645,187 @@
       }
     },
     {
+      "key": "id:01KTSJN9DK2KHF835B3JJX52DC",
+      "short": "OZ",
+      "name": "0nionz",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "0nionz",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9FSFV7WCPFRY5P76R31",
+      "short": "CAC",
+      "name": "CAC_EST",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMSGP3Q7VC3NGTFK6144T",
+      "short": "CLE",
+      "name": "Cuticle",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "Cuticle",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9DZM96H1S7BDZR53W4M",
+      "short": "GG",
+      "name": "GROWGaming",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "GROW Gaming",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KKCH1ZW9RYJD6VCEJGVN790J",
+      "short": "GS",
+      "name": "GUNSO",
+      "region": "apac-n",
+      "src": "official",
+      "lp": {
+        "name": "GUNSO",
+        "by": "이름 같음 · 선수 2명 겹침"
+      }
+    },
+    {
+      "key": "id:01M6ZJMS2XNVS567C1DDBG8ZW2",
+      "short": "IAM",
+      "name": "iAM",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "iAM",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRGN40Y6WPN7NGHAT2M9",
+      "short": "LT",
+      "name": "Laugh Tale",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Laugh Tale",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRDDVCAP5D9B7T7J7HFC",
+      "short": "NOVA",
+      "name": "NovaCroatia",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMREJNC9SQ8F407MXJ961",
+      "short": "RT",
+      "name": "rerereta",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "rerereta",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRYVGQBDX9JJAB5T7P78",
+      "short": "RRJ",
+      "name": "RIGALRISEJYASHIN",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMRBW7DR7E7PMHS6VERRQ",
+      "short": "SSS",
+      "name": "Salmon and SANMA",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMR95EX2ASVT4M8TY5NBT",
+      "short": "SRE",
+      "name": "SchweinRequiem",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "SchweinRequiem",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KTSJN9EEDKVNFF7XNN188HZ6",
+      "short": "ST",
+      "name": "SOTEN",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "SOTEN",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01KME2AGXES54T9244CGWABRHZ",
+      "short": "TIR",
+      "name": "TIR GAMING",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "TIR GAMING",
+        "by": "이름 같음 · 선수 1명 겹침"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRP578DPEEQKVKT7BT5D",
+      "short": "UNLA",
+      "name": "UNLIMIT ACADEMY",
+      "region": "apac-n",
+      "src": "lp",
+      "lp": {
+        "name": "UNLIMIT",
+        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "id:01M6ZJMRHM0PSWJ9TXGPX3J4PV",
+      "short": "VMS",
+      "name": "VAMOS",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
       "key": "id:01KTSJNABRTD7BVQV2647Y9HHN",
       "short": "ASD",
       "name": "asd",
@@ -1833,26 +2014,6 @@
       }
     },
     {
-      "key": "cc:0nionz",
-      "name": "0nionz",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "0nionz",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Butteramn, M1kyEGAO, Halneyyy)"
-      }
-    },
-    {
-      "key": "cc:laughtale",
-      "name": "Laugh Tale",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "Laugh Tale",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Lemon, YuRyo, Aqua)"
-      }
-    },
-    {
       "key": "cc:teamtomodachi",
       "name": "Team Tomodachi",
       "region": "apac-n",
@@ -1870,16 +2031,6 @@
       "lp": {
         "name": "waked",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Minun2nd, Mirytaya, Tarumeeen)"
-      }
-    },
-    {
-      "key": "cc:soten",
-      "name": "SOTEN",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "SOTEN",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: ZkYuTa, NIKO215, Mido)"
       }
     },
     {
@@ -1903,56 +2054,6 @@
       }
     },
     {
-      "key": "cc:rerereta",
-      "name": "rerereta",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "rerereta",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: KEISUKEFROMRYUQ, KANAMEDAISUKIMAN, Rerereta)"
-      }
-    },
-    {
-      "key": "cc:tirgaming",
-      "name": "TIR GAMING",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "TIR GAMING",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: APOLLONIA, Lily, Splash)"
-      }
-    },
-    {
-      "key": "cc:schweinrequiem",
-      "name": "SchweinRequiem",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "SchweinRequiem",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Maki, Eden, Lsalza)"
-      }
-    },
-    {
-      "key": "cc:cuticle",
-      "name": "Cuticle",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "Cuticle",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: 7ne, Gqzeln, Milim)"
-      }
-    },
-    {
-      "key": "cc:iam",
-      "name": "iAM",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "iAM",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Sayagiu, Ugiugii, Doramin)"
-      }
-    },
-    {
       "key": "cc:jyashin",
       "name": "JYASHIN",
       "region": "apac-n",
@@ -1963,16 +2064,6 @@
       }
     },
     {
-      "key": "cc:growgaming",
-      "name": "GROW Gaming",
-      "region": "apac-n",
-      "src": "lp",
-      "lp": {
-        "name": "GROW Gaming",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Gongon, IBUZOSQN, Nene)"
-      }
-    },
-    {
       "key": "cc:astranova",
       "name": "AstraNova",
       "region": "apac-n",
@@ -1980,16 +2071,6 @@
       "lp": {
         "name": "AstraNova",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Takuma, Yutaku7796, Ice7)"
-      }
-    },
-    {
-      "key": "cc:gunso",
-      "name": "GUNSO",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "GUNSO",
-        "by": "Liquipedia 서킷 순위표의 팀 (선수: Ouzia, 0FERU, TenTen)"
       }
     },
     {

@@ -818,6 +818,48 @@
       "logos/t/e3036224"
     ]
   },
+  "id:01M6ZJMSGP3Q7VC3NGTFK6144T": {
+    "src": "lp",
+    "f": [
+      "logos/t/34331309",
+      "logos/t/34331309"
+    ]
+  },
+  "id:01KTSJN9DZM96H1S7BDZR53W4M": {
+    "src": "lp",
+    "f": [
+      "logos/t/06adc65b",
+      "logos/t/06adc65b"
+    ]
+  },
+  "id:01KKCH1ZW9RYJD6VCEJGVN790J": {
+    "src": "official",
+    "f": [
+      "logos/t/9cac3b8b",
+      "logos/t/ce1f1c7a"
+    ]
+  },
+  "id:01KTSJN9EEDKVNFF7XNN188HZ6": {
+    "src": "lp",
+    "f": [
+      "logos/t/4507137a",
+      "logos/t/4507137a"
+    ]
+  },
+  "id:01KME2AGXES54T9244CGWABRHZ": {
+    "src": "lp",
+    "f": [
+      "logos/t/3e3d520f",
+      "logos/t/b129d9fa"
+    ]
+  },
+  "id:01M6ZJMRP578DPEEQKVKT7BT5D": {
+    "src": "lp",
+    "f": [
+      "logos/t/edd00d5d",
+      "logos/t/edd00d5d"
+    ]
+  },
   "id:01M6ZJMQRZ0R5Z6319MXH7BB0T": {
     "src": "lp",
     "f": [
@@ -853,13 +895,6 @@
       "logos/t/5716c6b5"
     ]
   },
-  "cc:soten": {
-    "src": "lp",
-    "f": [
-      "logos/t/4507137a",
-      "logos/t/4507137a"
-    ]
-  },
   "cc:unlimitacademy": {
     "src": "lp",
     "f": [
@@ -867,32 +902,11 @@
       "logos/t/edd00d5d"
     ]
   },
-  "cc:tirgaming": {
-    "src": "lp",
-    "f": [
-      "logos/t/3e3d520f",
-      "logos/t/b129d9fa"
-    ]
-  },
-  "cc:cuticle": {
-    "src": "lp",
-    "f": [
-      "logos/t/34331309",
-      "logos/t/34331309"
-    ]
-  },
   "cc:jyashin": {
     "src": "lp",
     "f": [
       "logos/t/860ad9ab",
       "logos/t/860ad9ab"
-    ]
-  },
-  "cc:growgaming": {
-    "src": "lp",
-    "f": [
-      "logos/t/06adc65b",
-      "logos/t/06adc65b"
     ]
   },
   "cc:astranova": {
