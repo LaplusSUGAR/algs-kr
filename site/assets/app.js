@@ -983,7 +983,8 @@ function lcqEntrants(ev) {
   }
   E.groupSrc = lobby.a?.length || lobby.b?.length ? 'official' : 'snake';
   const off = E.groupSrc === 'official';
-  const gOf = (t, i) => { const a = !!lobby.a?.includes(t.short), b = !!lobby.b?.includes(t.short); return a !== b ? (a ? 'a' : 'b') : off ? null : lcqGroupOf(i); };
+  // 확정 시드가 있으면 조는 그 시드의 지그재그 자리다(확정본이 곧 조 편성이므로, 공식 API 조 명단의 오류·지연보다 우선한다)
+  const gOf = (t, i) => { if (t.seedFixed) return lcqGroupOf(t.seed - 1); const a = !!lobby.a?.includes(t.short), b = !!lobby.b?.includes(t.short); return a !== b ? (a ? 'a' : 'b') : off ? null : lcqGroupOf(i); };
   E.list = E.list.map((t, i) => ({ ...t, seedN: t.seed ?? i + 1, group: gOf(t, i) }));
   if (off) { // 공식 조 명단에 두 조 모두 적혔거나 어느 조에도 없는 팀(공식 자료 오류): 자리가 남는 조에 넣고 표시한다
     const half = Math.ceil(E.list.length / 2), n = { a: E.list.filter((t) => t.group === 'a').length, b: E.list.filter((t) => t.group === 'b').length };
