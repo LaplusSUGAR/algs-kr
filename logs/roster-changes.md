@@ -4,6 +4,8 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-14 14:04 | 자동 반영 (Liquipedia) | Americas | PRES (W Press) | Dexican | ImMadness |
+| 2026-11-14 14:04 | 자동 반영 (Liquipedia) | APAC North | UFZ (UNFAZED) | kumaryu, vicky |  |
 | 2026-11-13 18:03 | 2부 팀 이름 변경 | APAC South | HKUF |  | 구 HungKuang Falcon |
 | 2026-11-13 18:03 | 2부 팀 명단 변경 | APAC South | Future Top Squad | Cloudstar |  |
 | 2026-11-13 18:03 | 2부 팀 명단 변경 | APAC South | EvolutionV | Doro, inori, B8O0WW, Cloudstar | OHH, SKY_WILL, Killme |
@@ -191,7 +193,7 @@
 | VR (EBOYS) | Americas | Hoplodamus |  |
 | SO (Sesame oil) | Americas |  | Brick |
 | URNM (Unreal Nightmare) | Americas | MaliceMamba |  |
-| DKF | Americas | DROPPED, Jxmo |  |
+| DKF (Geekay Esports) | Americas | DROPPED, Jxmo |  |
 | HAB | APAC South | Nonameguy |  |
 | DF (DreamFire) | APAC South | thurston, AceGod | Sid0o, 3Mz |
 | PF2 (PlayFor2nd) | EMEA | Faenex, Nono, Feuda | Hiarka, Slab |

@@ -2052,6 +2052,15 @@
    "since": "2026-11-09T11:01:49.100Z"
   },
   {
+   "team": "UFZ",
+   "out": [
+    "kumaryu",
+    "vicky"
+   ],
+   "in": [],
+   "since": "2026-11-14T05:04:19.838Z"
+  },
+  {
    "team": "FNC",
    "out": [
     "EIN"
@@ -2256,6 +2265,16 @@
     "Floating"
    ],
    "since": "2026-11-12T18:11:08.642Z"
+  },
+  {
+   "team": "PRES",
+   "out": [
+    "Dexican"
+   ],
+   "in": [
+    "ImMadness"
+   ],
+   "since": "2026-11-14T05:04:19.838Z"
   },
   {
    "team": "HEAD",
