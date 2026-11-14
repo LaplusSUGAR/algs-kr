@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-13T18:13:35.333Z",
+  "at": "2026-11-14T00:35:31.702Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1366,7 +1366,7 @@
     },
     {
       "key": "id:01M6ZJMR0X4D1YWZV5GXQ7B99Y",
-      "short": "AURA",
+      "short": "AURA2",
       "name": "Aura",
       "region": "americas",
       "src": null,
@@ -1679,7 +1679,7 @@
     },
     {
       "key": "id:01KTSJN9DZM96H1S7BDZR53W4M",
-      "short": "GG",
+      "short": "GROW",
       "name": "GROWGaming",
       "region": "apac-n",
       "src": "lp",
@@ -1848,7 +1848,7 @@
     },
     {
       "key": "id:01M6ZJMQRZ0R5Z6319MXH7BB0T",
-      "short": "BB",
+      "short": "BURG",
       "name": "Burger Boys",
       "region": "emea",
       "src": "lp",
@@ -2003,7 +2003,7 @@
     },
     {
       "key": "id:01KTSJNABFW0TWT5B8E9AW4X64",
-      "short": "VOID",
+      "short": "VE",
       "name": "VOID ESPORTS",
       "region": "emea",
       "src": "lp",
