@@ -299,20 +299,25 @@ async function collect(season, prev) {
         const ts = (sT[k]?.teams || []).filter((t) => t.shortName);
         if (ts.length) { lineIds[s.id] = ts.map((t) => t.teamId); for (const t of ts) add(t); }
       }
-      // 같은 대회에 약칭이 같은 팀이 있으면(예: EMEA의 MEOW 두 팀) 이름이 약칭과 같은 팀만 그 약칭을 쓰고, 나머지는 이름 머리글자로 바꾼다
-      const taken = new Set(out.teams.map((t) => t[1])), flat = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+      // 약칭이 겹치는 팀은 약칭을 바꾼다. 두 경우:
+      //   (1) 같은 대회에 약칭이 같은 팀이 둘(예: EMEA의 MEOW 두 팀) → 이름이 약칭과 같은 팀만 그 약칭을 쓴다
+      //   (2) 2부 팀의 약칭이 다른 프로리그 팀과 같다(예: GROWGaming 'GG' = GaiminGladiators 'GG') → 2부 팀 쪽을 바꾼다. 안 바꾸면 사이트가 그 프로리그 팀으로 착각한다
+      const plShort = new Map(cp.map((r) => [r[3], r[1]])); // 프로리그 팀 약칭 → 팀 ID
+      const taken = new Set([...out.teams.map((t) => t[1]), ...plShort.keys()]), flat = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+      const rename = (t, sh) => {
+        const words = String(t[2]).split(/[^\p{L}\p{N}]+/u).filter(Boolean), one = words.join('');
+        const cands = [words.length > 1 ? words.map((w) => w[0]).join('') : '', (words[0] || '').slice(0, 4), (words[0] || '').slice(0, 6), one.slice(0, 8)].map((c) => c.toUpperCase()).filter((c) => c.length >= 2);
+        let c = cands.find((x) => !taken.has(x)), k = 2;
+        if (!c) { const base = cands[0] || sh; do c = `${base}${k++}`; while (taken.has(c)); }
+        taken.add(c); dupShort[t[0]] = c;
+      };
       const byShort = {};
       for (const t of out.teams) (byShort[t[1]] ||= []).push(t);
       for (const [sh, g] of Object.entries(byShort)) {
-        if (g.length < 2 || !sh) continue;
-        const keep = g.find((t) => !dupShort[t[0]] && flat(t[2]) === flat(sh)) || g.find((t) => !dupShort[t[0]]) || g[0];
-        for (const t of g) {
-          if (t === keep || dupShort[t[0]]) continue;
-          const words = String(t[2]).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
-          let c = (words.length > 1 ? words.map((w) => w[0]).join('') : (words[0] || sh).slice(0, 4)).toUpperCase(), k = 2;
-          const base = c; while (taken.has(c)) c = `${base}${k++}`;
-          taken.add(c); dupShort[t[0]] = c;
-        }
+        if (!sh) continue;
+        const plId = plShort.get(sh);
+        const keep = g.find((t) => t[0] === plId) || (plId ? null : g.find((t) => !dupShort[t[0]] && flat(t[2]) === flat(sh)) || g.find((t) => !dupShort[t[0]]) || g[0]);
+        for (const t of g) if (t !== keep && !dupShort[t[0]]) rename(t, sh);
       }
       for (const t of out.teams) if (dupShort[t[0]]) { t[1] = dupShort[t[0]]; dupName[`${e.id}|${flatN(t[2])}`] = t[1]; }
       const shortOf = Object.fromEntries(out.teams.map((t) => [t[0], t[1]]));
