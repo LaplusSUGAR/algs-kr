@@ -3,7 +3,9 @@
   "_season": "아래 시즌 보정(rosterMoves, rosterAutoIgnore, cpSubs, cpRosterAdd, lcqSchedule, ccRenames)이 어느 시즌 것인지. 메인 시즌이 이 값과 다르면 빌드가 그 보정들을 쓰지 않는다(지난 시즌 이적을 새 시즌 로스터에 적용하지 않게). 새 시즌에 보정을 적기 시작할 때 이 값을 바꾸고 지난 시즌 줄은 지운다(사본은 archive/<시즌>/config/ 에 남아 있다). teams·streams는 시즌과 상관없이 쓴다.",
   "season": "year-6",
   "teams": {},
-  "streams": [],
+  "streams": [
+    { "team": "FNC", "name": "sedna", "role": "coach", "links": { "twitch": null, "chzzk": "https://chzzk.naver.com/8415f61e82d0f1ffed67ea40d69507c4", "youtube": null, "soop": null } }
+  ],
   "_cpSubs": "국제전 대체 출전(비자 문제 등). 빠진 선수(out)는 그 대회 CP를 받지 않고, 대체 선수(in)가 출전 팀 순위의 CP를 받아 원래 소속팀(home) 합계에 반영된다. 이름은 공식 API 표기. 키는 이벤트 슬러그.",
   "cpSubs": {
     "split-2-playoffs": [

@@ -192,6 +192,8 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    ['스트리머', 'ストリーマー', 'Streamer'], ['전 프로', '元プロ', 'Former pro'], ['한국 스트리머·전 프로', '韓国のストリーマー・元プロ', 'Korean streamers & former pros'],
+    ['대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.', '大会選手ではありませんが、Apexを配信しているチャンネルです。配信中の表示はApex配信のときだけ出ます。', 'Not tournament players, but channels that stream Apex. The live badge appears only while they stream Apex.'],
     ['실제 시드는 로스터 변경과 2부 팀의 챌린저 시리즈 포인트까지 반영해 정해지므로, 2부 팀이 프로리그 팀 사이에 들어가는 등 달라질 수 있습니다.', '実際のシードはロスター変更と2部チームのチャレンジャーシリーズポイントまで反映して決まるため、2部チームがプロリーグのチームの間に入るなど変わることがあります。', 'Actual seeds also reflect roster changes and Challenger teams\' series points, so they can differ — a Challenger team may be seeded among Pro League teams.'],
     ['오늘', '今日', 'Today'], ['경기 일정 보기', '試合日程を見る', 'See the schedule'], ['시간 미정', '時間未定', 'Time TBD'],
     ['공식 표기 {t}', '公式表記 {1}', 'Listed as {1}'],

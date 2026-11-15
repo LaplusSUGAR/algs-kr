@@ -480,13 +480,17 @@ const playerStreams = algs.krStreams.map(([team, name, role, provider, ch]) => {
   const links = Object.fromEntries(PLATFORMS.map((p) => [p, null]));
   if (provider && PLATFORMS.includes(provider)) links[provider] = streamUrl(provider, ch);
   for (const src of [lpLinks(name), manual(name)]) for (const p of PLATFORMS) if (src[p]) links[p] = src[p];
-  return { team, name, role, links, mix: rp?.mix ? 1 : 0 };
-}).filter((p) => teams[shortToId[p.team]]?.current !== false).sort((a, b) => (a.role === 'coach') - (b.role === 'coach'));
+  return { team, name, role, links, mix: rp?.mix ? 1 : 0, gone: teams[shortToId[team]]?.roster?.length && !rp ? 1 : 0 };
+}).filter((p) => teams[shortToId[p.team]]?.current !== false)
+  // 공식 명단에는 남아 있어도 로스터 변경(rosterMoves)으로 팀을 나간 사람은 방송 목록에서 뺀다
+  .filter((p) => { if (p.gone) console.log(`[build] 방송 목록에서 뺌: ${p.name} (${p.team} 로스터에 없음)`); return !p.gone; }).map(({ gone, ...p }) => p).sort((a, b) => (a.role === 'coach') - (b.role === 'coach'));
 const streams = {
   official: algs.officialStreams.map(([name, provider, ch]) => ({ name, provider, ch, url: streamUrl(provider, ch) })),
   broadcasts: season.broadcasts || [],
   partners: (algs.partnerStreams || []).map(([name, provider, ch]) => ({ name, provider, url: streamUrl(provider, ch) })),
   players: playerStreams.concat(ov.streams || []),
+  // 대회 선수가 아닌 한국 스트리머·전 프로 (config/players.json 의 creators)
+  creators: (readJson('config/players.json', {}).creators || []).filter((c) => c?.name).map((c) => ({ name: c.name, kind: c.kind === 'expro' ? 'expro' : 'streamer', ...(c.org ? { org: c.org } : {}), links: Object.fromEntries(PLATFORMS.map((k) => [k, c[k] || null])) })),
 };
 
 // 방송 상태 Worker(worker/streams)가 읽는 채널 목록: 공식 중계, 공식 파트너, 한국 관련 선수·코치
@@ -504,6 +508,7 @@ const streamIntl = []; // [twitch 로그인, 선수, 팀 약칭]
   const seen = new Set(streamChannels.flatMap((c) => [c.twitch?.toLowerCase()].filter(Boolean)));
   for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }, { apexOnly: true }); } }
   for (const p of streams.players) add(`p:${nameKey(p.name)}`, p.name, 'player', p.links || {}, { team: p.team, role: p.role });
+  for (const c of streams.creators) add(`c:${nameKey(c.name)}`, c.name, 'creator', c.links, { apexOnly: true });
   // 그 밖의 선수(해외 팀 포함, 현재 로스터 기준): 방송 중 여부만 본다. 화면에는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시로 쓰인다
   //   채널: config/players.json 수동 입력 > 공식 사이트에 선수가 등록한 채널. YouTube·치지직을 수동으로 넣은 선수는 위 목록처럼 전부 확인하고, 나머지는 Twitch만 묶어서 확인한다
   const have = new Set(streams.players.map((p) => nameKey(p.name)));

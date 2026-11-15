@@ -263,7 +263,7 @@ function subtabs(tab, parts, q) {
       : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
     teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
-    streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live']] : []), ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players']],
+    streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live']] : []), ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수 방송', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
   if (!SUB) return '';
@@ -2160,6 +2160,9 @@ const FIND = {
   youtube: (n) => `https://www.youtube.com/results?search_query=${encodeURIComponent(n + ' 에이펙스')}`,
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
+// 한국 스트리머·전 프로 (대회 선수 아님): 이름, 구분, 소속, 채널. Apex 방송 중이면 LIVE
+const creatorRow = (c) => { const l = (ST?.live || []).find((x) => x.kind === 'creator' && x.who === c.name); return `<div class="pl-row"><span class="nm"><b>${esc(c.name)}</b>${l ? ` <a class="tag live" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'} aria-label="${esc(c.name)} 방송 중, 방송 보기">LIVE</a>` : ''}<small><span>${c.kind === 'expro' ? '전 프로' : '스트리머'}</span>${c.org ? ` · ${esc(c.org)}` : ''}</small></span><span class="chips">${PLATFORM_KEYS.filter((k) => c.links[k]).map((k) => chip(k, c.links[k])).join('')}</span></div>`; };
+const PLATFORM_KEYS = ['twitch', 'chzzk', 'youtube', 'soop'];
 const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveTag(p.name, p.team)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
 /* ---------- 방송 상태 (worker/streams → C.streamsUrl) ---------- */
 // ST = { at, ok, live: [...], videos: [...] } | null(아직 못 받음). 60초마다 다시 받는다(화면이 보일 때만)
@@ -2169,7 +2172,7 @@ const vidSeen0 = store.get('vidSeen', null); // 이번 방문 전에 방송 탭�
 const starred = (short) => { const t = team(short); return !!t && opt.fav.includes(t.id); };
 // 해외 선수 방송(l.intl: 전 팀 선수의 Twitch)은 별표한 팀·관심 팀 선수만 카드로 보여 준다. 나머지는 방송 탭 아래 목록과 팀·선수 화면의 LIVE 표시로
 const liveShown = (l) => !l.intl || starred(l.team) || isF(l.team) || liveId(l) === parseHash().q.get('play');
-const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : 3);
+const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : l.kind === 'creator' ? 3 : 4);
 const liveList = () => (ST?.live || []).filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
 const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
 const playHref = (l) => (l.embed ? `#/streams?play=${encodeURIComponent(liveId(l))}` : esc(l.url));
@@ -2308,8 +2311,10 @@ function streams(parts, q) {
       ${show('players') ? `<section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>
         ${players.map(streamRow).join('')}
         <p class="lead">${fbLink('채널 제보', '', '선수 CHZZK·YouTube 채널 제보하기')}</p>
+        ${S.creators?.length && sv === 'all' ? `<h3 class="h3 cr-h">한국 스트리머·전 프로</h3>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.</p>` : ''}
         <p class="lead">채움 칩은 확인된 채널(공식 API, Liquipedia 선수 페이지, 운영자 입력), 점선 칩은 확인된 채널이 없어 해당 플랫폼에서 이름으로 검색하는 링크입니다. 선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>
       </section>` : ''}
+      ${sv === 'creators' && S.creators?.length ? `<section class="sec"><h2 class="h2">한국 스트리머·전 프로</h2>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.</p></section>` : ''}
     </div>`;
 }
 

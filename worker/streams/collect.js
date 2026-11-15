@@ -141,6 +141,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
       const [j] = await safe(() => getJson(f, `https://api.chzzk.naver.com/service/v2/channels/${encodeURIComponent(c.chzzk)}/live-detail`));
       const d = j?.content; if (j?.code === 200 || d) good++;
       if (d?.status !== 'OPEN') return;
+      if (c.apexOnly && !isApex(d.liveCategoryValue, d.liveCategory, d.liveTitle)) return; // 여러 게임을 하는 채널은 Apex 방송일 때만
       out.live.push({ ...meta(c), platform: 'chzzk', title: d.liveTitle || '', game: d.liveCategoryValue || '', viewers: d.concurrentUserCount ?? null, started: d.openDate ? new Date(String(d.openDate).replace(' ', 'T') + '+09:00').toISOString() : null, thumb: d.liveImageUrl ? String(d.liveImageUrl).replace('{type}', '480') : null, url: `https://chzzk.naver.com/live/${c.chzzk}`, embed: null });
     }));
     if (!good) throw new Error('no response');
