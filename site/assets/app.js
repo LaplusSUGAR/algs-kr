@@ -2327,7 +2327,7 @@ function streams(parts, q) {
         <div class="ch-grid">${players.map(streamRow).join('')}</div>
         <p class="caption">${fbLink('채널 제보', '', '선수 CHZZK·YouTube 채널 제보하기')}</p>
       </section>` : ''}
-    ${(sv === 'all' || sv === 'creators') && S.creators?.length ? `<section class="sec"><h2 class="h2">스트리머·전 프로 <small class="muted">${S.creators.length}</small></h2>
+    ${(sv === 'all' || sv === 'creators') && S.creators?.length ? `<section class="sec"><h2 class="h2">한국 스트리머·전 프로 <small class="muted">${S.creators.length}</small></h2>
         <div class="ch-grid">${S.creators.map(creatorRow).join('')}</div>
         <p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.</p>
       </section>` : ''}
