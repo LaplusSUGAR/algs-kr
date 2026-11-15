@@ -156,6 +156,9 @@
     { "name": "푸구", "kind": "streamer", "org": "ONSIDE COMPANY", "chzzk": "https://chzzk.naver.com/6fec0993dd10d888fab64fd99a6be3d0" },
     { "name": "짹제로", "kind": "streamer", "org": "ONSIDE COMPANY", "chzzk": "https://chzzk.naver.com/a20afe49e8dd2a7b40ca48226f08bf04" },
     { "name": "욱사마", "kind": "streamer", "org": "ONSIDE COMPANY", "chzzk": "https://chzzk.naver.com/c58bc799a67f0acba04eb098b877c813" },
-    { "name": "아카", "kind": "streamer", "org": "ONSIDE COMPANY", "chzzk": "https://chzzk.naver.com/9ee5dbcd1f7d52ffa4b489711ce0edb8" }
+    { "name": "아카", "kind": "streamer", "org": "ONSIDE COMPANY", "chzzk": "https://chzzk.naver.com/9ee5dbcd1f7d52ffa4b489711ce0edb8" },
+    { "name": "Selly", "kind": "expro", "youtube": "https://www.youtube.com/@Selly_o55" },
+    { "name": "RAS", "kind": "expro", "youtube": "https://www.youtube.com/@Ras99s" },
+    { "name": "Cpt", "kind": "expro", "youtube": "https://www.youtube.com/@CR_Cpt" }
   ]
 }

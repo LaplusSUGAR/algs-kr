@@ -1278,3 +1278,17 @@ a.tag.live { text-decoration: none; }
 .home-grid .tbl-wrap { border-radius: 12px; overflow: hidden; }
 
 .lv-game { padding: 1px 7px; border-radius: 6px; border: 1px solid var(--rule); font-weight: 700; }
+
+/* 방송 탭 채널 목록: 카드 격자 (넓은 화면에서 한 줄에 여러 개) */
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; }
+.ch-grid.wide { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.ch-grid .pl-row, .ch-grid .bc { display: grid; grid-template-columns: 1fr; align-content: start; gap: 10px; padding: 14px; background: var(--card); border: 0; border-radius: 12px; }
+.ch-grid .pl-row .nm { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 15px; }
+.ch-grid .pl-row .nm small { flex-basis: 100%; margin: 0; font-size: 12.5px; }
+.ch-grid .pl-row:has(.tag.live) { box-shadow: inset 0 0 0 1.5px var(--apex); }
+.ch-grid .bc h3 { font-size: 15px; } .ch-grid .bc p { margin: -6px 0 0; }
+.ch-grid .chips { gap: 6px; }
+.ch-note { max-width: 90ch; }
+@media (min-width: 900px) { .sec.mv.compact { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); align-items: center; } .sec.mv.compact ul { columns: 2; column-gap: 32px; } .sec.mv.compact li { break-inside: avoid; } }
+@media (max-width: 599px) { .ch-grid:not(.wide) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .ch-grid:not(.wide) .pl-row { padding: 12px 10px; gap: 8px; } .ch-grid:not(.wide) .chip { font-size: 12px; padding-inline: 8px; } }
+@media (max-width: 339px) { .ch-grid:not(.wide) { grid-template-columns: 1fr; } }
