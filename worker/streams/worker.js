@@ -4,7 +4,7 @@
 //   - 채널 목록은 사이트가 빌드 때 내보내는 data/stream-channels.json 을 읽는다 (10분 캐시).
 //   - 방송 중 확인: Twitch(Helix Get Streams), YouTube(채널 피드의 최근 영상 → videos.list), 치지직(채널 라이브 정보, 비공식)
 //   - 최근 영상: YouTube 채널 공개 피드(키·할당량 없음)에서 최근 VIDEO_DAYS일
-//   - 결과는 60초 동안 캐시한다. 요청이 없으면 아무것도 호출하지 않는다.
+//   - 결과는 60초 동안 새것으로 본다. 그 뒤 요청에는 있던 결과를 바로 돌려주고 뒤에서 새로 모은다(최대 15분 보관). 요청이 없으면 아무것도 호출하지 않는다.
 //   - 한 플랫폼이 실패하면 그 플랫폼만 ok=false 로 알리고 나머지는 정상 응답한다.
 //
 // 비밀 값(wrangler secret): TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, YOUTUBE_API_KEY
@@ -19,17 +19,28 @@ export default {
     const cors = { 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*', 'Vary': 'Origin' };
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (url.pathname !== '/streams.json') return json({ error: 'not found' }, 404, cors);
-    const ttl = Number(env.LIVE_TTL || 60);
+    const ttl = Number(env.LIVE_TTL || 60), keep = Number(env.STALE_TTL || 900);
     const cache = caches.default, key = new Request(`${url.origin}/streams.json`);
+    // 모은 결과는 keep초 동안 두고, ttl초가 지나면 '낡은 것'으로 본다.
+    // 낡았어도 있는 응답을 바로 돌려주고(사이트가 기다리지 않게) 뒤에서 새로 모은다. 아예 없을 때만 모으는 동안 기다린다.
+    const build = async () => {
+      const body = await collect({ env, fetch: (u, o) => fetch(u, o), store: cacheStore(cache, url.origin), now: Date.now() });
+      const fresh = json(body, 200, { 'Cache-Control': `public, max-age=${keep}`, 'X-At': String(Date.now()) });
+      await cache.put(key, fresh.clone());
+      return fresh;
+    };
     let hit = await cache.match(key);
-    if (!hit) {
-      const kv = cacheStore(cache, url.origin);
-      const body = await collect({ env, fetch: (u, o) => fetch(u, o), store: kv, now: Date.now() });
-      hit = json(body, 200, { 'Cache-Control': `public, max-age=${ttl}` });
-      ctx.waitUntil(cache.put(key, hit.clone()));
+    if (!hit) hit = await build();
+    else if (Date.now() - Number(hit.headers.get('X-At') || 0) > ttl * 1000) {
+      // 여러 요청이 한꺼번에 새로 모으지 않게 20초짜리 표시를 둔다
+      const lock = new Request(`${url.origin}/__refreshing`);
+      if (!(await cache.match(lock))) {
+        ctx.waitUntil((async () => { await cache.put(lock, new Response('1', { headers: { 'Cache-Control': 'public, max-age=20' } })); await build(); })().catch(() => {}));
+      }
     }
     const res = new Response(hit.body, hit);
     for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
+    res.headers.set('Cache-Control', 'no-store'); // 브라우저·중간 캐시는 두지 않는다(낡은 응답을 15분씩 붙들지 않게)
     return res;
   },
 };

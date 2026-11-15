@@ -126,15 +126,18 @@ const fbLink = (kind, ctx, label) => `<button type="button" class="link-btn fb-l
 /* ---------- 유틸 ---------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TZ = 'Asia/Seoul';
-const dayKey = (iso) => new Date(iso).toLocaleDateString('sv-SE', { timeZone: TZ });
+// 날짜·시각·숫자 표기는 화면을 그릴 때마다 수천 번 불린다. 포매터를 한 번만 만들고, 같은 시각 문자열은 계산해 둔 값을 다시 쓴다
+const DF_DAY = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ }), DF_HM = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }), NF = new Intl.NumberFormat('ko-KR');
+const memoStr = (f) => { const m = new Map(); return (k) => { if (typeof k !== 'string') return f(k); let v = m.get(k); if (v === undefined) { if (m.size > 4000) m.clear(); v = f(k); m.set(k, v); } return v; }; };
+const dayKey = memoStr((iso) => DF_DAY.format(new Date(iso)));
 // 시각은 언제나 24시간제 HH:mm (sv-SE 형식은 오전/오후 없이 00~23시로 나온다. 기기의 12시간제 설정과 상관없음)
-const hhmm = (iso) => new Date(iso).toLocaleTimeString('sv-SE', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
+const hhmm = memoStr((iso) => DF_HM.format(new Date(iso)));
 const WD = { ja: ['日', '月', '火', '水', '木', '金', '土'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] }[I.lang] || ['일', '월', '화', '수', '목', '금', '토'];
 const dayLabel = (key) => { const [y, m, d] = key.split('-').map(Number); const wd = WD[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]; return `${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')} (${wd})`; };
 const dateTime = (iso) => `${dayLabel(dayKey(iso))} ${hhmm(iso)}`;
 // 시리즈 시각 표시: 공식 시각이 지역 구분 없는 임시값이면 '시각 미정'
 const sTime = (s) => (s.timeTbd ? '시각 미정' : hhmm(s.start));
-const fmt = (n) => (n ?? '–').toLocaleString('ko-KR');
+const fmt = (n) => (typeof n === 'number' ? NF.format(n) : (n ?? '–').toLocaleString('ko-KR'));
 // 점수 표기 (모든 점수표 공통): 순위 / 킬 / 종합 (= 순위 점수 / 킬 점수 / 종합 점수)
 //   ALGS는 킬 1개 = 1점이라 킬 점수 = 킬 수, 순위 점수 = 종합 점수 − 킬 점수
 //   새 점수표를 만들 때도 PTS_TH(머리글 3칸)·ptsTd(칸 3개)·ptsLine(문장)을 쓴다
@@ -231,7 +234,19 @@ function parseHash() {
 }
 const qsLink = (path, q, patch) => { const p = new URLSearchParams(q); for (const [k, v] of Object.entries(patch)) (v == null ? p.delete(k) : p.set(k, v)); const t = p.toString(); return `#${path}${t ? '?' + t : ''}`; }; // 값이 null이면 그 항목을 뺀다
 
+let lastHtml = '', lastHash = null;
+// 펼쳐야 보이는 내용(포인트 표의 팀·선수별 내역 등)은 펼칠 때 만든다: 표를 그릴 때 수천 줄을 미리 만들지 않는다
+//   틀 안에서 ${lazy(() => html)} 를 속성 자리에 쓰면 data-lazy 번호가 붙고, 펼칠 때 fillLazy 가 채운다
+let LAZY = [], lazyNext = [];
+const lazy = (make) => ` data-lazy="${lazyNext.push(make) - 1}"`;
+function fillLazy(root) {
+  for (const el of root.matches?.('[data-lazy]') ? [root] : root.querySelectorAll('[data-lazy]')) {
+    const make = LAZY[+el.dataset.lazy]; el.removeAttribute('data-lazy');
+    if (make) { el.innerHTML = make(); I.tree(el); }
+  }
+}
 function render() {
+  lazyNext = [];
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
@@ -241,7 +256,11 @@ function render() {
   const view = { home, schedule, standings, points, teams, streams, rules, players: playerView }[tab] || home;
   // 지난 시즌 기록을 볼 때: 본문 맨 위에 어느 시즌인지와 돌아가는 링크
   const bar = FROZEN ? `<div class="season-bar" id="seasonBar"><span><b>${esc(A.season.name)}</b> <span>지난 시즌 기록을 보고 있습니다.</span></span> <a href="./">현재 시즌으로</a></div>` : '';
-  app.innerHTML = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + bar + view(parts, q);
+  const html = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + bar + view(parts, q);
+  // 주기적 갱신(데이터 확인·방송 상태·홈 카운트다운)으로 다시 불렸는데 내용이 그대로면 화면을 건드리지 않는다: 스크롤·펼친 항목·재생이 유지되고 그리는 비용도 없다
+  if (html === lastHtml && location.hash === lastHash && app.firstChild) return;
+  lastHtml = html; lastHash = location.hash; LAZY = lazyNext;
+  app.innerHTML = html;
   bind();
   I.tree(app);
   // 가로로 넘치는 LCQ 경기 탭: 고른 탭이 보이게
@@ -1792,7 +1811,7 @@ function cpView(q) {
       ${rows.map((r, i) => {
         const isCut = region === 'all' && !opt.krOnly && r.rank === cut;
         return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}</td><td class="r">${qualTag(r.status === 'direct')}</td></tr>
-        <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="3">${r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join('')}</td></tr>
+        <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="3"${lazy(() => r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join(''))}></td></tr>
         ${isCut ? `<tr class="cut-label"><td colspan="4">여기까지 챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`;
       }).join('')}
     </tbody></table></div>`;
@@ -1801,7 +1820,7 @@ function cpView(q) {
       .filter((x) => !opt.krOnly || x.kr).sort((a, b) => b.p - a.p).slice(0, 150);
     table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>선수</th><th>팀</th><th class="r">CP</th></tr></thead><tbody>
       ${ps.map((x, i) => `<tr class="expandable ${x.kr ? 'kr k-team' : ''}" data-toggle="cpp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${i + 1}</td><td class="team">${x.kr ? krDot('team') : ''}${esc(x.n)}</td><td>${teamLink(x.short)}</td><td class="r num">${fmt(x.p)}</td></tr>
-        <tr class="detail" id="cpp-${i}" hidden><td></td><td colspan="3">${cpBreak(x.id, x.n, x.p, x.short)}</td></tr>`).join('')}
+        <tr class="detail" id="cpp-${i}" hidden><td></td><td colspan="3"${lazy(() => cpBreak(x.id, x.n, x.p, x.short))}></td></tr>`).join('')}
     </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
   const cpKey = BD.state === 'live' || BD.state === 'pending' ? intlKey() : null;
@@ -2259,12 +2278,21 @@ function liveBadge() {
   if (!n && !nv) return;
   const b = document.createElement('span'); b.className = `nav-badge${n ? '' : ' dot'}`; b.textContent = n ? String(n) : ''; b.setAttribute('aria-label', n ? `방송 중 ${n}` : '새 영상'); a.appendChild(b);
 }
+// 사이트를 열자마자 방송 상태가 보이게: 지난번에 받은 응답(5분 이내)을 먼저 쓰고, 새 응답이 오면 바꾼다
+let stCached = false, stRetry = 0;
+function loadStreamsCache() {
+  if (!C.streamsUrl || ST) return;
+  try { const c = JSON.parse(localStorage.getItem('algskr.streams') || 'null'); if (c?.j && Array.isArray(c.j.live) && Date.now() - c.t < 5 * 60e3) { ST = c.j; stCached = true; } } catch { /* 없으면 새로 받는다 */ }
+}
 async function pollStreams() {
   if (!C.streamsUrl || document.hidden) return;
   try {
     const r = await fetch(C.streamsUrl, { cache: 'no-store' }); if (!r.ok) return;
     const j = await r.json(); if (!j || !Array.isArray(j.live)) return;
-    const first = !ST; ST = j;
+    const first = !ST || stCached; ST = j; stCached = false;
+    // 한동안 아무도 열지 않았으면 Worker가 예전 결과를 먼저 준다(뒤에서 새로 모으는 중). 그럴 땐 몇 초 뒤 한 번 더 받아 온다
+    if (Date.now() - Date.parse(j.at) > 90e3 && !stRetry) stRetry = setTimeout(() => { stRetry = 0; pollStreams(); }, 4000);
+    try { localStorage.setItem('algskr.streams', JSON.stringify({ t: Date.now(), j })); } catch { /* 저장 못 해도 동작에는 지장 없음 */ }
     const sig = JSON.stringify([j.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
     liveBadge();
     const osig = JSON.stringify(j.live.filter((l) => l.kind === 'official').map((l) => [l.key, l.platform]));
@@ -2321,7 +2349,7 @@ function streams(parts, q) {
 /* ---------- 이벤트 연결 ---------- */
 function bind() {
   app.querySelectorAll('[data-toggle]').forEach((tr) => {
-    const go = () => { const d = document.getElementById(tr.dataset.toggle); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); };
+    const go = () => { const d = document.getElementById(tr.dataset.toggle); if (d.hidden) fillLazy(d); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); };
     tr.addEventListener('click', (e) => { if (e.target.closest('a')) return; go(); });
     tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
@@ -2582,10 +2610,13 @@ measureStick();
 addEventListener('resize', measureStick);
 footer();
 initMore();
+loadStreamsCache();
+if (C.streamsUrl) pollStreams(); // 화면을 그리기 전에 요청부터 보낸다
 render();
+liveBadge();
 pollVer();
 setInterval(pollVer, C.verPollMs || 30000);
-if (C.streamsUrl) { pollStreams(); setInterval(pollStreams, C.streamsPollMs || 60000); }
+if (C.streamsUrl) setInterval(pollStreams, C.streamsPollMs || 60000);
 if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
 else if (LIVE.mode === 'direct') { pollDirect(); refreshOfficial(); }
 updatePill();
