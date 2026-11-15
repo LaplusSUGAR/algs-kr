@@ -508,7 +508,7 @@ const streamIntl = []; // [twitch 로그인, 선수, 팀 약칭]
   const seen = new Set(streamChannels.flatMap((c) => [c.twitch?.toLowerCase()].filter(Boolean)));
   for (const p of streams.partners) { const id = chanId.twitch(p.url); if (p.provider === 'twitch' && id && !seen.has(id.toLowerCase())) { seen.add(id.toLowerCase()); add(`x:${nameKey(p.name)}`, p.name, 'partner', { twitch: p.url }, { apexOnly: true }); } }
   for (const p of streams.players) add(`p:${nameKey(p.name)}`, p.name, 'player', p.links || {}, { team: p.team, role: p.role });
-  for (const c of streams.creators) add(`c:${nameKey(c.name)}`, c.name, 'creator', c.links, { apexOnly: true });
+  for (const c of streams.creators) add(`c:${nameKey(c.name)}`, c.name, 'creator', c.links); // 다른 게임 방송도 알린다(화면이 게임 이름을 함께 적고, 홈에는 Apex 방송만 올린다)
   // 그 밖의 선수(해외 팀 포함, 현재 로스터 기준): 방송 중 여부만 본다. 화면에는 응원 팀 선수 방송과 팀·선수 화면의 LIVE 표시로 쓰인다
   //   채널: config/players.json 수동 입력 > 공식 사이트에 선수가 등록한 채널. YouTube·치지직을 수동으로 넣은 선수는 위 목록처럼 전부 확인하고, 나머지는 Twitch만 묶어서 확인한다
   const have = new Set(streams.players.map((p) => nameKey(p.name)));

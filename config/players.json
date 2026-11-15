@@ -147,7 +147,7 @@
       "title": "애널리스트"
     }
   },
-  "_creators": "대회 선수는 아니지만 방송 탭에 함께 보여 줄 한국 스트리머·전 프로. kind: streamer(스트리머) | expro(전 프로). org: 소속(선택). twitch·youtube·chzzk·soop 주소를 넣는다. 다른 게임도 하는 채널이라, 방송 중 표시는 Apex 방송일 때만 뜬다.",
+  "_creators": "대회 선수는 아니지만 방송 탭에 함께 보여 줄 한국 스트리머·전 프로. kind: streamer(스트리머) | expro(전 프로). org: 소속(선택). twitch·youtube·chzzk·soop 주소를 넣는다. 다른 게임 방송도 방송 탭에 뜨고(게임 이름 표시), 홈에는 Apex 방송일 때만 올라간다.",
   "creators": [
     { "name": "준콤", "kind": "streamer", "chzzk": "https://chzzk.naver.com/5600cb060793ce998ea004c49efff304" },
     { "name": "mansi", "kind": "expro", "chzzk": "https://chzzk.naver.com/b814f4e8ca70c61a2198b2ce9636c362" },
