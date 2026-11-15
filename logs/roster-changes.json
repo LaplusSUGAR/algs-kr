@@ -1,5 +1,14 @@
 [
  {
+  "at": "2026-11-15T16:01:54.593Z",
+  "kind": "rename",
+  "team": "CAC EST",
+  "region": "apac-n",
+  "was": "waked",
+  "out": [],
+  "in": []
+ },
+ {
   "at": "2026-11-15T00:00:00+09:00",
   "kind": "manual",
   "team": "FNC",
