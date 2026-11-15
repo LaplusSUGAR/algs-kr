@@ -55,6 +55,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   let left = BUDGET - used - 1 /* 끝의 저장 */ - (needToken ? 1 : 0) - (twOn ? Math.ceil(byLogin.size / 100) : 0) - cz.length - (yt.length && env.YOUTUBE_API_KEY ? 1 : 0);
   const take = (n) => { const k = Math.max(0, Math.min(n, left)); left -= k; return k; };
   const oldest = (list, at) => list.slice().sort((a, b) => (at(a) || 0) - (at(b) || 0));
+  const trPlan = env.AI ? take(2) : 0; // 방송 제목 번역 몫은 먼저 떼어 둔다(영상 피드 갱신에 밀려 영영 못 하지 않게)
   const idTodo = env.YOUTUBE_API_KEY ? yt.filter((c) => !ytId(c)) : [];
   const idNow = idTodo.slice(0, take(idTodo.length));
   const feedStale = oldest(yt.filter((c) => idNow.includes(c) || (ytId(c) && stale(S.feeds[ytId(c)]?.at, 300))), (c) => S.feeds[ytId(c)]?.at);
@@ -155,9 +156,10 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   out.live.sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
   // 방송 제목 번역 (Workers AI, 무료 할당량 안에서): 제목마다 한 번만 번역해 기억해 둔다. 한 요청에 새 제목 4개까지, 실패하면 10분 쉰다
   S.tr = S.tr || {};
-  const titles = [...new Set(out.live.map((l) => String(l.title || '').trim()).filter((t) => t.length >= 2))];
+  // 카드로 먼저 보이는 방송(한국 관련·공식·스트리머)의 제목부터
+  const titles = [...new Set([...out.live.filter((l) => !l.intl), ...out.live.filter((l) => l.intl)].map((l) => String(l.title || '').trim()).filter((t) => t.length >= 2))];
   if (env.AI && !(S.trFailAt && now - S.trFailAt < 600e3)) {
-    const todo = titles.filter((t) => !S.tr[t]).slice(0, take(4));
+    const todo = titles.filter((t) => !S.tr[t]).slice(0, trPlan + take(2));
     await Promise.all(todo.map(async (t) => {
       used++;
       const [r, e] = await safe(() => translateTitle(env, t));
