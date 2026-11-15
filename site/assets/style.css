@@ -1292,3 +1292,32 @@ a.tag.live { text-decoration: none; }
 @media (min-width: 900px) { .sec.mv.compact { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); align-items: center; } .sec.mv.compact ul { columns: 2; column-gap: 32px; } .sec.mv.compact li { break-inside: avoid; } }
 @media (max-width: 599px) { .ch-grid:not(.wide) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .ch-grid:not(.wide) .pl-row { padding: 12px 10px; gap: 8px; } .ch-grid:not(.wide) .chip { font-size: 12px; padding-inline: 8px; } }
 @media (max-width: 339px) { .ch-grid:not(.wide) { grid-template-columns: 1fr; } }
+
+/* 사이트 안 플레이어: 멀티뷰 격자, 시네마 모드 */
+.lv-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.lv-btn { border: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: var(--fs-sm); font-weight: 600; border-radius: 999px; padding: 4px 12px; cursor: pointer; min-height: 32px; }
+.lv-btn[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.lv-close { min-height: 32px; }
+.lv-tiles { display: grid; gap: 2px; background: #000; }
+.lv-tiles[data-n='2'], .lv-tiles[data-n='3'], .lv-tiles[data-n='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lv-tile { position: relative; display: grid; grid-template-rows: auto 1fr; min-width: 0; background: #000; }
+.lv-tbar { display: flex; align-items: center; gap: 6px 10px; padding: 6px 10px; background: var(--card); font-size: var(--fs-sm); min-width: 0; }
+.lv-tbar b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .lv-tbar b small { font-weight: 500; color: var(--steel); margin-left: 4px; }
+.lv-tbar .more { margin-left: auto; white-space: nowrap; }
+.lv-x { border: 0; background: none; color: inherit; font-size: 20px; line-height: 1; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none; }
+.lv-x:hover { background: var(--paper); }
+.lv-tile .yt-frame { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 72vh; border: 0; }
+.lv-player.multi .lv-tbar .more, .lv-player.multi .lv-tbar .chip { display: none; }
+.lv-player.multi { max-width: none; }
+@media (max-width: 700px) and (orientation: portrait) { .lv-tiles[data-n] { grid-template-columns: 1fr; } }
+html.lv-cinema, html.lv-cinema body { overflow: hidden; }
+.lv-player.cinema { position: fixed; inset: 0; z-index: 1000; margin: 0; max-width: none; border-radius: 0; background: #000; color: #fff; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.lv-player.cinema .caption { display: none; }
+.lv-player.cinema .lv-bar { background: #101114; padding: 6px 10px; }
+.lv-player.cinema .lv-btn, .lv-player.cinema .lv-close { border-color: #3a3d46; color: #fff; }
+.lv-player.cinema .lv-btn[aria-pressed='true'] { background: #fff; color: #101114; border-color: #fff; }
+.lv-player.cinema .lv-tiles { height: 100%; min-height: 0; grid-auto-rows: minmax(0, 1fr); }
+.lv-player.cinema .lv-tile { min-height: 0; }
+.lv-player.cinema .lv-tbar { background: #101114; color: #fff; padding: 3px 8px; }
+.lv-player.cinema .lv-x:hover { background: #2a2d35; }
+.lv-player.cinema .lv-tile .yt-frame { aspect-ratio: auto; height: 100%; max-height: none; }

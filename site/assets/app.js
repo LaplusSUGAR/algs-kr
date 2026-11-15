@@ -2212,12 +2212,59 @@ const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive();
 const newVideos = () => (ST?.videos || []).filter((v) => !v.short && v.platform !== 'twitch' && vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
-const livePlayerSrc = (e) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0`);
+const livePlayerSrc = (e, muted) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true${muted ? '&muted=true' : ''}` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0${muted ? '&mute=1' : ''}`); // 두 번째 화면부터는 소리를 끄고 시작한다(소리가 겹치지 않게)
 const liveId = (l) => `${l.key}|${l.platform}`;
+// ── 사이트 안 플레이어 ──
+//   멀티뷰: 켜면 카드를 누를 때마다 화면이 추가된다(최대 4개, 다시 누르면 빠진다). 끄면 누른 방송 하나로 바뀐다
+//   시네마 모드: 플레이어가 브라우저 창 전체를 채운다(Esc 또는 버튼으로 나온다)
+const MV_MAX = 4;
+let mvOn = false;
+const lvBox = () => document.getElementById('lvPlayer');
+const lvIds = () => [...(lvBox()?.querySelectorAll('.lv-tile') || [])].map((t) => t.dataset.id);
+function lvSync() {
+  const box = lvBox(); if (!box) return;
+  const ids = lvIds();
+  if (!ids.length) { lvCinema(false); box.innerHTML = ''; box.hidden = true; mvOn = false; if (parseHash().q.has('play')) history.replaceState(null, '', '#/streams'); } // 닫은 뒤 새로고침 때 다시 열리지 않게
+  else { box.querySelector('.lv-tiles').dataset.n = ids.length; box.querySelector('[data-mv]').setAttribute('aria-pressed', String(mvOn)); box.classList.toggle('multi', ids.length > 1); }
+  document.querySelectorAll('#app button.lv-card').forEach((c) => c.classList.toggle('on', ids.includes(c.dataset.lvid)));
+}
+function lvCinema(on) {
+  const box = lvBox(); if (!box) return;
+  box.classList.toggle('cinema', on); document.documentElement.classList.toggle('lv-cinema', on);
+  const b = box.querySelector('[data-cinema]'); if (b) { b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '시네마 모드 끝내기' : '시네마 모드'; I.tree(b); }
+}
+function playLive(id) {
+  const l = (ST?.live || []).find((x) => liveId(x) === id), box = lvBox(); if (!l?.embed || !box) return;
+  if (!box.querySelector('.lv-tiles')) {
+    box.hidden = false;
+    box.innerHTML = `<div class="lv-bar"><b>방송 보기</b><span class="lv-tools"><button class="lv-btn" type="button" data-mv aria-pressed="false" title="켜면 방송 카드를 누를 때마다 화면이 추가됩니다 (최대 4개)">멀티뷰</button><button class="lv-btn" type="button" data-cinema aria-pressed="false">시네마 모드</button><button class="lv-close" type="button" data-close-all aria-label="플레이어 닫기">닫기</button></span></div>
+      <div class="lv-tiles" data-n="0"></div>
+      <p class="caption"><span>멀티뷰를 켜고 아래 방송 카드를 누르면 화면이 추가됩니다(최대 4개).</span> <span>선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</span></p>`;
+    box.querySelector('[data-mv]').addEventListener('click', () => { mvOn = !mvOn; lvSync(); });
+    box.querySelector('[data-cinema]').addEventListener('click', () => lvCinema(!box.classList.contains('cinema')));
+    box.querySelector('[data-close-all]').addEventListener('click', () => { box.querySelector('.lv-tiles').innerHTML = ''; lvSync(); });
+    I.tree(box);
+  }
+  const tiles = box.querySelector('.lv-tiles'), have = [...tiles.children].find((t) => t.dataset.id === id);
+  if (have) { if (mvOn || tiles.children.length > 1) have.remove(); lvSync(); return; } // 이미 보고 있는 방송을 다시 누르면 뺀다(하나만 볼 때는 그대로)
+  if (!mvOn) tiles.innerHTML = '';
+  else if (tiles.children.length >= MV_MAX) tiles.firstElementChild.remove(); // 꽉 찼으면 가장 먼저 연 화면을 뺀다
+  const tile = document.createElement('div'); tile.className = 'lv-tile'; tile.dataset.id = id;
+  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
+    <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed, tiles.children.length > 0))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  tile.querySelector('.lv-x').addEventListener('click', () => { tile.remove(); lvSync(); });
+  I.tree(tile); tiles.append(tile); lvSync();
+  if (!box.classList.contains('cinema')) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lvBox()?.classList.contains('cinema')) lvCinema(false); });
+window.addEventListener('hashchange', () => { document.documentElement.classList.remove('lv-cinema'); mvOn = false; });
+
+// 방송 제목: 서버가 번역해 둔 것이 있으면 지금 화면 언어로 (원문은 마우스를 올리면 보인다)
+const liveTitle = (l) => l.tr?.[I.lang] || l.title || '';
 function liveCard(l, i, asLink) {
   const hide = opt.spoiler; // 결과 가리기: 제목과 미리보기에 결과가 드러날 수 있어 가린다
   const inner = `<span class="lv-thumb">${l.thumb && !hide ? `<img src="${esc(l.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="tag live">LIVE</span>${l.embed ? '<span class="yt-play" aria-hidden="true"></span>' : ''}</span>
-    <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title">${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(l.title || '')}</span>
+    <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title"${!hide && liveTitle(l) !== (l.title || '') ? ` title="${esc(l.title)}"` : ''}>${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(liveTitle(l))}</span>
     <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
   if (asLink && l.embed) return `<a class="lv-card" href="${playHref(l)}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
   return l.embed
@@ -2381,18 +2428,7 @@ function bind() {
   const fs = document.getElementById('favSearch');
   if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
-  app.querySelectorAll('button.lv-card').forEach((b) => b.addEventListener('click', () => {
-    const l = (ST?.live || []).find((x) => liveId(x) === b.dataset.lvid), box = document.getElementById('lvPlayer'); if (!l?.embed || !box) return;
-    box.hidden = false;
-    box.innerHTML = `<div class="lv-bar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-close" type="button" aria-label="플레이어 닫기">닫기</button></div>
-      <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
-      <p class="caption">선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>`;
-    I.tree(box);
-    box.querySelector('.lv-close').addEventListener('click', () => { box.innerHTML = ''; box.hidden = true;
-      if (parseHash().q.has('play')) history.replaceState(null, '', '#/streams'); }); // 닫은 뒤 새로고침 때 다시 열리지 않게
-    app.querySelectorAll('.lv-card').forEach((c) => c.classList.toggle('on', c === b));
-    box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }));
+  app.querySelectorAll('button.lv-card').forEach((b) => b.addEventListener('click', () => playLive(b.dataset.lvid)));
   { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
     const want = parseHash().q.get('play'), box = document.getElementById('lvPlayer');
     if (want && box && !box.querySelector('iframe')) [...app.querySelectorAll('button.lv-card')].find((b) => b.dataset.lvid === want)?.click();

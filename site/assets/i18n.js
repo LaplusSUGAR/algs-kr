@@ -192,6 +192,8 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    ['방송 보기', '配信を見る', 'Watching'], ['시네마 모드', 'シネマモード', 'Cinema mode'], ['시네마 모드 끝내기', 'シネマモード終了', 'Exit cinema mode'],
+    ['멀티뷰를 켜고 아래 방송 카드를 누르면 화면이 추가됩니다(최대 4개).', 'マルチビューをオンにして下の配信カードを押すと、画面が追加されます（最大4つ）。', 'Turn on Multiview and tap stream cards below to add screens (up to 4).'],
     ['선수·코치 방송', '選手・コーチの配信', 'Players & coaches'], ['선수·코치', '選手・コーチ', 'Players'], ['스트리머·전 프로', 'ストリーマー・元プロ', 'Streamers & former pros'],
     ['스트리머', 'ストリーマー', 'Streamer'], ['전 프로', '元プロ', 'Former pro'], ['한국 스트리머·전 프로', '韓国のストリーマー・元プロ', 'Korean streamers & former pros'],
     ['대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.', '大会選手ではありませんが、Apexを配信しているチャンネルです。配信中の表示はApex配信のときだけ出ます。', 'Not tournament players, but channels that stream Apex. The live badge appears only while they stream Apex.'],

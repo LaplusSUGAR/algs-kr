@@ -153,11 +153,48 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   const all = ytVideos.slice().sort(byNew);
   out.videos = [...all.filter((v) => !v.short).slice(0, 60), ...all.filter((v) => v.short).slice(0, 30)].sort(byNew);
   out.live.sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
+  // 방송 제목 번역 (Workers AI, 무료 할당량 안에서): 제목마다 한 번만 번역해 기억해 둔다. 한 요청에 새 제목 4개까지, 실패하면 10분 쉰다
+  S.tr = S.tr || {};
+  const titles = [...new Set(out.live.map((l) => String(l.title || '').trim()).filter((t) => t.length >= 2))];
+  if (env.AI && !(S.trFailAt && now - S.trFailAt < 600e3)) {
+    const todo = titles.filter((t) => !S.tr[t]).slice(0, take(4));
+    await Promise.all(todo.map(async (t) => {
+      used++;
+      const [r, e] = await safe(() => translateTitle(env, t));
+      if (r) { S.tr[t] = { at: now, ...r }; dirty = true; } else { out.err.translate = e; S.trFailAt = now; dirty = true; }
+    }));
+  }
+  for (const k of Object.keys(S.tr)) if (!titles.includes(k) && now - S.tr[k].at > 6 * 3600e3) { delete S.tr[k]; dirty = true; }
+  for (const l of out.live) { const r = S.tr[String(l.title || '').trim()]; if (r) l.tr = { ko: r.ko, ja: r.ja, en: r.en }; }
   // 지금 목록에 없는 채널의 기억은 지운다
   const keepYt = new Set(yt.map(ytId).filter(Boolean));
   for (const k of Object.keys(S.feeds)) if (!keepYt.has(k)) { delete S.feeds[k]; delete S.shorts[k]; dirty = true; }
   if (S.vods || S.uids) { delete S.vods; delete S.uids; dirty = true; } // 예전 Twitch 다시보기 기억은 지운다
   return finish();
+}
+
+// 방송 제목을 한국어·일본어·영어로. 닉네임·팀 이름·해시태그·게임 용어·이모지는 그대로 둔다
+const TR_SYS = `You translate livestream titles for an Apex Legends esports site. Reply with ONLY a JSON object: {"ko":"...","ja":"...","en":"..."}.
+Rules:
+- Give a natural, short title in Korean (ko), Japanese (ja) and English (en), the way a streamer of that language would write it.
+- Do NOT translate or transliterate: streamer nicknames, player names, team names, handles (@name), hashtags, URLs, emoji, and anything that looks like a nickname or an ID. Copy them exactly.
+- Keep game terms that players use as-is (Apex, ALGS, ranked tiers like Predator/Master, scrim, LCQ, legend and map names) or use the usual term in that language (ranked = 랭크 / ランク).
+- For the language the title is already written in, copy the title unchanged.
+- Never add explanations, quotes or extra words. If the title is only names, symbols or numbers, return it unchanged for all three.`;
+async function translateTitle(env, title) {
+  const models = String(env.TR_MODELS || '@cf/meta/llama-3.3-70b-instruct-fp8-fast,@cf/meta/llama-3.1-8b-instruct').split(',').map((x) => x.trim()).filter(Boolean);
+  let last = new Error('no model');
+  for (const model of models) {
+    try {
+      const r = await env.AI.run(model, { messages: [{ role: 'system', content: TR_SYS }, { role: 'user', content: title.slice(0, 200) }], max_tokens: 400, temperature: 0.2 });
+      const txt = typeof r?.response === 'string' ? r.response : JSON.stringify(r?.response ?? r);
+      const j = JSON.parse((txt.match(/\{[\s\S]*\}/) || [])[0]);
+      const ok = (v) => typeof v === 'string' && v.trim() && v.length <= 300;
+      if (!ok(j.ko) || !ok(j.ja) || !ok(j.en)) throw new Error('bad shape');
+      return { ko: j.ko.trim(), ja: j.ja.trim(), en: j.en.trim() };
+    } catch (e) { last = new Error(`${model.split('/').pop()}: ${String(e?.message || e).slice(0, 80)}`); }
+  }
+  throw last;
 }
 
 // YouTube 채널 공개 피드 → [{ id, title, published, channel }]

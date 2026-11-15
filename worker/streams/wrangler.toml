@@ -3,6 +3,10 @@ main = "worker.js"
 compatibility_date = "2026-10-01"
 workers_dev = true
 
+# 방송 제목 번역용 Workers AI (무료 할당량: 하루 10,000 뉴런. 넘으면 번역만 멈춘다)
+[ai]
+binding = "AI"
+
 [vars]
 SITE_URL = "https://laplussugar.github.io/algs-kr"
 ALLOWED_ORIGIN = "https://laplussugar.github.io"
