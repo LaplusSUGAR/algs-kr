@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-14T00:35:31.702Z",
+  "at": "2026-11-15T11:45:56.510Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -3135,7 +3135,7 @@
       "key": "cc:valkyrieesports",
       "name": "Valkyrie Esports",
       "region": "americas",
-      "src": null,
+      "src": "lp",
       "lp": {
         "name": "Valkyrie Esports",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Noiyzi, Wvlly, K2pler)"
