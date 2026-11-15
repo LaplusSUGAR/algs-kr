@@ -70,3 +70,4 @@ jobs:
             sleep 10
           done
           echo "$body" | jq '{at, ok, err, calls, live: [.live[] | select(.intl | not) | {who, platform, viewers, title}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'
+          echo "치지직 점검:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/chzzk" | jq -c '.[]' || true

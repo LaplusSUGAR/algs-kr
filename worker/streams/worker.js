@@ -18,6 +18,25 @@ export default {
     const url = new URL(req.url);
     const cors = { 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*', 'Vary': 'Origin' };
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    // 점검용: 치지직이 채널마다 무엇을 돌려주는지 요약해서 보여 준다 (공개 정보만, 배포 점검 워크플로가 읽는다)
+    if (url.pathname === '/debug/chzzk') {
+      const S = (await cacheStore(caches.default, url.origin).get('state')) || {};
+      const chs = (S.channels?.list || []).filter((c) => c.chzzk).slice(0, 12);
+      const paths = ['service/v2/channels/ID/live-detail', 'service/v3/channels/ID/live-detail', 'polling/v2/channels/ID/live-status'];
+      const out = await Promise.all(chs.map(async (c, i) => {
+        const row = { who: c.who };
+        for (const p of (i < 3 ? paths : paths.slice(0, 1))) {
+          try {
+            const r = await fetch(`https://api.chzzk.naver.com/${p.replace('ID', c.chzzk)}`, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; algs-kr-streams)' } });
+            const t = await r.text(); let j = null; try { j = JSON.parse(t); } catch { /* JSON 아님 */ }
+            const d = j?.content;
+            row[p.split('/')[1] + ':' + p.split('/').pop()] = { http: r.status, code: j?.code ?? null, keys: d ? Object.keys(d).slice(0, 40).join(',') : null, status: d?.status ?? null, cat: d?.liveCategory ?? null, catValue: d?.liveCategoryValue ?? null, title: d?.liveTitle ? String(d.liveTitle).slice(0, 40) : null, raw: j ? undefined : t.slice(0, 120) };
+          } catch (e) { row[p] = { error: String(e).slice(0, 80) }; }
+        }
+        return row;
+      }));
+      return json(out, 200, cors);
+    }
     if (url.pathname !== '/streams.json') return json({ error: 'not found' }, 404, cors);
     const ttl = Number(env.LIVE_TTL || 60), keep = Number(env.STALE_TTL || 900);
     const cache = caches.default, key = new Request(`${url.origin}/streams.json`);
