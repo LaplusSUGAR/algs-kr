@@ -1,5 +1,16 @@
 [
  {
+  "at": "2026-11-15T00:00:00+09:00",
+  "kind": "manual",
+  "team": "FNC",
+  "teamName": "FNATIC",
+  "region": "apac-n",
+  "out": [],
+  "in": [
+   "sedna"
+  ]
+ },
+ {
   "at": "2026-11-14T05:04:19.838Z",
   "kind": "auto",
   "team": "PRES",

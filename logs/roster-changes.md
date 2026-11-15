@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-15 00:00 | 수동 반영 (config) | APAC North | FNC (FNATIC) |  | sedna |
 | 2026-11-14 14:04 | 자동 반영 (Liquipedia) | Americas | PRES (W Press) | Dexican | ImMadness |
 | 2026-11-14 14:04 | 자동 반영 (Liquipedia) | APAC North | UFZ (UNFAZED) | kumaryu, vicky |  |
 | 2026-11-13 18:03 | 2부 팀 이름 변경 | APAC South | HKUF |  | 구 HungKuang Falcon |
