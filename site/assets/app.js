@@ -2191,9 +2191,14 @@ const vidSeen0 = store.get('vidSeen', null); // 이번 방문 전에 방송 탭�
 const starred = (short) => { const t = team(short); return !!t && opt.fav.includes(t.id); };
 // 해외 선수 방송(l.intl: 전 팀 선수의 Twitch)은 별표한 팀·관심 팀 선수만 카드로 보여 준다. 나머지는 방송 탭 아래 목록과 팀·선수 화면의 LIVE 표시로
 // 스트리머·전 프로가 Apex가 아닌 게임을 방송 중인가 (방송 탭에는 게임 이름과 함께 보이고, 홈에는 올리지 않는다)
-const offApex = (l) => l.kind === 'creator' && !!l.game && !/apex|에이펙스|에펙|エーペックス/i.test(l.game);
-const liveShown = (l) => !l.intl || starred(l.team) || isF(l.team) || liveId(l) === parseHash().q.get('play');
-const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : l.kind === 'creator' ? (offApex(l) ? 3.5 : 3) : 4);
+// 대전제: 선수·코치·스트리머의 방송은 Apex를 하고 있을 때만 '방송 중'으로 친다.
+//   Twitch·치지직은 방송에 붙은 게임(카테고리)으로 판단한다. YouTube는 게임 표시를 알 수 없어, 선수 채널은 그대로 두고 스트리머 채널만 서버가 제목·태그로 거른다.
+const APEX_RE = /apex|에이펙스|에펙|エーペックス/i;
+const apexLive = (l) => !(l.kind === 'player' || l.kind === 'creator') || l.platform === 'youtube' || APEX_RE.test(l.game || '');
+const setStreams = (j) => { ST = { ...j, live: (j.live || []).filter(apexLive) }; };
+// 카드로 보여 줄 방송: 선수·코치는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀만. 스트리머·전 프로, 공식 중계·파트너는 보기와 상관없이 항상
+const liveShown = (l) => l.kind !== 'player' || !l.team || starred(l.team) || isF(l.team) || liveId(l) === parseHash().q.get('play');
+const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : l.kind === 'creator' ? 3 : 4);
 const liveList = () => (ST?.live || []).filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
 const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
 const playHref = (l) => (l.embed ? `#/streams?play=${encodeURIComponent(liveId(l))}` : esc(l.url));
@@ -2213,7 +2218,7 @@ function liveCard(l, i, asLink) {
   const hide = opt.spoiler; // 결과 가리기: 제목과 미리보기에 결과가 드러날 수 있어 가린다
   const inner = `<span class="lv-thumb">${l.thumb && !hide ? `<img src="${esc(l.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="tag live">LIVE</span>${l.embed ? '<span class="yt-play" aria-hidden="true"></span>' : ''}</span>
     <span class="lv-meta"><b>${liveWho(l)}</b><span class="lv-title">${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(l.title || '')}</span>
-    <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${offApex(l) ? `<span class="lv-game">${esc(l.game)}</span>` : ''}${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
+    <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
   if (asLink && l.embed) return `<a class="lv-card" href="${playHref(l)}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
   return l.embed
     ? `<button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
@@ -2224,7 +2229,7 @@ function liveSection() {
   if (!ST) return '<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="lead">방송 상태를 확인하는 중입니다.</p></section>';
   const L = liveList();
   const rest = ST.live.filter((l) => !liveShown(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
-  const others = rest.length ? `<details class="lv-rest"><summary>다른 팀 선수 방송 <small class="muted">${rest.length}</small></summary><p class="caption">팀을 응원 팀(별표)으로 고르면 그 팀 선수 방송이 위 카드와 홈에 보입니다.</p>
+  const others = rest.length ? `<details class="lv-rest"><summary>다른 팀 선수 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀의 선수 방송이 나옵니다.</p>
     <ul>${rest.map((l) => `<li><a href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}><b>${esc(l.who)}</b></a>${team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
   const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
   const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
@@ -2259,7 +2264,7 @@ function videoSection(q) {
 }
 // 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다
 function liveStrip() {
-  const L = liveList().filter((l) => l.kind !== 'partner' && !offApex(l));
+  const L = liveList().filter((l) => l.kind !== 'partner');
   if (!L.length) return '';
   return `<section class="sec lv lv-home" aria-labelledby="h-lvh"><div class="sec-head"><h2 class="h2" id="h-lvh">지금 방송 중 <small class="muted">${L.length}</small></h2><a class="more" href="#/streams">방송 전체</a></div>
     <div class="lv-grid">${L.slice(0, 3).map((l, i) => liveCard(l, i, true)).join('')}</div></section>`;
@@ -2284,20 +2289,20 @@ function liveBadge() {
 let stCached = false, stRetry = 0;
 function loadStreamsCache() {
   if (!C.streamsUrl || ST) return;
-  try { const c = JSON.parse(localStorage.getItem('algskr.streams') || 'null'); if (c?.j && Array.isArray(c.j.live) && Date.now() - c.t < 5 * 60e3) { ST = c.j; stCached = true; } } catch { /* 없으면 새로 받는다 */ }
+  try { const c = JSON.parse(localStorage.getItem('algskr.streams') || 'null'); if (c?.j && Array.isArray(c.j.live) && Date.now() - c.t < 5 * 60e3) { setStreams(c.j); stCached = true; } } catch { /* 없으면 새로 받는다 */ }
 }
 async function pollStreams() {
   if (!C.streamsUrl || document.hidden) return;
   try {
     const r = await fetch(C.streamsUrl, { cache: 'no-store' }); if (!r.ok) return;
     const j = await r.json(); if (!j || !Array.isArray(j.live)) return;
-    const first = !ST || stCached; ST = j; stCached = false;
+    const first = !ST || stCached; setStreams(j); stCached = false;
     // 한동안 아무도 열지 않았으면 Worker가 예전 결과를 먼저 준다(뒤에서 새로 모으는 중). 그럴 땐 몇 초 뒤 한 번 더 받아 온다
     if (Date.now() - Date.parse(j.at) > 90e3 && !stRetry) stRetry = setTimeout(() => { stRetry = 0; pollStreams(); }, 4000);
     try { localStorage.setItem('algskr.streams', JSON.stringify({ t: Date.now(), j })); } catch { /* 저장 못 해도 동작에는 지장 없음 */ }
-    const sig = JSON.stringify([j.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
+    const sig = JSON.stringify([ST.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
     liveBadge();
-    const osig = JSON.stringify(j.live.filter((l) => l.kind === 'official').map((l) => [l.key, l.platform]));
+    const osig = JSON.stringify(ST.live.filter((l) => l.kind === 'official').map((l) => [l.key, l.platform]));
     const oChanged = osig !== stOSig; stOSig = osig;
     if (sig === stSig && !first) return;
     stSig = sig;
@@ -2341,10 +2346,10 @@ function streams(parts, q) {
       ${show('players') ? `<section class="sec"><h2 class="h2">한국 선수 개인 방송</h2>
         ${players.map(streamRow).join('')}
         <p class="lead">${fbLink('채널 제보', '', '선수 CHZZK·YouTube 채널 제보하기')}</p>
-        ${S.creators?.length && sv === 'all' ? `<h3 class="h3 cr-h">한국 스트리머·전 프로</h3>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 다른 게임을 방송 중일 때는 게임 이름이 함께 표시됩니다.</p>` : ''}
+        ${S.creators?.length && sv === 'all' ? `<h3 class="h3 cr-h">한국 스트리머·전 프로</h3>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.</p>` : ''}
         <p class="lead">채움 칩은 확인된 채널(공식 API, Liquipedia 선수 페이지, 운영자 입력), 점선 칩은 확인된 채널이 없어 해당 플랫폼에서 이름으로 검색하는 링크입니다. 선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.</p>
       </section>` : ''}
-      ${sv === 'creators' && S.creators?.length ? `<section class="sec"><h2 class="h2">한국 스트리머·전 프로</h2>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 다른 게임을 방송 중일 때는 게임 이름이 함께 표시됩니다.</p></section>` : ''}
+      ${sv === 'creators' && S.creators?.length ? `<section class="sec"><h2 class="h2">한국 스트리머·전 프로</h2>${S.creators.map(creatorRow).join('')}<p class="caption">대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.</p></section>` : ''}
     </div>`;
 }
 
