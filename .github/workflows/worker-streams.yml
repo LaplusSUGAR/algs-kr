@@ -69,5 +69,5 @@ jobs:
             if echo "$body" | jq -e '.live' >/dev/null 2>&1; then break; fi
             sleep 10
           done
-          echo "$body" | jq '{at, ok, err, calls, live: [.live[] | select(.intl | not) | {who, platform, viewers, title, tr}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'
+          echo "$body" | jq '{at, ok, err, calls, liveAll: (.live | length), translated: ([.live[] | select(.tr)] | length), trSample: ([.live[] | select(.tr)][:4] | map({title, tr})), live: [.live[] | select(.intl | not) | {who, platform, viewers, title, tr}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'
           echo "치지직 점검:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/chzzk" | jq -c '.[]' || true
