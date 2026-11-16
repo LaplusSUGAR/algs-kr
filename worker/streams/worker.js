@@ -1,4 +1,4 @@
-// 방송 상태 Worker (Cloudflare Workers, 저장소 없이 캐시만 사용)
+// 방송 상태 Worker (Cloudflare Workers). KV 가 묶여 있으면 예약 실행 + KV, 없으면 예전처럼 캐시만 쓴다
 //
 // GET /streams.json → { at, ok, live: [...], videos: [...] }
 //   - 채널 목록은 사이트가 빌드 때 내보내는 data/stream-channels.json 을 읽는다 (10분 캐시).
@@ -13,7 +13,21 @@ import { collect } from './collect.js';
 
 const json = (body, status, headers) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', ...headers } });
 
+// ── KV 방식(권장): 2분마다 예약 실행이 방송 상태를 모아 KV 한 칸('blob' = { state, latest, at })에 적어 두고,
+//    사이트 요청에는 그 값을 읽어 바로 돌려준다. 캐시 방식과 달리 어느 지역에서 열어도, 한동안 아무도 안 열었어도 기다리지 않는다.
+//    (KV 무료 한도: 쓰기 하루 1,000번 → 2분 간격이면 720번)
+const BLOB = 'blob';
+async function runKv(env) {
+  const blob = (await env.KV.get(BLOB, 'json')) || {};
+  const store = { get: async () => blob.state || null, put: async (_k, v) => { blob.state = v; } };
+  blob.latest = await collect({ env, fetch: (u, o) => fetch(u, o), store, now: Date.now() });
+  blob.at = Date.now();
+  await env.KV.put(BLOB, JSON.stringify(blob));
+  return blob;
+}
+
 export default {
+  async scheduled(_event, env, ctx) { if (env.KV) ctx.waitUntil(runKv(env).catch(() => {})); },
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
     const cors = { 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*', 'Vary': 'Origin' };
@@ -37,7 +51,23 @@ export default {
       }));
       return json(out, 200, cors);
     }
+    // 점검용: Twitch 채널 찾기 (?q=검색어 여러 개는 쉼표로). 공개 정보만
+    if (url.pathname === '/debug/twitch') {
+      const S = (env.KV ? (await env.KV.get(BLOB, 'json'))?.state : await cacheStore(caches.default, url.origin).get('state')) || {};
+      if (!S.token?.token) return json({ error: 'no token yet' }, 200, cors);
+      const H = { headers: { Authorization: `Bearer ${S.token.token}`, 'Client-Id': env.TWITCH_CLIENT_ID } };
+      const out = {};
+      for (const q of String(url.searchParams.get('q') || 'algs').split(',').slice(0, 8)) {
+        try { const j = await (await fetch(`https://api.twitch.tv/helix/search/channels?first=40&query=${encodeURIComponent(q)}`, H)).json(); out[q] = (j.data || []).map((c) => `${c.broadcaster_login}${c.is_live ? '(LIVE)' : ''} | ${c.display_name} | ${c.game_name || '-'} | ${String(c.title || '').slice(0, 60)}`); } catch (e) { out[q] = String(e).slice(0, 80); }
+      }
+      return json(out, 200, cors);
+    }
     if (url.pathname !== '/streams.json') return json({ error: 'not found' }, 404, cors);
+    if (env.KV) {
+      let blob = await env.KV.get(BLOB, 'json');
+      if (!blob?.latest || Date.now() - (blob.at || 0) > 10 * 60e3) blob = await runKv(env); // 예약 실행이 아직 안 돌았거나 멈췄을 때만 직접 모은다
+      return json(blob.latest, 200, { ...cors, 'Cache-Control': 'public, max-age=20' });
+    }
     const ttl = Number(env.LIVE_TTL || 60), keep = Number(env.STALE_TTL || 900);
     const cache = caches.default, key = new Request(`${url.origin}/streams.json`);
     // 모은 결과는 keep초 동안 두고, ttl초가 지나면 '낡은 것'으로 본다.

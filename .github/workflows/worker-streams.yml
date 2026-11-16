@@ -43,6 +43,13 @@ jobs:
           if [ -z "$cur" ]; then echo "::error::workers.dev 주소 이름을 등록하지 못했습니다. Cloudflare 대시보드의 Workers & Pages에서 직접 만들어 주세요."; exit 1; fi
           echo "workers.dev 이름: $cur"
           echo "SUB=$cur" >> "$GITHUB_ENV"
+      - name: KV 저장소 확인 (없으면 만들기)
+        if: steps.has.outputs.ok == '1'
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/storage/kv/namespaces"
+          id=$(curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$api?per_page=100" | jq -r '.result[]? | select(.title == "algs-kr-streams") | .id' | head -1)
+          if [ -z "$id" ]; then id=$(curl -sS -X POST -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" -d '{"title":"algs-kr-streams"}' "$api" | jq -r '.result.id // empty'); fi
+          if [ -n "$id" ]; then printf '\n[[kv_namespaces]]\nbinding = "KV"\nid = "%s"\n' "$id" >> worker/streams/wrangler.toml; echo "KV 사용"; else echo "::warning::KV 저장소를 만들지 못했습니다(API 토큰에 Workers KV Storage 편집 권한 필요). 예전 방식(캐시)으로 배포합니다."; fi
       - name: 배포
         if: steps.has.outputs.ok == '1'
         working-directory: worker/streams
@@ -70,4 +77,5 @@ jobs:
             sleep 10
           done
           echo "$body" | jq '{at, ok, err, calls, liveAll: (.live | length), translated: ([.live[] | select(.tr)] | length), trSample: ([.live[] | select(.tr)][:4] | map({title, tr})), live: [.live[] | select(.intl | not) | {who, platform, viewers, title, tr}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'
+          echo "Twitch 채널 찾기:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/twitch?q=algs,playapex,algs%20pov,apex%20legends%20global%20series,rage%20apex,algs%20apac" | jq . || true
           echo "치지직 점검:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/chzzk" | jq -c '.[]' || true

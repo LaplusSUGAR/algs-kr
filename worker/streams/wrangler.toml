@@ -7,6 +7,10 @@ workers_dev = true
 [ai]
 binding = "AI"
 
+# 2분마다 방송 상태를 모아 KV 에 적는다 (KV 묶음은 배포 워크플로가 만들어 아래에 덧붙인다)
+[triggers]
+crons = ["*/2 * * * *"]
+
 [vars]
 SITE_URL = "https://laplussugar.github.io/algs-kr"
 ALLOWED_ORIGIN = "https://laplussugar.github.io"
