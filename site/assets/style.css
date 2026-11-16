@@ -1172,7 +1172,8 @@ table.rl td.rl-at { white-space: nowrap; }
 @media (max-width: 520px) {
   .lv-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .lv-card { grid-template-rows: none; grid-template-columns: 42% minmax(0, 1fr); align-items: stretch; }
-  .lv-thumb { aspect-ratio: auto; min-height: 84px; }
+  /* 미리보기는 늘 16:9 칸: YouTube 그림(hqdefault, 4:3에 위아래 검은 띠)도 띠가 잘려 다른 플랫폼과 같은 크기가 된다 */
+  .lv-thumb { aspect-ratio: 16 / 9; align-self: start; }
   .lv-thumb .yt-play { transform: translate(-50%, -50%) scale(.62); }
   .lv-meta { padding: 8px 10px; }
   .lv-ext { position: static; grid-column: 2; justify-self: start; margin: 0 10px 8px; background: none; color: var(--steel); padding: 0; }
