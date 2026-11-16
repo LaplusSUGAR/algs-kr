@@ -367,16 +367,17 @@ const ccOf = (region) => {
   //   1) config/overrides.json ccRenames { 옛 이름: 새 이름 }  2) 참가 명단에 같은 이름이 없고, 선수(서브 제외) 2명 이상이 같은 참가 팀이 하나뿐이면 그 이름
   const opps = [...(lpLcq?.pages?.[region]?.text || '').matchAll(/\{\{Opponent\|([^\n|}]*)\s*\|players=\{\{Persons([\s\S]*?)\n\s*\}\}/g)]
     .map((m) => {
-      const ps = [...m[2].matchAll(/\{\{Person\|([^|}]+)([^}]*)\}\}/g)].map((p) => ({ n: p[1].trim(), c: (p[2].match(/flag=([a-z]{2})\b/i)?.[1] || '').toUpperCase(), sub: /status=sub|played=false/.test(p[2]) }));
-      return { name: m[1].trim(), roster: ps, players: ps.filter((p) => !p.sub).map((p) => nk(p.n)) };
+      // type=staff(코치·분석가 등)는 선수가 아니다: 명단에서는 코치로 표시하고, 팀 맞추기(같은 선수 2명)에는 쓰지 않는다
+      const ps = [...m[2].matchAll(/\{\{Person\|([^|}]+)([^}]*)\}\}/g)].map((p) => ({ n: p[1].trim(), c: (p[2].match(/flag=([a-z]{2})\b/i)?.[1] || '').toUpperCase(), sub: /status=sub|played=false/.test(p[2]), staff: /type=staff/.test(p[2]) }));
+      return { name: m[1].trim(), roster: ps, players: ps.filter((p) => !p.sub && !p.staff).map((p) => nk(p.n)) };
     });
   const oppNames = new Set(opps.map((o) => nk(o.name)));
   const ccSrc = new Map((lpTeamsSrc.pages?.[`cc:${region}`]?.teams || []).map((t) => [nk(t.name), t.players || []]));
   const ccPlayers = new Map([...ccSrc].map(([k, v]) => [k, v.map(nk)]));
-  // 선수 명단: LCQ 참가 명단(국적·서브 포함) > 서킷 순위표 팀 카드. [이름, 국적, 서브면 1]
+  // 선수 명단: LCQ 참가 명단(국적·서브 포함) > 서킷 순위표 팀 카드. [이름, 국적, 서브면 1, 스태프면 'k'] (스태프는 선수 뒤에)
   const rosterOf = (name, was) => {
     const o = opps.find((x) => nk(x.name) === nk(name)) || (was && opps.find((x) => nk(x.name) === nk(was)));
-    if (o?.roster.length) return o.roster.map((p) => [p.n, p.c, p.sub ? 1 : 0]);
+    if (o?.roster.length) return [...o.roster.filter((p) => !p.staff).map((p) => [p.n, p.c, p.sub ? 1 : 0]), ...o.roster.filter((p) => p.staff).map((p) => [p.n, p.c, 0, 'k'])];
     return (ccSrc.get(nk(was || name)) || ccSrc.get(nk(name)) || []).map((n) => [n, '', 0]);
   };
   const renameOf = (name) => {
@@ -433,7 +434,9 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
   // 확정 시드(운영자 입력): 40팀이 모두 맞을 때만 쓴다
   const fixed = ov.lcqSeeds?.[e.region];
   if (fixed?.length && ts.length) {
-    const find = (n) => ts.find((t) => t.short === n) || ts.find((t) => [t.name, t.off, t.ccKey].some((x) => x && flat(x) === flat(n)));
+    // 서킷 팀의 옛 이름도 받는다: 확정 시드를 적은 뒤 Liquipedia에서 팀 이름이 바뀌어도(예: waked → CAC EST) 그대로 맞게
+    const wasOf = (t) => cc.find((c) => c.short === t.ccKey)?.was;
+    const find = (n) => ts.find((t) => t.short === n) || ts.find((t) => [t.name, t.off, t.ccKey, wasOf(t)].some((x) => x && flat(x) === flat(n)));
     const hit = fixed.map(find), miss = fixed.filter((_, i) => !hit[i]);
     if (!miss.length && new Set(hit).size === ts.length) hit.forEach((t, i) => { t.seed = i + 1; t.seedFixed = 1; });
     else console.warn(`[build] LCQ ${e.region}: lcqSeeds 를 쓰지 않음 (명단 ${ts.length}팀, 입력 ${fixed.length}팀, 못 찾은 이름: ${miss.join(', ') || '없음'}${new Set(hit).size !== hit.length ? ', 겹친 팀 있음' : ''})`);

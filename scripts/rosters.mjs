@@ -150,10 +150,12 @@ export function createRosterWatch(nowIso) {
   W.cc = (lcq) => {
     for (const e of lcq) for (const c of e.cc || []) {
       const k = `${e.region}:${nk(c.was || c.name)}`;
-      const cur = (c.players || []).filter((p) => !p[2]).map((p) => p[0]);
+      // 서브·스태프(코치 등)는 빼고 선수만 비교한다. 예전 상태에 스태프가 선수로 들어 있던 것은 '빠짐'으로 기록하지 않는다
+      const cur = (c.players || []).filter((p) => !p[2] && p[3] !== 'k').map((p) => p[0]);
+      const staff = new Set((c.players || []).filter((p) => p[3] === 'k').map((p) => nk(p[0])));
       const p = st.cc[k];
       if (p && !first) {
-        const out = p.filter((n) => !cur.some((x) => nk(x) === nk(n))), inn = cur.filter((n) => !p.some((x) => nk(x) === nk(n)));
+        const out = p.filter((n) => !cur.some((x) => nk(x) === nk(n)) && !staff.has(nk(n))), inn = cur.filter((n) => !p.some((x) => nk(x) === nk(n)));
         if (out.length || inn.length) add({ kind: 'cc', team: c.name, region: e.region, out, in: inn });
       }
       st.cc[k] = cur;
