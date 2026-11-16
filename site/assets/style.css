@@ -1321,3 +1321,7 @@ html.lv-cinema, html.lv-cinema body { overflow: hidden; }
 .lv-player.cinema .lv-tbar { background: #101114; color: #fff; padding: 3px 8px; }
 .lv-player.cinema .lv-x:hover { background: #2a2d35; }
 .lv-player.cinema .lv-tile .yt-frame { aspect-ratio: auto; height: 100%; max-height: none; }
+
+.lv-add { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; min-height: 28px; }
+.lv-add::before { content: '▶'; font-size: 9px; margin-right: 6px; color: var(--steel); }
+.lv-add.on { color: var(--apex); } .lv-add.on::before { color: var(--apex); }

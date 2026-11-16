@@ -2226,7 +2226,7 @@ function lvSync() {
   const ids = lvIds();
   if (!ids.length) { lvCinema(false); box.innerHTML = ''; box.hidden = true; mvOn = false; if (parseHash().q.has('play')) history.replaceState(null, '', '#/streams'); } // 닫은 뒤 새로고침 때 다시 열리지 않게
   else { box.querySelector('.lv-tiles').dataset.n = ids.length; box.querySelector('[data-mv]').setAttribute('aria-pressed', String(mvOn)); box.classList.toggle('multi', ids.length > 1); }
-  document.querySelectorAll('#app button.lv-card').forEach((c) => c.classList.toggle('on', ids.includes(c.dataset.lvid)));
+  document.querySelectorAll('#app button.lv-card, #app button.lv-add').forEach((c) => c.classList.toggle('on', ids.includes(c.dataset.lvid)));
 }
 function lvCinema(on) {
   const box = lvBox(); if (!box) return;
@@ -2277,7 +2277,7 @@ function liveSection() {
   const L = liveList();
   const rest = ST.live.filter((l) => !liveShown(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
   const others = rest.length ? `<details class="lv-rest"><summary>다른 팀 선수 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀의 선수 방송이 나옵니다.</p>
-    <ul>${rest.map((l) => `<li><a href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}><b>${esc(l.who)}</b></a>${team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
+    <ul>${rest.map((l) => `<li>${l.embed ? `<button class="lv-add" type="button" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생"><b>${esc(l.who)}</b></button>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.who)}</b></a>`}${team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
   const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
   const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
   if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p><div class="lv-player" id="lvPlayer" hidden></div>${others}${foot}</section>`;
@@ -2428,7 +2428,7 @@ function bind() {
   const fs = document.getElementById('favSearch');
   if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
-  app.querySelectorAll('button.lv-card').forEach((b) => b.addEventListener('click', () => playLive(b.dataset.lvid)));
+  app.querySelectorAll('button.lv-card, button.lv-add').forEach((b) => b.addEventListener('click', () => playLive(b.dataset.lvid))); // 접힌 '다른 팀 선수 방송' 목록도 같은 플레이어(멀티뷰)로
   { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
     const want = parseHash().q.get('play'), box = document.getElementById('lvPlayer');
     if (want && box && !box.querySelector('iframe')) [...app.querySelectorAll('button.lv-card')].find((b) => b.dataset.lvid === want)?.click();
