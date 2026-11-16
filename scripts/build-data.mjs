@@ -593,7 +593,9 @@ function unpackIds(d) {
 }
 
 // 채널 목록 파일은 내용이 바뀔 때만 다시 쓴다 (본 데이터 버전과 따로)
-{ const txt = JSON.stringify({ channels: streamChannels, intl: streamIntl }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
+{ const pc = season.povChannels || {};
+  const pov = (pc.prefixes || []).flatMap((x) => [...Array.from({ length: pc.teams || 20 }, (_, i) => `${x}_team${i + 1}`), ...(pc.map ? [`${x}_map`] : [])]);
+  const txt = JSON.stringify({ channels: streamChannels, intl: streamIntl, pov }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
 const v = hash(JSON.stringify({ ...data, generated: null }));
 const prevVer = readJson('site/data/ver.json');
 if (prevVer?.v === v && !process.argv.includes('--force')) { console.log(`[build] 변경 없음 (v=${v})`); process.exit(0); }

@@ -192,6 +192,8 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    ['그 밖의 방송', 'その他の配信', 'Other streams'], ['팀 화면', 'チーム視点', 'Team POV'],
+    ['위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.', '上のカードには、選択中の表示（韓国関連 / APAC North / お気に入り）に合う配信だけが出ます。ここで選んだ配信も同じプレーヤーとマルチビューで見られます。', 'The cards above show only streams that match your current view (Korea-related / APAC North / My teams). Streams picked here open in the same player and Multiview.'],
     ['방송 보기', '配信を見る', 'Watching'], ['시네마 모드', 'シネマモード', 'Cinema mode'], ['시네마 모드 끝내기', 'シネマモード終了', 'Exit cinema mode'],
     ['멀티뷰를 켜고 아래 방송 카드를 누르면 화면이 추가됩니다(최대 4개).', 'マルチビューをオンにして下の配信カードを押すと、画面が追加されます（最大4つ）。', 'Turn on Multiview and tap stream cards below to add screens (up to 4).'],
     ['선수·코치 방송', '選手・コーチの配信', 'Players & coaches'], ['선수·코치', '選手・コーチ', 'Players'], ['스트리머·전 프로', 'ストリーマー・元プロ', 'Streamers & former pros'],

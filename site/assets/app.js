@@ -2197,21 +2197,41 @@ const APEX_RE = /apex|에이펙스|에펙|エーペックス/i;
 const apexLive = (l) => !(l.kind === 'player' || l.kind === 'creator') || l.platform === 'youtube' || APEX_RE.test(l.game || '');
 const setStreams = (j) => { ST = { ...j, live: (j.live || []).filter(apexLive) }; };
 // 카드로 보여 줄 방송: 선수·코치는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀만. 스트리머·전 프로, 공식 중계·파트너는 보기와 상관없이 항상
-const liveShown = (l) => l.kind !== 'player' || !l.team || starred(l.team) || isF(l.team) || liveId(l) === parseHash().q.get('play');
-const liveRank = (l) => (l.kind === 'player' && (starred(l.team) || (isF(l.team) && focusList().some((k) => k.short === l.team))) ? 0 : l.kind === 'official' ? 1 : l.kind === 'player' ? 2 : l.kind === 'creator' ? 3 : 4);
+// 보기에 따라 카드로 보여 줄 방송 (나머지는 방송 탭의 접힌 '그 밖의 방송' 목록):
+//   한국 관련  : 한국 선수·코치(한국 국적·한국계) + 한국 스트리머·전 프로 / 대회 때는 영어·일본어 공식 중계 + 한국 관련 팀의 공식 팀 화면
+//   APAC North: APAC North 팀 선수 / 대회 때는 일본어 공식 중계 + APAC North 팀의 공식 팀 화면
+//   내 응원 팀 : 고른 팀 선수 / 대회 때는 영어·일본어 공식 중계 + 고른 팀의 공식 팀 화면
+// 공식 중계와 공식 팀 화면은 대회 때만 켜지므로 따로 '대회 중' 판단은 하지 않는다
+const flatName = (x) => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+let POV_IX = null, POV_SRC = null;
+function povTeam(l) { // 공식 팀 화면의 제목 속 팀 이름 → 팀 약칭
+  if (POV_SRC !== A) { POV_SRC = A; POV_IX = new Map(); for (const t of [...Object.values(A.xteams || {}), ...Object.values(A.teams)]) for (const n of [t.name, t.was, t.short]) if (n) POV_IX.set(flatName(n), t.short); }
+  return POV_IX.get(flatName(l.pov)) || null;
+}
+const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
+const inFocus = (short) => { const t = team(short); return !!t && (opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short)); };
+function liveShown(l) {
+  if (liveId(l) === parseHash().q.get('play')) return true;
+  if (l.kind === 'official') return opt.mode === 'apn' ? l.key === 'o:ja' : true;
+  if (l.kind === 'pov') return !l.map && inFocus(povTeam(l));
+  if (l.kind === 'creator') return opt.mode !== 'apn' && opt.mode !== 'custom';
+  if (l.kind === 'player') return opt.mode === 'apn' || opt.mode === 'custom' ? inFocus(l.team) : !l.intl;
+  return false; // 공식 파트너 등
+}
+const liveRank = (l) => ({ official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4); // 공식 중계 → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
 const liveList = () => (ST?.live || []).filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
 const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
 const playHref = (l) => (l.embed ? `#/streams?play=${encodeURIComponent(liveId(l))}` : esc(l.url));
 // 이름 옆 LIVE 표시: 누르면 그 방송으로
 const liveTag = (name, short) => { const l = liveOf(name, short); return l ? ` <a class="tag live" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'} aria-label="${esc(name)} 방송 중, 방송 보기">LIVE</a>` : ''; };
 // 팀·선수 화면 맨 위: 그 팀(선수)이 방송 중이면 카드로
-const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => l.kind === 'player' && pick(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0)); return L.length ? `<section class="sec lv lv-home"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2><div class="lv-grid">${L.slice(0, 6).map((l, i) => liveCard(l, i, true)).join('')}</div></section>` : ''; };
+const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => (l.kind === 'player' && pick(l)) || (l.kind === 'pov' && !l.map && pick({ ...l, team: povTeam(l), who: '' }))).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0)); return L.length ? `<section class="sec lv lv-home"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2><div class="lv-grid">${L.slice(0, 6).map((l, i) => liveCard(l, i, true)).join('')}</div></section>` : ''; };
 // 진행 중인 경기 옆 '중계 보기': 공식 중계가 켜져 있으면 그 방송을 방송 탭에서 바로 열고, 켜진 중계를 못 찾으면 공식 중계 채널 목록으로
 const officialLive = () => { const L = (ST?.live || []).filter((l) => l.kind === 'official'); const pref = I.lang === 'ja' ? 'o:ja' : 'o:en'; return L.find((l) => l.key === pref && l.embed) || L.find((l) => l.embed) || L[0] || null; };
 const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive(); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
 const newVideos = () => (ST?.videos || []).filter((v) => !v.short && v.platform !== 'twitch' && vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
-const liveWho = (l) => (l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
+const liveWho = (l) => (l.kind === 'pov' ? `${esc(xteam(povTeam(l))?.name || l.who)} <small>팀 화면</small>` : l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e, muted) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true${muted ? '&muted=true' : ''}` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0${muted ? '&mute=1' : ''}`); // 두 번째 화면부터는 소리를 끄고 시작한다(소리가 겹치지 않게)
 const liveId = (l) => `${l.key}|${l.platform}`;
 // ── 사이트 안 플레이어 ──
@@ -2276,8 +2296,8 @@ function liveSection() {
   if (!ST) return '<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="lead">방송 상태를 확인하는 중입니다.</p></section>';
   const L = liveList();
   const rest = ST.live.filter((l) => !liveShown(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
-  const others = rest.length ? `<details class="lv-rest"><summary>다른 팀 선수 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀의 선수 방송이 나옵니다.</p>
-    <ul>${rest.map((l) => `<li>${l.embed ? `<button class="lv-add" type="button" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생"><b>${esc(l.who)}</b></button>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.who)}</b></a>`}${team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
+  const others = rest.length ? `<details class="lv-rest"><summary>그 밖의 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.</p>
+    <ul>${rest.map((l) => `<li>${l.embed ? `<button class="lv-add" type="button" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생"><b>${liveWho(l)}</b></button>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.who)}</b></a>`}${l.kind === 'player' && team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
   const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
   const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
   if (!L.length) return `<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="empty">지금 방송 중인 채널이 없습니다.</p><div class="lv-player" id="lvPlayer" hidden></div>${others}${foot}</section>`;

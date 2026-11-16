@@ -33,7 +33,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   // 채널 목록 (사이트가 빌드 때 만든 파일, 10분마다 다시 읽는다. 못 읽으면 전에 읽은 목록)
   if (stale(S.channels?.at, 600)) {
     const [j, e] = await safe(() => getJson(f, `${String(env.SITE_URL || '').replace(/\/$/, '')}/data/stream-channels.json`));
-    if (j) { S.channels = { at: now, list: (j.channels || []).slice(0, 120), intl: (j.intl || []).filter((x) => Array.isArray(x) && /^[A-Za-z0-9_]{2,30}$/.test(x[0] || '')).slice(0, 800) }; dirty = true; }
+    if (j) { S.channels = { at: now, list: (j.channels || []).slice(0, 120), intl: (j.intl || []).filter((x) => Array.isArray(x) && /^[A-Za-z0-9_]{2,30}$/.test(x[0] || '')).slice(0, 800), pov: (j.pov || []).filter((x) => /^[A-Za-z0-9_]{2,30}$/.test(x || '')).slice(0, 200) }; dirty = true; }
     else if (!S.channels) { out.err.channels = e; return finish(); }
   }
   const chs = S.channels.list;
@@ -43,7 +43,9 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   let ytVideos = []; // 최근 영상: YouTube 업로드
 
   // 그 밖의 선수(전 팀)는 Twitch만, Apex 방송일 때만
-  const tw = chs.filter((c) => c.twitch).concat(S.channels.intl.map(([login, who, team]) => ({ key: `p:${String(who).toLowerCase()}`, who, team, kind: 'player', intl: true, apexOnly: true, twitch: login })));
+  const tw = chs.filter((c) => c.twitch).concat(S.channels.intl.map(([login, who, team]) => ({ key: `p:${String(who).toLowerCase()}`, who, team, kind: 'player', intl: true, apexOnly: true, twitch: login })))
+    // 공식 팀 화면 채널(대회 때만 켜진다): 제목 맨 앞이 팀 이름
+    .concat((S.channels.pov || []).map((login) => ({ key: `v:${login}`, who: login, kind: 'pov', twitch: login })));
   const twOn = !!(tw.length && env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET);
   const byLogin = new Map(); for (const c of tw) { const k = c.twitch.toLowerCase(); if (!byLogin.has(k)) byLogin.set(k, c); } // 같은 채널이면 앞(한국 관련·공식)이 우선
   const yt = chs.filter((c) => c.youtube);
@@ -80,6 +82,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
         const c = byLogin.get(String(s.user_login).toLowerCase()); if (!c || s.type !== 'live') continue;
         liveStreamIds.add(String(s.id));
         if (c.apexOnly && !isApex(s.game_name)) continue;
+        if (c.kind === 'pov') { const name = String(s.title || '').split('|')[0].trim(); if (!name) continue; out.live.push({ key: c.key, who: name, team: null, kind: 'pov', pov: name, map: /^map$/i.test(name) || undefined, platform: 'twitch', title: String(s.title || '').split('|').slice(1).join('|').trim(), game: s.game_name || '', viewers: s.viewer_count ?? null, started: s.started_at || null, thumb: String(s.thumbnail_url || '').replace('{width}', '640').replace('{height}', '360'), url: `https://www.twitch.tv/${s.user_login}`, embed: { type: 'twitch', channel: s.user_login } }); continue; }
         out.live.push({ ...meta(c), platform: 'twitch', title: s.title || '', game: s.game_name || '', viewers: s.viewer_count ?? null, started: s.started_at || null, thumb: String(s.thumbnail_url || '').replace('{width}', '640').replace('{height}', '360'), url: `https://www.twitch.tv/${s.user_login}`, embed: { type: 'twitch', channel: s.user_login } });
       }
     }));
@@ -157,7 +160,7 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   // 방송 제목 번역 (Workers AI, 무료 할당량 안에서): 제목마다 한 번만 번역해 기억해 둔다. 한 요청에 새 제목 4개까지, 실패하면 10분 쉰다
   S.tr = S.tr || {};
   // 카드로 먼저 보이는 방송(한국 관련·공식·스트리머)의 제목부터
-  const titles = [...new Set([...out.live.filter((l) => !l.intl), ...out.live.filter((l) => l.intl)].map((l) => String(l.title || '').trim()).filter((t) => t.length >= 2))];
+  const titles = [...new Set([...out.live.filter((l) => !l.intl), ...out.live.filter((l) => l.intl)].filter((l) => l.kind !== 'pov').map((l) => String(l.title || '').trim()).filter((t) => t.length >= 2))];
   if (env.AI && !(S.trFailAt && now - S.trFailAt < 600e3)) {
     const todo = titles.filter((t) => !S.tr[t]).slice(0, trPlan + take(2));
     await Promise.all(todo.map(async (t) => {
