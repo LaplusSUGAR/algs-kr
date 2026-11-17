@@ -5,6 +5,11 @@ const safe = async (fn) => { try { return [await fn(), null]; } catch (e) { retu
 const getJson = async (f, url, opt = {}) => { const r = await f(url, { ...opt, headers: { 'User-Agent': UA, Accept: 'application/json', ...(opt.headers || {}) } }); if (!r.ok) throw new Error(`${new URL(url).hostname} ${r.status}`); return r.json(); };
 const decode = (s) => String(s || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
+// 갱신 차례는 시각에서 바로 나온다: '마지막으로 받은 때'를 KV 에 적어 두면 그 값이 매번 바뀌어,
+//   모아 온 내용이 앞 차례와 같아도 KV 에 다시 써야 했다(무료 한도 쓰기 1,000/일 중 720을 그렇게 썼다).
+//   예약 실행은 2분 간격(wrangler.toml)이므로, 지금이 몇 번째 차례인지로 '이번에 받을 몫'을 정한다.
+const TURNS = { feed: 3, shorts: 15, channels: 5 }; // 2분 × 3 = 6분(피드), × 15 = 30분(쇼츠), × 5 = 10분(채널 목록)
+
 // 여러 게임을 다루는 채널(apexOnly)은 Apex 방송·영상만 내보낸다: Twitch는 게임 이름, YouTube는 제목·태그로 판단
 const APEX = /apex|algs|エーペックス|エペ|에이펙스|에펙/i;
 const isApex = (...texts) => texts.some((t) => APEX.test(String(t || '')));
@@ -15,6 +20,7 @@ const isApex = (...texts) => texts.some((t) => APEX.test(String(t || '')));
 //   이번에 못 한 갱신은 저장해 둔 값을 그대로 쓰고 다음 요청(약 1분 뒤)에서 이어서 한다.
 export async function collect({ env, fetch: rawFetch, store, now }) {
   const BUDGET = Number(env.SUBREQ_BUDGET || 40); // Worker 본체의 응답 캐시 읽기·쓰기 몫을 남겨 둔 값
+  const turn = Math.floor(now / (Number(env.CRON_MINUTES || 2) * 6e4)); // 지금이 몇 번째 예약 실행 차례인지
   let used = 0;
   const f = (u, o) => { used++; return rawFetch(u, o); };
   const out = { at: new Date(now).toISOString(), ok: { twitch: null, youtube: null, chzzk: null }, err: {}, live: [], videos: [] };
@@ -22,7 +28,6 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   const S = (await safe(() => store.get('state')))[0] || {};
   for (const k of ['ytIds', 'feeds', 'shorts']) S[k] = S[k] || {};
   let dirty = false;
-  const stale = (at, sec) => !at || now - at > sec * 1000;
   const finish = async () => {
     if (dirty) { used++; await safe(() => store.put('state', S, 7 * 86400)); }
     out.calls = used;
@@ -31,9 +36,9 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   };
 
   // 채널 목록 (사이트가 빌드 때 만든 파일, 10분마다 다시 읽는다. 못 읽으면 전에 읽은 목록)
-  if (stale(S.channels?.at, 600)) {
+  if (!S.channels || turn % TURNS.channels === 0) {
     const [j, e] = await safe(() => getJson(f, `${String(env.SITE_URL || '').replace(/\/$/, '')}/data/stream-channels.json`));
-    if (j) { S.channels = { at: now, list: (j.channels || []).slice(0, 120), intl: (j.intl || []).filter((x) => Array.isArray(x) && /^[A-Za-z0-9_]{2,30}$/.test(x[0] || '')).slice(0, 800), pov: (j.pov || []).filter((x) => /^[A-Za-z0-9_]{2,30}$/.test(x || '')).slice(0, 200) }; dirty = true; }
+    if (j) { S.channels = { list: (j.channels || []).slice(0, 120), intl: (j.intl || []).filter((x) => Array.isArray(x) && /^[A-Za-z0-9_]{2,30}$/.test(x[0] || '')).slice(0, 800), pov: (j.pov || []).filter((x) => /^[A-Za-z0-9_]{2,30}$/.test(x || '')).slice(0, 200) }; dirty = true; }
     else if (!S.channels) { out.err.channels = e; return finish(); }
   }
   const chs = S.channels.list;
@@ -56,13 +61,14 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
   const needToken = twOn && !(S.token?.token && S.token.exp > now + 60e3);
   let left = BUDGET - used - 1 /* 끝의 저장 */ - (needToken ? 1 : 0) - (twOn ? Math.ceil(byLogin.size / 100) : 0) - cz.length - (yt.length && env.YOUTUBE_API_KEY ? 1 : 0);
   const take = (n) => { const k = Math.max(0, Math.min(n, left)); left -= k; return k; };
-  const oldest = (list, at) => list.slice().sort((a, b) => (at(a) || 0) - (at(b) || 0));
   const trPlan = env.AI ? take(2) : 0; // 방송 제목 번역 몫은 먼저 떼어 둔다(영상 피드 갱신에 밀려 영영 못 하지 않게)
   const idTodo = env.YOUTUBE_API_KEY ? yt.filter((c) => !ytId(c)) : [];
   const idNow = idTodo.slice(0, take(idTodo.length));
-  const feedStale = oldest(yt.filter((c) => idNow.includes(c) || (ytId(c) && stale(S.feeds[ytId(c)]?.at, 300))), (c) => S.feeds[ytId(c)]?.at);
+  // 피드·쇼츠는 이번 차례 몫만 받는다(채널을 돌아가며: 피드 6분, 쇼츠 30분에 한 번)
+  const myTurn = (i, n) => i % n === turn % n;
+  const feedStale = yt.filter((c, i) => idNow.includes(c) || (ytId(c) && myTurn(i, TURNS.feed)));
   const feedNow = new Set(feedStale.slice(0, take(feedStale.length)));
-  const shortStale = oldest(yt.filter((c) => ytId(c) && stale(S.shorts[ytId(c)]?.at, 1800)), (c) => S.shorts[ytId(c)]?.at);
+  const shortStale = yt.filter((c, i) => ytId(c) && myTurn(i, TURNS.shorts));
   const shortNow = shortStale.slice(0, take(shortStale.length));
   const jobs = [];
 
@@ -97,18 +103,18 @@ export async function collect({ env, fetch: rawFetch, store, now }) {
       const [j] = await safe(() => getJson(f, `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent('@' + handle)}&key=${env.YOUTUBE_API_KEY}`));
       const id = j?.items?.[0]?.id; if (id) { S.ytIds[handle.toLowerCase()] = id; dirty = true; }
     }));
-    // 채널 공개 피드 (최근 영상 약 15개, 5분마다)
+    // 채널 공개 피드 (최근 영상 약 15개, 채널을 돌아가며 6분에 한 번)
     await Promise.all([...feedNow].map(async (c) => {
       const id = ytId(c); if (!id) return;
       const [items] = await safe(() => youtubeFeed({ id, f }));
-      if (items) { S.feeds[id] = { at: now, items }; dirty = true; }
+      if (items) { S.feeds[id] = { items }; dirty = true; } // 받은 때는 적지 않는다(차례는 시각에서 나온다)
     }));
-    // 쇼츠: 채널의 쇼츠 재생목록('UUSH' + 채널 ID 뒷부분) 피드에 있는 영상, 30분마다. 쇼츠가 없는 채널은 피드가 없어 빈 목록
+    // 쇼츠: 채널의 쇼츠 재생목록('UUSH' + 채널 ID 뒷부분) 피드에 있는 영상, 채널을 돌아가며 30분에 한 번. 쇼츠가 없는 채널은 피드가 없어 빈 목록
     await Promise.all(shortNow.map(async (c) => {
       const id = ytId(c);
       const [r] = await safe(() => f(`https://www.youtube.com/feeds/videos.xml?playlist_id=UUSH${id.slice(2)}`, { headers: { 'User-Agent': UA } }));
       if (!r || !(r.ok || r.status === 404)) return;
-      S.shorts[id] = { at: now, ids: r.ok ? [...(await r.text()).matchAll(/<yt:videoId>([^<]+)</g)].map((m) => m[1]) : [] }; dirty = true;
+      S.shorts[id] = { ids: r.ok ? [...(await r.text()).matchAll(/<yt:videoId>([^<]+)</g)].map((m) => m[1]) : [] }; dirty = true;
     }));
     const cand = [];
     let anyId = false;

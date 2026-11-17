@@ -7,7 +7,8 @@ workers_dev = true
 [ai]
 binding = "AI"
 
-# 2분마다 방송 상태를 모아 KV 에 적는다 (KV 묶음은 배포 워크플로가 만들어 아래에 덧붙인다)
+# 2분마다 방송 상태를 모아 KV 에 적는다 (KV 묶음은 배포 워크플로가 만들어 아래에 덧붙인다).
+# KV 무료 한도는 읽기 100,000·쓰기 1,000/일이라, 매번 적지 않고 바뀐 때·방송 중 3분·평소 10분 간격으로만 적는다.
 [triggers]
 crons = ["*/2 * * * *"]
 
@@ -16,3 +17,10 @@ SITE_URL = "https://laplussugar.github.io/algs-kr"
 ALLOWED_ORIGIN = "https://laplussugar.github.io"
 VIDEO_DAYS = "21"
 LIVE_TTL = "60"
+# ── KV 사용량 (무료 한도: 쓰기 1,000/일, 읽기 100,000/일). 하루 예상: 평일 150번, 대회일 300~400번 ──
+CRON_MINUTES = "2"          # 예약 실행 간격(분). 위 crons 와 같아야 한다(피드·쇼츠를 돌아가며 받는 차례 계산에 쓴다)
+LIVE_WRITE_SEC = "180"      # 방송 중일 때 KV 에 적는 간격(초): 시청자 수 갱신
+IDLE_WRITE_SEC = "600"      # 아무것도 방송 중이 아닐 때 KV 에 적는 간격(초)
+MIN_WRITE_GAP_SEC = "45"    # 아무리 자주 바뀌어도 이 간격(초)보다 잦게는 적지 않는다
+STALE_SEC = "1200"          # 예약 실행이 이만큼(초) 못 돌면 사이트 요청이 대신 모은다
+EDGE_TTL_SEC = "30"         # 지역 캐시(Cache API)가 응답을 들고 있는 시간(초) = 지역마다 KV 를 읽는 간격

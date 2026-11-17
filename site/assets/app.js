@@ -2588,8 +2588,8 @@ async function pollStreams() {
     const r = await fetch(C.streamsUrl, { cache: 'no-store' }); if (!r.ok) return;
     const j = await r.json(); if (!j || !Array.isArray(j.live)) return;
     const first = !ST || stCached; setStreams(j); stCached = false;
-    // 한동안 아무도 열지 않았으면 Worker가 예전 결과를 먼저 준다(뒤에서 새로 모으는 중). 그럴 땐 몇 초 뒤 한 번 더 받아 온다
-    if (Date.now() - Date.parse(j.at) > 90e3 && !stRetry) stRetry = setTimeout(() => { stRetry = 0; pollStreams(); }, 4000);
+    // 예약 실행이 멈춰 값이 아주 낡았을 때만 몇 초 뒤 한 번 더 받아 온다 (Worker 가 요청을 받을 때 직접 모으는 경우가 대부분이라 그때는 필요 없다)
+    if (Date.now() - Date.parse(j.at) > 12 * 60e3 && !stRetry) stRetry = setTimeout(() => { stRetry = 0; pollStreams(); }, 4000);
     try { localStorage.setItem('algskr.streams', JSON.stringify({ t: Date.now(), j })); } catch { /* 저장 못 해도 동작에는 지장 없음 */ }
     const sig = JSON.stringify([ST.live.map((l) => [l.key, l.platform]), (j.videos || []).length, j.ok]);
     liveBadge();
