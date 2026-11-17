@@ -398,8 +398,10 @@ function render() {
   // 주기적 갱신(데이터 확인·방송 상태·홈 카운트다운)으로 다시 불렸는데 내용이 그대로면 화면을 건드리지 않는다: 스크롤·펼친 항목·재생이 유지되고 그리는 비용도 없다
   if (html === lastHtml && location.hash === lastHash && app.firstChild) return;
   lastHtml = html; lastHash = location.hash; LAZY = lazyNext;
+  const keep = ['teamSearch', 'favSearch'].map((id) => [id, document.getElementById(id)?.value]).filter(([, v]) => v);
   app.innerHTML = html;
   bind();
+  for (const [id, v] of keep) { const el = document.getElementById(id); if (el) { el.value = v; el.dispatchEvent(new Event('input')); } } // 데이터 갱신으로 다시 그려도 검색어 유지
   I.tree(app);
   // 가로로 넘치는 LCQ 경기 탭: 고른 탭이 보이게
   const on = app.querySelector('.lcq-tabs [aria-current="true"]');
@@ -2166,7 +2168,8 @@ function teams(parts, q) {
     <p class="lead">현재 시즌 팀과 로스터입니다. <b class="krn">굵은 이름</b>은 한국 선수, <sup class="mix">계</sup>는 한국계(혼혈·이중국적 등) 선수입니다.</p>
     ${krLegend()}
     <label class="visually-hidden" for="teamSearch">팀 또는 선수 검색</label>
-    <input class="search" id="teamSearch" type="search" placeholder="팀이나 선수 이름으로 찾기" autocomplete="off">
+    <div class="team-tools"><input class="search" id="teamSearch" type="search" placeholder="팀이나 선수 이름으로 찾기" autocomplete="off"><a class="btn-link pick-btn" href="#/teams/pick"><span aria-hidden="true">★</span><span>응원 팀 고르기</span>${opt.fav.length ? ` <small>${opt.fav.length}</small>` : ''}</a></div>
+    <p class="empty" id="teamNone" hidden>찾는 팀이나 선수가 없습니다.</p>
     ${groups.map(([g, ts]) => ts.length ? `<section class="sec team-group"><h2 class="h2">${esc(g)} <small class="muted">${ts.length}팀</small></h2><div class="team-grid">${ts.map(tile).join('')}</div></section>` : '').join('')}`;
 }
 
@@ -2667,7 +2670,7 @@ function bind() {
   app.querySelectorAll('[data-main]').forEach((b) => b.addEventListener('click', () => setMain(b.dataset.main)));
   app.querySelectorAll('[data-fav-clear]').forEach((b) => b.addEventListener('click', () => { opt.fav = []; store.set('fav', []); opt.main = null; store.set('main', null); FOCUS = null; render(); }));
   const fs = document.getElementById('favSearch');
-  if (fs) fs.addEventListener('input', () => { const v = fs.value.trim().toLowerCase(); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = v && !c.textContent.toLowerCase().includes(v); }); });
+  if (fs) fs.addEventListener('input', () => { const v = flatName(fs.value); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = !!v && !flatName(c.textContent + ' ' + (c.dataset.name || '')).includes(v); }); });
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
   app.querySelectorAll('button.lv-card, button.lv-add').forEach((b) => b.addEventListener('click', () => playLive(b.dataset.lvid))); // 접힌 '다른 팀 선수 방송' 목록도 같은 플레이어(멀티뷰)로
   { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
@@ -2682,9 +2685,11 @@ function bind() {
   }));
   const search = document.getElementById('teamSearch');
   if (search) search.addEventListener('input', () => {
-    const v = search.value.trim().toLowerCase();
-    app.querySelectorAll('.team-tile').forEach((t) => { t.hidden = v && !t.dataset.name.includes(v); });
+    const v = flatName(search.value);
+    let n = 0;
+    app.querySelectorAll('.team-tile').forEach((t) => { t.hidden = !!v && !flatName(t.dataset.name).includes(v) && !t.dataset.name.includes(search.value.trim().toLowerCase()); if (!t.hidden) n++; });
     app.querySelectorAll('.team-group').forEach((g) => { g.hidden = ![...g.querySelectorAll('.team-tile')].some((t) => !t.hidden); });
+    const none = document.getElementById('teamNone'); if (none) none.hidden = !v || n > 0;
   });
 }
 

@@ -1496,3 +1496,10 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
   .tabbar a:active { background: rgba(255, 255, 255, .06); }
   input, select, textarea { font-size: 16px; } /* iOS 가 입력창을 눌렀을 때 화면을 확대하지 않게 */
 }
+/* hidden 속성은 어떤 display 규칙보다 우선 (팀 검색 등이 hidden 으로 숨긴다) */
+[hidden] { display: none !important; }
+/* 팀 탭: 검색창 + 응원 팀 고르기 */
+.team-tools { display: flex; gap: 8px; align-items: stretch; margin: 12px 0 4px; }
+.team-tools .search { flex: 1; min-width: 0; margin: 0; }
+.team-tools .pick-btn { flex: none; display: inline-flex; align-items: center; gap: 6px; margin: 0; white-space: nowrap; }
+.team-tools .pick-btn small { font-size: 11px; opacity: .8; }
