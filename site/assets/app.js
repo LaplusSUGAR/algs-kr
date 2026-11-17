@@ -1193,7 +1193,7 @@ function poiSection(B, st) {
   const byId = new Map(B.E.list.map((t) => [t.id, t]));
   const row = ([n, id, name, spot]) => { const t = byId.get(id); return `<tr class="${t ? rowCls(t) : ''}"><td class="rank">${n}</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td>${esc(spot)}</td></tr>`; };
   const missed = (P.missed || []).map(([id, name]) => { const t = byId.get(id); return `<tr class="muted"><td class="rank">–</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`; });
-  const seg = P.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${P.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
+  const seg = P.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${P.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
   const src = `${cur.img}?v=${encodeURIComponent(cur.v || '')}`;
   return `<section class="sec poi" aria-labelledby="h-poi"><h2 class="h2" id="h-poi">POI 드래프트</h2>
     <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서이고, 그림을 누르면 크게 열립니다.</span> <span>출처: ALGS 공식 사이트</span></p>
@@ -2675,7 +2675,14 @@ function applyLive() {
 /* ---------- 시작 ---------- */
 I.chrome();
 
-window.addEventListener('hashchange', () => { render(); app.focus({ preventScroll: true }); window.scrollTo(0, 0); });
+// 같은 화면 안에서 보기만 바꾸는 링크(data-keep-scroll, 예: POI 드래프트 지도 전환)는 맨 위로 올리지 않고 누른 때의 스크롤 위치를 지킨다.
+// 같은 주소를 다시 눌러 화면이 안 바뀌거나 새 탭으로 열 때를 위해 위치 기억은 잠깐만 둔다
+let keepY = null, keepT = 0;
+document.addEventListener('click', (e) => {
+  if (!e.target.closest?.('a[data-keep-scroll]')) return;
+  keepY = window.scrollY; clearTimeout(keepT); keepT = setTimeout(() => { keepY = null; }, 600);
+});
+window.addEventListener('hashchange', () => { const y = keepY; keepY = null; render(); app.focus({ preventScroll: true }); window.scrollTo(0, y ?? 0); });
 setupSettings();
 setupFeedback();
 // 세부 탭이 머리말(웹은 머리말+탭) 바로 아래에 붙도록 높이를 잰다
