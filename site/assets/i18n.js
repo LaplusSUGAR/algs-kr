@@ -201,6 +201,7 @@
     ['위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.', '上のカードには、選択中の表示（韓国関連 / APAC North / お気に入り）に合う配信だけが出ます。ここで選んだ配信も同じプレーヤーとマルチビューで見られます。', 'The cards above show only streams that match your current view (Korea-related / APAC North / My teams). Streams picked here open in the same player and Multiview.'],
     ['방송 보기', '配信を見る', 'Watching'], ['시네마 모드', 'シネマモード', 'Cinema mode'], ['시네마 모드 끝내기', 'シネマモード終了', 'Exit cinema mode'],
     ['멀티뷰를 켜고 아래 방송 카드를 누르면 화면이 추가됩니다(최대 4개).', 'マルチビューをオンにして下の配信カードを押すと、画面が追加されます（最大4つ）。', 'Turn on Multiview and tap stream cards below to add screens (up to 4).'],
+    ['선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.', '選手の個人配信は大会規定で遅延があるため、このサイトのスコアが配信より先に変わることがあります。', 'Player streams are delayed by tournament rules, so scores here may update before the stream.'],
     ['선수·코치 방송', '選手・コーチの配信', 'Players & coaches'], ['선수·코치', '選手・コーチ', 'Players'], ['스트리머·전 프로', 'ストリーマー・元プロ', 'Streamers & former pros'],
     ['스트리머', 'ストリーマー', 'Streamer'], ['전 프로', '元プロ', 'Former pro'], ['한국 스트리머·전 프로', '韓国のストリーマー・元プロ', 'Korean streamers & former pros'],
     ['대회 선수는 아니지만 Apex 방송을 하는 채널입니다. 방송 중 표시는 Apex 방송일 때만 뜹니다.', '大会選手ではありませんが、Apexを配信しているチャンネルです。配信中の表示はApex配信のときだけ出ます。', 'Not tournament players, but channels that stream Apex. The live badge appears only while they stream Apex.'],
