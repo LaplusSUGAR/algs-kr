@@ -564,7 +564,7 @@ function eventHome() {
 }
 function home() {
   const krs = focusList();
-  const lead = krs.find((k) => k.level === 'team') || krs[0];
+  const lead = krs.find((k) => mainId() && team(k.short)?.id === mainId()) || krs.find((k) => k.level === 'team') || krs[0]; // 대표 응원 팀이 있으면 그 팀이 큰 카드
   const others = krs.filter((k) => k !== lead);
   const upcoming = A.series.filter((s) => s.status !== 'completed').sort((a, b) => a.start.localeCompare(b.start));
   const B = bracket();
