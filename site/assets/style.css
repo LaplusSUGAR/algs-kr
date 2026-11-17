@@ -814,6 +814,7 @@ html, body { overflow-x: clip; }
 /* POI 드래프트: 바탕 지도 위에 팀 핀(좌표 %)을 얹는다. 핀 크기는 지도 폭에 비례(cqw), 툴팁은 고정 px */
 .poi-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .poi-zoom { font-size: 13px; }
+.poi-live { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin: 10px 0 0; font-size: 14px; }
 .poi-fig { margin: 12px 0; max-width: 760px; }
 .poi-scroll.big { overflow-x: auto; overscroll-behavior-x: contain; border-radius: var(--r-lg); }
 .poi-scroll.big .poi-map { width: 220%; }

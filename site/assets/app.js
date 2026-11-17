@@ -246,7 +246,7 @@ function fillLazy(root) {
   }
 }
 function render() {
-  lazyNext = [];
+  lazyNext = []; poiWatch = null;
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
@@ -257,6 +257,7 @@ function render() {
   // 지난 시즌 기록을 볼 때: 본문 맨 위에 어느 시즌인지와 돌아가는 링크
   const bar = FROZEN ? `<div class="season-bar" id="seasonBar"><span><b>${esc(A.season.name)}</b> <span>지난 시즌 기록을 보고 있습니다.</span></span> <a href="./">현재 시즌으로</a></div>` : '';
   const html = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + bar + view(parts, q);
+  if (!poiWatch) poiAsked = null; // POI 드래프트 구역을 떠났으면, 다시 열 때 바로 확인하도록
   // 주기적 갱신(데이터 확인·방송 상태·홈 카운트다운)으로 다시 불렸는데 내용이 그대로면 화면을 건드리지 않는다: 스크롤·펼친 항목·재생이 유지되고 그리는 비용도 없다
   if (html === lastHtml && location.hash === lastHash && app.firstChild) return;
   lastHtml = html; lastHash = location.hash; LAZY = lazyNext;
@@ -1185,33 +1186,74 @@ function stageMatch(B, st) {
   return `<section class="sec lcq-m"><div class="bk-stage-h"><h2 class="h2">${x?.id ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h2> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${esc(stWhen(st))}</span></div>
     ${from || rule ? `<p class="bk-rule lcq-rule">${from ? `<span>출전: ${from}</span>` : ''}${rule ? `<span>${esc(rule)}</span>` : ''}</p>` : ''}${stageGrid(B, st)}</section>${poiSection(B, st)}`;
 }
-// POI 드래프트 (scripts/poi-maps.mjs → A.poi): 끝난 드래프트의 팀별 낙하 지점 선택. 공식 사이트의 'Map View'와 같은 자료다.
-//   바탕 지도(poi/base)는 팀과 상관없이 모든 드래프트가 같이 쓰고, 팀 핀은 좌표(%)로 화면에서 얹는다.
+// POI 드래프트 (scripts/poi-maps.mjs → A.poi): 팀별 낙하 지점 선택. 공식 사이트의 'Map View'와 같은 자료다.
+//   바탕 지도(poi/base)는 모든 드래프트가 같이 쓰고, 팀 핀은 좌표(%)로 화면에서 얹는다.
 //   핀에 마우스를 올리거나(키보드 포커스·휴대폰은 누르기) 팀 로고·이름·낙하 지점이 뜨고, 같은 번호의 표 줄이 함께 강조된다.
+//   끝난 드래프트는 빌드가 확정해 둔 목록(A.poi[시리즈].maps)을 쓴다. 아직 안 끝난 드래프트는 시작 15분 전부터, 그 구역을 보고 있는 동안만
+//   브라우저가 공식 API에서 직접 받아 선택이 나오는 대로 보여 주고(경기 점수 실시간과 같은 방식), 끝나면 멈춘다. 빌드가 확정한 목록이 오면 그것으로 바뀐다.
 let poiBig = false; // 좁은 화면에서 지도를 크게 보는지 (가로로 밀어서 본다)
+const POI_LIVE = {}; // 시리즈 ID → { maps, picked, total, done, active, missed } (공식 API에서 직접 받은 진행 상황)
+let poiWatch = null, poiAsked = null; // 지금 화면에 있는 안 끝난 드래프트 { id, draft, date } / 방금 바로 확인을 요청한 시리즈
+const poiSlug = (x) => String(x || '').toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); // scripts/poi-maps.mjs 와 같은 규칙
 const poiInit = (name) => { const w = String(name || '').split(/[^A-Za-z0-9]+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join('').slice(0, 3) : (w[0] || '').slice(0, 3) || '?').toUpperCase(); };
+// 공식 API의 드래프트 선택(/poi-drafts/{id}/pick) → 화면용 지도별 핀 목록. 아직 못 고른 줄(낙하 지점이 비어 있음)은 뺀다
+function poiFromApi(d, picks) {
+  const ok = (p) => p.map?.name && p.spawnLocation?.name && p.spawnLocation.x != null;
+  const chosen = picks.filter(ok);
+  const order = [...new Set(chosen.slice().sort((a, b) => a.actualPickNumber - b.actualPickNumber).map((p) => p.map.name))];
+  const maps = order.map((name) => ({ map: name, base: `poi/base/${poiSlug(name)}.webp`, picks: chosen.filter((p) => p.map.name === name).sort((a, b) => a.pickNumber - b.pickNumber).map((p) => [p.pickNumber, p.team?.id, p.team?.name, p.spawnLocation.name, Number(p.spawnLocation.x), Number(p.spawnLocation.y)]) }));
+  const done = !!d?.completed;
+  return { maps, picked: chosen.length, total: picks.length, done, active: picks.find((p) => p.isActivePick && !ok(p))?.team?.name || null,
+    missed: done ? [...new Map(picks.filter((p) => !ok(p)).map((p) => [p.team?.id, p.team?.name])).entries()] : [] };
+}
+async function poiTick() {
+  const w = poiWatch;
+  if (!w || document.hidden || LIVE.mode === 'off' || !w.draft || !w.date) return;
+  const t0 = Date.parse(w.date), n = Date.now();
+  if (!(n >= t0 - 15 * 60e3 && n <= t0 + 6 * 3600e3)) return; // 시작 15분 전 ~ 6시간 뒤
+  if (A.poi?.[w.id]?.done || POI_LIVE[w.id]?.done) return; // 끝났으면 더 받지 않는다
+  const get = (u) => fetch(LIVE.api + u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const [d, p] = await Promise.all([get(`/poi-drafts/${w.draft}`), get(`/poi-drafts/${w.draft}/pick`)]);
+  if (!d || !p) return;
+  POI_LIVE[w.id] = poiFromApi(d.poiDraft, p.picks || []);
+  if (poiWatch?.id === w.id) render(); // 아직 이 구역을 보고 있을 때만 (그림은 내용이 바뀐 때만 다시 그려진다)
+}
+(function poiLoop() { setTimeout(() => { poiTick().catch(() => {}).finally(poiLoop); }, (C.livePollMs || 10000) + Math.random() * 3000); })(); // 요청이 몰리지 않게 무작위 지연
+document.addEventListener('visibilitychange', () => { if (!document.hidden) poiTick().catch(() => {}); });
+
 function poiSection(B, st) {
-  const P = A.poi?.[st.s?.id];
-  if (!P?.maps?.length) return '';
-  const cur = P.maps.find((m) => m.map === B.q.get('pm')) || P.maps[0];
+  const id = st.s?.id, P = A.poi?.[id];
+  if (!P) return '';
+  const L = POI_LIVE[id];
+  const src = P.done ? P : L;
+  const when = P.date || st.s?.start || null; // 드래프트 시작 시각(없으면 시리즈 시작 시각)
+  if (!P.done) { poiWatch = { id, draft: P.draft, date: when }; if (poiAsked !== id) { poiAsked = id; setTimeout(() => poiTick().catch(() => {}), 50); } } // 이 구역을 열면 바로 한 번 확인
+  const head = `<section class="sec poi" aria-labelledby="h-poi"><h2 class="h2" id="h-poi">POI 드래프트</h2>`;
+  if (!src?.maps?.length) { // 아직 시작 전이거나, 시작했지만 첫 선택이 나오기 전
+    const t0 = Date.parse(when || ''), soon = !t0 || Date.now() >= t0 - 15 * 60e3;
+    return `${head}<p class="caption">${soon ? '<span>POI 드래프트가 곧 시작되거나 진행 중입니다.</span> <span>선택이 나오면 이곳에 바로 나타납니다.</span>' : `<span>POI 드래프트는 ${esc(dateTime(when))} ${esc(TZL)} 시작 예정입니다.</span>`}</p></section>`;
+  }
+  const cur = src.maps.find((m) => m.map === B.q.get('pm')) || src.maps[0];
   const byId = new Map(B.E.list.map((t) => [t.id, t]));
   const hasLogo = (t) => { const lg = t && xteam(t.short)?.logo; return !!(lg && (lg[0] || lg[1])); };
   const teamCell = (t, name) => (t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name));
-  const row = ([n, id, name, spot]) => { const t = byId.get(id); return `<tr class="${t ? rowCls(t) : ''}" data-n="${n}"><td class="rank">${n}</td><td class="team">${teamCell(t, name)}</td><td>${esc(spot)}</td></tr>`; };
-  const missed = (P.missed || []).map(([id, name]) => `<tr class="muted"><td class="rank">–</td><td class="team">${teamCell(byId.get(id), name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`);
+  const row = ([n, tid, name, spot]) => { const t = byId.get(tid); return `<tr class="${t ? rowCls(t) : ''}" data-n="${n}"><td class="rank">${n}</td><td class="team">${teamCell(t, name)}</td><td>${esc(spot)}</td></tr>`; };
+  const missed = (src.missed || []).map(([tid, name]) => `<tr class="muted"><td class="rank">–</td><td class="team">${teamCell(byId.get(tid), name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`);
   // 핀: 지도 폭에 비례해 커지고(cqw), 가장자리 가까이면 툴팁이 안쪽으로 열린다
-  const pin = ([n, id, name, spot, x, y]) => {
-    const t = byId.get(id), disp = t?.name || name;
+  const pin = ([n, tid, name, spot, x, y]) => {
+    const t = byId.get(tid), disp = t?.name || name;
     const ic = (cls) => (hasLogo(t) ? logo(t.short, cls, true) : `<span class="poi-ph ${cls}">${esc(poiInit(disp))}</span>`);
     const pos = `${y < 28 ? 'b' : 't'}${x < 30 ? 'l' : x > 70 ? 'r' : 'c'}`;
     return `<button type="button" class="poi-pin p-${pos}" style="left:${x}%;top:${y}%" data-n="${n}" aria-label="${esc(`#${n} ${disp} · ${spot}`)}"><span class="poi-dot">${ic('poi')}</span><i class="poi-num">${n}</i>
       <span class="poi-tip" role="tooltip">${ic('lg')}<span class="poi-tt"><b>${esc(disp)}</b><small>#${n} · ${esc(spot)}</small></span></span></button>`;
   };
-  const seg = P.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${P.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
-  return `<section class="sec poi" aria-labelledby="h-poi"><h2 class="h2" id="h-poi">POI 드래프트</h2>
+  const seg = src.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${src.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
+  const status = P.done ? '' : !L ? '' : L.done ? '<p class="poi-live"><span class="tag">종료</span> <span>드래프트가 끝났습니다. 공식 기록으로 곧 확정됩니다.</span></p>'
+    : `<p class="poi-live"><span class="tag live">LIVE</span> <span>POI 드래프트 진행 중</span> <small class="muted">${L.picked}/${L.total}</small>${L.active ? ` <span>지금 고르는 팀:</span> <b>${esc(L.active)}</b>` : ''}</p>`;
+  return `${head}${status}
     <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.</span> <span>출처: ALGS 공식 사이트</span></p>
     <div class="poi-bar">${seg}<button type="button" class="link-btn poi-zoom" data-poi-zoom aria-pressed="${poiBig}">${poiBig ? '작게 보기' : '크게 보기'}</button></div>
-    <figure class="poi-fig"><div class="poi-scroll${poiBig ? ' big' : ''}"><div class="poi-map"><img class="poi-base" src="${esc(cur.base)}" width="1255" height="1255" alt="${esc(cur.map)}" loading="lazy" decoding="async">${cur.picks.map(pin).join('')}</div></div></figure>
+    <figure class="poi-fig"><div class="poi-scroll${poiBig ? ' big' : ''}"><div class="poi-map"><img class="poi-base" src="${esc(cur.base)}" width="1255" height="1255" alt="${esc(cur.map)}" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">${cur.picks.map(pin).join('')}</div></div></figure>
     <div class="tbl-wrap"><table class="tbl poi-tbl"><thead><tr><th>#</th><th>팀</th><th>낙하 지점</th></tr></thead><tbody>${cur.picks.map(row).join('')}${missed.join('')}</tbody></table></div></section>`;
 }
 // 핀 ↔ 표 줄 강조(같은 번호), 휴대폰·터치에서 핀 누르면 툴팁 열기, 크게 보기 전환

@@ -281,11 +281,12 @@ const series = algs.series.map(([id, eventId, phase, name, status, start, region
   return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
 });
-// POI 드래프트 지도 (scripts/poi-maps.mjs 가 만든 site/data/poi-maps.json): 끝난 드래프트의 선택 목록. 이 시즌 시리즈 것만 쓴다
-//   { 시리즈 ID: { maps: [{ map, img, v, picks: [[선택 순서, 팀 ID, 팀 이름, 낙하 지점]] }], missed: [[팀 ID, 팀 이름]] } }
+// POI 드래프트 (scripts/poi-maps.mjs가 적은 site/data/poi-maps.json): 이 시즌 시리즈 것만 싣는다
+//   { 시리즈 ID: { draft, date, done, maps?: [{ map, base, picks: [[선택 순서, 팀 ID, 팀 이름, 낙하 지점, x(%), y(%)]] }], missed? } }
+//   끝난 드래프트(done)는 선택 목록까지, 아직 안 끝난 것은 드래프트 ID와 시작 시각만: 화면이 시작 시각부터 공식 API에서 직접 받아 보여 주고, 끝나면 빌드가 위 목록으로 확정한다
 const poi = Object.fromEntries(Object.entries(readJson('site/data/poi-maps.json', { series: {} }).series || {})
-  .filter(([id, v]) => v.done && v.maps?.length && series.some((s) => s.id === id))
-  .map(([id, v]) => [id, { maps: v.maps, ...(v.missed?.length ? { missed: v.missed } : {}) }]));
+  .filter(([id, v]) => v.draft && series.some((s) => s.id === id))
+  .map(([id, v]) => [id, v.done && v.maps?.length ? { draft: v.draft, date: v.date || null, done: 1, maps: v.maps, ...(v.missed?.length ? { missed: v.missed } : {}) } : { draft: v.draft, date: v.date || null }]));
 // LCQ 시각: 규정 부록 D4(지역 현지 시각)를 기준으로 공식 API 값을 가려 쓴다
 //   공식 사이트는 일정을 태평양 시간으로 먼저 넣어 두고 지역별 시각은 나중에 고친다. 그래서 단계마다:
 //   1) 운영자가 적은 시각(config/overrides.json lcqSchedule[지역][단계])이 있으면 그 시각
