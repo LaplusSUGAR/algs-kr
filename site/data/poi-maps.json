@@ -1,0 +1,2230 @@
+{
+  "series": {
+    "01M3AVJK0ZEVGKKFTHJNYVNX1T": {
+      "region": "americas",
+      "name": "Winners Round 1 Lobby A",
+      "draft": "01M794127JXFCYARNWMA9NP46B",
+      "date": "2026-11-17T01:00:00.000Z",
+      "completedAt": "2026-11-17T01:10:30.107Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/americas-winners-round-1-lobby-a-storm-point.webp",
+          "v": "b2b893f8",
+          "picks": [
+            [
+              1,
+              "01KHPREX931TTBJDXH1AN6D121",
+              "FFS",
+              "Lightning Rod"
+            ],
+            [
+              2,
+              "01KJSEK7XNMD7VYXNHJKRPBFV3",
+              "Unreal Nightmare",
+              "Cascade Falls"
+            ],
+            [
+              3,
+              "01KHPREYRD48P80Q2ME3FWEX57",
+              "Nice Guys",
+              "Ceto Station"
+            ],
+            [
+              4,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "Barometer"
+            ],
+            [
+              5,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "The Pylon"
+            ],
+            [
+              6,
+              "01M6ZJMRM1YGNAPJSS88W6QMJP",
+              "Niche",
+              "The Mill"
+            ],
+            [
+              8,
+              "01M6ZJMQV7ABV0CBXGS2MKC2JV",
+              "RIQON Gaming",
+              "Forbidden Zone"
+            ],
+            [
+              10,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "Storm Catcher"
+            ],
+            [
+              12,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "PawSocksUnited",
+              "Command Center"
+            ],
+            [
+              13,
+              "01KTSJN8Z8J301NM94Z8DZVCMZ",
+              "ZQ7",
+              "The Wall"
+            ],
+            [
+              14,
+              "01M6ZJMRFTHWS4Q1A7HWBCER32",
+              "Happy Birthday",
+              "Echo HQ"
+            ],
+            [
+              15,
+              "01M5TTC7HMZXNATARTFS45T9J2",
+              "Legion Gaming",
+              "Checkpoint"
+            ],
+            [
+              17,
+              "01M6ZJMQ7PN60DGR2FC86Q2X9J",
+              "chronic",
+              "Downed Beast"
+            ],
+            [
+              27,
+              "01KKCH1ZQ2PBZQ3NRKKV8QTVV5",
+              "Free Thinkers",
+              "Coastal Camp"
+            ],
+            [
+              29,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "Launch Pad"
+            ],
+            [
+              31,
+              "01KTSJN92PKS2AX6XM17PG7KS0",
+              "Undecided",
+              "North Pad"
+            ],
+            [
+              36,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "Zeus Station"
+            ],
+            [
+              38,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "Mountain Lift"
+            ],
+            [
+              39,
+              "01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+              "Zesty Besties",
+              "Cenote Cave"
+            ],
+            [
+              40,
+              "01KTSJN9W1QPJFXEJBSC01R9W3",
+              "Coughing Baby",
+              "Devastated Coast"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/americas-winners-round-1-lobby-a-e-district.webp",
+          "v": "7e6092aa",
+          "picks": [
+            [
+              7,
+              "01KKCH1ZQ2PBZQ3NRKKV8QTVV5",
+              "Free Thinkers",
+              "Old Town"
+            ],
+            [
+              9,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "Draft Point"
+            ],
+            [
+              11,
+              "01KTSJN92PKS2AX6XM17PG7KS0",
+              "Undecided",
+              "City Hall"
+            ],
+            [
+              16,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "Uptown"
+            ],
+            [
+              18,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "Energy Bank"
+            ],
+            [
+              19,
+              "01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+              "Zesty Besties",
+              "The Lotus"
+            ],
+            [
+              20,
+              "01KTSJN9W1QPJFXEJBSC01R9W3",
+              "Coughing Baby",
+              "Canal Plaza"
+            ],
+            [
+              21,
+              "01KHPREX931TTBJDXH1AN6D121",
+              "FFS",
+              "Heights"
+            ],
+            [
+              22,
+              "01KJSEK7XNMD7VYXNHJKRPBFV3",
+              "Unreal Nightmare",
+              "Boardwalk"
+            ],
+            [
+              23,
+              "01KHPREYRD48P80Q2ME3FWEX57",
+              "Nice Guys",
+              "Electro Dam"
+            ],
+            [
+              24,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "Stadium"
+            ],
+            [
+              25,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "Street Market"
+            ],
+            [
+              26,
+              "01M6ZJMRM1YGNAPJSS88W6QMJP",
+              "Niche",
+              "Viaduct"
+            ],
+            [
+              28,
+              "01M6ZJMQV7ABV0CBXGS2MKC2JV",
+              "RIQON Gaming",
+              "Neon Square"
+            ],
+            [
+              30,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "Blossom Drive"
+            ],
+            [
+              32,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "PawSocksUnited",
+              "Galleria"
+            ],
+            [
+              33,
+              "01KTSJN8Z8J301NM94Z8DZVCMZ",
+              "ZQ7",
+              "Resort"
+            ],
+            [
+              34,
+              "01M6ZJMRFTHWS4Q1A7HWBCER32",
+              "Happy Birthday",
+              "Settlement"
+            ],
+            [
+              35,
+              "01M5TTC7HMZXNATARTFS45T9J2",
+              "Legion Gaming",
+              "Humbert Labs"
+            ],
+            [
+              37,
+              "01M6ZJMQ7PN60DGR2FC86Q2X9J",
+              "chronic",
+              "Shipyard Arcade"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AVK9ST8CF6FPCM9RCJ0KWG": {
+      "region": "americas",
+      "name": "Winners Round 1 Lobby B",
+      "draft": "01M7947FFNKFZY679HXM83FN8T",
+      "date": "2026-11-17T01:00:00.000Z",
+      "completedAt": "2026-11-17T01:10:34.867Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/americas-winners-round-1-lobby-b-storm-point.webp",
+          "v": "d7aef9ca",
+          "picks": [
+            [
+              1,
+              "01KHPREWJ40HYNJSHV1D5GWDGY",
+              "World Wide",
+              "Cascade Falls"
+            ],
+            [
+              2,
+              "01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+              "VexX Gaming",
+              "Lightning Rod"
+            ],
+            [
+              3,
+              "01KMF09WG9A551ZCYGZWWKPCXZ",
+              "Full XI",
+              "Ceto Station"
+            ],
+            [
+              4,
+              "01KHPREX1EC5Z0DQ4472BPDS5H",
+              "Buckle Boys",
+              "Zeus Station"
+            ],
+            [
+              5,
+              "01KHPREXBTGD37GD3ZJ25R7ABW",
+              "EBOYS",
+              "The Mill"
+            ],
+            [
+              6,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "The Pylon"
+            ],
+            [
+              7,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "Forbidden Zone"
+            ],
+            [
+              8,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "Downed Beast"
+            ],
+            [
+              9,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "Launch Pad"
+            ],
+            [
+              10,
+              "01M6ZJMR2KZAGVE05RJ6PFMJ3P",
+              "Above All",
+              "Cenote Cave"
+            ],
+            [
+              11,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "Barometer"
+            ],
+            [
+              12,
+              "01KTSJN8PB2AZA3G55MWWNF7PT",
+              "LICS",
+              "Storm Catcher"
+            ],
+            [
+              13,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "Checkpoint"
+            ],
+            [
+              15,
+              "01M5WKA5RKG0DVP2RR80FGXFM4",
+              "Full Send",
+              "Command Center"
+            ],
+            [
+              17,
+              "01M6ZJMRTNPZME85FY6RWHBTFJ",
+              "sequence",
+              "The Wall"
+            ],
+            [
+              34,
+              "01M6ZJMQZV75FWERKM1PFSPGYC",
+              "GC8",
+              "Mountain Lift"
+            ],
+            [
+              36,
+              "01M6ZJMSHV0VKS24G49BYEE07E",
+              "Mugs",
+              "North Pad"
+            ],
+            [
+              38,
+              "01KTSJN9QA20EHN1JZT6EKQ2DQ",
+              "DURAGS",
+              "Outpost North"
+            ],
+            [
+              39,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Coastal Camp"
+            ],
+            [
+              40,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "Echo HQ"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/americas-winners-round-1-lobby-b-e-district.webp",
+          "v": "ce5d3be4",
+          "picks": [
+            [
+              14,
+              "01M6ZJMQZV75FWERKM1PFSPGYC",
+              "GC8",
+              "Settlement"
+            ],
+            [
+              16,
+              "01M6ZJMSHV0VKS24G49BYEE07E",
+              "Mugs",
+              "The Lotus"
+            ],
+            [
+              18,
+              "01KTSJN9QA20EHN1JZT6EKQ2DQ",
+              "DURAGS",
+              "Neon Square"
+            ],
+            [
+              19,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Energy Bank"
+            ],
+            [
+              20,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "Heights"
+            ],
+            [
+              21,
+              "01KHPREWJ40HYNJSHV1D5GWDGY",
+              "World Wide",
+              "Draft Point"
+            ],
+            [
+              22,
+              "01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+              "VexX Gaming",
+              "Street Market"
+            ],
+            [
+              23,
+              "01KMF09WG9A551ZCYGZWWKPCXZ",
+              "Full XI",
+              "Viaduct"
+            ],
+            [
+              24,
+              "01KHPREX1EC5Z0DQ4472BPDS5H",
+              "Buckle Boys",
+              "City Hall"
+            ],
+            [
+              25,
+              "01KHPREXBTGD37GD3ZJ25R7ABW",
+              "EBOYS",
+              "Uptown"
+            ],
+            [
+              26,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "Boardwalk"
+            ],
+            [
+              27,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "Electro Dam"
+            ],
+            [
+              28,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "Humbert Labs"
+            ],
+            [
+              29,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "Stadium"
+            ],
+            [
+              30,
+              "01M6ZJMR2KZAGVE05RJ6PFMJ3P",
+              "Above All",
+              "Blossom Drive"
+            ],
+            [
+              31,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "Canal Plaza"
+            ],
+            [
+              32,
+              "01KTSJN8PB2AZA3G55MWWNF7PT",
+              "LICS",
+              "Resort"
+            ],
+            [
+              33,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "Shipyard Arcade"
+            ],
+            [
+              35,
+              "01M5WKA5RKG0DVP2RR80FGXFM4",
+              "Full Send",
+              "Old Town"
+            ],
+            [
+              37,
+              "01M6ZJMRTNPZME85FY6RWHBTFJ",
+              "sequence",
+              "Galleria"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AVKZPJZ8KY06KNPWB6YK3W": {
+      "region": "americas",
+      "name": "Winners Round 2",
+      "draft": "01M794EPX8A0NG8JB8NZ3WK5HS",
+      "date": "2026-11-21T05:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AVMY8W75AACGB8H6B7KKBM": {
+      "region": "americas",
+      "name": "Elimination Round 1",
+      "draft": "01M794FV8B8RR3EM9PH4Y63ZYM",
+      "date": "2026-11-21T05:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AVNSER58QR64HRKPB5GHPW": {
+      "region": "americas",
+      "name": "Elimination Round 2",
+      "draft": "01M794J92AKHVC7VX2GETKTGYN",
+      "date": "2026-11-22T00:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AVSHN0QD8GRH2RV8WPC6BN": {
+      "region": "americas",
+      "name": "Match Point Finals",
+      "draft": "01M794KSSR9EV9EHGD5204K0Q7",
+      "date": "2026-11-22T05:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1TSX8DG9TT3W1FK0PAFQ": {
+      "region": "apac-n",
+      "name": "Winners Round 1 Lobby A",
+      "draft": "01M795MFJ0GASZP691SQV0YG3Q",
+      "date": "2026-11-17T01:30:00.000Z",
+      "completedAt": "2026-11-17T01:40:15.783Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/apac-n-winners-round-1-lobby-a-storm-point.webp",
+          "v": "08c813b7",
+          "picks": [
+            [
+              1,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "Lightning Rod"
+            ],
+            [
+              3,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "Barometer"
+            ],
+            [
+              5,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "Cascade Falls"
+            ],
+            [
+              6,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "Storm Catcher"
+            ],
+            [
+              7,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "Ceto Station"
+            ],
+            [
+              8,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "Forbidden Zone"
+            ],
+            [
+              9,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "The Pylon"
+            ],
+            [
+              10,
+              "01KHPREY2Q30PNMWXNRJF2KSSZ",
+              "FNATIC",
+              "North Pad"
+            ],
+            [
+              11,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "Command Center"
+            ],
+            [
+              15,
+              "01KTSJN9EEDKVNFF7XNN188HZ6",
+              "SOTEN",
+              "The Wall"
+            ],
+            [
+              16,
+              "01M6ZJMREJNC9SQ8F407MXJ961",
+              "rerereta",
+              "Downed Beast"
+            ],
+            [
+              18,
+              "01M6ZJMRYVGQBDX9JJAB5T7P78",
+              "RIGALRISEJYASHIN",
+              "Launch Pad"
+            ],
+            [
+              20,
+              "01M6ZJMRHM0PSWJ9TXGPX3J4PV",
+              "VAMOS",
+              "Checkpoint"
+            ],
+            [
+              22,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Devastated Coast"
+            ],
+            [
+              24,
+              "01KTSJN9FCV6Q57S7410RHJC1Z",
+              "noEND",
+              "Zeus Station"
+            ],
+            [
+              32,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Coastal Camp"
+            ],
+            [
+              33,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Echo HQ"
+            ],
+            [
+              34,
+              "01M6ZJMSGP3Q7VC3NGTFK6144T",
+              "Cuticle",
+              "The Mill"
+            ],
+            [
+              37,
+              "01M6ZJMRDDVCAP5D9B7T7J7HFC",
+              "NovaCroatia",
+              "Mountain Lift"
+            ],
+            [
+              39,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "Laugh Tale",
+              "Cenote Cave"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/apac-n-winners-round-1-lobby-a-e-district.webp",
+          "v": "cadc8e03",
+          "picks": [
+            [
+              2,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Boardwalk"
+            ],
+            [
+              4,
+              "01KTSJN9FCV6Q57S7410RHJC1Z",
+              "noEND",
+              "Street Market"
+            ],
+            [
+              12,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Energy Bank"
+            ],
+            [
+              13,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Canal Plaza"
+            ],
+            [
+              14,
+              "01M6ZJMSGP3Q7VC3NGTFK6144T",
+              "Cuticle",
+              "Galleria"
+            ],
+            [
+              17,
+              "01M6ZJMRDDVCAP5D9B7T7J7HFC",
+              "NovaCroatia",
+              "Draft Point"
+            ],
+            [
+              19,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "Laugh Tale",
+              "Uptown"
+            ],
+            [
+              21,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "Heights"
+            ],
+            [
+              23,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "The Lotus"
+            ],
+            [
+              25,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "Blossom Drive"
+            ],
+            [
+              26,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "Stadium"
+            ],
+            [
+              27,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "City Hall"
+            ],
+            [
+              28,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "Viaduct"
+            ],
+            [
+              29,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "Neon Square"
+            ],
+            [
+              30,
+              "01KHPREY2Q30PNMWXNRJF2KSSZ",
+              "FNATIC",
+              "Shipyard Arcade"
+            ],
+            [
+              31,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "Electro Dam"
+            ],
+            [
+              35,
+              "01KTSJN9EEDKVNFF7XNN188HZ6",
+              "SOTEN",
+              "Resort"
+            ],
+            [
+              36,
+              "01M6ZJMREJNC9SQ8F407MXJ961",
+              "rerereta",
+              "Humbert Labs"
+            ],
+            [
+              38,
+              "01M6ZJMRYVGQBDX9JJAB5T7P78",
+              "RIGALRISEJYASHIN",
+              "Old Town"
+            ],
+            [
+              40,
+              "01M6ZJMRHM0PSWJ9TXGPX3J4PV",
+              "VAMOS",
+              "Settlement"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AW1TSZN8G3RJN419PJJZ55": {
+      "region": "apac-n",
+      "name": "Winners Round 1 Lobby B",
+      "draft": "01M795QTA8WTH52HV2MB5VVQ8G",
+      "date": "2026-11-17T01:30:00.000Z",
+      "completedAt": "2026-11-17T01:38:39.219Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/apac-n-winners-round-1-lobby-b-storm-point.webp",
+          "v": "0d955d7c",
+          "picks": [
+            [
+              1,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "Storm Catcher"
+            ],
+            [
+              2,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "Lightning Rod"
+            ],
+            [
+              3,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "Ceto Station"
+            ],
+            [
+              4,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "Cascade Falls"
+            ],
+            [
+              5,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "Barometer"
+            ],
+            [
+              6,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "The Wall"
+            ],
+            [
+              7,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "Zeus Station"
+            ],
+            [
+              8,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "The Pylon"
+            ],
+            [
+              9,
+              "01KTSJNA350MXM4N2G21X0FQES",
+              "ETiAS",
+              "Forbidden Zone"
+            ],
+            [
+              10,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "Command Center"
+            ],
+            [
+              13,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "Downed Beast"
+            ],
+            [
+              16,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "Devastated Coast"
+            ],
+            [
+              17,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "Launch Pad"
+            ],
+            [
+              19,
+              "01KTSJN9DZM96H1S7BDZR53W4M",
+              "GROWGaming",
+              "North Pad"
+            ],
+            [
+              31,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "Checkpoint"
+            ],
+            [
+              32,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "Echo HQ"
+            ],
+            [
+              34,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "The Mill"
+            ],
+            [
+              35,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Cenote Cave"
+            ],
+            [
+              38,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "Outpost North"
+            ],
+            [
+              40,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "Basin Armory"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/apac-n-winners-round-1-lobby-b-e-district.webp",
+          "v": "a2557413",
+          "picks": [
+            [
+              11,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "Uptown"
+            ],
+            [
+              12,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "Heights"
+            ],
+            [
+              14,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "Canal Plaza"
+            ],
+            [
+              15,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Blossom Drive"
+            ],
+            [
+              18,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "The Lotus"
+            ],
+            [
+              20,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "Galleria"
+            ],
+            [
+              21,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "Draft Point"
+            ],
+            [
+              22,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "City Hall"
+            ],
+            [
+              23,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "Neon Square"
+            ],
+            [
+              24,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "Energy Bank"
+            ],
+            [
+              25,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "Electro Dam"
+            ],
+            [
+              26,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "Viaduct"
+            ],
+            [
+              27,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "Street Market"
+            ],
+            [
+              28,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "Boardwalk"
+            ],
+            [
+              29,
+              "01KTSJNA350MXM4N2G21X0FQES",
+              "ETiAS",
+              "Settlement"
+            ],
+            [
+              30,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "Humbert Labs"
+            ],
+            [
+              33,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "Old Town"
+            ],
+            [
+              36,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "Stadium"
+            ],
+            [
+              37,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "Resort"
+            ],
+            [
+              39,
+              "01KTSJN9DZM96H1S7BDZR53W4M",
+              "GROWGaming",
+              "Shipyard Arcade"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AW1TT15W44GZ3SEHGFW5M4": {
+      "region": "apac-n",
+      "name": "Winners Round 2",
+      "draft": "01M795S9PGCVPHYG4SA74WD9QJ",
+      "date": "2026-11-21T03:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1TT6G4R3PWJYF7RGV49V": {
+      "region": "apac-n",
+      "name": "Elimination Round 1",
+      "draft": "01M795TD2DS1879GY268NBJFHF",
+      "date": "2026-11-21T03:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1TT8B3GE0QP89WNNWC1X": {
+      "region": "apac-n",
+      "name": "Elimination Round 2",
+      "draft": "01M795VRM7SHJSNKD3Z79V6F9Q",
+      "date": "2026-11-21T07:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1TTA13PP4VV1JTQPKGGQ": {
+      "region": "apac-n",
+      "name": "Match Point Finals",
+      "draft": "01M795WXJ35GHH6RBBWCAK8661",
+      "date": "2026-11-21T12:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW2AFX89DTFAZNWW3MXGQM": {
+      "region": "emea",
+      "name": "Winners Round 1 Lobby A",
+      "draft": "01M794VYZKZEPSR6X7G243GNSV",
+      "date": "2026-11-16T17:00:00.000Z",
+      "completedAt": "2026-11-16T17:11:58.024Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/emea-winners-round-1-lobby-a-storm-point.webp",
+          "v": "8981fe1f",
+          "picks": [
+            [
+              1,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "Barometer"
+            ],
+            [
+              2,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Ceto Station"
+            ],
+            [
+              3,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "Zeus Station"
+            ],
+            [
+              4,
+              "01KHPREZ9GPCDSSQKNVXNEACVV",
+              "FUL",
+              "The Pylon"
+            ],
+            [
+              5,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "Lightning Rod"
+            ],
+            [
+              6,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "Storm Catcher"
+            ],
+            [
+              7,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "Cascade Falls"
+            ],
+            [
+              9,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "Forbidden Zone"
+            ],
+            [
+              10,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Launch Pad"
+            ],
+            [
+              11,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "Command Center"
+            ],
+            [
+              12,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "The Wall"
+            ],
+            [
+              13,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "North Pad"
+            ],
+            [
+              14,
+              "01M6ZJMSCQ1R8NAE4XQ5XVTZRS",
+              "Nemesis",
+              "Checkpoint"
+            ],
+            [
+              15,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "Downed Beast"
+            ],
+            [
+              16,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "The Mill"
+            ],
+            [
+              18,
+              "01KTSJNA93DA8WPMXGWNGH1ZNY",
+              "QSM",
+              "Cenote Cave"
+            ],
+            [
+              28,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "Devastated Coast"
+            ],
+            [
+              37,
+              "01M6ZJMS520CH2N35AXE21CZQW",
+              "Si Vis Pacem",
+              "Echo HQ"
+            ],
+            [
+              39,
+              "01M6ZJMR6CEA2RTM8KNQHG1KWM",
+              "ForFun",
+              "Coastal Camp"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/emea-winners-round-1-lobby-a-e-district.webp",
+          "v": "9ac1ab35",
+          "picks": [
+            [
+              8,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "Heights"
+            ],
+            [
+              17,
+              "01M6ZJMS520CH2N35AXE21CZQW",
+              "Si Vis Pacem",
+              "Draft Point"
+            ],
+            [
+              19,
+              "01M6ZJMR6CEA2RTM8KNQHG1KWM",
+              "ForFun",
+              "City Hall"
+            ],
+            [
+              21,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "Canal Plaza"
+            ],
+            [
+              22,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Humbert Labs"
+            ],
+            [
+              23,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "Electro Dam"
+            ],
+            [
+              24,
+              "01KHPREZ9GPCDSSQKNVXNEACVV",
+              "FUL",
+              "The Lotus"
+            ],
+            [
+              25,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "Boardwalk"
+            ],
+            [
+              26,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "Galleria"
+            ],
+            [
+              27,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "Neon Square"
+            ],
+            [
+              29,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "Uptown"
+            ],
+            [
+              30,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Resort"
+            ],
+            [
+              31,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "Settlement"
+            ],
+            [
+              32,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "Blossom Drive"
+            ],
+            [
+              33,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "Stadium"
+            ],
+            [
+              34,
+              "01M6ZJMSCQ1R8NAE4XQ5XVTZRS",
+              "Nemesis",
+              "Energy Bank"
+            ],
+            [
+              35,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "Street Market"
+            ],
+            [
+              36,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "Viaduct"
+            ],
+            [
+              38,
+              "01KTSJNA93DA8WPMXGWNGH1ZNY",
+              "QSM",
+              "Old Town"
+            ]
+          ]
+        }
+      ],
+      "missed": [
+        [
+          "01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+          "OnChikken"
+        ]
+      ]
+    },
+    "01M3AW2AFZVZY6544BW2T7WHK1": {
+      "region": "emea",
+      "name": "Winners Round 1 Lobby B",
+      "draft": "01M794ZPF9T4A8E6S95SR8A4DP",
+      "date": "2026-11-16T17:00:00.000Z",
+      "completedAt": "2026-11-16T17:11:08.299Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/emea-winners-round-1-lobby-b-storm-point.webp",
+          "v": "6dda2925",
+          "picks": [
+            [
+              1,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "Ceto Station"
+            ],
+            [
+              3,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "Lightning Rod"
+            ],
+            [
+              4,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "Storm Catcher"
+            ],
+            [
+              5,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "Cascade Falls"
+            ],
+            [
+              7,
+              "01KHPREW26WW7WFZ1H5YMJXWN2",
+              "Ben",
+              "The Wall"
+            ],
+            [
+              8,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "Zeus Station"
+            ],
+            [
+              9,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "Majin",
+              "Downed Beast"
+            ],
+            [
+              10,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "The Mill"
+            ],
+            [
+              11,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "The Pylon"
+            ],
+            [
+              12,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "North Pad"
+            ],
+            [
+              13,
+              "01KTSJNAA5CR05C7HPH72X4AEM",
+              "Shadows Of Nine",
+              "Forbidden Zone"
+            ],
+            [
+              14,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "Barometer"
+            ],
+            [
+              15,
+              "01KTSJN9K4MV4KZM8GE7E6566V",
+              "Clocks",
+              "Launch Pad"
+            ],
+            [
+              16,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "Echo HQ"
+            ],
+            [
+              17,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "Command Center"
+            ],
+            [
+              20,
+              "01M6ZJMQATFXKMNR48B08J3W41",
+              "Daikoku",
+              "Checkpoint"
+            ],
+            [
+              22,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Coastal Camp"
+            ],
+            [
+              26,
+              "01KHPREWQ7ZZGP8S40W48MFHF9",
+              "Blessed",
+              "Mountain Lift"
+            ],
+            [
+              38,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "Cenote Cave"
+            ],
+            [
+              39,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "Devastated Coast"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/emea-winners-round-1-lobby-b-e-district.webp",
+          "v": "9c8a2bed",
+          "picks": [
+            [
+              2,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Heights"
+            ],
+            [
+              6,
+              "01KHPREWQ7ZZGP8S40W48MFHF9",
+              "Blessed",
+              "Old Town"
+            ],
+            [
+              18,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "Electro Dam"
+            ],
+            [
+              19,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "Uptown"
+            ],
+            [
+              21,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "Draft Point"
+            ],
+            [
+              23,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "Boardwalk"
+            ],
+            [
+              24,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "Energy Bank"
+            ],
+            [
+              25,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "Galleria"
+            ],
+            [
+              27,
+              "01KHPREW26WW7WFZ1H5YMJXWN2",
+              "Ben",
+              "Viaduct"
+            ],
+            [
+              28,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "Settlement"
+            ],
+            [
+              29,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "Majin",
+              "Stadium"
+            ],
+            [
+              30,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "Humbert Labs"
+            ],
+            [
+              31,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "City Hall"
+            ],
+            [
+              32,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "Blossom Drive"
+            ],
+            [
+              33,
+              "01KTSJNAA5CR05C7HPH72X4AEM",
+              "Shadows Of Nine",
+              "Canal Plaza"
+            ],
+            [
+              34,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "The Lotus"
+            ],
+            [
+              35,
+              "01KTSJN9K4MV4KZM8GE7E6566V",
+              "Clocks",
+              "Shipyard Arcade"
+            ],
+            [
+              36,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "Resort"
+            ],
+            [
+              37,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "Neon Square"
+            ],
+            [
+              40,
+              "01M6ZJMQATFXKMNR48B08J3W41",
+              "Daikoku",
+              "Street Market"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AW2AG068S47B7ANE7EAGM8": {
+      "region": "emea",
+      "name": "Winners Round 2",
+      "draft": "01M7951TPBVEWRHE0TG0H5BY9D",
+      "date": "2026-11-20T21:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW2AG3S4MACVZW2Q5T1R6A": {
+      "region": "emea",
+      "name": "Elimination Round 1",
+      "draft": "01M7952TPPAGN4MZCSVMT832X6",
+      "date": "2026-11-20T21:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW2AG52Y60BYQZ7MTFAP61": {
+      "region": "emea",
+      "name": "Elimination Round 2",
+      "draft": "01M7954B0A4G80G83MMCT46GWF",
+      "date": "2026-11-21T17:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW2AG6MJP4NKB4AT49WM7C": {
+      "region": "emea",
+      "name": "Match Point Finals",
+      "draft": "01M795578NNWEY453B4FPPK86H",
+      "date": "2026-11-21T21:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1M8MF3J70S1Q32P8FE18": {
+      "region": "apac-s",
+      "name": "Winners Round 1 Lobby A",
+      "draft": "01M796PZYBRCDHNZJ97S0B9Z4W",
+      "date": "2026-11-17T02:00:00.000Z",
+      "completedAt": "2026-11-17T02:12:03.017Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/apac-s-winners-round-1-lobby-a-storm-point.webp",
+          "v": "c873960b",
+          "picks": [
+            [
+              2,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Ceto Station"
+            ],
+            [
+              3,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Cascade Falls"
+            ],
+            [
+              4,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "Barometer"
+            ],
+            [
+              5,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "Command Center"
+            ],
+            [
+              6,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "Zeus Station"
+            ],
+            [
+              7,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "The Mill"
+            ],
+            [
+              11,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "The Pylon"
+            ],
+            [
+              12,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "The Wall"
+            ],
+            [
+              13,
+              "01KME2AH2D6TNG9D1321DKVFZ5",
+              "Inside The Ring",
+              "Forbidden Zone"
+            ],
+            [
+              14,
+              "01KTSJNA8N6GKE7W1HAYG9JT14",
+              "SAT",
+              "Lightning Rod"
+            ],
+            [
+              15,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "Storm Catcher"
+            ],
+            [
+              17,
+              "01M6ZJMS1P3Z0N05FM3B8JY3TK",
+              "TripleP",
+              "Checkpoint"
+            ],
+            [
+              21,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "Launch Pad"
+            ],
+            [
+              28,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "North Pad"
+            ],
+            [
+              29,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Cenote Cave"
+            ],
+            [
+              30,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "Downed Beast"
+            ],
+            [
+              36,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "Mountain Lift"
+            ],
+            [
+              38,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "Basin Armory"
+            ],
+            [
+              39,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "Coastal Camp"
+            ],
+            [
+              40,
+              "01KTSJN9G77TZFPY7FCJFVA7TE",
+              "DMA",
+              "Devastated Coast"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/apac-s-winners-round-1-lobby-a-e-district.webp",
+          "v": "f6016fad",
+          "picks": [
+            [
+              1,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "City Hall"
+            ],
+            [
+              8,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "The Lotus"
+            ],
+            [
+              9,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Resort"
+            ],
+            [
+              10,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "Draft Point"
+            ],
+            [
+              16,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "Canal Plaza"
+            ],
+            [
+              18,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "Old Town"
+            ],
+            [
+              19,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "Energy Bank"
+            ],
+            [
+              20,
+              "01KTSJN9G77TZFPY7FCJFVA7TE",
+              "DMA",
+              "Electro Dam"
+            ],
+            [
+              22,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Heights"
+            ],
+            [
+              23,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Galleria"
+            ],
+            [
+              24,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "Boardwalk"
+            ],
+            [
+              25,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "Humbert Labs"
+            ],
+            [
+              26,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "Neon Square"
+            ],
+            [
+              27,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "Blossom Drive"
+            ],
+            [
+              31,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "Street Market"
+            ],
+            [
+              32,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "Uptown"
+            ],
+            [
+              33,
+              "01KME2AH2D6TNG9D1321DKVFZ5",
+              "Inside The Ring",
+              "Settlement"
+            ],
+            [
+              34,
+              "01KTSJNA8N6GKE7W1HAYG9JT14",
+              "SAT",
+              "Stadium"
+            ],
+            [
+              35,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "Viaduct"
+            ],
+            [
+              37,
+              "01M6ZJMS1P3Z0N05FM3B8JY3TK",
+              "TripleP",
+              "Shipyard Arcade"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AW1M8Q9GVQ6G6VMQZESFK1": {
+      "region": "apac-s",
+      "name": "Winners Round 1 Lobby B",
+      "draft": "01M796THE5V28M12QSX9FNZS25",
+      "date": "2026-11-17T02:00:00.000Z",
+      "completedAt": "2026-11-17T02:12:19.393Z",
+      "done": true,
+      "checked": 83096,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "img": "poi/apac-s-winners-round-1-lobby-b-storm-point.webp",
+          "v": "2751ab30",
+          "picks": [
+            [
+              1,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "Ceto Station"
+            ],
+            [
+              2,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "Lightning Rod"
+            ],
+            [
+              3,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Zeus Station"
+            ],
+            [
+              5,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "The Pylon"
+            ],
+            [
+              7,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "Cascade Falls"
+            ],
+            [
+              9,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "Barometer"
+            ],
+            [
+              10,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "The Wall"
+            ],
+            [
+              11,
+              "01KJSEK7SCXK8JYAP8W3WF8VZV",
+              "TEC Black",
+              "Echo HQ"
+            ],
+            [
+              12,
+              "01M6ZJMSANF042KQ8AMEHKM7KX",
+              "SeNioR",
+              "Storm Catcher"
+            ],
+            [
+              13,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "Checkpoint"
+            ],
+            [
+              14,
+              "01M6ZJMS3T4RR50CS7XQXRJ388",
+              "mr greedy",
+              "Cenote Cave"
+            ],
+            [
+              18,
+              "01KTSJNA7ASK8GGCQ4N4CFD09G",
+              "LAST STAND",
+              "The Mill"
+            ],
+            [
+              20,
+              "01M78QZ2RTDTZ8G4RVVGR5QZHS",
+              "HKUF",
+              "Forbidden Zone"
+            ],
+            [
+              24,
+              "01KHPREYF197FBMPQBY0AKNF59",
+              "Outside",
+              "Command Center"
+            ],
+            [
+              26,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Outpost North"
+            ],
+            [
+              28,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "North Pad"
+            ],
+            [
+              35,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "Coastal Camp"
+            ],
+            [
+              36,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "Devastated Coast"
+            ],
+            [
+              37,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "Basin Armory"
+            ],
+            [
+              39,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "Mountain Lift"
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "img": "poi/apac-s-winners-round-1-lobby-b-e-district.webp",
+          "v": "732f66d9",
+          "picks": [
+            [
+              4,
+              "01KHPREYF197FBMPQBY0AKNF59",
+              "Outside",
+              "Heights"
+            ],
+            [
+              6,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Uptown"
+            ],
+            [
+              8,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "Electro Dam"
+            ],
+            [
+              15,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "The Lotus"
+            ],
+            [
+              16,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "Boardwalk"
+            ],
+            [
+              17,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "Settlement"
+            ],
+            [
+              19,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "Old Town"
+            ],
+            [
+              21,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "Galleria"
+            ],
+            [
+              22,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "City Hall"
+            ],
+            [
+              23,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Shipyard Arcade"
+            ],
+            [
+              25,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "Draft Point"
+            ],
+            [
+              27,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "Humbert Labs"
+            ],
+            [
+              29,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "Street Market"
+            ],
+            [
+              30,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "Stadium"
+            ],
+            [
+              31,
+              "01KJSEK7SCXK8JYAP8W3WF8VZV",
+              "TEC Black",
+              "Viaduct"
+            ],
+            [
+              32,
+              "01M6ZJMSANF042KQ8AMEHKM7KX",
+              "SeNioR",
+              "Neon Square"
+            ],
+            [
+              33,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "Energy Bank"
+            ],
+            [
+              34,
+              "01M6ZJMS3T4RR50CS7XQXRJ388",
+              "mr greedy",
+              "Blossom Drive"
+            ],
+            [
+              38,
+              "01KTSJNA7ASK8GGCQ4N4CFD09G",
+              "LAST STAND",
+              "Canal Plaza"
+            ],
+            [
+              40,
+              "01M78QZ2RTDTZ8G4RVVGR5QZHS",
+              "HKUF",
+              "Resort"
+            ]
+          ]
+        }
+      ]
+    },
+    "01M3AW1M8T54P59JP3DKNWQR5D": {
+      "region": "apac-s",
+      "name": "Winners Round 2",
+      "draft": "01M796X7KVHGETFZFNF0K28MG4",
+      "date": "2026-11-21T04:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1M8X9AQXS0JKF9K3VH3X": {
+      "region": "apac-s",
+      "name": "Elimination Round 1",
+      "draft": "01M796Y6WBFZ03ATN8ZVHHP48T",
+      "date": "2026-11-21T04:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1M8ZEGT5P8MGB1BRVWNX": {
+      "region": "apac-s",
+      "name": "Elimination Round 2",
+      "draft": "01M796YX0SJ8E9G4NP5YR12Y1S",
+      "date": "2026-11-21T08:00:00.000Z",
+      "checked": 83096
+    },
+    "01M3AW1M9221ZW688QWHX8RTS7": {
+      "region": "apac-s",
+      "name": "Match Point Finals",
+      "draft": "01M7970CEQDVY7HMFZH9HM7W1G",
+      "date": "2026-11-21T13:00:00.000Z",
+      "checked": 83096
+    }
+  }
+}

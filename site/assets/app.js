@@ -1182,7 +1182,23 @@ function stageMatch(B, st) {
   const from = st.from || (flow ? flow.map(([k, a, b]) => `<span>${esc(`${B[k].tab} ${a}~${b}위`)}</span>`).join(' + ') : '');
   const rule = st.key === 'f' ? `매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승${st.top ? ` · 상위 ${st.top}팀 챔피언십 진출` : ''}` : st.cut ? `1~${st.cut}위 → ${st.up} · ${st.cut + 1}~${st.n}위 → ${st.down}` : '';
   return `<section class="sec lcq-m"><div class="bk-stage-h"><h2 class="h2">${x?.id ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h2> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${esc(stWhen(st))}</span></div>
-    ${from || rule ? `<p class="bk-rule lcq-rule">${from ? `<span>출전: ${from}</span>` : ''}${rule ? `<span>${esc(rule)}</span>` : ''}</p>` : ''}${stageGrid(B, st)}</section>`;
+    ${from || rule ? `<p class="bk-rule lcq-rule">${from ? `<span>출전: ${from}</span>` : ''}${rule ? `<span>${esc(rule)}</span>` : ''}</p>` : ''}${stageGrid(B, st)}</section>${poiSection(B, st)}`;
+}
+// POI 드래프트 지도 (scripts/poi-maps.mjs → A.poi): 끝난 드래프트의 팀별 낙하 지점 선택. 공식 사이트의 'Map View'와 같은 자료다.
+//   지도 그림에는 팀 로고 핀과 선택 순서만 있고, 팀 이름·낙하 지점은 아래 표로 읽는다. 그림을 누르면 원본 크기로 열려 확대해서 볼 수 있다
+function poiSection(B, st) {
+  const P = A.poi?.[st.s?.id];
+  if (!P?.maps?.length) return '';
+  const cur = P.maps.find((m) => m.map === B.q.get('pm')) || P.maps[0];
+  const byId = new Map(B.E.list.map((t) => [t.id, t]));
+  const row = ([n, id, name, spot]) => { const t = byId.get(id); return `<tr class="${t ? rowCls(t) : ''}"><td class="rank">${n}</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td>${esc(spot)}</td></tr>`; };
+  const missed = (P.missed || []).map(([id, name]) => { const t = byId.get(id); return `<tr class="muted"><td class="rank">–</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`; });
+  const seg = P.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${P.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
+  const src = `${cur.img}?v=${encodeURIComponent(cur.v || '')}`;
+  return `<section class="sec poi" aria-labelledby="h-poi"><h2 class="h2" id="h-poi">POI 드래프트</h2>
+    <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서이고, 그림을 누르면 크게 열립니다.</span> <span>출처: ALGS 공식 사이트</span></p>
+    ${seg}<figure class="poi-fig"><a href="${esc(src)}" target="_blank" rel="noopener" aria-label="${esc(cur.map)} POI draft"><img src="${esc(src)}" width="1255" height="1255" alt="${esc(cur.map)} POI draft" loading="lazy" decoding="async"></a></figure>
+    <div class="tbl-wrap"><table class="tbl poi-tbl"><thead><tr><th>#</th><th>팀</th><th>낙하 지점</th></tr></thead><tbody>${cur.picks.map(row).join('')}${missed.join('')}</tbody></table></div></section>`;
 }
 // LCQ 화면. base: 이 화면의 주소 (순위 탭 또는 이전 결과). 경기마다 탭(m=groups|a|b|wr2|er1|er2|f)
 function lcqBody(q, base) {

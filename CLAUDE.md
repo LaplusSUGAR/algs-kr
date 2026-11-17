@@ -28,6 +28,7 @@
 
 - 공식 API(`fetch-algs.mjs`)가 기본, Liquipedia(`fetch-liquipedia.mjs`, `fetch-lp-*.mjs`)가 보조.
 - 빌드 때마다 `scripts/check-rules.mjs` 가 규칙 파일과 데이터를 대조한다.
+- **LCQ POI 드래프트 지도**: `scripts/poi-maps.mjs` 가 끝난 드래프트의 선택(공식 API `poi-drafts/{id}/pick`)을 받아 바탕 지도(`raw/poi-base/<지도>.webp`, 공식 사이트 그림) 위에 팀 로고 핀(선택 순서 번호)을 얹은 그림을 `site/poi/` 에, 선택 목록을 `site/data/poi-maps.json` 에 만든다. 빌드가 이 목록을 `A.poi` 로 싣고, LCQ 경기 탭(`stageMatch` → `poiSection`)이 그림과 표를 보여 준다. 워크플로가 매 실행 `--plan` 으로 확인해 그릴 것이 있을 때만 sharp 를 설치해 그린다(시작 시각 앞 2시간~뒤 6시간만 자주 확인, 그 밖에는 6시간에 한 번). 새 지도가 나오면 바탕 그림을 `raw/poi-base/` 에 같은 이름(소문자·하이픈, 예 `worlds-edge.webp`)으로 넣는다. 다시 그리려면 `node scripts/poi-maps.mjs --force`(작업 공간에서는 `NODE_USE_ENV_PROXY=1` 필요).
 - 워크플로 `build.yml`: 5분마다 스스로 다시 실행하는 사슬. 동시 실행 제한은 build·deploy 작업에만 걸려 있어 수동 실행이 대기 없이 바로 돈다.
 
 ## 운영자가 손으로 고치는 설정
@@ -90,5 +91,6 @@ JSON 을 고친 뒤에는 꼭 문법을 확인한다(운영자가 따옴표 없�
 ## 남은 일
 
 - 공식 팀 화면 채널(algs1~4)과 경기 중 "중계 보기"·LIVE 표시는 실제 대회(11-20 LCQ)에서 확인 필요.
+- LCQ 승자 2R 이후 POI 드래프트 지도(11-20~22 드래프트)는 자동으로 올라오는지 실제 대회에서 확인 필요(승자 1R 로비 A·B 16장은 11-17 에 만들어 둠).
 - Americas 2부 4팀(Coughing Baby, Mugs, Niche, RIQON Gaming)은 챌린저 서킷 순위표와 못 맞춰 포인트·선수가 비어 있다.
 - LCQ 일정: 11-17 POI 드래프트, 11-20~22 LCQ(지역별 시각 상이), 이후 챔피언십. 경기 중 "중계 보기" 버튼·LIVE 상태는 실제 경기로 아직 확인 못 함.
