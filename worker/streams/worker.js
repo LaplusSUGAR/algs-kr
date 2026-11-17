@@ -88,8 +88,11 @@ async function runKv(env, blob) {
   });
   const stateChanged = JSON.stringify(blob.state || {}) !== before;
   const { write, why } = writeDecision({ env, blob, latest, stateChanged, now });
-  const next = { state: blob.state || null, latest, at: write ? now : blob.at || 0 };
+  const next = { state: blob.state || null, latest, at: write ? now : blob.at || 0, n: blob.n || null };
   if (write) {
+    // 오늘 몇 번 적었는지 (무료 한도 리셋이 00:00 UTC 라 같은 기준으로 센다). /debug/kv 로 본다
+    const day = new Date(now).toISOString().slice(0, 10);
+    next.n = { day, count: (blob.n?.day === day ? blob.n.count : 0) + 1 };
     try { await env.KV.put(BLOB, JSON.stringify(next)); }
     catch (e) {
       // 쓰기 한도를 넘겼거나 KV 가 잠깐 막힌 경우: 이번 결과는 이 요청에만 쓰고 다음 차례에 다시 적는다
@@ -112,6 +115,14 @@ export default {
     const url = new URL(req.url);
     const cors = { 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*', 'Vary': 'Origin' };
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    // 점검용: 지금 KV 상태와 오늘 몇 번 적었는지 (무료 한도 쓰기 1,000/일 대비)
+    if (url.pathname === '/debug/kv') {
+      if (!env.KV) return reply({ error: 'no kv binding' }, 200, cors);
+      try {
+        const b = (await env.KV.get(BLOB, 'json')) || {};
+        return reply({ at: b.at ? new Date(b.at).toISOString() : null, ageSec: b.at ? Math.round((Date.now() - b.at) / 1000) : null, live: (b.latest?.live || []).length, writes: b.n || null, now: new Date().toISOString() }, 200, { ...cors, 'Cache-Control': 'no-store' });
+      } catch (e) { return reply({ error: String(e?.message || e).slice(0, 120) }, 503, cors); }
+    }
     // 점검용: 이 지역(데이터센터)에서 Cache API 가 실제로 동작하는지. KV 읽기를 아끼는 근거라 배포 뒤에 한 번 본다
     if (url.pathname === '/debug/cache') {
       const probe = String(Date.now());

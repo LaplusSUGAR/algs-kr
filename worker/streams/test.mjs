@@ -141,6 +141,7 @@ let blob = await runScheduled(0);
 assert.equal(kv.ops.put, 1, '첫 실행은 KV 에 한 번 적는다');
 assert.ok(blob.latest.videos.length >= 2, '최근 영상이 담긴다');
 assert.equal(blob.latest.live.length, 0, '방송 중인 채널이 없다');
+assert.equal(blob.n?.count, 1, '오늘 적은 횟수를 센다(/debug/kv)');
 ok(`첫 실행 → KV 쓰기 ${kv.ops.put}회`);
 
 // ── 2. 2분 뒤, 내용이 같으면 쓰지 않는다 ──
