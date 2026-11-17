@@ -542,8 +542,12 @@ const streamIntl = []; // [twitch 로그인, 선수, 팀 약칭]
 RW.cc(lcq);
 const rosterLog = RW.save();
 
-// 공유용 페이지(site/s/): 페이지마다 따로 링크로 공유하고 미리보기 카드를 보이게 한다 (scripts/share.mjs). 앱의 공유 버튼이 이 경로 목록(data.share)을 본다
-const sharePages = buildSharePages(Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])), season.name);
+// 공유용 페이지(site/s/, site/404.html): 화면마다 '#'·'?' 없는 주소로 공유하고 미리보기 카드를 보이게 한다 (scripts/share.mjs)
+//   LCQ는 지역 × 경기 × (그 경기에 POI 드래프트 지도가 있으면) 지도별로 만든다
+const lcqStages = (rules.brackets?.lcq?.stages || []).map((s) => ({ key: s.key, name: s.name, tab: s.tab }));
+const lcqShare = lcq.map((e) => ({ region: e.region, maps: Object.fromEntries(lcqStages.map((s) => [s.key,
+  (poi[series.find((x) => x.eventId === e.eventId && (x.name === s.name || (s.key === 'f' && x.phase === 'Match Point Finals')))?.id]?.maps || []).map((m) => m.map)])) }));
+const sharePages = buildSharePages(Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])), { seasonName: season.name, lcq: lcqShare, lcqStages });
 const data = {
   generated: new Date().toISOString(),
   sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
@@ -564,7 +568,6 @@ const data = {
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
-  share: sharePages.map((p) => p.path),
   poi,
   cpRosterAdd, cpRosterOut,
   rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null, ...(m.auto ? { auto: 1 } : {}) })),

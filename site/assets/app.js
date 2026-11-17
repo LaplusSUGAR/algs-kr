@@ -249,21 +249,32 @@ function setPageTitle(parts, q) {
   const name = I.t(TAB_NAME[tab] || '');
   document.title = [head, head === name ? '' : name, I.info.brand].filter(Boolean).join(' · ');
 }
-// 링크 공유: 공유용 주소(미리보기 카드가 있는 페이지, data.share 목록)가 있는 화면이면 그것을, 없으면(선수 화면 등) 기존 '#/…' 주소를 쓴다.
-//   사이트 설정(언어가 한국어가 아니면 ?lang=, 지난 시즌 ?y=)과 화면 안 상태(?r=지역&m=경기 …)를 함께 담아, 받은 사람이 같은 화면을 본다
+// 링크 공유: 주소를 '#'·'?'·'&'·'=' 없는 경로로 만든다 (DC인사이드 같은 게시판은 그 뒤를 잘라 버리고, 미리보기 수집기도 '#' 뒤를 못 읽는다).
+//   …/s/standings/-/r/emea/m/a/pm/storm-point/  = 화면 경로 + '-' + 이름/값 쌍. 언어(브라우저 기본과 다를 때 lang)·지난 시즌(y)도 같은 쌍으로 담는다.
+//   자주 공유되는 화면은 빌드(scripts/share.mjs)가 실제 파일로 만들어 두고(미리보기 카드 있음), 나머지는 site/404.html 이 풀어 준다.
+//   경로 규칙(sharePath)은 scripts/share.mjs 의 같은 이름 함수와 반드시 같아야 한다.
+const SHARE_ORDER = ['r', 'm', 'pm'];
+const shareSeg = (s) => encodeURIComponent(String(s)).replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+function sharePath(parts, pairs) {
+  const ps = pairs.slice().sort((a, b) => { const i = SHARE_ORDER.indexOf(a[0]), j = SHARE_ORDER.indexOf(b[0]); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j) || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0); });
+  return [...parts.map(shareSeg), ...(ps.length ? ['-', ...ps.flatMap(([k, v]) => [shareSeg(k), shareSeg(v)])] : [])].join('/');
+}
 function shareUrl() {
   const { parts, q } = parseHash();
   const root = new URL('./', location.href); root.search = ''; root.hash = '';
-  const site = new URLSearchParams();
-  if (I.lang !== 'ko') site.set('lang', I.lang);
-  const y = new URLSearchParams(location.search).get('y'); if (y) site.set('y', y);
-  const path = parts.join('/');
-  if (path && (A.share || []).includes(path)) {
-    const all = new URLSearchParams([...site, ...q]);
-    return `${root.href}s/${path.split('/').map(encodeURIComponent).join('/')}/${all.toString() ? '?' + all : ''}`;
+  const pairs = [...q].filter(([k]) => k !== 'play').map(([k, v]) => [k, k === 'pm' ? poiSlug(v) : v]); // 재생 중인 방송(play)은 순간 상태라 뺀다. 지도 이름은 경로에 쓸 수 있게 소문자·하이픈으로
+  // LCQ 화면: 지금 보는 지역·경기·지도를 주소에 명시한다 (안 그러면 받는 사람이 여는 때의 기본 탭으로 열린다)
+  if (parts[0] === 'standings' && (!parts[1] || parts[1] === 'lcq') && app.querySelector('.lcq-tabs')) { // (챔피언십 등 다른 순위 화면은 제외)
+    for (const [sel, key] of [['.controls .seg a[aria-current="true"]', 'r'], ['.lcq-tabs a[aria-current="true"]', 'm'], ['.poi .seg a[aria-current="true"]', 'pm']]) {
+      const v = new URLSearchParams((app.querySelector(sel)?.getAttribute('href') || '').split('?')[1] || '').get(key);
+      if (v && !pairs.some(([k]) => k === key)) pairs.push([key, key === 'pm' ? poiSlug(v) : v]);
+    }
   }
-  const qs = q.toString();
-  return `${root.href}${site.toString() ? '?' + site : ''}${path || qs ? `#/${parts.map(encodeURIComponent).join('/')}${qs ? '?' + qs : ''}` : ''}`;
+  // 언어: 이 브라우저의 기본 언어(i18n.js detect 와 같은 규칙)와 다를 때만 담는다. 같으면 받는 사람이 자기 언어로 보고, 링크는 미리보기 카드가 있는 짧은 형태로 남는다
+  const auto = (() => { const n = String((navigator.languages && navigator.languages[0]) || navigator.language || 'ko').toLowerCase(); return n.startsWith('ko') ? 'ko' : n.startsWith('ja') ? 'ja' : 'en'; })();
+  if (I.lang !== auto) pairs.push(['lang', I.lang]);
+  const y = new URLSearchParams(location.search).get('y'); if (y) pairs.push(['y', y]);
+  return parts.length || pairs.length ? `${root.href}s/${sharePath(parts, pairs)}/` : root.href;
 }
 let toastT = 0;
 function toast(msg) {
@@ -1278,7 +1289,7 @@ function poiSection(B, st) {
     const t0 = Date.parse(when || ''), soon = !t0 || Date.now() >= t0 - 15 * 60e3;
     return `${head}<p class="caption">${soon ? '<span>POI 드래프트가 곧 시작되거나 진행 중입니다.</span> <span>선택이 나오면 이곳에 바로 나타납니다.</span>' : `<span>POI 드래프트는 ${esc(dateTime(when))} ${esc(TZL)} 시작 예정입니다.</span>`}</p></section>`;
   }
-  const cur = src.maps.find((m) => m.map === B.q.get('pm')) || src.maps[0];
+  const cur = src.maps.find((m) => poiSlug(m.map) === poiSlug(B.q.get('pm'))) || src.maps[0]; // 이름('Storm Point')이든 경로용 이름('storm-point')이든
   const byId = new Map(B.E.list.map((t) => [t.id, t]));
   const hasLogo = (t) => { const lg = t && xteam(t.short)?.logo; return !!(lg && (lg[0] || lg[1])); };
   const teamCell = (t, name) => (t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name));

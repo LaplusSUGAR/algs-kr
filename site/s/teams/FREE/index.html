@@ -25,10 +25,15 @@
 <body>
 <p><a href="../../../#/teams/FREE">Free Thinkers · 팀 · EASY ALGS KR 열기</a></p>
 <script>
-(function(){var q=new URLSearchParams(location.search),a=new URLSearchParams(),r=new URLSearchParams();
-q.forEach(function(v,k){(k==='lang'||k==='y'?a:r).append(k,v)});
-var s=a.toString(),h=r.toString();
-location.replace(new URL("../../../",location.href).href+(s?'?'+s:'')+'#/'+"teams/FREE"+(h?'?'+h:''));})();
+(function(){try{
+var L=location,b=new URL("../../../",location.href).pathname,m=L.pathname.match(/\/s\/(.*)$/),rest=m?m[1].split('/').filter(Boolean).map(decodeURIComponent):[];
+var i=rest.indexOf('-'),route=i<0?rest:rest.slice(0,i),kv=i<0?[]:rest.slice(i+1),a=new URLSearchParams(),q=new URLSearchParams();
+function put(k,v){(k==='lang'||k==='y'?a:q).set(k,v)}
+for(var j=0;j+1<kv.length;j+=2)put(kv[j],kv[j+1]);
+new URLSearchParams(L.search).forEach(function(v,k){put(k,v)});
+var s=a.toString(),h=q.toString();
+L.replace(b+(s?'?'+s:'')+'#/'+route.map(encodeURIComponent).join('/')+(h?'?'+h:''));
+}catch(e){location.replace(new URL("../../../",location.href).pathname)}})();
 </script>
 </body>
 </html>
