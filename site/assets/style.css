@@ -1402,7 +1402,7 @@ dialog { border: 1px solid var(--rule); }
 .tbl .m3, .tbl td.gc.m3 { color: var(--bronze); font-weight: 800; }
 
 /* ===== 2026-11 구조 개편 ① 헤더·메뉴 (OWticker 구조 참고, 색·글꼴은 HUD 그대로) =====
-   메뉴(.tabbar)는 헤더 안에 있다. 휴대폰: 화면 아래 고정 6칸(규칙은 설정·푸터), PC: 로고 | 메뉴 7개 | 도구 한 줄.
+   메뉴(.tabbar)는 헤더 안에 있다. 휴대폰: 화면 아래 고정 7칸, PC: 로고 | 메뉴 7개 | 도구 한 줄.
    주의: 헤더·메뉴 자체에 filter·backdrop-filter·transform 을 쓰면 안 된다(아래 고정 메뉴의 기준이 헤더로 바뀜). 배경은 ::before/::after 에 둔다. */
 .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px var(--gut); margin-bottom: 3px; color: var(--bar-ink); isolation: isolate; }
 .top::before { content: ''; position: absolute; inset: 0 -100vmax -3px; background: var(--bar); border-bottom: 3px solid var(--apex); z-index: -1; pointer-events: none; }
@@ -1415,7 +1415,7 @@ dialog { border: 1px solid var(--rule); }
 .top .pill { margin-right: 4px; background: var(--bar-2); border: 1px solid #2C2F37; border-radius: var(--r-sm); color: var(--bar-steel); font-weight: 700; font-variant-numeric: tabular-nums; }
 .top .pill.is-live { color: #fff; border-color: var(--apex); background: rgba(218, 41, 42, .2); }
 @media (max-width: 767px) { .top .pill:not(.is-live) { display: none; } .top .pill #refreshText { display: none; } .top .pill { padding: 9px; } }
-.tabbar { position: fixed; left: 50%; bottom: 0; z-index: 30; width: 100%; max-width: 720px; height: var(--tab-h); transform: translateX(-50%); display: grid; grid-template-columns: repeat(6, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); isolation: isolate; }
+.tabbar { position: fixed; left: 50%; bottom: 0; z-index: 30; width: 100%; max-width: 720px; height: var(--tab-h); transform: translateX(-50%); display: grid; grid-template-columns: repeat(7, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); isolation: isolate; }
 .tabbar::after { content: ''; position: absolute; inset: 0 -100vmax; background: var(--bar); z-index: -1; pointer-events: none; }
 :root[data-theme='dark'] .tabbar::after { background: rgba(11, 15, 21, .92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--rule); }
 .tabbar a { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; text-decoration: none; white-space: nowrap; font-size: 11px; color: var(--bar-steel); }
@@ -1424,8 +1424,7 @@ dialog { border: 1px solid var(--rule); }
 .tabbar a[aria-current='page'] { color: #fff; font-weight: 700; }
 .tabbar a[aria-current='page'] svg { color: var(--apex-hot); }
 .tabbar a[aria-current='page']::before { content: ''; position: absolute; top: 0; left: 18%; right: 18%; height: 2px; background: var(--apex); }
-.tabbar .tab-pc { display: none; }
-@media (max-width: 380px) { .tabbar a { font-size: 10.5px; } .tabbar svg { width: 20px; height: 20px; } }
+@media (max-width: 380px) { .tabbar a { font-size: 10px; letter-spacing: -.02em; } .tabbar svg { width: 20px; height: 20px; } }
 @media (max-height: 480px) and (orientation: landscape) { .tabbar a { flex-direction: row; gap: 5px; font-size: 12px; } .tabbar svg { width: 18px; height: 18px; } .top { padding-top: 6px; padding-bottom: 6px; } }
 @media (min-width: 768px) {
   .top { gap: 20px; }
@@ -1488,3 +1487,12 @@ dialog { border: 1px solid var(--rule); }
 /* 보기 기준(한국 팀·APAC North)에 안 맞는 대표 응원 팀: 소속 지역 표시 */
 .oreg { display: inline-block; margin-left: 4px; padding: 0 5px; border: 1px solid var(--rule); border-radius: 4px; background: var(--raise); color: var(--steel); font: 700 10px/1.5 var(--display); letter-spacing: .06em; text-transform: uppercase; vertical-align: 1px; }
 .kchip .oreg { display: block; margin: 1px 0 0; width: fit-content; }
+/* 2026-11 휴대폰 다듬기 */
+a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (max-width: 767px) {
+  html { -webkit-text-size-adjust: 100%; }
+  .subtabs-in, .lcq-tabs, .kr-strip, .seg { overscroll-behavior-x: contain; scroll-snap-type: none; }
+  .tabbar a { padding-top: 2px; }
+  .tabbar a:active { background: rgba(255, 255, 255, .06); }
+  input, select, textarea { font-size: 16px; } /* iOS 가 입력창을 눌렀을 때 화면을 확대하지 않게 */
+}
