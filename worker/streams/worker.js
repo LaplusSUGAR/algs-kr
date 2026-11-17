@@ -112,6 +112,15 @@ export default {
     const url = new URL(req.url);
     const cors = { 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*', 'Vary': 'Origin' };
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    // 점검용: 이 지역(데이터센터)에서 Cache API 가 실제로 동작하는지. KV 읽기를 아끼는 근거라 배포 뒤에 한 번 본다
+    if (url.pathname === '/debug/cache') {
+      const probe = String(Date.now());
+      await edgePut(url.origin, 'probe', probe, 60, 'text/plain');
+      const got = await edgeGet(url.origin, 'probe');
+      const text = got ? await got.text() : null;
+      const cached = await edgeGet(url.origin, 'streams.json');
+      return reply({ works: text === probe, probe: text, streams: cached ? 'cached' : 'empty', now: new Date().toISOString() }, 200, { ...cors, 'Cache-Control': 'no-store' });
+    }
     // 점검용: 치지직이 채널마다 무엇을 돌려주는지 요약해서 보여 준다 (공개 정보만, 배포 점검 워크플로가 읽는다)
     if (url.pathname === '/debug/chzzk') {
       const S = await readState(env, url.origin);
