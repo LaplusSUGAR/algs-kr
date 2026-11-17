@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript>
-  <link rel="stylesheet" href="assets/style.css?v=8cfed43b">
+  <link rel="stylesheet" href="assets/style.css?v=00e1e75a">
   <script>try{var t=localStorage.getItem('algskr.theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
 <body>
@@ -38,35 +38,30 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" class="brand-mark"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="44 16"/><circle cx="12" cy="12" r="3.4" fill="var(--ring)"/></svg>
         <span>EASY ALGS KR</span>
       </a>
+      <nav class="tabbar" aria-label="주 메뉴">
+      <a href="#/" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8h-5v-5H9v5H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span>홈</span></a>
+      <a href="#/schedule" data-tab="schedule"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4 10h16M9 3.5v4M15 3.5v4" stroke="currentColor" stroke-width="1.9"/></svg><span>경기</span></a>
+      <a href="#/standings" data-tab="standings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>순위</span></a>
+      <a href="#/points/cp" data-tab="points"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-dasharray="30 8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/></svg><span>포인트</span></a>
+      <a href="#/teams" data-tab="teams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15 15c2.5-.4 4.6.7 5.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>팀</span></a>
+      <a href="#/streams" data-tab="streams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M8 8a5.6 5.6 0 000 8M16 8a5.6 5.6 0 010 8M5.2 5.2a9.6 9.6 0 000 13.6M18.8 5.2a9.6 9.6 0 010 13.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>방송</span></a>
+      <a class="tab-pc" href="#/rules" data-tab="rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 11h6M9 15h6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>규칙</span></a>
+    </nav>
       <div class="top-right">
       <button class="pill" id="refreshPill" type="button" aria-label="갱신 주기 보기"><span class="pill-dot"></span><span id="refreshText">정기 갱신</span></button>
       <button class="icon-btn" id="shareBtn" type="button" aria-label="이 페이지 링크 공유" title="이 페이지 링크 공유"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 12v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="icon-btn" id="feedbackBtn" type="button" aria-label="문의·피드백" aria-haspopup="dialog" title="문의·피드백"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8 9.5h8M8 12.5h5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
       <button class="icon-btn" id="settingsBtn" aria-label="설정 열기" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
       </button>
       </div>
     </header>
 
-    <nav class="tabbar" aria-label="주 메뉴">
-      <a href="#/" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8h-5v-5H9v5H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>홈</a>
-      <a href="#/schedule" data-tab="schedule"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4 10h16M9 3.5v4M15 3.5v4" stroke="currentColor" stroke-width="1.9"/></svg>경기</a>
-      <a href="#/standings" data-tab="standings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>순위</a>
-      <a href="#/streams" data-tab="streams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M8 8a5.6 5.6 0 000 8M16 8a5.6 5.6 0 010 8M5.2 5.2a9.6 9.6 0 000 13.6M18.8 5.2a9.6 9.6 0 010 13.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>방송</a>
-      <a href="#/teams" data-tab="teams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15 15c2.5-.4 4.6.7 5.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>팀</a>
-      <a href="#/more" role="button" data-tab="more" id="moreBtn" aria-haspopup="true" aria-expanded="false" aria-controls="moreMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="18.5" cy="12" r="1.8" fill="currentColor"/></svg><span>더보기</span></a>
-      <div class="tab-more" id="moreMenu">
-        <a href="#/points/cp" data-tab="points"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-dasharray="30 8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/></svg>포인트</a>
-        <a href="#/rules" data-tab="rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 11h6M9 15h6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>규칙</span></a>
-      </div>
-    </nav>
-
     <main id="app" tabindex="-1"></main>
 
     <footer class="foot">
       <p>비공식 팬 사이트입니다. EA·Respawn과 관련이 없습니다.</p>
       <p id="sourceLine"></p>
-      <p><button class="link-btn" type="button" data-feedback="기타">문의·피드백 보내기</button></p>
+      <p><a class="link-btn" href="#/rules">규칙</a> · <button class="link-btn" type="button" data-feedback="기타">문의·피드백 보내기</button></p>
     </footer>
 
   </div>
@@ -97,6 +92,8 @@
       <div class="dlg-note" id="refreshInfo"></div>
       <h3 class="dlg-h">데이터 출처</h3>
       <div class="dlg-note" id="dataInfo"></div>
+      <h3 class="dlg-h">더 보기</h3>
+      <div class="dlg-links"><a class="link-btn" href="#/rules" data-close>규칙·대회 방식</a><button class="link-btn" type="button" data-feedback="기타" data-close>문의·피드백 보내기</button></div>
       <button class="btn" value="close">닫기</button>
     </form>
   </dialog>
@@ -104,6 +101,6 @@
   <script src="data/algs-data.js?v=2e015011"></script>
   <script src="assets/config.js?v=ffcf9e30"></script>
   <script src="assets/i18n.js?v=21d55f97"></script>
-  <script type="module" src="assets/app.js?v=9f0d0143"></script>
+  <script type="module" src="assets/app.js?v=8bda9e6f"></script>
 </body>
 </html>

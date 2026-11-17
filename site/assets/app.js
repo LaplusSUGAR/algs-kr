@@ -357,12 +357,16 @@ function render() {
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
   document.querySelectorAll('.tabbar a').forEach((a) => { if (a.dataset.tab === navTab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  { const mb = document.getElementById('moreBtn'); mb?.classList.toggle('on', !!document.querySelector('#moreMenu a[aria-current]')); closeMore(); } // 더보기 안의 화면이면 더보기에 표시
   board();
   const view = { home, schedule, standings, points, teams, streams, rules, players: playerView }[tab] || home;
   // 지난 시즌 기록을 볼 때: 본문 맨 위에 어느 시즌인지와 돌아가는 링크
   const bar = FROZEN ? `<div class="season-bar" id="seasonBar"><span><b>${esc(A.season.name)}</b> <span>지난 시즌 기록을 보고 있습니다.</span></span> <a href="./">현재 시즌으로</a></div>` : '';
-  const html = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q) + bar + view(parts, q);
+  // 페이지 머리(작은 윗줄 + 제목) → 세부 메뉴(알약) → 본문 순서로 모든 화면이 같은 틀을 쓴다
+  const sub = subtabs(navTab, tab === 'players' ? ['teams', 'x'] : parts, q);
+  let body = view(parts, q), head = '';
+  const hm = /^<h1 class="title">[^<]*<\/h1>/.exec(body);
+  if (hm) { head = `<header class="ph"><p class="ph-eyebrow"><span>${esc(A.season.name)}</span>${sub.cur ? ` <i>/</i> <span>${esc(sub.cur)}</span>` : ''}</p>${hm[0]}</header>`; body = body.slice(hm[0].length); }
+  const html = head + sub.html + bar + body;
   if (!poiWatch) poiAsked = null; // POI 드래프트 구역을 떠났으면, 다시 열 때 바로 확인하도록
   // 주기적 갱신(데이터 확인·방송 상태·홈 카운트다운)으로 다시 불렸는데 내용이 그대로면 화면을 건드리지 않는다: 스크롤·펼친 항목·재생이 유지되고 그리는 비용도 없다
   if (html === lastHtml && location.hash === lastHash && app.firstChild) return;
@@ -394,8 +398,9 @@ function subtabs(tab, parts, q) {
     streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live']] : []), ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수·코치', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
-  if (!SUB) return '';
-  return `<nav class="subtabs" aria-label="세부 메뉴"><div class="subtabs-in">${SUB.map(([n, h, on]) => `<a href="${h}"${on ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('')}</div></nav>`;
+  if (!SUB) return { html: '', cur: '' };
+  const cur = (SUB.find((x) => x[2]) || [])[0] || '';
+  return { cur, html: `<nav class="subtabs" aria-label="세부 메뉴"><div class="subtabs-in">${SUB.map(([n, h, on]) => `<a href="${h}"${on ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('')}</div></nav>` };
 }
 
 /* ---------- 국제전 브래킷 (Playoffs·Championship 공통 형식) ---------- */
@@ -2533,14 +2538,6 @@ function liveStrip() {
     <div class="lv-grid">${L.slice(0, 3).map((l, i) => liveCard(l, i, true)).join('')}</div></section>`;
 }
 // 메뉴의 방송 탭: 방송 중 채널 수, 없으면 새 영상 점
-// 휴대폰 주 메뉴의 '더보기'(포인트·규칙): 누르면 탭 위에 작은 메뉴가 뜬다
-function closeMore() { const bar = document.querySelector('.tabbar'); if (!bar?.classList.contains('more-open')) return; bar.classList.remove('more-open'); document.getElementById('moreBtn')?.setAttribute('aria-expanded', 'false'); }
-function initMore() {
-  const bar = document.querySelector('.tabbar'), btn = document.getElementById('moreBtn'); if (!bar || !btn) return;
-  btn.addEventListener('click', (e) => { e.preventDefault(); const open = bar.classList.toggle('more-open'); btn.setAttribute('aria-expanded', String(open)); if (open) document.querySelector('#moreMenu a')?.focus(); });
-  document.addEventListener('click', (e) => { if (!e.target.closest('#moreBtn, #moreMenu')) closeMore(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && bar.classList.contains('more-open')) { closeMore(); btn.focus(); } });
-}
 function liveBadge() {
   const a = document.querySelector('.tabbar a[data-tab="streams"]'); if (!a) return;
   a.querySelector('.nav-badge')?.remove();
@@ -2676,6 +2673,7 @@ function setupFeedback() {
 function setupSettings() {
   const dlg = document.getElementById('settings');
   const dark = document.getElementById('optDark'), sp = document.getElementById('optSpoiler'), kr = document.getElementById('optKrOnly');
+  dlg.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dlg.close(); });
   document.getElementById('settingsBtn').addEventListener('click', () => {
     dark.checked = document.documentElement.dataset.theme === 'dark';
     sp.checked = opt.spoiler; kr.checked = opt.krOnly;
@@ -2871,14 +2869,13 @@ function measureStick() {
   const top = document.querySelector('.top'), bar = document.querySelector('.tabbar');
   const desk = matchMedia('(min-width: 768px)').matches;
   const z = parseFloat(getComputedStyle(document.querySelector('.frame')).zoom) || 1;
-  const h = (top?.offsetHeight || 0) + (desk ? bar?.offsetHeight || 0 : 0);
+  const h = top?.offsetHeight || 0; // 메뉴(PC)가 헤더 안에 있다
   document.documentElement.style.setProperty('--top-h', `${top?.offsetHeight || 0}px`);
   document.documentElement.style.setProperty('--stick', `${h}px`);
 }
 measureStick();
 addEventListener('resize', measureStick);
 footer();
-initMore();
 loadStreamsCache();
 if (C.streamsUrl) pollStreams(); // 화면을 그리기 전에 요청부터 보낸다
 render();
