@@ -147,6 +147,56 @@ const ptsOf = (pts, kills) => ({ pp: pts != null && kills != null ? pts - kills 
 const PTS_TH = '<th class="r pts-h" title="순위 점수" data-tr="순위 점수 칸">순위</th><th class="r pts-h" title="킬 점수" data-tr="킬 점수 칸">킬</th><th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>';
 const ptsTd = (pts, kills) => { const p = ptsOf(pts, kills); return `<td class="r num">${p.pp ?? '–'}</td><td class="r num">${p.kp ?? '–'}</td><td class="r num"><b>${p.tp ?? '–'}</b></td>`; };
 const ptsLine = (pts, kills) => { const p = ptsOf(pts, kills); return p.pp == null ? `종합 ${p.tp ?? '–'}점` : `순위 ${p.pp} / 킬 ${p.kp} / 종합 ${p.tp}점`; };
+// 게임별 점수 열 (g1, g2, …): 시리즈(단계)의 게임마다 팀의 그 게임 점수. 표가 충분히 넓을 때만 보인다(CSS 컨테이너 쿼리 .gtab, 모자라면 숨김).
+//   데이터는 공식 API 게임 통계(/stats/series/{id}/match/number/{n}: 팀별 points·kills·placement)를 그 시리즈를 보고 있을 때만, 넓은 화면에서만 받는다.
+//   끝난 게임은 다시 받지 않고, 끝난 시리즈는 브라우저에 저장해 둔다. 진행 중인 시리즈는 실시간 주기(livePollMs)로 새 게임·진행 중 게임을 받는다.
+//   열: 일반 경기는 g1~g6 고정(시리즈의 게임 수), 결승(Match Point Finals)은 게임이 진행될 때마다 g1부터 하나씩 생긴다.
+const GAMES = {}; // 시리즈 ID → { by: { 게임 번호: { st, map, t: { 팀 ID: [점수, 킬, 순위, 순위 점수] } } }, settled, loading }
+const GWATCH = new Map(); // 지금 화면에 있는 시리즈 ID → 시리즈
+const gamesWide = () => window.matchMedia('(min-width: 800px)').matches;
+const GM_KEEP = 40; // 브라우저에 저장해 두는 끝난 시리즈 수
+function gamesStored(id) { const v = store.get('gm:' + id, null); if (v?.by) GAMES[id] = { by: v.by, settled: true }; return !!GAMES[id]; }
+async function loadGames(x) {
+  const g = (GAMES[x.id] ||= { by: {}, settled: false });
+  if (g.settled || g.loading) return;
+  g.loading = true;
+  try {
+    const get = (u) => fetch(LIVE.api + u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const m = await get(`/series/${x.id}/matches`);
+    if (!m) return;
+    const started = (m.matches || []).filter((y) => y.status === 'completed' || y.status === 'live' || y.inGameStatus === 'postmatch');
+    const before = JSON.stringify(g.by);
+    await Promise.all(started.filter((y) => g.by[y.matchNumber]?.st !== 'completed').map(async (y) => {
+      const j = await get(`/stats/series/${x.id}/match/number/${y.matchNumber}`);
+      if (!j?.teams?.length) return;
+      g.by[y.matchNumber] = { st: y.status === 'completed' ? 'completed' : 'live', map: j.map?.name || y.map?.name || '', t: Object.fromEntries(j.teams.map((tm) => [tm.id, [tm.points ?? 0, tm.kills ?? 0, tm.placement ?? 0, tm.placementPoints ?? 0]])) };
+    }));
+    // 끝난 시리즈에서 시작한 게임이 모두 끝나 있으면 더 받지 않는다 (브라우저에 저장)
+    if ((x.status === 'completed' && !x.live) && started.length && started.every((y) => g.by[y.matchNumber]?.st === 'completed')) {
+      g.settled = true;
+      const keys = store.get('gmKeys', []).filter((k) => k !== x.id); keys.push(x.id);
+      while (keys.length > GM_KEEP) { try { localStorage.removeItem('algskr.gm:' + keys.shift()); } catch { keys.shift(); } }
+      store.set('gmKeys', keys); store.set('gm:' + x.id, { by: g.by });
+    }
+    g.at = Date.now();
+    if (before !== JSON.stringify(g.by) || g.settled) render();
+  } finally { g.loading = false; }
+}
+(function gamesLoop() { setTimeout(() => { Promise.all([...GWATCH.values()].map((x) => (GAMES[x.id]?.settled ? null : loadGames(x)))).catch(() => {}).finally(gamesLoop); }, (C.livePollMs || 10000) + Math.random() * 3000); })();
+// x: 시리즈, final: 결승이면 true. 열 정의 { n, th, td(short) } 또는 null(좁은 화면·아직 받지 못함·시작 전)
+function gameCols(x, final) {
+  if (!x?.id || FROZEN || !gamesWide() || !(x.results?.length || x.live || x.status === 'live' || x.status === 'completed')) return null;
+  GWATCH.set(x.id, x);
+  if (!GAMES[x.id] && !gamesStored(x.id)) { GAMES[x.id] = { by: {}, settled: false }; setTimeout(() => loadGames(x).catch(() => {}), 50); } // 처음 보면 바로 한 번 받는다
+  const by = GAMES[x.id].by, nums = Object.keys(by).map(Number).sort((a, b) => a - b);
+  if (!nums.length) return null;
+  const N = final ? nums.at(-1) : Math.min(12, Math.max(x.matches || 6, nums.at(-1)));
+  const idOf = (sh) => team(sh)?.id || A.xteams?.[sh]?.id || null;
+  const th = Array.from({ length: N }, (_, i) => { const d = by[i + 1]; return `<th class="r gc${d?.st === 'live' ? ' live' : ''}"${d?.map ? ` title="G${i + 1} · ${esc(d.map)}"` : ''}>g${i + 1}</th>`; }).join('');
+  const td = (sh) => { const id = idOf(sh); return Array.from({ length: N }, (_, i) => { const v = id && by[i + 1]?.t[id]; return v ? `<td class="r num gc${v[2] === 1 ? ' gw' : ''}${by[i + 1].st === 'live' ? ' live' : ''}" title="${v[2]}위 · 킬 ${v[1]} · 순위 점수 ${v[3]}">${v[0]}</td>` : '<td class="r num gc muted">–</td>'; }).join(''); };
+  return { n: N, th, td };
+}
+window.matchMedia('(min-width: 800px)').addEventListener?.('change', () => render()); // 화면 폭이 넓어지면 게임별 점수를 받아 보여 준다
 const REGION = { 'apac-n': 'APAC North', 'apac-s': 'APAC South', emea: 'EMEA', americas: 'Americas', global: '국제전' };
 const PHASE_KO = {
   'Group Stage': '조별 리그', 'Bracket Stage': '브래킷', 'Match Point Finals': '매치 포인트 결승', 'Survival Stage': '서바이벌 스테이지',
@@ -301,7 +351,7 @@ function fillLazy(root) {
   }
 }
 function render() {
-  lazyNext = []; poiWatch = null;
+  lazyNext = []; poiWatch = null; GWATCH.clear();
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
@@ -1216,6 +1266,7 @@ function stageGrid(B, st, limit = 0) {
   if (opt.krOnly) rows = rows.filter((r) => r.short && isF(r.short));
   if (limit) rows = rows.filter((r, i) => i < limit || (r.short && isF(r.short)));
   const hasDest = !!st.cut || st.key === 'f';
+  const G = gameCols(x, st.key === 'f');
   const dest = (r) => {
     if (!r.pos) return '';
     if (st.key === 'f') return r.won ? '<span class="tag mpe">우승</span>' : st.top && st.status === 'completed' && r.pos <= st.top ? '<span class="tag ok">챔피언십 진출</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '';
@@ -1224,10 +1275,10 @@ function stageGrid(B, st, limit = 0) {
   };
   const body = rows.map((r) => {
     const cutHere = !opt.krOnly && st.cut && (res ? r.pos === st.cut : false);
-    return `<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${ptsTd(r.pts, r.kills)}${hasDest ? `<td class="r small">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${hasDest ? 6 : 5}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
+    return `<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
   }).join('');
   const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다.' : '';
-  return `<div class="tbl-wrap"><table class="tbl lcq-grid"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${hasDest ? `<th class="r">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>${cap ? `<p class="caption">${esc(cap)}</p>` : ''}`;
+  return `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>${cap ? `<p class="caption">${esc(cap)}</p>` : ''}`;
 }
 // 단계 시각 (LCQ·챔피언십 공통): 'MM.DD (요일) HH:mm KST'. 공식 시각이 임시값이면 '시각 미정', 날짜만 알면 날짜
 const stWhen = (st) => (st.whenText ? st.whenText : st.start && !st.tbd ? `${dateTime(st.start)} ${TZL}` : st.date ? `${dayLabel(st.date)} 시각 미정` : st.tbd ? '시각 미정' : '일정 미정');
@@ -1593,10 +1644,11 @@ function stageTable(st) {
   if (res?.length) {
     let rows = res;
     if (opt.krOnly) rows = rows.filter((r) => isF(r.short));
+    const G = gameCols(x, st.key === 'f');
     const out = (r) => (st.cut ? (r.pos <= st.cut ? `<span class="adv up">${esc(st.up)}</span>` : `<span class="adv ${st.down === '탈락' ? 'out' : 'down'}">${esc(st.down)}</span>`)
       : st.top && st.status === 'completed' && r.pos <= st.top ? `<span class="tag ok">챔피언십 진출</span>${r.won ? ' <span class="tag mpe">우승</span>' : ''}` : r.won ? '<span class="tag mpe">우승</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '');
-    body = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${PTS_TH}<th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}<td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="6">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
+    body = `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}<th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}${G ? G.td(r.short) : ''}<td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="${6 + (G ? G.n : 0)}">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
     </tbody></table></div>${x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : ''}`;
   } else if (st.teams?.length) {
     const seedOf = st.seed || ((sh) => { const g = (st.ev || A.intl)?.rows?.find((r) => r.short === sh); return g ? { n: g.pos, label: `조별 ${g.pos}위` } : null; });
