@@ -59,7 +59,15 @@ const MODES = {
 const ML = () => MODES[opt.mode] || MODES.kr;
 function setMode(m) { opt.mode = MODES[m] ? m : 'kr'; store.set('mode', opt.mode); FOCUS = null; render(); }
 // 대표 응원 팀: 응원 팀 중 하나를 홈 맨 위 큰 카드와 표 맨 앞 강조로
-const mainId = () => (opt.mode === 'custom' && opt.fav.includes(opt.main) ? opt.main : null);
+// 대표 응원 팀은 어느 보기(한국 팀·APAC North·내 응원 팀)에서도 관심 팀으로 치고 가장 먼저 보여 준다
+const mainId = () => (opt.main && opt.fav.includes(opt.main) ? opt.main : null);
+// 보기 기준에 안 맞는데 대표 팀이라서 끼어든 팀이면, 어느 지역 팀인지 따로 알려 준다 (한국 팀 보기에서 한국 관련이 아니면, APAC North 보기에서 다른 지역이면)
+function outsider(short) {
+  const t = A.teams?.[short];
+  if (!t || !mainId() || t.id !== mainId()) return false;
+  return opt.mode === 'kr' ? !t.krLevel || t.krLevel === 'none' : opt.mode === 'apn' ? t.region !== 'apac-n' : false;
+}
+const outTag = (short) => (outsider(short) ? `<span class="oreg" title="${esc(opt.mode === 'kr' ? '한국 관련 팀이 아닙니다' : 'APAC North 팀이 아닙니다')}">${esc(REGION[A.teams[short].region] || '')}</span>` : '');
 function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; render(); }
 // 대표 응원 팀: 팀 로고에서 뽑은 색(A.teams[].color)으로 사이트 강조색을 바꾸고, 헤더에 팀 칩을 단다. 색이 없는 팀은 기본 빨강
 const mainTeam = () => (opt.main && opt.fav.includes(opt.main) ? Object.values(A.teams).find((x) => x.id === opt.main && x.current) || null : null);
@@ -83,28 +91,29 @@ function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : 
 function lvlOf(short) {
   const t = A.teams?.[short];
   if (!t) return 'none';
-  if (opt.mode === 'apn') return t.region === 'apac-n' ? 'team' : 'none';
-  if (opt.mode === 'custom') return opt.fav.includes(t.id) ? 'team' : 'none';
-  return t.krLevel || 'none';
+  const base = opt.mode === 'apn' ? (t.region === 'apac-n' ? 'team' : 'none') : opt.mode === 'custom' ? (opt.fav.includes(t.id) ? 'team' : 'none') : t.krLevel || 'none';
+  return base === 'none' && t.id === mainId() ? 'team' : base;
 }
 const isF = (short) => lvlOf(short) !== 'none';
 // 관심 팀 카드 목록 (kr 모드는 빌드가 만든 A.kr, 다른 모드는 화면에서 만듦)
 let FOCUS = null;
 function focusList() {
-  if (opt.mode === 'kr') return A.kr || [];
-  if (FOCUS && FOCUS.a === A && FOCUS.b === BOARD && FOCUS.m === opt.mode && FOCUS.mid === mainId()) return FOCUS.list;
+  const mid = mainId();
+  if (FOCUS && FOCUS.a === A && FOCUS.b === BOARD && FOCUS.m === opt.mode && FOCUS.mid === mid && FOCUS.kr === A.kr) return FOCUS.list;
   const bd = typeof board === 'function' ? board() : null;
   const pl2 = Object.values(A.pl).filter((p) => p.split === Math.max(...Object.values(A.pl).map((x) => x.split))).flatMap((p) => p.rows);
-  const list = Object.values(A.teams).filter((t) => isF(t.short)).map((t) => {
+  const mk = (t) => {
     const b = bd?.rows.find((r) => r.id === t.id), c = A.cp.find((r) => r.id === t.id), s2 = pl2.find((r) => r.id === t.id), ir = A.intl?.rows.find((r) => r.id === t.id);
     return { short: t.short, name: t.name, level: 'team', kc: false, krPlayers: (t.roster || []).filter((p) => p.r !== 'k').map((p) => p.n), krCoaches: [],
       cp: b ? { rank: b.prank, total: b.min, gap: b.pgap, status: b.pstatus } : c ? { rank: c.rank, total: c.total, gap: c.gap, status: c.status } : t.cp ? { rank: t.cp.rank, total: t.cp.total } : null,
       pl: s2 ? { pos: s2.pos, rs: s2.rs, kills: s2.kills, qualified: s2.qualified } : null,
       intl: ir ? { pos: ir.pos, pts: ir.pts, of: A.intl.rows.length, next: ir.next } : null, nextSeries: null };
-  }).sort((a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
-  const mid = mainId();
-  if (mid) list.sort((a, b) => (team(b.short)?.id === mid) - (team(a.short)?.id === mid));
-  FOCUS = { a: A, b: BOARD, m: opt.mode, list, mid };
+  };
+  let list = opt.mode === 'kr' ? [...(A.kr || [])] : Object.values(A.teams).filter((t) => isF(t.short)).map(mk).sort((a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999));
+  const mt = mid && Object.values(A.teams).find((t) => t.id === mid);
+  if (mt && !list.some((k) => k.short === mt.short)) list.push(mk(mt)); // 한국 팀 보기에 한국 관련이 아닌 대표 팀이 끼어든다
+  if (mid) list.sort((a, b) => (team(b.short)?.id === mid) - (team(a.short)?.id === mid)); // 대표 팀을 맨 앞에 (나머지 순서는 그대로)
+  FOCUS = { a: A, b: BOARD, m: opt.mode, list, mid, kr: A.kr };
   return list;
 }
 
@@ -242,7 +251,7 @@ const CAT = { team: 'k-team', member: 'k-member', coach: 'k-coach' };
 const krDot = (lvl0, short) => {
   const lvl = short ? lvlOf(short) : lvl0;
   if (!lvl || lvl === 'none') return '';
-  return `<span class="krdot ${CAT[lvl]}" title="${opt.mode === 'kr' ? KR_LABEL[lvl] : ML().label}"></span>`;
+  return `<span class="krdot ${CAT[lvl]}" title="${short && outsider(short) ? '대표 응원 팀' : opt.mode === 'kr' ? KR_LABEL[lvl] : ML().label}"></span>`;
 };
 const rowCls = (r) => { const l = r.short ? lvlOf(r.short) : r.kr; return l && l !== 'none' ? `kr ${CAT[l]}${mainId() && A.teams[r.short]?.id === mainId() ? ' main' : ''}` : ''; };
 const coachBadge = () => '';
@@ -655,7 +664,7 @@ function stageShort(short) {
 function krStrip(list) {
   return `<section class="sec" aria-labelledby="h-kr2">
     <div class="sec-head"><h2 class="h2" id="h-kr2">${ML().strip}</h2><a class="more" href="#/teams?g=kr">자세히 보기</a></div>
-    ${spoil(`<div class="kr-strip">${list.slice(0, opt.mode === 'kr' ? 99 : 12).map((k) => `<a class="kchip ${CAT[k.level]}${mainId() && team(k.short)?.id === mainId() ? ' main' : ''}" href="#/teams/${encodeURIComponent(k.short)}" title="${esc(k.name)}">${logo(k.short)}<span><b>${esc(k.short)}</b><small>${esc(stageShort(k.short))}</small></span></a>`).join('')}${list.length > 12 && opt.mode !== 'kr' ? `<a class="kchip more-chip" href="#/teams?g=kr"><span><b>+${list.length - 12}</b><small>전체 보기</small></span></a>` : ''}</div>`, intlKey(), '관심 팀 성적')}
+    ${spoil(`<div class="kr-strip">${list.slice(0, opt.mode === 'kr' ? 99 : 12).map((k) => `<a class="kchip ${CAT[k.level]}${mainId() && team(k.short)?.id === mainId() ? ' main' : ''}" href="#/teams/${encodeURIComponent(k.short)}" title="${esc(k.name)}">${logo(k.short)}<span><b>${esc(k.short)}</b>${outTag(k.short)}<small>${esc(stageShort(k.short))}</small></span></a>`).join('')}${list.length > 12 && opt.mode !== 'kr' ? `<a class="kchip more-chip" href="#/teams?g=kr"><span><b>+${list.length - 12}</b><small>전체 보기</small></span></a>` : ''}</div>`, intlKey(), '관심 팀 성적')}
     ${krLegend()}
   </section>`;
 }
@@ -718,8 +727,8 @@ function krStageInfo(short) {
 const krStage = (short) => krStageInfo(short).text;
 function lineupLine(s) {
   if (!s.lineup?.length) return '';
-  const ks = krIn(s.lineup);
-  return `<div class="meta lineup">출전 ${s.lineup.length}팀 확정${ks.length ? ` · ${ML().group} ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}${coachBadge(krOf(sh), sh)}`).join(' ')}` : ''}</div>`;
+  const ks = krIn(s.lineup).sort((a, b) => (team(b)?.id === mainId()) - (team(a)?.id === mainId()));
+  return `<div class="meta lineup">출전 ${s.lineup.length}팀 확정${ks.length ? ` · ${ML().group} ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}${outTag(sh)}${coachBadge(krOf(sh), sh)}`).join(' ')}` : ''}</div>`;
 }
 
 // 홈: 지금(또는 가장 최근) 브래킷 단계 요약
@@ -845,7 +854,7 @@ function heroCard(k) {
     key = intlKey();
   }
   return `<section class="kr-hero" aria-labelledby="h-hero">
-    <span class="flag ${CAT[k.level] || ''}">${opt.mode === 'kr' ? KR_LABEL[k.level] || '' : mainId() && team(k.short)?.id === mainId() ? '★ 대표 응원 팀' : ML().label}</span>
+    <span class="flag ${CAT[k.level] || ''}">${mainId() && team(k.short)?.id === mainId() ? '★ 대표 응원 팀' : opt.mode === 'kr' ? KR_LABEL[k.level] || '' : ML().label}</span>${outTag(k.short)}
     <div class="hero-id">${logo(k.short, 'xl', true)}<h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1></div>
     <p class="roster">${esc(roster)}</p>
     ${spoil(`${stats}${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, key, '성적')}
@@ -1411,9 +1420,9 @@ function lcqBody(q, base) {
   const B = lcqBracket(ev);
   B.base = base; B.q = q;
   const key = B.started && now() - new Date(ev.end) < 7 * 864e5 ? `ev:${ev.eventId}` : null;
-  const focusIn = evs.flatMap((e) => lcqEntrants(e).list.filter((t) => isF(t.short)).map((t) => ({ ...t, region: e.region })));
+  const focusIn = evs.flatMap((e) => lcqEntrants(e).list.filter((t) => isF(t.short)).map((t) => ({ ...t, region: e.region }))).sort((a, b) => (team(b.short)?.id === mainId()) - (team(a.short)?.id === mainId()));
   const seg = `<div class="seg" role="group" aria-label="지역">${evs.map((e) => { const n = focusIn.filter((t) => t.region === e.region).length; return `<a href="${qsLink(base, q, { r: e.region })}" aria-current="${e === ev}">${REGION[e.region]}${n ? ` <span class="seg-n">${n}</span>` : ''}</a>`; }).join('')}</div>`;
-  const focusLine = focusIn.length ? `<p class="lcq-focus"><b>${esc(ML().group)} ${focusIn.length}팀 출전</b> ${focusIn.map((t) => `<a class="lcq-chip ${CAT[lvlOf(t.short)] || ''}" href="${qsLink(base, q, { r: t.region })}">${logo(t.short)}<span>${esc(t.short)}</span><small>${esc(REGION[t.region])}</small></a>`).join('')}</p>` : '';
+  const focusLine = focusIn.length ? `<p class="lcq-focus"><b>${esc(ML().group)} ${focusIn.length}팀 출전</b> ${focusIn.map((t) => `<a class="lcq-chip ${CAT[lvlOf(t.short)] || ''}" href="${qsLink(base, q, { r: t.region })}">${logo(t.short)}<span>${esc(t.short)}</span>${outTag(t.short)}<small>${esc(REGION[t.region])}</small></a>`).join('')}</p>` : '';
   // 기본 탭: 진행 중 경기 → 출전 팀이 정해진 다음 경기 → 마지막으로 끝난 경기 → 조 편성
   const live = B.list.find((st) => st.status === 'live');
   const nextUp = B.list.find((st) => st.status !== 'completed' && st.teams.length === st.n);
@@ -2146,12 +2155,12 @@ function teams(parts, q) {
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
     const cls = rowCls({ short: t.short });
     return `<a class="team-tile ${cls}" href="#/teams/${encodeURIComponent(t.short)}" data-name="${esc((t.short + ' ' + t.name + ' ' + (t.roster || []).map((p) => p.n).join(' ')).toLowerCase())}">
-      <span class="tile-id">${logo(t.short, 'lg')}<b>${esc(t.short)}</b>${krDot('', t.short)}</span><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
+      <span class="tile-id">${logo(t.short, 'lg')}<b>${esc(t.short)}</b>${krDot('', t.short)}${outTag(t.short)}</span><span>${esc(t.name)}${t.cp ? `, CP ${t.cp.rank}위` : ''}</span>
       <span class="tile-roster">${ps.map(pName).join(', ') || '로스터 정보 없음'}${cs.length ? `<br><span class="muted">코치 ${cs.map(pName).join(', ')}</span>` : ''}</span></a>`;
   };
   const byCp = (a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999);
   const order = { team: 0, member: 1, coach: 2 };
-  let groups = [[ML().group, all.filter((t) => isF(t.short)).sort((a, b) => (order[lvlOf(a.short)] ?? 0) - (order[lvlOf(b.short)] ?? 0) || byCp(a, b))], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && (g !== 'all' || !isF(t.short))).sort(byCp)])];
+  let groups = [[ML().group, all.filter((t) => isF(t.short)).sort((a, b) => ((b.id === mainId()) - (a.id === mainId())) || (order[lvlOf(a.short)] ?? 0) - (order[lvlOf(b.short)] ?? 0) || byCp(a, b))], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && (g !== 'all' || !isF(t.short))).sort(byCp)])];
   if (g !== 'all') groups = groups.filter(([n]) => n === REGION[g]);
   return `<h1 class="title">팀</h1>
     <p class="lead">현재 시즌 팀과 로스터입니다. <b class="krn">굵은 이름</b>은 한국 선수, <sup class="mix">계</sup>는 한국계(혼혈·이중국적 등) 선수입니다.</p>
@@ -2182,7 +2191,7 @@ function krTeams() {
     const si = A.intl ? krStageInfo(k.short) : { text: '' };
     const ps = (t.roster || []).filter((p) => p.r !== 'k'), cs = (t.roster || []).filter((p) => p.r === 'k');
     return `<a class="kcard ${CAT[k.level]}" href="#/teams/${encodeURIComponent(k.short)}">
-      <span class="kcard-id">${logo(k.short, 'lg')}<span><b>${esc(k.name)}</b><small>${esc(opt.mode === 'kr' ? KR_LABEL[k.level] : ML().label)} · ${esc(REGION[t.region] || '')}</small></span></span>
+      <span class="kcard-id">${logo(k.short, 'lg')}<span><b>${esc(k.name)}</b><small>${esc(outsider(k.short) ? '대표 응원 팀' : opt.mode === 'kr' ? KR_LABEL[k.level] : ML().label)} · ${esc(REGION[t.region] || '')}</small></span></span>
       <span class="kcard-stats"><span><b>${k.cp ? k.cp.rank + '위' : '–'}</b><small>CP</small></span><span><b>${k.pl ? k.pl.pos + '위' : '–'}</b><small>Split ${lastSplit()} PL</small></span><span><b>${k.intl ? k.intl.pos + '위' : '–'}</b><small>조별 리그</small></span></span>
       ${si.text ? `<span class="kcard-now">지금 · ${esc(si.text)}</span>` : ''}
       <span class="kcard-roster">${ps.map(pName).join(', ')}${cs.length ? ` · 코치 ${cs.map(pName).join(', ')}` : ''}</span>
@@ -2429,13 +2438,13 @@ function povTeam(l) { // 공식 팀 화면의 제목 속 팀 이름 → 팀 약�
   return POV_IX.get(flatName(l.pov)) || null;
 }
 const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
-const inFocus = (short) => { const t = team(short); return !!t && (opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short)); };
+const inFocus = (short) => { const t = team(short); return !!t && (t.id === mainId() || opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short)); };
 function liveShown(l) {
   if (liveId(l) === parseHash().q.get('play')) return true;
   if (l.kind === 'official') return opt.mode === 'apn' ? l.key === 'o:ja' : true;
   if (l.kind === 'pov') return !l.map && inFocus(povTeam(l));
   if (l.kind === 'creator') return opt.mode !== 'apn' && opt.mode !== 'custom';
-  if (l.kind === 'player') return opt.mode === 'apn' || opt.mode === 'custom' ? inFocus(l.team) : !l.intl;
+  if (l.kind === 'player') return opt.mode === 'apn' || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
   return false; // 공식 파트너 등
 }
 const liveRank = (l) => ({ official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4); // 공식 중계 → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
@@ -2539,14 +2548,14 @@ function videoSection(q) {
     const isNew = vidSeen0 && Date.parse(v.published) > vidSeen0, tw = v.platform === 'twitch';
     const link = tw ? `<a href="https://www.twitch.tv/videos/${esc(v.id)}" target="_blank" rel="noopener">Twitch에서 보기</a>` : `<a href="${v.short ? `https://www.youtube.com/shorts/${esc(v.id)}` : `https://youtu.be/${esc(v.id)}`}" target="_blank" rel="noopener">YouTube에서 보기</a>`;
     const kindTag = tw ? '<span class="tag vk">다시보기</span> ' : v.short ? '<span class="tag vk">쇼츠</span> ' : '';
-    return `<figure class="vid${tw ? ' tw' : ''}"><button class="yt" type="button" ${tw ? `data-tw="${esc(v.id)}"` : `data-yt="${esc(v.id)}"`} aria-label="${esc(v.title)} 재생">${v.thumb ? `<img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="${tw ? 270 : 360}">` : ''}<span class="yt-play" aria-hidden="true"></span></button>
+    return `<figure class="vid${tw ? ' tw' : ''}${v.short ? ' short' : ''}"><button class="yt" type="button" ${tw ? `data-tw="${esc(v.id)}"` : `data-yt="${esc(v.id)}"`} aria-label="${esc(v.title)} 재생">${v.thumb ? `<img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="${tw ? 270 : v.short ? 853 : 360}">` : ''}<span class="yt-play" aria-hidden="true"></span></button>
     <figcaption><b>${isNew ? '<span class="tag live">새 영상</span> ' : ''}${kindTag}${esc(v.title)}</b><span>${esc(v.kind === 'player' ? v.who : v.channel || v.who)} · ${esc(day(v.published))}${tw && durTxt(v.dur) ? ` · <span>${durTxt(v.dur)}</span>` : ''} · ${link}</span></figcaption></figure>`;
   };
   const tabs = [['main', '영상'], ['short', '쇼츠']].filter(([k]) => G[k].length);
   const seg = tabs.length > 1 ? `<div class="seg vid-kind" role="group" aria-label="영상 종류">${tabs.map(([k, t]) => `<a href="${qsLink('/streams', q, { vk: k === 'main' ? null : k, v: null, play: null })}" aria-current="${k === kind}"><span>${t}</span> <small>${G[k].length}</small></a>`).join('')}</div>` : '';
   return `<section class="sec" id="vids"><h2 class="h2">최근 영상 <small class="muted">${G.main.length}</small></h2>
     <p class="lead">등록된 채널에 최근 3주 동안 올라온 YouTube 영상입니다. 쇼츠는 따로 모았습니다.</p>
-    ${seg}<div class="vid-grid">${list.map(card).join('')}</div>
+    ${seg}<div class="vid-grid${kind === 'short' ? ' shorts' : ''}">${list.map(card).join('')}</div>
     ${cur.length > list.length ? `<p class="lead"><a class="more" href="${qsLink('/streams', q, { v: 'all' })}">영상 ${cur.length}개 모두 보기</a></p>` : ''}</section>`;
 }
 // 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다

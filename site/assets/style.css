@@ -1480,3 +1480,11 @@ dialog { border: 1px solid var(--rule); }
 .match.mine { border-left: 4px solid var(--apex); background: linear-gradient(90deg, color-mix(in srgb, var(--apex) 12%, transparent), transparent 62%), var(--card); }
 .tag.mine-tag { background: var(--apex); border-color: var(--apex); color: #fff; letter-spacing: .06em; }
 @media (max-width: 380px) { .brand-team b { display: none; } .brand-team { padding-right: 5px; } }
+/* 쇼츠: 세로 영상 비율(9:16)로 보여 준다 (썸네일·재생 화면 모두) */
+.vid.short .yt, .vid.short .yt-frame { aspect-ratio: 9 / 16; max-height: 78vh; }
+.vid-grid.shorts { grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); }
+@media (min-width: 768px) { .vid-grid.shorts { grid-template-columns: repeat(auto-fill, minmax(190px, 220px)); } }
+@media (max-width: 640px) { .vid-grid.shorts { grid-auto-columns: min(56%, 220px); } }
+/* 보기 기준(한국 팀·APAC North)에 안 맞는 대표 응원 팀: 소속 지역 표시 */
+.oreg { display: inline-block; margin-left: 4px; padding: 0 5px; border: 1px solid var(--rule); border-radius: 4px; background: var(--raise); color: var(--steel); font: 700 10px/1.5 var(--display); letter-spacing: .06em; text-transform: uppercase; vertical-align: 1px; }
+.kchip .oreg { display: block; margin: 1px 0 0; width: fit-content; }
