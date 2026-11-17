@@ -266,6 +266,7 @@ function render() {
   // 가로로 넘치는 LCQ 경기 탭: 고른 탭이 보이게
   const on = app.querySelector('.lcq-tabs [aria-current="true"]');
   if (on) { const bar = on.closest('.lcq-tabs'); bar.scrollLeft = on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2; }
+  { const ps = app.querySelector('.poi-scroll.big'); if (ps) ps.scrollLeft = (ps.scrollWidth - ps.clientWidth) / 2; } // POI 지도 크게 보기: 가운데부터
 }
 
 /* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
@@ -1184,21 +1185,49 @@ function stageMatch(B, st) {
   return `<section class="sec lcq-m"><div class="bk-stage-h"><h2 class="h2">${x?.id ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h2> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${esc(stWhen(st))}</span></div>
     ${from || rule ? `<p class="bk-rule lcq-rule">${from ? `<span>출전: ${from}</span>` : ''}${rule ? `<span>${esc(rule)}</span>` : ''}</p>` : ''}${stageGrid(B, st)}</section>${poiSection(B, st)}`;
 }
-// POI 드래프트 지도 (scripts/poi-maps.mjs → A.poi): 끝난 드래프트의 팀별 낙하 지점 선택. 공식 사이트의 'Map View'와 같은 자료다.
-//   지도 그림에는 팀 로고 핀과 선택 순서만 있고, 팀 이름·낙하 지점은 아래 표로 읽는다. 그림을 누르면 원본 크기로 열려 확대해서 볼 수 있다
+// POI 드래프트 (scripts/poi-maps.mjs → A.poi): 끝난 드래프트의 팀별 낙하 지점 선택. 공식 사이트의 'Map View'와 같은 자료다.
+//   바탕 지도(poi/base)는 팀과 상관없이 모든 드래프트가 같이 쓰고, 팀 핀은 좌표(%)로 화면에서 얹는다.
+//   핀에 마우스를 올리거나(키보드 포커스·휴대폰은 누르기) 팀 로고·이름·낙하 지점이 뜨고, 같은 번호의 표 줄이 함께 강조된다.
+let poiBig = false; // 좁은 화면에서 지도를 크게 보는지 (가로로 밀어서 본다)
+const poiInit = (name) => { const w = String(name || '').split(/[^A-Za-z0-9]+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join('').slice(0, 3) : (w[0] || '').slice(0, 3) || '?').toUpperCase(); };
 function poiSection(B, st) {
   const P = A.poi?.[st.s?.id];
   if (!P?.maps?.length) return '';
   const cur = P.maps.find((m) => m.map === B.q.get('pm')) || P.maps[0];
   const byId = new Map(B.E.list.map((t) => [t.id, t]));
-  const row = ([n, id, name, spot]) => { const t = byId.get(id); return `<tr class="${t ? rowCls(t) : ''}"><td class="rank">${n}</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td>${esc(spot)}</td></tr>`; };
-  const missed = (P.missed || []).map(([id, name]) => { const t = byId.get(id); return `<tr class="muted"><td class="rank">–</td><td class="team">${t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`; });
+  const hasLogo = (t) => { const lg = t && xteam(t.short)?.logo; return !!(lg && (lg[0] || lg[1])); };
+  const teamCell = (t, name) => (t ? `${krDot(null, t.short)}${teamLink(t.short, t.name)}` : esc(name));
+  const row = ([n, id, name, spot]) => { const t = byId.get(id); return `<tr class="${t ? rowCls(t) : ''}" data-n="${n}"><td class="rank">${n}</td><td class="team">${teamCell(t, name)}</td><td>${esc(spot)}</td></tr>`; };
+  const missed = (P.missed || []).map(([id, name]) => `<tr class="muted"><td class="rank">–</td><td class="team">${teamCell(byId.get(id), name)}</td><td><span>미선택 (시간 초과)</span></td></tr>`);
+  // 핀: 지도 폭에 비례해 커지고(cqw), 가장자리 가까이면 툴팁이 안쪽으로 열린다
+  const pin = ([n, id, name, spot, x, y]) => {
+    const t = byId.get(id), disp = t?.name || name;
+    const ic = (cls) => (hasLogo(t) ? logo(t.short, cls, true) : `<span class="poi-ph ${cls}">${esc(poiInit(disp))}</span>`);
+    const pos = `${y < 28 ? 'b' : 't'}${x < 30 ? 'l' : x > 70 ? 'r' : 'c'}`;
+    return `<button type="button" class="poi-pin p-${pos}" style="left:${x}%;top:${y}%" data-n="${n}" aria-label="${esc(`#${n} ${disp} · ${spot}`)}"><span class="poi-dot">${ic('poi')}</span><i class="poi-num">${n}</i>
+      <span class="poi-tip" role="tooltip">${ic('lg')}<span class="poi-tt"><b>${esc(disp)}</b><small>#${n} · ${esc(spot)}</small></span></span></button>`;
+  };
   const seg = P.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${P.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
-  const src = `${cur.img}?v=${encodeURIComponent(cur.v || '')}`;
   return `<section class="sec poi" aria-labelledby="h-poi"><h2 class="h2" id="h-poi">POI 드래프트</h2>
-    <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서이고, 그림을 누르면 크게 열립니다.</span> <span>출처: ALGS 공식 사이트</span></p>
-    ${seg}<figure class="poi-fig"><a href="${esc(src)}" target="_blank" rel="noopener" aria-label="${esc(cur.map)} POI draft"><img src="${esc(src)}" width="1255" height="1255" alt="${esc(cur.map)} POI draft" loading="lazy" decoding="async"></a></figure>
+    <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.</span> <span>출처: ALGS 공식 사이트</span></p>
+    <div class="poi-bar">${seg}<button type="button" class="link-btn poi-zoom" data-poi-zoom aria-pressed="${poiBig}">${poiBig ? '작게 보기' : '크게 보기'}</button></div>
+    <figure class="poi-fig"><div class="poi-scroll${poiBig ? ' big' : ''}"><div class="poi-map"><img class="poi-base" src="${esc(cur.base)}" width="1255" height="1255" alt="${esc(cur.map)}" loading="lazy" decoding="async">${cur.picks.map(pin).join('')}</div></div></figure>
     <div class="tbl-wrap"><table class="tbl poi-tbl"><thead><tr><th>#</th><th>팀</th><th>낙하 지점</th></tr></thead><tbody>${cur.picks.map(row).join('')}${missed.join('')}</tbody></table></div></section>`;
+}
+// 핀 ↔ 표 줄 강조(같은 번호), 휴대폰·터치에서 핀 누르면 툴팁 열기, 크게 보기 전환
+{
+  const hl = (e, on) => { const el = e.target.closest?.('.poi [data-n]'); if (el) el.closest('.poi').querySelectorAll(`[data-n="${el.dataset.n}"]`).forEach((x) => x.classList.toggle('hl', on)); };
+  document.addEventListener('mouseover', (e) => hl(e, true));
+  document.addEventListener('mouseout', (e) => hl(e, false));
+  document.addEventListener('focusin', (e) => hl(e, true));
+  document.addEventListener('focusout', (e) => hl(e, false));
+  document.addEventListener('click', (e) => {
+    const pin = e.target.closest?.('.poi-pin');
+    document.querySelectorAll('.poi-pin.on').forEach((x) => { if (x !== pin) x.classList.remove('on'); });
+    if (pin) pin.classList.toggle('on');
+    if (e.target.closest?.('[data-poi-zoom]')) { poiBig = !poiBig; render(); }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.poi-pin.on').forEach((x) => x.classList.remove('on')); });
 }
 // LCQ 화면. base: 이 화면의 주소 (순위 탭 또는 이전 결과). 경기마다 탭(m=groups|a|b|wr2|er1|er2|f)
 function lcqBody(q, base) {

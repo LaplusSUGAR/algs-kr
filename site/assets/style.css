@@ -811,12 +811,36 @@ html, body { overflow-x: clip; }
 .lcq-roster .kr-p { color: var(--ink); font-weight: 700; }
 .lcq-roster .krdot { width: 6px; height: 6px; margin-right: 3px; vertical-align: 1px; }
 @media (max-width: 760px) { .lcq-gcols { grid-template-columns: minmax(0, 1fr); } }
-/* POI 드래프트 지도: 정사각 그림 + 선택 표. 넓은 화면에서는 그림이 너무 커지지 않게 */
-.poi .seg { margin-top: 10px; }
+/* POI 드래프트: 바탕 지도 위에 팀 핀(좌표 %)을 얹는다. 핀 크기는 지도 폭에 비례(cqw), 툴팁은 고정 px */
+.poi-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.poi-zoom { font-size: 13px; }
 .poi-fig { margin: 12px 0; max-width: 760px; }
-.poi-fig a { display: block; }
-.poi-fig img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--r-lg); background: #0b0f15; }
+.poi-scroll.big { overflow-x: auto; overscroll-behavior-x: contain; border-radius: var(--r-lg); }
+.poi-scroll.big .poi-map { width: 220%; }
+.poi-map { position: relative; container-type: inline-size; }
+.poi-base { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--r-lg); background: #0b0f15; }
+.poi-pin { position: absolute; width: clamp(24px, 5.4cqw, 60px); aspect-ratio: 1; transform: translate(-50%, -50%); padding: 0; border: 0; background: none; cursor: pointer; z-index: 1; font: inherit; color: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.poi-pin:focus-visible { outline: 2px solid var(--apex); outline-offset: 3px; border-radius: 50%; }
+.poi-dot { display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%; background: #0b0f15; border: max(2px, .24cqw) solid #fff; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, .5); transition: transform .12s, border-color .12s; }
+.poi-dot .tlogo.poi { width: 74%; height: 74%; vertical-align: 0; }
+.poi-ph { display: grid; place-items: center; color: #fff; font: 700 clamp(7px, 1.3cqw, 13px)/1 var(--body); letter-spacing: .02em; }
+.poi-num { position: absolute; right: -6%; top: -6%; min-width: 40%; height: 40%; padding: 0 2px; box-sizing: border-box; display: grid; place-items: center; border-radius: 999px; background: #da292a; border: max(1px, .15cqw) solid #fff; color: #fff; font: 700 clamp(7px, 1.25cqw, 13px)/1 var(--body); font-style: normal; pointer-events: none; }
+.poi-tip { position: absolute; z-index: 6; display: none; align-items: center; gap: 10px; width: max-content; max-width: 190px; padding: 8px 10px; border-radius: 8px; background: #141b24; color: #ecebe4; border: 1px solid #283547; box-shadow: 0 6px 18px rgba(0, 0, 0, .45); text-align: left; font-size: 13px; line-height: 1.3; pointer-events: none; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); }
+.p-bl .poi-tip, .p-bc .poi-tip, .p-br .poi-tip { bottom: auto; top: calc(100% + 8px); }
+.p-tl .poi-tip, .p-bl .poi-tip { left: 0; transform: none; }
+.p-tr .poi-tip, .p-br .poi-tip { left: auto; right: 0; transform: none; }
+.poi-tip .tlogo, .poi-tip .poi-ph { width: 34px; height: 34px; flex: none; font-size: 11px; }
+.poi-tip .poi-ph { border-radius: 50%; background: #1e2836; }
+.poi-tt { display: grid; gap: 2px; min-width: 0; }
+.poi-tt b { font-size: 13.5px; overflow-wrap: anywhere; }
+.poi-tt small { color: #8a99ad; font-size: 12px; }
+.poi-pin:hover, .poi-pin:focus-visible, .poi-pin.on { z-index: 5; }
+.poi-pin:hover .poi-tip, .poi-pin:focus-visible .poi-tip, .poi-pin.on .poi-tip { display: flex; }
+.poi-pin.hl { z-index: 4; }
+.poi-pin.hl .poi-dot, .poi-pin:hover .poi-dot { transform: scale(1.18); border-color: #ff2a2a; }
 .poi-tbl td:last-child { white-space: nowrap; }
+.poi-tbl tr.hl td { background: var(--raise); }
+@media (min-width: 900px) { .poi-zoom { display: none; } .poi-scroll.big { overflow: visible; } .poi-scroll.big .poi-map { width: 100%; } }
 .lcq-rule { display: flex; flex-wrap: wrap; gap: 2px 16px; }
 time.tbd { font-size: 12px; color: var(--steel); }
 .tbl.lcq-sch td { white-space: nowrap; }

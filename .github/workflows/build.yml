@@ -69,10 +69,10 @@ jobs:
         run: node scripts/fetch-lp-squads.mjs ${{ (inputs.refresh == '1' || inputs.refresh == 'squads') && '--force --raw' || '' }}
       - name: 팀 로고 (Liquipedia 확인 → 이름·선수 대조 → 받기·캡처 → 64·160px WebP, 새로 만들 것이 있을 때만 도구 설치)
         run: node scripts/logos.mjs --plan || (npm i --no-save --no-package-lock sharp@0.33 playwright-core@1.47.2 && node scripts/logos.mjs)
-      # 끝난 LCQ POI 드래프트의 지도 그림 (시작 시각 가까이만 확인하고, 그릴 것이 있을 때만 도구 설치). 실패해도 빌드는 계속
-      - name: LCQ POI 드래프트 지도
+      # 끝난 LCQ POI 드래프트의 선택(좌표)을 받아 site/data/poi-maps.json 에 적는다. 시작 시각 가까이만 확인하고, 실패해도 빌드는 계속
+      - name: LCQ POI 드래프트
         continue-on-error: true
-        run: node scripts/poi-maps.mjs --plan || [ $? -ne 3 ] || (npm i --no-save --no-package-lock sharp@0.33 && node scripts/poi-maps.mjs)
+        run: node scripts/poi-maps.mjs
       - name: 병합·빌드
         run: node scripts/build-data.mjs
       - name: 규칙 파일(config/rules)과 실제 데이터 대조 (어긋나도 멈추지 않고 경고만)
@@ -82,7 +82,7 @@ jobs:
         run: |
           git config user.name "algs-kr-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add raw logs site/data site/index.html site/logos site/poi
+          git add raw logs site/data site/index.html site/logos
           if [ -d archive ]; then git add archive; fi   # 지난 시즌 보관본 (시즌이 바뀔 때 한 번 생김)
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"

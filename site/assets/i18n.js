@@ -194,7 +194,8 @@
     ['더보기', 'その他', 'More'],
     // POI 드래프트 지도 (LCQ 경기 탭)
     ['팀별 낙하 지점(POI) 선택입니다.', 'チームごとの降下地点（POI）の選択です。', 'Each team’s landing spot (POI) pick.'],
-    ['핀의 번호는 드래프트 선택 순서이고, 그림을 누르면 크게 열립니다.', 'ピンの番号はドラフトの指名順です。画像をタップすると大きく開きます。', 'Pin numbers show the draft pick order. Tap the image to open it full size.'],
+    ['핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.', 'ピンの番号はドラフトの指名順です。ピンにカーソルを合わせるかタップすると、チームと降下地点が表示されます。', 'Pin numbers show the draft pick order. Hover over or tap a pin to see the team and its landing spot.'],
+    ['크게 보기', '大きく表示', 'Enlarge'], ['작게 보기', '小さく表示', 'Shrink'],
     ['출처: ALGS 공식 사이트', '出典: ALGS公式サイト', 'Source: official ALGS site'],
     ['낙하 지점', '降下地点', 'Landing spot'], ['지도', 'マップ', 'Map'], ['미선택 (시간 초과)', '未選択（時間切れ）', 'Not picked (timed out)'],
     ['그 밖의 방송', 'その他の配信', 'Other streams'], ['팀 화면', 'チーム視点', 'Team POV'],

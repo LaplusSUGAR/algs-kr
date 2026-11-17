@@ -28,7 +28,7 @@
 
 - 공식 API(`fetch-algs.mjs`)가 기본, Liquipedia(`fetch-liquipedia.mjs`, `fetch-lp-*.mjs`)가 보조.
 - 빌드 때마다 `scripts/check-rules.mjs` 가 규칙 파일과 데이터를 대조한다.
-- **LCQ POI 드래프트 지도**: `scripts/poi-maps.mjs` 가 끝난 드래프트의 선택(공식 API `poi-drafts/{id}/pick`)을 받아 바탕 지도(`raw/poi-base/<지도>.webp`, 공식 사이트 그림) 위에 팀 로고 핀(선택 순서 번호)을 얹은 그림을 `site/poi/` 에, 선택 목록을 `site/data/poi-maps.json` 에 만든다. 빌드가 이 목록을 `A.poi` 로 싣고, LCQ 경기 탭(`stageMatch` → `poiSection`)이 그림과 표를 보여 준다. 워크플로가 매 실행 `--plan` 으로 확인해 그릴 것이 있을 때만 sharp 를 설치해 그린다(시작 시각 앞 2시간~뒤 6시간만 자주 확인, 그 밖에는 6시간에 한 번). 새 지도가 나오면 바탕 그림을 `raw/poi-base/` 에 같은 이름(소문자·하이픈, 예 `worlds-edge.webp`)으로 넣는다. 다시 그리려면 `node scripts/poi-maps.mjs --force`(작업 공간에서는 `NODE_USE_ENV_PROXY=1` 필요).
+- **LCQ POI 드래프트**: `scripts/poi-maps.mjs` 가 끝난 드래프트의 선택(공식 API `poi-drafts/{id}/pick`)을 받아 좌표(%)와 함께 `site/data/poi-maps.json` 에 적고(받을 때 공식 낙하 지점 목록과 대조해 어긋나면 `[poi] 경고`), 빌드가 `A.poi` 로 싣는다. 화면(`stageMatch` → `poiSection`, LCQ 경기 탭)은 바탕 지도(`site/poi/base/<지도>.webp`, 공식 사이트 그림) 위에 팀 로고 핀을 얹고, 핀에 마우스를 올리면(휴대폰은 누르면) 팀 로고·이름·낙하 지점이 뜬다. 그림 파일은 만들지 않는다. 워크플로가 매 실행 이 스크립트를 돌린다(시작 시각 앞 2시간~뒤 6시간만 자주 확인, 그 밖에는 6시간에 한 번). 새 지도가 나오면 바탕 그림을 `site/poi/base/` 에 같은 이름(소문자·하이픈, 예 `worlds-edge.webp`)으로 넣는다. 다시 받으려면 `node scripts/poi-maps.mjs --force`(작업 공간에서는 `NODE_USE_ENV_PROXY=1` 필요).
 - 워크플로 `build.yml`: 5분마다 스스로 다시 실행하는 사슬. 동시 실행 제한은 build·deploy 작업에만 걸려 있어 수동 실행이 대기 없이 바로 돈다.
 
 ## 운영자가 손으로 고치는 설정
