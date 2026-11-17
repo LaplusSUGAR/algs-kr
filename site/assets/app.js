@@ -234,6 +234,50 @@ function parseHash() {
 }
 const qsLink = (path, q, patch) => { const p = new URLSearchParams(q); for (const [k, v] of Object.entries(patch)) (v == null ? p.delete(k) : p.set(k, v)); const t = p.toString(); return `#${path}${t ? '?' + t : ''}`; }; // 값이 null이면 그 항목을 뺀다
 
+// 페이지마다 다른 제목: 탭·기록·공유 시트에 어느 화면인지 보인다 (예: 'RIDDLEORDER ZERO · 팀 · EASY ALGS KR')
+const TAB_NAME = { schedule: '경기', standings: '순위', points: '포인트', teams: '팀', players: '팀', streams: '방송', rules: '규칙' };
+function setPageTitle(parts, q) {
+  const tab = parts[0] || 'home';
+  if (tab === 'home') { document.title = `${I.info.brand} · ${I.info.title}`; return; }
+  let head = '';
+  if ((tab === 'teams' || tab === 'players') && parts[1]) head = app.querySelector('h1')?.textContent.trim() || '';
+  else head = app.querySelector('.subtabs [aria-current="page"]')?.textContent.trim() || '';
+  if (head && tab === 'standings' && lcqEvents().length && !champsMain() && !intlCurrent() && !['past', 'champs'].includes(parts[1])) { // LCQ는 지역까지
+    const r = lcqEvents().some((e) => e.region === q.get('r')) ? q.get('r') : lcqRegionDefault();
+    head = `${head} ${I.t(REGION[r] || '')}`.trim();
+  }
+  const name = I.t(TAB_NAME[tab] || '');
+  document.title = [head, head === name ? '' : name, I.info.brand].filter(Boolean).join(' · ');
+}
+// 링크 공유: 공유용 주소(미리보기 카드가 있는 페이지, data.share 목록)가 있는 화면이면 그것을, 없으면(선수 화면 등) 기존 '#/…' 주소를 쓴다.
+//   사이트 설정(언어가 한국어가 아니면 ?lang=, 지난 시즌 ?y=)과 화면 안 상태(?r=지역&m=경기 …)를 함께 담아, 받은 사람이 같은 화면을 본다
+function shareUrl() {
+  const { parts, q } = parseHash();
+  const root = new URL('./', location.href); root.search = ''; root.hash = '';
+  const site = new URLSearchParams();
+  if (I.lang !== 'ko') site.set('lang', I.lang);
+  const y = new URLSearchParams(location.search).get('y'); if (y) site.set('y', y);
+  const path = parts.join('/');
+  if (path && (A.share || []).includes(path)) {
+    const all = new URLSearchParams([...site, ...q]);
+    return `${root.href}s/${path.split('/').map(encodeURIComponent).join('/')}/${all.toString() ? '?' + all : ''}`;
+  }
+  const qs = q.toString();
+  return `${root.href}${site.toString() ? '?' + site : ''}${path || qs ? `#/${parts.map(encodeURIComponent).join('/')}${qs ? '?' + qs : ''}` : ''}`;
+}
+let toastT = 0;
+function toast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.append(el); }
+  el.textContent = I.t(msg); el.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2200);
+}
+async function sharePage() {
+  const url = shareUrl();
+  if (navigator.share) { try { await navigator.share({ title: document.title, url }); return; } catch (e) { if (e?.name === 'AbortError') return; } } // 휴대폰: 공유 시트. 취소하면 그대로 끝
+  try { await navigator.clipboard.writeText(url); toast('링크를 복사했습니다'); } catch { window.prompt(I.t('아래 주소를 복사하세요'), url); }
+}
+
 let lastHtml = '', lastHash = null;
 // 펼쳐야 보이는 내용(포인트 표의 팀·선수별 내역 등)은 펼칠 때 만든다: 표를 그릴 때 수천 줄을 미리 만들지 않는다
 //   틀 안에서 ${lazy(() => html)} 를 속성 자리에 쓰면 data-lazy 번호가 붙고, 펼칠 때 fillLazy 가 채운다
@@ -268,6 +312,7 @@ function render() {
   const on = app.querySelector('.lcq-tabs [aria-current="true"]');
   if (on) { const bar = on.closest('.lcq-tabs'); bar.scrollLeft = on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2; }
   { const ps = app.querySelector('.poi-scroll.big'); if (ps) ps.scrollLeft = (ps.scrollWidth - ps.clientWidth) / 2; } // POI 지도 크게 보기: 가운데부터
+  setPageTitle(parts, q);
 }
 
 /* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
@@ -2556,6 +2601,7 @@ function bind() {
 
 function setupFeedback() {
   document.getElementById('feedbackBtn')?.addEventListener('click', () => openFeedback('', ''));
+  document.getElementById('shareBtn')?.addEventListener('click', sharePage);
   document.querySelectorAll('#feedback .fb-kind').forEach((b) => b.addEventListener('click', () => {
     window.open(feedbackUrl(b.dataset.kind, fbCtx), '_blank', 'noopener');
     document.getElementById('feedback').close();

@@ -13,6 +13,7 @@ import { nk as logoKey } from './lp-teams-parse.mjs';
 import { createRosterWatch } from './rosters.mjs';
 import { seasonName, buildTimeline, lpYear, lpSeasonPage } from './season.mjs';
 import { loadRules, scoringOf, rulesBrief, lcqRuleStart, LCQ_ORDER, lcqStage } from './rules.mjs';
+import { buildSharePages, writeSharePages } from './share.mjs';
 
 // 정적 파일 캐시 무효화: index.html의 링크에 파일 내용 해시를 붙인다 (GitHub Pages는 10분 캐시)
 function stampAssets() {
@@ -541,6 +542,8 @@ const streamIntl = []; // [twitch 로그인, 선수, 팀 약칭]
 RW.cc(lcq);
 const rosterLog = RW.save();
 
+// 공유용 페이지(site/s/): 페이지마다 따로 링크로 공유하고 미리보기 카드를 보이게 한다 (scripts/share.mjs). 앱의 공유 버튼이 이 경로 목록(data.share)을 본다
+const sharePages = buildSharePages(Object.fromEntries(Object.values(teams).filter((t) => t.short && t.current).map((t) => [t.short, t])), season.name);
 const data = {
   generated: new Date().toISOString(),
   sources: { algs: algs.fetchedAt, lp: lpPlacements?.fetchedAt || null, lpLcq: lpLcq?.fetchedAt || null },
@@ -561,6 +564,7 @@ const data = {
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
+  share: sharePages.map((p) => p.path),
   poi,
   cpRosterAdd, cpRosterOut,
   rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null, ...(m.auto ? { auto: 1 } : {}) })),
@@ -606,6 +610,7 @@ function unpackIds(d) {
 { const pc = season.povChannels || {};
   const pov = (pc.prefixes || []).flatMap((x) => [...Array.from({ length: pc.teams || 20 }, (_, i) => `${x}_team${i + 1}`), ...(pc.map ? [`${x}_map`] : [])]);
   const txt = JSON.stringify({ channels: streamChannels, intl: streamIntl, pov }); const fp = path.join(ROOT, 'site/data/stream-channels.json'); if (!fs.existsSync(fp) || fs.readFileSync(fp, 'utf8') !== txt) { writeText('site/data/stream-channels.json', txt); console.log(`[build] 방송 채널 목록 ${streamChannels.length}개`); } }
+writeSharePages(sharePages); // 데이터가 안 바뀌어도(아래에서 끝나기 전에) 템플릿·팀 변화는 반영
 const v = hash(JSON.stringify({ ...data, generated: null }));
 const prevVer = readJson('site/data/ver.json');
 if (prevVer?.v === v && !process.argv.includes('--force')) { console.log(`[build] 변경 없음 (v=${v})`); process.exit(0); }

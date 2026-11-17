@@ -196,6 +196,8 @@
     ['팀별 낙하 지점(POI) 선택입니다.', 'チームごとの降下地点（POI）の選択です。', 'Each team’s landing spot (POI) pick.'],
     ['핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.', 'ピンの番号はドラフトの指名順です。ピンにカーソルを合わせるかタップすると、チームと降下地点が表示されます。', 'Pin numbers show the draft pick order. Hover over or tap a pin to see the team and its landing spot.'],
     ['크게 보기', '大きく表示', 'Enlarge'], ['작게 보기', '小さく表示', 'Shrink'],
+    // 링크 공유
+    ['이 페이지 링크 공유', 'このページのリンクを共有', 'Share this page'], ['링크를 복사했습니다', 'リンクをコピーしました', 'Link copied'], ['아래 주소를 복사하세요', 'このアドレスをコピーしてください', 'Copy this link'],
     ['POI 드래프트가 곧 시작되거나 진행 중입니다.', 'POIドラフトはまもなく開始、または進行中です。', 'The POI draft is about to start or in progress.'], ['선택이 나오면 이곳에 바로 나타납니다.', '指名が出ると、ここにすぐ表示されます。', 'Picks will appear here as soon as they are made.'],
     ['POI 드래프트는 {t} 시작 예정입니다.', 'POIドラフトは{1}開始予定です。', 'The POI draft is scheduled to start at {1}.'],
     ['POI 드래프트 진행 중', 'POIドラフト進行中', 'POI draft in progress'], ['지금 고르는 팀:', '現在指名中のチーム:', 'Picking now:'],

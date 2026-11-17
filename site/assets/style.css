@@ -1503,3 +1503,10 @@ dialog { border: 1px solid var(--rule); }
   .tabbar a[aria-current='page'] svg { color: var(--apex-hot); }
   .tabbar a:hover { color: #fff; }
 }
+
+/* 알림 한 줄 (링크 복사 등) */
+.toast { position: fixed; left: 50%; bottom: calc(78px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 90; max-width: calc(100vw - 32px); padding: 10px 14px; border-radius: 8px; background: #141b24; color: #ecebe4; border: 1px solid #283547; box-shadow: 0 6px 18px rgba(0, 0, 0, .35); font-size: 14px; line-height: 1.3; text-align: center; }
+.toast[hidden] { display: none; }
+@media (min-width: 768px) { .toast { bottom: 24px; } }
+/* 아주 좁은 화면(320px대): 헤더 아이콘이 4개(상태·공유·문의·설정)라 간격을 줄여 브랜드 글자와 붙지 않게 */
+@media (max-width: 350px) { .top-right { gap: 0; } .top .pill { padding: 6px; } .top .icon-btn { width: 30px; } .top .icon-btn + .icon-btn { margin-left: 0; } }
