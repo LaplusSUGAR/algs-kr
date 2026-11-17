@@ -1473,3 +1473,10 @@ dialog { border: 1px solid var(--rule); }
 .ch-grid .chip { padding: 3px 8px; font-size: 12px; gap: 5px; }
 .ch-grid .chips { gap: 4px; }
 @media (max-width: 767px) { .ch-grid { gap: 8px; } }
+/* 2026-11 대표 응원 팀: 팀 색은 JS 가 --apex 계열 변수로 덮어쓴다 */
+.brand-team { display: inline-flex; align-items: center; gap: 6px; flex: none; text-decoration: none; margin-left: -4px; padding: 3px 9px 3px 5px; border: 1px solid var(--apex); border-radius: 999px; background: color-mix(in srgb, var(--apex) 22%, transparent); color: #fff; font: 800 12px/1 var(--display); letter-spacing: .02em; }
+.brand-team .tlogo { width: 18px; height: 18px; }
+.top { transition: none; }
+.match.mine { border-left: 4px solid var(--apex); background: linear-gradient(90deg, color-mix(in srgb, var(--apex) 12%, transparent), transparent 62%), var(--card); }
+.tag.mine-tag { background: var(--apex); border-color: var(--apex); color: #fff; letter-spacing: .06em; }
+@media (max-width: 380px) { .brand-team b { display: none; } .brand-team { padding-right: 5px; } }

@@ -61,6 +61,23 @@ function setMode(m) { opt.mode = MODES[m] ? m : 'kr'; store.set('mode', opt.mode
 // 대표 응원 팀: 응원 팀 중 하나를 홈 맨 위 큰 카드와 표 맨 앞 강조로
 const mainId = () => (opt.mode === 'custom' && opt.fav.includes(opt.main) ? opt.main : null);
 function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; render(); }
+// 대표 응원 팀: 팀 로고에서 뽑은 색(A.teams[].color)으로 사이트 강조색을 바꾸고, 헤더에 팀 칩을 단다. 색이 없는 팀은 기본 빨강
+const mainTeam = () => (opt.main && opt.fav.includes(opt.main) ? Object.values(A.teams).find((x) => x.id === opt.main && x.current) || null : null);
+const TEAM_VARS = ['--apex', '--apex-hot', '--ring', '--ring-soft'];
+function applyTeamTheme() {
+  const t = mainTeam(), c = t?.color, st = document.documentElement.style;
+  if (c) {
+    const n = parseInt(c.slice(1), 16), up = (v) => Math.min(255, Math.round(v + (255 - v) * 0.22));
+    const hot = `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => up(v).toString(16).padStart(2, '0')).join('')}`;
+    st.setProperty('--apex', c); st.setProperty('--apex-hot', hot); st.setProperty('--ring', hot); st.setProperty('--ring-soft', `${c}26`);
+  } else TEAM_VARS.forEach((k) => st.removeProperty(k));
+  const brand = document.querySelector('.brand'); if (!brand) return;
+  let chip = document.getElementById('brandTeam');
+  if (!t) { chip?.remove(); return; }
+  if (!chip) { chip = document.createElement('a'); chip.id = 'brandTeam'; chip.className = 'brand-team'; brand.after(chip); }
+  const html = `${logo(t.short, '', true)}<b>${esc(t.short)}</b>`;
+  if (chip.dataset.k !== t.short + document.documentElement.dataset.theme) { chip.dataset.k = t.short + document.documentElement.dataset.theme; chip.href = `#/teams/${encodeURIComponent(t.short)}`; chip.title = `대표 응원 팀: ${t.name}`; chip.innerHTML = html; }
+}
 function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : s.add(id); opt.fav = [...s]; store.set('fav', opt.fav); FOCUS = null; render(); }
 // 관심 팀 단계: kr 모드는 한국 팀/한국 선수 소속/한국 코치 팀, 다른 모드는 관심 팀이면 'team'
 function lvlOf(short) {
@@ -352,6 +369,7 @@ function fillLazy(root) {
   }
 }
 function render() {
+  applyTeamTheme();
   lazyNext = []; poiWatch = null; GWATCH.clear();
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
@@ -902,9 +920,10 @@ function matchItem(s) {
     const full = s.results.length > 5 ? `<details><summary>${s.eventSlug.includes('pro-league') ? `상위 3팀과 ${ML().group} 팀 표` : `전체 ${s.results.length}팀 결과`}</summary>${resultTable(s.results)}</details>` : '';
     res = spoil(`<div class="res">${inner}</div>${full}`, seriesKey(s)) + `<a class="more rp-link" href="#/schedule/replay?s=${s.id}">게임 다시보기</a>`;
   }
-  return `<article class="match">
+  const mt = mainTeam(), mine = !!mt && ((s.lineup || []).includes(mt.short) || (s.results || []).some((r) => r.short === mt.short));
+  return `<article class="match${mine ? ' mine' : ''}">
     <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}</time>
-    <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${tags}</div>
+    <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
       <div class="meta">${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(', '))}</div>
       ${res || lineupLine(s)}</div>
   </article>`;

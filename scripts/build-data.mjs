@@ -105,6 +105,12 @@ const logoOf = (key, official) => {
   return official ? [localLogo(official[0]), localLogo(official[1])] : null;
 };
 for (const t of Object.values(teams)) t.logo = logoOf(`id:${t.id}`, algs.logos?.[t.id]);
+// 팀 색: 로고에서 뽑아 둔 값(config/team-colors.json, scripts/team-colors.mjs). 없으면 화면이 기본 색을 쓴다
+const TEAM_COLORS = readJson('config/team-colors.json', {});
+const NEUTRAL = new Set(['#6f86a6', '#34476b']); // 무채색 로고용 푸른 은빛·푸른 검빛
+// 색 있는 로고가 우선. 흑백뿐이면 흰 로고(밝은 쪽)가 있는 팀은 은빛, 어두운 로고만 있는 팀은 검빛
+const colorOf = (lg) => { const cs = (lg || []).map((u) => (u ? TEAM_COLORS[String(u).split('/').pop()] : null)); return cs.find((c) => c && !NEUTRAL.has(c)) || cs.find(Boolean) || null; };
+for (const t of Object.values(teams)) { const c = colorOf(t.logo); if (c) t.color = c; }
 
 // 로스터와 한국 판별
 // config/players.json: 선수별 수동 보정. role(coach/player)로 역할을 고치고, heritage: "KR"로 한국계(혼혈·이중국적 등)를 표시한다.
