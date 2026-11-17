@@ -1518,8 +1518,14 @@ dialog { border: 1px solid var(--rule); }
 .tbl th.gc, .tbl td.gc { min-width: 38px; }
 .tbl th.gc { text-transform: none; } /* 'g1' 처럼 소문자로 (표 머리글 기본은 대문자) */
 .tbl td.gc { color: var(--steel); font-variant-numeric: tabular-nums; }
-.tbl td.gc.gw { color: var(--ink); font-weight: 800; }
 .tbl th.gc.live::after { content: ''; display: inline-block; width: 6px; height: 6px; margin-left: 4px; border-radius: 50%; background: var(--apex); vertical-align: 2px; animation: gcPulse 1.4s ease-in-out infinite; }
 .tbl td.gc.live { font-style: italic; }
 @keyframes gcPulse { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .tbl th.gc.live::after { animation: none; } }
+
+/* 한 게임(매치) 1·2·3위 팀의 점수: 금·은·동 글자색 (게임별 점수 열 g1…, 게임 다시보기의 게임 결과 표). 색만으로 구분하지 않게 굵게도 */
+:root { --gold: #A6780B; --silver: #6C84A8; --bronze: #B05A2B; } /* 밝은 배경에서 대비 3.2~4:1, 은은 일반 회색 숫자와 구분되게 푸른빛 */
+:root[data-theme='dark'] { --gold: #F4C542; --silver: #C9D1DC; --bronze: #E0955C; }
+.tbl .m1, .tbl td.gc.m1 { color: var(--gold); font-weight: 800; }
+.tbl .m2, .tbl td.gc.m2 { color: var(--silver); font-weight: 800; }
+.tbl .m3, .tbl td.gc.m3 { color: var(--bronze); font-weight: 800; }

@@ -145,12 +145,13 @@ const fmt = (n) => (typeof n === 'number' ? NF.format(n) : (n ?? '–').toLocale
 const ptsOf = (pts, kills) => ({ pp: pts != null && kills != null ? pts - kills : null, kp: kills ?? null, tp: pts ?? null });
 // data-tr: 번역 사전 키 (메뉴의 '순위'(Standings)와 구분)
 const PTS_TH = '<th class="r pts-h" title="순위 점수" data-tr="순위 점수 칸">순위</th><th class="r pts-h" title="킬 점수" data-tr="킬 점수 칸">킬</th><th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>';
-const ptsTd = (pts, kills) => { const p = ptsOf(pts, kills); return `<td class="r num">${p.pp ?? '–'}</td><td class="r num">${p.kp ?? '–'}</td><td class="r num"><b>${p.tp ?? '–'}</b></td>`; };
+// place: 한 게임(매치)의 결과 표일 때 그 게임 순위. 1·2·3위의 종합 점수는 금·은·동 글자색(.m1 .m2 .m3)
+const ptsTd = (pts, kills, place) => { const p = ptsOf(pts, kills); return `<td class="r num">${p.pp ?? '–'}</td><td class="r num">${p.kp ?? '–'}</td><td class="r num"><b${place >= 1 && place <= 3 ? ` class="m${place}"` : ''}>${p.tp ?? '–'}</b></td>`; };
 const ptsLine = (pts, kills) => { const p = ptsOf(pts, kills); return p.pp == null ? `종합 ${p.tp ?? '–'}점` : `순위 ${p.pp} / 킬 ${p.kp} / 종합 ${p.tp}점`; };
 // 게임별 점수 열 (g1, g2, …): 시리즈(단계)의 게임마다 팀의 그 게임 점수. 표가 충분히 넓을 때만 보인다(CSS 컨테이너 쿼리 .gtab, 모자라면 숨김).
 //   데이터는 공식 API 게임 통계(/stats/series/{id}/match/number/{n}: 팀별 points·kills·placement)를 그 시리즈를 보고 있을 때만, 넓은 화면에서만 받는다.
 //   끝난 게임은 다시 받지 않고, 끝난 시리즈는 브라우저에 저장해 둔다. 진행 중인 시리즈는 실시간 주기(livePollMs)로 새 게임·진행 중 게임을 받는다.
-//   열: 일반 경기는 g1~g6 고정(시리즈의 게임 수), 결승(Match Point Finals)은 게임이 진행될 때마다 g1부터 하나씩 생긴다.
+//   그 게임 1·2·3위 팀의 점수는 금·은·동 글자색. 열: 일반 경기는 g1~g6 고정(시리즈의 게임 수), 결승(Match Point Finals)은 게임이 진행될 때마다 g1부터 하나씩 생긴다.
 const GAMES = {}; // 시리즈 ID → { by: { 게임 번호: { st, map, t: { 팀 ID: [점수, 킬, 순위, 순위 점수] } } }, settled, loading }
 const GWATCH = new Map(); // 지금 화면에 있는 시리즈 ID → 시리즈
 const gamesWide = () => window.matchMedia('(min-width: 800px)').matches;
@@ -193,7 +194,7 @@ function gameCols(x, final) {
   const N = final ? nums.at(-1) : Math.min(12, Math.max(x.matches || 6, nums.at(-1)));
   const idOf = (sh) => team(sh)?.id || A.xteams?.[sh]?.id || null;
   const th = Array.from({ length: N }, (_, i) => { const d = by[i + 1]; return `<th class="r gc${d?.st === 'live' ? ' live' : ''}"${d?.map ? ` title="G${i + 1} · ${esc(d.map)}"` : ''}>g${i + 1}</th>`; }).join('');
-  const td = (sh) => { const id = idOf(sh); return Array.from({ length: N }, (_, i) => { const v = id && by[i + 1]?.t[id]; return v ? `<td class="r num gc${v[2] === 1 ? ' gw' : ''}${by[i + 1].st === 'live' ? ' live' : ''}" title="${v[2]}위 · 킬 ${v[1]} · 순위 점수 ${v[3]}">${v[0]}</td>` : '<td class="r num gc muted">–</td>'; }).join(''); };
+  const td = (sh) => { const id = idOf(sh); return Array.from({ length: N }, (_, i) => { const v = id && by[i + 1]?.t[id]; return v ? `<td class="r num gc${v[2] >= 1 && v[2] <= 3 ? ' m' + v[2] : ''}${by[i + 1].st === 'live' ? ' live' : ''}" title="${v[2]}위 · 킬 ${v[1]} · 순위 점수 ${v[3]}">${v[0]}</td>` : '<td class="r num gc muted">–</td>'; }).join(''); };
   return { n: N, th, td };
 }
 window.matchMedia('(min-width: 800px)').addEventListener?.('change', () => render()); // 화면 폭이 넓어지면 게임별 점수를 받아 보여 준다
@@ -959,7 +960,7 @@ function replayView(q) {
   const cards = teams.slice().sort((a, b) => a.short.localeCompare(b.short)).map((t) => `<div class="rp-team ${rowCls(t)}" data-team="${esc(t.short)}">${logo(t.short)}<b>${esc(t.short)}</b><small class="rp-state">생존</small></div>`).join('');
   const log = order.map((t, i) => `<li class="rp-ev ${rowCls(t)}" data-step="${i + 1}" hidden><span class="rp-place">${t.place}위</span> ${teamLink(t.short)} ${t.place === 1 ? '<b class="rp-win">챔피언</b>' : '탈락'} <span class="muted">· ${ptsLine(t.pts, t.kills)}</span></li>`).reverse().join('');
   const detail = `<details class="rp-detail"><summary>팀별 레전드·킬 보기</summary><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th>선수 (레전드, 킬)</th>${PTS_TH}</tr></thead><tbody>
-    ${teams.slice().sort((a, b) => a.place - b.place).map((t) => `<tr class="${rowCls(t)}"><td class="rank">${t.place}</td><td class="team">${teamLink(t.short)}</td><td class="small">${t.players.map((p) => `${esc(p.n)} <span class="muted">(${esc(p.lg)}, ${p.k})</span>`).join(', ')}</td>${ptsTd(t.pts, t.kills)}</tr>`).join('')}
+    ${teams.slice().sort((a, b) => a.place - b.place).map((t) => `<tr class="${rowCls(t)}"><td class="rank">${t.place}</td><td class="team">${teamLink(t.short)}</td><td class="small">${t.players.map((p) => `${esc(p.n)} <span class="muted">(${esc(p.lg)}, ${p.k})</span>`).join(', ')}</td>${ptsTd(t.pts, t.kills, t.place)}</tr>`).join('')}
     </tbody></table></div></details>`;
   return head + tabs + `
     <section class="sec rp">
