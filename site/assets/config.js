@@ -24,7 +24,7 @@ window.ALGS_CONFIG = {
   //   구글 폼 주소를 넣으면 그 폼으로 보냄 (로그인 필요 없음) — 지금 쓰는 방식
   //   폼의 '미리 채우기'에서 얻은 항목 번호를 feedbackFormFields에 적으면 종류·보던 화면·대상·언어를 미리 채움
   //   폼 문항이나 선택지 글자를 바꾸면 feedbackKinds·feedbackLangs 도 같은 글자로 고칠 것 (다르면 미리 선택이 안 됨)
-  feedback: 'https://docs.google.com/forms/d/1vUX1o_9TWfxE9yb8-d1TGoB5DOL5HiG5XMNg5epZy0M/viewform',
+  feedback: 'https://docs.google.com/forms/d/e/1FAIpQLSdEZYIJ71kZitsZ3Se8ouroju9LuNoqhbXT6Y-OqnwBa3DH3A/viewform',
   feedbackRepo: 'LaplusSUGAR/algs-kr',
   feedbackFormFields: { kind: 'entry.1584639342', body: 'entry.2108601449', page: 'entry.403730710', lang: 'entry.2033145694' }, // 연락처(선택): entry.939533145
   feedbackKinds: { '데이터 오류': '데이터 오류 · Data error', '채널 제보': '채널 제보 · Channel tip', '기능 제안': '기능 제안 · Feature request', '기타': '기타 · Other' },
