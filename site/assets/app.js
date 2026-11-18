@@ -325,7 +325,7 @@ function extraItem(x) {
   </article>`;
 }
 // 시리즈와 추가 일정을 시각 순으로 섞어 그린다
-const timedItems = (series, extras) => [...series.map((s) => ({ t: s.start, h: () => matchItem(s) })), ...extras.map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).map((o) => o.h()).join('');
+const timedItems = (series, extras, o) => [...series.map((s) => ({ t: s.start, h: () => matchItem(s, o) })), ...extras.map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).map((o) => o.h()).join('');
 const seriesState = (s) => s.status === 'completed' ? '종료' : s.live || s.status === 'live' ? 'LIVE' : s.timeTbd ? '시각 미정' : until(s.start) || '시작 대기';
 
 /* ---------- 라우터 ---------- */
@@ -395,7 +395,10 @@ let lastHtml = '', lastHash = null;
 // 펼쳐야 보이는 내용(포인트 표의 팀·선수별 내역 등)은 펼칠 때 만든다: 표를 그릴 때 수천 줄을 미리 만들지 않는다
 //   틀 안에서 ${lazy(() => html)} 를 속성 자리에 쓰면 data-lazy 번호가 붙고, 펼칠 때 fillLazy 가 채운다
 let LAZY = [], lazyNext = [];
+let RGEN = 0; // 그리기 번호 (render 마다 1씩): 한 번 그리는 동안만 쓰는 계산 저장용
 const lazy = (make) => ` data-lazy="${lazyNext.push(make) - 1}"`;
+// 접힌 <details class="lz"> 는 펼칠 때 채운다 (toggle 은 거품이 안 올라와 잡기 단계에서 받는다)
+app.addEventListener('toggle', (e) => { if (e.target.open && e.target.matches?.('details.lz')) fillLazy(e.target); }, true);
 function fillLazy(root) {
   for (const el of root.matches?.('[data-lazy]') ? [root] : root.querySelectorAll('[data-lazy]')) {
     const make = LAZY[+el.dataset.lazy]; el.removeAttribute('data-lazy');
@@ -404,7 +407,7 @@ function fillLazy(root) {
 }
 function render() {
   applyTeamTheme();
-  lazyNext = []; poiWatch = null; GWATCH.clear();
+  lazyNext = []; poiWatch = null; GWATCH.clear(); RGEN++;
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
   const navTab = tab === 'players' ? 'teams' : tab;
@@ -1047,7 +1050,16 @@ function intlMini() {
 
 /* ---------- 경기 ---------- */
 // 관심 팀 경기: 결과·출전 명단에 관심 팀이 있거나, 관심 팀이 뛰는 지역 리그·국제전 결승
+// 한 번 그릴 때 같은 시리즈를 여러 번 묻는다(필터·카드 태그·다시보기 목록). 그리기마다(RGEN) 한 번만 계산
+const krsCache = new WeakMap();
 function isKrSeries(s) {
+  const c = krsCache.get(s);
+  if (c && c.g === RGEN) return c.v;
+  const v = isKrSeries0(s);
+  krsCache.set(s, { g: RGEN, v });
+  return v;
+}
+function isKrSeries0(s) {
   if ((s.results || []).some((r) => isF(r.short)) || (s.lineup || []).some(isF)) return true;
   if (s.results?.length || s.lineup?.length) return false; // 출전 팀이 정해진 시리즈는 명단으로만 판단
   if (s.status !== 'completed') {
@@ -1059,8 +1071,19 @@ function isKrSeries(s) {
   return false;
 }
 
-function matchItem(s) {
-  const state = seriesState(s);
+// 경기 탭 카드의 남은 시간 (시각 아래 작게): 하루 넘게 남으면 D-n(날짜 기준), 1시간 넘게 남으면 'n시간 후', 그 안은 'n분 후'(빨강)
+function schCd(s) {
+  if (s.status === 'completed' || s.live || s.status === 'live' || s.timeTbd) return '';
+  const ms = new Date(s.start) - now();
+  if (ms <= 0) return '<small class="cd soon">시작 대기</small>';
+  if (ms < 3.6e6) return `<small class="cd soon">${Math.max(1, Math.floor(ms / 6e4))}분 후</small>`;
+  if (ms < 864e5) return `<small class="cd">${Math.floor(ms / 3.6e6)}시간 후</small>`;
+  const d = Math.round((Date.parse(dayKey(s.start)) - Date.parse(dayKey(new Date(now()).toISOString()))) / 864e5);
+  return `<small class="cd">D-${Math.max(1, d)}</small>`;
+}
+// o.cd: 경기 탭 — 남은 시간을 시각 아래로 옮기고 설명 줄은 ' · ' 로 나눈다 (홈 카드는 그대로)
+function matchItem(s, o = {}) {
+  const state = o.cd ? '' : seriesState(s);
   const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
   let res = '';
   if (s.results?.length) {
@@ -1068,14 +1091,14 @@ function matchItem(s) {
     const krs = s.results.filter((r) => isF(r.short));
     const mpTag = (r) => (r.won ? ' <span class="tag mpe">우승</span>' : r.mpe ? ' <span class="tag mpe">MP</span>' : '');
     const inner = `<span><b>1위 ${teamLink(top.short)}</b> ${ptsLine(top.pts, top.kills)}${mpTag(top)}</span>${krs.filter((r) => r !== top).map((r) => `<span>${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)} ${r.pos}위 · ${ptsLine(r.pts, r.kills)}${mpTag(r)}</span>`).join('')}${s.liveAt ? `<span class="upd">${ago(s.liveAt)} 공식 API 확인</span>` : ''}`;
-    const full = s.results.length > 5 ? `<details><summary>${s.eventSlug.includes('pro-league') ? `상위 3팀과 ${ML().group} 팀 표` : `전체 ${s.results.length}팀 결과`}</summary>${resultTable(s.results)}</details>` : '';
+    const full = s.results.length > 5 ? `<details class="lz"><summary>${s.eventSlug.includes('pro-league') ? `상위 3팀과 ${ML().group} 팀 표` : `전체 ${s.results.length}팀 결과`}</summary><div${lazy(() => resultTable(s.results))}></div></details>` : ''; // 표는 펼칠 때 만든다
     res = spoil(`<div class="res">${inner}</div>${full}`, seriesKey(s)) + `<a class="more rp-link" href="#/schedule/replay?s=${s.id}">게임 다시보기</a>`;
   }
   const mt = mainTeam(), mine = !!mt && ((s.lineup || []).includes(mt.short) || (s.results || []).some((r) => r.short === mt.short));
   return `<article class="match${mine ? ' mine' : ''}">
-    <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}</time>
+    <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}${o.cd ? schCd(s) : ''}</time>
     <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${gameCount(s)} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
-      <div class="meta">${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(', '))}</div>
+      <div class="meta">${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(o.cd ? ' · ' : ', '))}</div>
       ${res || lineupLine(s)}</div>
   </article>`;
 }
@@ -1090,6 +1113,11 @@ async function loadReplay(sid) {
   RP[sid] = { ...(RP[sid] || {}), loading: true }; // 다시 받는 동안에도 지난 값을 보여 준다
   const api = LIVE.api, j = (u) => fetch(api + u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const [m, vt, v] = await Promise.all([j(`/series/${sid}/matches`), j(`/series/${sid}/vods/timeline`), j(`/series/${sid}/vods`)]);
+  if (!m) { // 공식 API 실패: 지난 값이 있으면 그대로 두고, 없으면 '불러오지 못함'(다시 불러오기 버튼)
+    RP[sid] = RP[sid]?.matches ? { ...RP[sid], loading: false } : { err: true, at: Date.now() };
+    if (parseHash().parts[1] === 'replay') render();
+    return;
+  }
   const matches = (m?.matches || []).filter((x) => x.status === 'completed' || x.status === 'live' || x.inGameStatus === 'postmatch');
   const stats = await Promise.all(matches.map((x) => j(`/stats/series/${sid}/match/number/${x.matchNumber}`)));
   RP[sid] = { matches, stats, segs: vt?.segments || [], vods: v?.vods || [], at: Date.now() };
@@ -1118,6 +1146,7 @@ function replayView(q) {
     <p class="lead">게임마다 탈락 순서를 재생합니다. 재생바를 움직이면 그 시점까지 탈락한 팀과 남은 팀이 바뀝니다. 공식 데이터에는 게임 중 위치가 없어 지도 동선은 아직 없습니다.</p>
     <div class="controls"><label class="rp-pick"><span class="visually-hidden">시리즈 고르기</span><select id="rpSeries">${opts}</select></label></div>`;
   const D = RP[s.id];
+  if (D?.err) return head + `<div class="rp-err" role="alert"><p>공식 경기 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.</p><button type="button" class="rp-retry" data-rp-retry="${esc(s.id)}">다시 불러오기</button></div>`;
   if (!D || (D.loading && !D.matches)) { loadReplay(s.id); return head + '<p class="empty">공식 경기 기록을 불러오는 중…</p>'; }
   if (!D.matches.length) return head + '<p class="empty">이 시리즈의 게임 기록이 아직 없습니다.</p>';
   const g = Math.min(Math.max(1, +(q.get('g') || 1)), D.matches.length);
@@ -1152,6 +1181,7 @@ function replayView(q) {
 function bindReplay() {
   const sel = document.getElementById('rpSeries');
   if (sel) sel.addEventListener('change', () => { location.hash = `#/schedule/replay?s=${sel.value}&g=1`; });
+  app.querySelector('[data-rp-retry]')?.addEventListener('click', (e) => { delete RP[e.currentTarget.dataset.rpRetry]; render(); });
   const sl = document.getElementById('rpSlider');
   if (!sl || !window.__rp) return;
   const { order, N } = window.__rp;
@@ -1182,24 +1212,35 @@ function bindReplay() {
   show(0);
 }
 
+const SCH_REG = { 'apac-n': 'APAC N', 'apac-s': 'APAC S', emea: 'EMEA', americas: 'Americas', global: '국제전' };
+const SCH_DAYS = 3; // 지난 결과: 처음에 보여 줄 날 수 (나머지는 '이전 결과 더 보기'를 누르면 그린다)
 function schedule(parts, q) {
   if (parts[1] === 'replay') return replayView(q);
   const view = q.get('view') === 'results' ? 'results' : 'upcoming';
   const kronly = q.get('kr') === '1';
   let list = A.series.filter((s) => (view === 'results' ? s.status === 'completed' : s.status !== 'completed'));
   if (kronly) list = list.filter(isKrSeries);
+  // 지역 칩: 지금 목록에 있는 지역만 (한 지역뿐이면 칩을 내지 않는다)
+  const regs = Object.keys(SCH_REG).filter((r) => list.some((s) => s.region === r));
+  const reg = regs.length > 1 && regs.includes(q.get('r')) ? q.get('r') : null;
+  if (reg) list = list.filter((s) => s.region === reg);
   list.sort((a, b) => (view === 'results' ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start)));
   const days = {}, xdays = {};
   for (const s of list) (days[s.timeTbd && view !== 'results' ? 'tbd' : dayKey(s.start)] ||= []).push(s);
-  if (view === 'upcoming') for (const x of extrasUpcoming().filter((x) => !kronly || isKrExtra(x))) { const d = dayKey(x.start); (xdays[d] ||= []).push(x); days[d] ||= []; }
+  if (view === 'upcoming') for (const x of extrasUpcoming().filter((x) => (!kronly || isKrExtra(x)) && (!reg || !x.region || x.region === reg))) { const d = dayKey(x.start); (xdays[d] ||= []).push(x); days[d] ||= []; }
   const order = Object.keys(days).filter((d) => d !== 'tbd').sort(); if (days.tbd) order.push('tbd');
   // 공식 시각이 임시값인 시리즈(LCQ 일부 지역)는 날짜도 확실하지 않아 맨 뒤 '시각 미정'에 모은다
-  return `<h1 class="title">경기</h1><p class="lead">모든 시간은 한국 시간(KST)입니다. 한 시리즈는 보통 6게임입니다.</p>
-    ${refreshNote(true)}
-    <div class="controls">
-      <div class="seg"><a href="${qsLink('/schedule', q, { kr: kronly ? '0' : '1' })}" aria-current="${kronly}">${ML().only}</a></div>
+  const keys = view === 'results' ? Object.keys(days) : order;
+  const day = (d) => { const ss = days[d], xs = xdays[d] || []; return `<section class="day"><h2 class="day-h">${d === 'tbd' ? '시각 미정' : dayLabel(d)}<small>${[ss.length ? `${ss.length}시리즈` : '', xs.length ? `일정 ${xs.length}` : ''].filter(Boolean).join(' · ')}</small></h2>${timedItems(ss, xs, { cd: true })}</section>`; };
+  const shown = view === 'results' ? keys.slice(0, SCH_DAYS) : keys, rest = view === 'results' ? keys.slice(SCH_DAYS) : [];
+  const more = rest.length ? `<div class="days sch-more" id="schMore" hidden${lazy(() => rest.map(day).join(''))}></div><button type="button" class="more-days" data-toggle="schMore" aria-expanded="false">이전 결과 더 보기 (${rest.length}일)</button>` : '';
+  const chip = (patch, on, label, cls = '') => `<a${cls ? ` class="${cls}"` : ''} href="${qsLink('/schedule', q, patch)}" aria-current="${on}">${label}</a>`;
+  return `<h1 class="title">경기</h1>
+    <div class="sch-bar">
+      <div class="sch-chips" role="group" aria-label="경기 필터">${chip({ kr: kronly ? null : '1' }, kronly, `<i aria-hidden="true">★</i> ${ML().only}`, 'kr')}${regs.length > 1 ? `<span class="sep" aria-hidden="true"></span>${chip({ r: null }, !reg, '전체 지역')}${regs.map((r) => chip({ r }, reg === r, SCH_REG[r])).join('')}` : ''}</div>
+      <div class="sch-note"><span>한국 시간(KST) 기준 · 한 시리즈는 보통 6게임</span>${refreshNote(true)}</div>
     </div>
-    <div class="days">${(view === 'results' ? Object.keys(days) : order).map((d) => { const ss = days[d], xs = xdays[d] || []; return `<section class="day"><h2 class="day-h">${d === 'tbd' ? '시각 미정' : dayLabel(d)}<small>${[ss.length ? `${ss.length}시리즈` : '', xs.length ? `일정 ${xs.length}` : ''].filter(Boolean).join(' · ')}</small></h2>${timedItems(ss, xs)}</section>`; }).join('') || '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}</div>`;
+    ${keys.length ? `<div class="days">${shown.map(day).join('')}</div>${more}` : '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}`;
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */
