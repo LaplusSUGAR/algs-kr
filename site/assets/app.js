@@ -3549,8 +3549,19 @@ I.chrome();
 // 같은 화면 안에서 보기만 바꾸는 링크(data-keep-scroll, 예: POI 드래프트 지도 전환)는 맨 위로 올리지 않고 누른 때의 스크롤 위치를 지킨다.
 // 같은 주소를 다시 눌러 화면이 안 바뀌거나 새 탭으로 열 때를 위해 위치 기억은 잠깐만 둔다
 let keepY = null, keepT = 0;
+// 같은 메뉴 안에서 보기만 바꾸는 버튼(세부 메뉴 알약, 지역·단위·스플릿 같은 선택 버튼 묶음, 직행권 지역 칸)도 같은 규칙:
+//   누르면 맨 위로 튀지 않고 지금 위치를 지킨다. 주 메뉴나 다른 메뉴로 가는 링크, 팀·선수 상세 링크는 그대로 맨 위에서 시작한다.
+const VIEW_LINK = 'a[data-keep-scroll], .subtabs a, [role="group"] a, .qual-g a';
 document.addEventListener('click', (e) => {
-  if (!e.target.closest?.('a[data-keep-scroll]')) return;
+  if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest?.(VIEW_LINK);
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  if (!a.hasAttribute('data-keep-scroll')) {
+    // 같은 메뉴(경로 첫 칸이 같음) 안의 이동만
+    const top = (h) => (h.replace(/^#\/?/, '').split(/[/?]/)[0] || '');
+    if (!href.startsWith('#') || top(href) !== top(location.hash)) return;
+  }
   keepY = window.scrollY; clearTimeout(keepT); keepT = setTimeout(() => { keepY = null; }, 600);
 });
 window.addEventListener('hashchange', () => { const y = keepY; keepY = null; render(); app.focus({ preventScroll: true }); window.scrollTo(0, y ?? 0); });
