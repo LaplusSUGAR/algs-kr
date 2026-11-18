@@ -437,6 +437,8 @@ function patchApp(html) {
   lastTpl = tpl;
   return true;
 }
+let lastNav = null;
+const H_SCROLL = ['.subtabs-in', '.seg', '.kr-strip'];
 function render() {
   applyTeamTheme();
   lazyNext = []; poiWatch = null; GWATCH.clear(); RGEN++;
@@ -462,8 +464,15 @@ function render() {
   lastTpl = null;
   lastHtml = html; lastHash = location.hash; LAZY = lazyNext;
   const keep = ['teamSearch', 'favSearch'].map((id) => [id, document.getElementById(id)?.value]).filter(([, v]) => v);
+  // 가로로 스크롤되는 줄(세부 메뉴·보기 버튼·팀 칩): 같은 탭 안에서 다시 그릴 때 스크롤 위치를 유지한다 (휴대폰에서 메뉴를 밀어 둔 뒤 누르면 처음으로 돌아가던 문제)
+  const sameTab = navTab === lastNav; lastNav = navTab;
+  const hx = sameTab ? H_SCROLL.map((sel) => [...app.querySelectorAll(sel)].map((el) => el.scrollLeft)) : null;
   app.innerHTML = html;
   if (tab === 'standings') { lastTpl = document.createElement('template'); lastTpl.innerHTML = html; }
+  if (hx) H_SCROLL.forEach((sel, i) => app.querySelectorAll(sel).forEach((el, j) => { if (hx[i][j]) el.scrollLeft = hx[i][j]; }));
+  // 고른 세부 메뉴가 화면 밖이면 보이는 곳까지만 민다
+  { const on = app.querySelector('.subtabs [aria-current="page"]'), bar = on?.closest('.subtabs-in');
+    if (bar) { const l = on.offsetLeft - bar.offsetLeft, r = l + on.offsetWidth; if (l < bar.scrollLeft) bar.scrollLeft = l - 16; else if (r > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = r - bar.clientWidth + 16; } }
   bind();
   for (const [id, v] of keep) { const el = document.getElementById(id); if (el) { el.value = v; el.dispatchEvent(new Event('input')); } } // 데이터 갱신으로 다시 그려도 검색어 유지
   I.tree(app);
