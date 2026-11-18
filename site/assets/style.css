@@ -1660,13 +1660,11 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 .rp-err p { margin: 0; }
 .rp-retry { margin-top: 10px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font: 650 13px var(--body); cursor: pointer; }
 /* ── 홈 탭 개선 (2026-11-19) ── */
-/* 보기 모드: 휴대폰은 한 줄 알약, 옆으로 넘김 (잘리지 않게) */
+/* 보기 모드: 휴대폰도 PC와 같은 사각 버튼 한 줄 (넘치면 옆으로 넘김, 잘리지 않게) */
 @media (max-width: 719px) {
-  .mode-bar .mode-seg { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: none; width: auto; border: 0; background: transparent; border-radius: 0; gap: 6px; padding: 0 16px 2px; margin: 0 -16px; }
+  .mode-bar .mode-seg { display: flex; flex-wrap: nowrap; width: 100%; max-width: none; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .mode-bar .mode-seg::-webkit-scrollbar { display: none; }
-  .mode-bar .mode-seg button { flex: none; min-height: 38px; padding: 0 14px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); font-size: 13.5px; overflow: visible; }
-  .mode-bar .mode-seg button + button { border-left: 1px solid var(--rule); }
-  .mode-bar .mode-seg [aria-current='true'] { border-color: var(--ink); }
+  .mode-bar .mode-seg button:nth-child(n) { flex: 1 0 auto; min-height: 40px; padding: 0 12px; font-size: 13.5px; overflow: visible; text-overflow: clip; border: 0; }
 }
 /* 다음 경기: 시간대·남은 시간, 팀 칩은 경기 이름 바로 옆, 캘린더 버튼 */
 .nx-tz { font-size: 12px; font-weight: 700; color: var(--steel); margin-left: 2px; }
