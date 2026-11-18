@@ -1270,7 +1270,7 @@ a.tag.live { text-decoration: none; }
 .lv-tile .yt-frame { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 72vh; border: 0; }
 .lv-player.multi .lv-tbar .more, .lv-player.multi .lv-tbar .chip { display: none; }
 .lv-player.multi { max-width: none; }
-@media (max-width: 700px) and (orientation: portrait) { .lv-tiles[data-n] { grid-template-columns: 1fr; } }
+@media (max-width: 700px) and (orientation: portrait) { .lv-tiles[data-n="2"] { grid-template-columns: 1fr; } }
 html.lv-cinema, html.lv-cinema body { overflow: hidden; }
 .lv-player.cinema { position: fixed; inset: 0; z-index: 1000; margin: 0; max-width: none; border-radius: 0; background: #000; color: #fff; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .lv-player.cinema .caption { display: none; }
@@ -1866,3 +1866,120 @@ tr.flash td, li.flash { animation: stFlash 1.6s ease-out; outline: 2px solid tra
   .st-split-in > .poi .poi-zoom { display: none; }
 }
 @media (max-width: 480px) { .cutgap { display: block; margin: 2px 0 0; } }
+/* ── 팀 탭 (11-19 개편): 팀 카드 이름·배지, 지역별 더 보기, 팀 상세 머리·다음 경기·결과 줄, 로스터 변경 날짜 묶음 ── */
+.team-tile { display: flex; flex-direction: column; gap: 8px; }
+.team-tile > span.tile-id { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tile-nm { display: grid; min-width: 0; }
+.tile-nm b { font: 800 20px/1.05 var(--display); color: var(--ink); white-space: nowrap; }
+.tile-nm small { font-size: 11.5px; color: var(--steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-tile .tile-id .oreg { margin-left: auto; align-self: flex-start; }
+.team-tile > span.tile-meta { display: flex; flex-wrap: wrap; gap: 4px; }
+.team-tile .tile-roster { margin-top: 0; }
+.tchip { display: inline-block; font: 700 10.5px/1.5 var(--body); letter-spacing: .02em; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--rule); color: var(--steel); white-space: nowrap; }
+.tchip.st-lcq { border-color: var(--cyan); color: var(--cyan); }
+.tchip.st-direct { border-color: var(--amber); color: var(--amber); }
+.tchip.st-live { background: var(--live); border-color: var(--live); color: #fff; }
+.tchip.st-out { color: var(--steel); border-style: dashed; }
+.tchip.st-intl { border-color: var(--ink); color: var(--ink); }
+.team-group.clip:not(.q) .team-tile:nth-child(n+9) { display: none; }
+.team-group.q .tm-more { display: none; }
+.tm-more { display: block; width: 100%; margin-top: 8px; padding: 10px; background: transparent; border: 1px dashed var(--rule); border-radius: 6px; color: var(--ink); font: 700 13px/1.2 var(--body); cursor: pointer; }
+.tm-more:hover { border-color: var(--apex); color: var(--apex); }
+@media (max-width: 360px) {
+  .team-tile { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id meta" "ro ro"; align-items: center; gap: 6px 8px; }
+  .team-tile > span.tile-id { grid-area: id; }
+  .team-tile > span.tile-meta { grid-area: meta; flex-direction: column; align-items: flex-end; }
+  .team-tile .tile-roster { grid-area: ro; }
+}
+.td-head { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.td-id { display: grid; gap: 8px; min-width: 0; }
+.td-id .title { margin: 0; overflow-wrap: anywhere; }
+.td-id .was { color: var(--steel); font-size: 13px; }
+.td-tags { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.td-tags .tag { font-size: 10.5px; }
+.td-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0 0; max-width: 420px; }
+.td-btn { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); color: var(--ink); font: 700 13.5px/1.2 var(--body); cursor: pointer; }
+.td-btn:hover { border-color: var(--apex); }
+.td-btn.on { background: var(--apex); border-color: var(--apex); color: #fff; }
+.td-next { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--apex); border-radius: 6px; text-decoration: none; color: var(--ink); max-width: 640px; }
+.td-next-k { font: 800 11px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--apex); }
+.td-next.live .td-next-k { background: var(--live); color: #fff; padding: 4px 6px; border-radius: 4px; }
+.td-next-b { display: grid; gap: 2px; min-width: 0; }
+.td-next-b b { font-size: 14.5px; }
+.td-next-b small { color: var(--steel); font-size: 12.5px; }
+.td-next-go { font-size: 22px; color: var(--steel); }
+.td-season, .td-res { list-style: none; padding: 0; margin: 8px 0 0; }
+.td-season li { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n r" "n s"; gap: 0 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); align-items: center; }
+.td-season li > span { grid-area: n; font-weight: 600; }
+.td-season li > b { grid-area: r; font: 800 20px/1 var(--display); text-align: right; }
+.td-season li > small { grid-area: s; color: var(--steel); font-size: 12px; text-align: right; }
+.td-res li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); align-items: center; }
+.td-res-n { display: grid; gap: 2px; min-width: 0; }
+.td-res-n small { color: var(--steel); font-size: 12px; }
+.td-res-n a { font-weight: 700; }
+.td-res-r { display: grid; justify-items: end; gap: 2px; }
+.td-res-r b { font: 800 22px/1 var(--display); }
+.td-res-r b small { font-size: 12px; margin-left: 1px; }
+.td-res-r > small { color: var(--steel); font-size: 12px; white-space: nowrap; }
+@media (min-width: 1024px) {
+  .td-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 40px; align-items: start; }
+}
+.rl-wrap.clip tr.xtra { display: none !important; }
+table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/1 var(--body); letter-spacing: .06em; color: var(--steel); border-bottom: 2px solid var(--ink); background: none; }
+@media (max-width: 760px) {
+  table.rl tr.rl-day { display: block; padding: 0; border: 0; }
+  table.rl tr.rl-day th { display: block; }
+  table.rl.tbl tr.kr td, table.rl.tbl tr.kr td:first-child { background: none; box-shadow: none; }
+  table.rl tr.kr { background: var(--kc-soft, var(--ring-soft)); box-shadow: inset 4px 0 0 var(--kc-col, var(--ring)); padding-left: 12px; padding-right: 8px; }
+  table.rl tr.kr.main { background: color-mix(in srgb, var(--apex) 14%, transparent); box-shadow: inset 6px 0 0 var(--apex); }
+}
+.team-sort { margin: 10px 0 0; }
+@media (max-width: 360px) { .team-tools { flex-wrap: wrap; } .team-tools .search { flex-basis: 100%; } .team-tools .pick-btn { flex: 1; justify-content: center; } }
+
+/* ========== 방송 탭 개선 (2026-11-19) ========== */
+/* 휴대폰 방송 카드: 제목 1줄, 플랫폼·시청자·경과 시간 한 줄, 재생 버튼 작게 (방송 탭 #lv 에만) */
+.lv-extn { display: none; margin-left: 6px; font-size: 11px; font-weight: 600; color: var(--steel); white-space: nowrap; }
+@media (max-width: 520px) {
+  #lv .lv-card { grid-template-columns: 38% minmax(0, 1fr); }
+  #lv .lv-thumb .tag.live { left: 5px; top: 5px; padding: 1px 5px; font-size: 9.5px; }
+  #lv .lv-thumb .yt-play { transform: translate(-50%, -50%) scale(.45); }
+  #lv .lv-meta { padding: 7px 10px 8px; gap: 2px; }
+  #lv .lv-meta b { font-size: 14.5px; }
+  #lv .lv-title { font-size: 12.5px; -webkit-line-clamp: 1; }
+  #lv .lv-sub { gap: 1px 8px; margin-top: 1px; }
+  #lv .lv-sub .chip.mini { padding: 0; border: 0; background: none; }
+  #lv .lv-ext { display: none; }
+  #lv .lv-extn { display: inline; }
+}
+/* 작은 회색 안내 글씨 */
+#lv .lv-foot, #lv .lv-player .caption, .ch-note { font-size: var(--fs-xs, 12.5px); color: var(--steel); line-height: 1.55; }
+.lv-stale { color: var(--apex); font-weight: 600; }
+/* 방송 없음 / 불러오지 못함 */
+.lv-empty { display: grid; gap: 8px; margin-top: 12px; padding: 14px; border: 1px dashed var(--rule); border-radius: var(--r-md, 6px); }
+.lv-empty b { font-size: 15px; }
+.lv-empty p { margin: 0; font-size: var(--fs-sm, 13.5px); color: var(--steel); }
+.lv-bcs { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.lv-bcs > span { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.lv-bcs small { font-size: 12px; color: var(--steel); margin-right: 2px; }
+.lv-bcs .chip { padding: 3px 8px; font-size: 12px; }
+/* 선수·코치 / 스트리머 목록: 한 줄 행 (이름·팀 | 칩) */
+.ch-grid.rows { grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 6px; }
+.ch-grid.rows .pl-row { display: flex; flex-wrap: wrap; align-items: center; align-content: center; justify-content: space-between; gap: 6px 10px; padding: 9px 12px; }
+.ch-grid.rows .pl-row .nm { min-width: 0; font-size: 14.5px; }
+.ch-grid.rows .pl-row .nm small { flex-basis: auto; font-size: 12px; }
+.ch-grid.rows .chips { flex-wrap: nowrap; gap: 4px; margin-left: auto; }
+.ch-grid.rows .chip { gap: 4px; padding: 3px 7px; font-size: 11.5px; }
+.ch-grid.rows .chip.find { opacity: .8; }
+@media (max-width: 339px) { .ch-grid.rows .chips { flex-wrap: wrap; } }
+/* 미니 플레이어 (휴대폰·태블릿, 한 화면일 때) */
+.lv-big { display: none; }
+.lv-player.mini { position: fixed; right: 10px; bottom: calc(var(--tab-h) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 25; width: min(62vw, 360px); margin: 0; box-shadow: 0 10px 28px rgba(0, 0, 0, .45); }
+.lv-player.mini .lv-bar, .lv-player.mini > .caption, .lv-player.mini .lv-tbar .more, .lv-player.mini .lv-tbar .chip { display: none; }
+.lv-player.mini .lv-tbar { gap: 4px; padding: 2px 4px 2px 8px; font-size: 12px; }
+.lv-player.mini .lv-big { display: inline-block; margin-left: auto; padding: 4px 6px; border: 0; background: none; color: var(--apex); font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.lv-player.mini .lv-x { width: 28px; height: 28px; font-size: 18px; }
+/* 휴대폰 세로 멀티뷰 3~4화면: 2×2 격자 (화면 제목줄은 작게) */
+@media (max-width: 700px) and (orientation: portrait) {
+  .lv-tiles[data-n='3'] .lv-tbar, .lv-tiles[data-n='4'] .lv-tbar { padding: 2px 2px 2px 6px; font-size: 11.5px; }
+  .lv-tiles[data-n='3'] .lv-x, .lv-tiles[data-n='4'] .lv-x { width: 26px; height: 26px; font-size: 17px; }
+}
