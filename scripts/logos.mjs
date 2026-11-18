@@ -93,6 +93,9 @@ function manualFiles() {
   return out;
 }
 
+// 운영자 파일의 ID는 파일 내용으로 정한다 (수정 시각을 쓰면 Actions가 매번 새로 받은 파일이라 빌드마다 다시 만들게 됨)
+const manualId = (p) => `file:${p}:${hash(fs.readFileSync(path.join(ROOT, p)))}`;
+
 // ---------- 로고 출처 정하기 ----------
 const fileBase = (srcId) => `${OUT}/${hash(PROC + '|' + srcId)}`;
 const done = (srcId) => SIZES.every((s) => fs.existsSync(path.join(ROOT, `${fileBase(srcId)}-${s}.webp`)));
@@ -112,7 +115,7 @@ function plan() {
     const lpx = m.ok ? lp.find((x) => x.page === m.lpPage && x.pageKey === m.from && nk(x.name) === nk(m.lpName)) : null;
     const off = snap.logos?.[t.id];
     let src = null, pick = null;
-    if (man) { src = 'manual'; pick = man.map((p) => (p ? { kind: 'file', id: `file:${p}:${fs.statSync(path.join(ROOT, p)).mtimeMs}`, path: p } : null)); }
+    if (man) { src = 'manual'; pick = man.map((p) => (p ? { kind: 'file', id: manualId(p), path: p } : null)); }
     else if (lpx && (lpx.icon[0] || lpx.icon[1])) { src = 'lp'; pick = lpx.icon.map((u) => (u ? { kind: 'lp', id: u, url: u, page: lpx.pageUrl } : null)); }
     else if (off && (off[0] || off[1])) { src = 'official'; pick = off.map((u) => (u ? { kind: 'url', id: u, url: u } : null)); }
     entries[t.key] = { key: t.key, short: t.short, name: t.name, src, pick };
@@ -127,7 +130,7 @@ function plan() {
     const man = manual[nk(x.name)];
     if (man) usedMan.add(nk(x.name));
     let src = null, pick = null;
-    if (man) { src = 'manual'; pick = man.map((p) => (p ? { kind: 'file', id: `file:${p}:${fs.statSync(path.join(ROOT, p)).mtimeMs}`, path: p } : null)); }
+    if (man) { src = 'manual'; pick = man.map((p) => (p ? { kind: 'file', id: manualId(p), path: p } : null)); }
     else if (x.icon[0] || x.icon[1]) { src = 'lp'; pick = x.icon.map((u) => (u ? { kind: 'lp', id: u, url: u, page: x.pageUrl } : null)); }
     entries[key] = { key, short: '', name: x.name, src, pick };
     report.push({ key, name: x.name, region: x.region, src, lp: { name: x.name, by: 'Liquipedia 서킷 순위표의 팀 (선수: ' + x.players.join(', ') + ')' } });
@@ -137,7 +140,7 @@ function plan() {
   for (const [k, man] of Object.entries(manual)) {
     const key = `cc:${k}`;
     if (usedMan.has(k) || entries[key]) continue;
-    const pick = man.map((p) => (p ? { kind: 'file', id: `file:${p}:${fs.statSync(path.join(ROOT, p)).mtimeMs}`, path: p } : null));
+    const pick = man.map((p) => (p ? { kind: 'file', id: manualId(p), path: p } : null));
     entries[key] = { key, short: '', name: k, src: 'manual', pick };
     report.push({ key, name: k, region: null, src: 'manual', lp: { why: '운영자 파일 (팀 표에 없는 이름: 이름이 바뀐 2부 팀 등)' } });
   }

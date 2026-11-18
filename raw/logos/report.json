@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-15T11:45:56.510Z",
+  "at": "2026-11-18T22:25:57.471Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -406,7 +406,7 @@
       "short": "RID0",
       "name": "RIDDLEORDER ZERO",
       "region": "apac-n",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "RIDDLE ZERO",
         "by": "약자·같은 조직 이름 · 선수 3명 겹침"
@@ -472,7 +472,7 @@
       "short": "RID1",
       "name": "RIDDLEORDER ONE",
       "region": "apac-n",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "RIDDLE ONE",
         "by": "약자·같은 조직 이름 · 선수 3명 겹침"
@@ -1178,7 +1178,7 @@
       "short": "VOID",
       "name": "Void Esports OCE",
       "region": "apac-s",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "Void Esports OCE",
         "by": "이름 같음 · 선수 3명 겹침"
@@ -1806,7 +1806,7 @@
       "short": "UNLA",
       "name": "UNLIMIT ACADEMY",
       "region": "apac-n",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "UNLIMIT",
         "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
@@ -1884,7 +1884,7 @@
       "short": "FF",
       "name": "ForFun",
       "region": "emea",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "For Fun Esports",
         "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
@@ -2006,7 +2006,7 @@
       "short": "VE",
       "name": "VOID ESPORTS",
       "region": "emea",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "Void Esports",
         "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
@@ -2225,7 +2225,7 @@
       "key": "cc:unlimitacademy",
       "name": "UNLIMIT ACADEMY",
       "region": "apac-n",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "UNLIMIT ACADEMY",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Mizore, Tatuta, Saro)"
@@ -2755,7 +2755,7 @@
       "key": "cc:forfunacademy",
       "name": "For Fun Academy",
       "region": "emea",
-      "src": "lp",
+      "src": "manual",
       "lp": {
         "name": "For Fun Academy",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Chxrge, Sweterflayer, Lunalj)"
