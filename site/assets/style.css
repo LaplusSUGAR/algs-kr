@@ -1815,7 +1815,7 @@ tr.jumped > td { animation: cpJump 2s ease-out; }
   .pl-tbl td.team { white-space: nowrap !important; }
   .pl-tbl .cut-label td, .pl-tbl th { white-space: normal; }
   .pl-tbl td.team .tl { display: inline-flex; vertical-align: middle; }
-  .pl-tbl td.team .tl > span:last-child { display: inline-block; max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pl-tbl td.team .tl > span:last-child { display: inline-block; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
 /* ---------- 2026-11 순위 탭 개선 ---------- */
