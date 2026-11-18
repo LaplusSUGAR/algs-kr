@@ -43,7 +43,7 @@
     ['갱신 주기', '更新間隔', 'Update interval'], ['데이터 출처', 'データ出典', 'Data sources'], ['언어 · Language', '言語 · Language', 'Language'],
     ['비공식 팬 사이트입니다. EA·Respawn과 관련이 없습니다.', '非公式ファンサイトです。EA・Respawnとは関係ありません。', 'Unofficial fan site. Not affiliated with EA or Respawn.'],
     ['데이터:', 'データ:', 'Data:'], ['ALGS 공식', 'ALGS公式', 'ALGS official'], ['문의·피드백 보내기', 'お問い合わせ・フィードバックを送る', 'Send feedback'],
-    ['무엇에 대한 내용인가요? 고르면 작성 화면이 새 창으로 열리고, 지금 보던 화면 주소가 미리 채워집니다. 개인 정보는 넣지 마세요.', '内容を選んでください。新しいウィンドウで作成画面が開き、今見ている画面のアドレスが入力されます。個人情報は書かないでください。', 'What is it about? Picking one opens a form in a new window with this page’s address filled in. Please don’t include personal information.'],
+    ['무엇에 대한 내용인가요? 고르면 문의 양식(Google 설문지, 로그인 필요 없음)이 새 창으로 열리고, 지금 보던 화면 주소가 미리 채워집니다. 개인 정보는 넣지 마세요.', '内容を選んでください。新しいウィンドウでお問い合わせフォーム（Google フォーム、ログイン不要）が開き、今見ている画面のアドレスが入力されます。個人情報は書かないでください。', 'What is it about? Picking one opens a feedback form (Google Forms, no sign-in needed) in a new window with this page’s address filled in. Please don’t include personal information.'],
     ['데이터 오류', 'データの誤り', 'Data error'], ['순위·점수·로스터가 틀렸어요', '順位・スコア・ロスターが違います', 'Standings, scores or rosters are wrong'],
     ['채널 제보', 'チャンネル情報', 'Channel info'], ['선수 CHZZK·YouTube 주소를 알려 줄게요', '選手のCHZZK・YouTubeを教えます', 'Share a player’s CHZZK/YouTube channel'],
     ['기능 제안', '機能の提案', 'Feature idea'], ['이런 기능이 있으면 좋겠어요', 'こんな機能がほしい', 'I’d like this feature'], ['기타 문의', 'その他', 'Other'], ['그 밖의 이야기', 'その他のお問い合わせ', 'Anything else'],
