@@ -3388,13 +3388,34 @@ function refreshNote() {
 function refreshInfo() {
   return `경기 중: 진행 중인 시리즈만 공식 API에서 ${Math.round((C.livePollMs || R.liveSeconds * 1000) / 1000)}초마다 확인 (${LIVE.mode === 'worker' ? '실시간 서버 경유' : '브라우저에서 직접'}). 탭을 보고 있을 때만 확인합니다.<br>확정값: 대회 기간에는 조별 리그 순위·출전 명단(국제전은 챔피언십 포인트도)을 공식 API에서 ${Math.round(OFF.ms / 1000)}초마다, 시리즈 종료 즉시 다시 받음${OFF.lastAt ? ` (마지막 ${ago(OFF.lastAt)})` : ''}.<br>평상시: 약 ${R.buildMinutes}분마다 자동 빌드. 새 빌드는 ${Math.round((C.verPollMs || 30000) / 1000)}초 안에 화면에 반영됩니다.<br>지금 상태: ${LIVE.active.length ? `실시간 확인 중 (${LIVE.active.length}개 시리즈, 마지막 ${LIVE.lastAt ? ago(LIVE.lastAt) : '대기'})` : '진행 중인 경기 없음'}`;
 }
+// PC 헤더 메뉴가 넘치면 단계적으로 줄인다(style.css 의 .top.f1…f5). 언어·대표 팀 칩·갱신 표시 길이에 따라 필요한 단계가 달라 실제 폭을 재서 고른다.
+const FIT_MAX = 5, fitMq = matchMedia('(min-width: 768px)');
+function fitHeader() {
+  const top = document.querySelector('.top'), bar = top?.querySelector('.tabbar');
+  if (!bar) return;
+  for (let i = 1; i <= FIT_MAX; i++) top.classList.remove('f' + i);
+  if (!fitMq.matches) return;
+  for (let i = 1; i <= FIT_MAX && bar.scrollWidth > bar.clientWidth + 1; i++) top.classList.add('f' + i);
+}
+function watchHeader() {
+  const top = document.querySelector('.top'); if (!top) return;
+  let raf = 0;
+  const go = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; fitHeader(); }); };
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(go);
+    // 창 폭(.top), 메뉴 글자(번역), 오른쪽 도구(갱신 표시 글자) 크기가 바뀌면 다시 잰다. 대표 팀 칩이 생기면 메뉴 칸 폭이 바뀐다.
+    [top, top.querySelector('.tabbar'), top.querySelector('.top-right'), ...top.querySelectorAll('.tabbar a span')].forEach((el) => el && ro.observe(el));
+  } else addEventListener('resize', go);
+  fitMq.addEventListener?.('change', go);
+  fitHeader();
+}
 function updatePill() {
   const pill = document.getElementById('refreshPill'), txt = document.getElementById('refreshText');
   if (!pill) return;
   const on = LIVE.active.length > 0 && A.series.some((s) => s.live);
   pill.classList.toggle('is-live', on);
-  if (FROZEN) { pill.classList.remove('is-live'); txt.textContent = I.t('지난 시즌 기록'); return; }
-  txt.textContent = I.t(on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`);
+  if (FROZEN) { pill.classList.remove('is-live'); pill.title = txt.textContent = I.t('지난 시즌 기록'); return; }
+  pill.title = txt.textContent = I.t(on ? `실시간 · ${LIVE.lastAt ? ago(LIVE.lastAt) : '확인 중'}` : LIVE.active.length ? '경기 대기 · 실시간 준비' : `${R.buildMinutes}분 갱신 · ${hhmm(A.generated)}`);
 }
 // 진행 중이거나 5분 안에 시작하는 시리즈 (시작 후 10시간까지)
 const liveCandidates = () => A.series.filter((s) => s.status !== 'completed' && new Date(s.start) - now() < 5 * 60e3 && now() - new Date(s.start) < 10 * 3600e3);
@@ -3569,6 +3590,7 @@ footer();
 loadStreamsCache();
 if (C.streamsUrl) pollStreams(); // 화면을 그리기 전에 요청부터 보낸다
 render();
+watchHeader();
 liveBadge();
 pollVer();
 setInterval(pollVer, C.verPollMs || 30000);
