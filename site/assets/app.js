@@ -2709,7 +2709,7 @@ function favPicker() {
     ${['apac-n', 'apac-s', 'emea', 'americas'].map((r) => `<section class="sec fav-group"><h2 class="h2">${REGION[r]}</h2><div class="fav-grid">${all.filter((t) => t.region === r).map(chip).join('')}</div></section>`).join('')}`;
 }
 // 보기 모드 전환 버튼
-const modeSwitch = () => `<div class="seg mode-seg" role="group" aria-label="보기 모드">${Object.entries(MODES).map(([k, m]) => `<button type="button" data-mode="${k}" aria-current="${opt.mode === k}">${m.label}${k === 'custom' && opt.fav.length ? ` ${opt.fav.length}` : ''}</button>`).join('')}</div>`;
+const modeSwitch = () => `<div class="seg mode-seg" role="group" aria-label="보기 모드">${Object.entries(MODES).map(([k, m]) => `<button type="button" data-mode="${k}" aria-current="${opt.mode === k}" title="${m.label}"><span class="mm-l">${m.label}</span><span class="mm-s" aria-hidden="true">${m.tag}</span>${k === 'custom' && opt.fav.length ? ` ${opt.fav.length}` : ''}</button>`).join('')}</div>`;
 
 // 팀 탭 '한국 관련': 한국 팀·한국 선수 팀·한국 코치 팀의 자세한 카드
 function krTeams() {
