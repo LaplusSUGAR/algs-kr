@@ -205,6 +205,11 @@
     ['대회 중', '大会中', 'Event day'], ['지금 Apex 방송 중인 채널이 없습니다.', '今Apexを配信中のチャンネルはありません。', 'No channels are streaming Apex right now.'], ['공식 중계 채널 보기', '公式配信チャンネルを見る', 'Official broadcast channels'],
     ['챔피언십 직행 확정', 'チャンピオンシップ出場確定', 'Championship qualified'], ['챔피언십 직행권', 'チャンピオンシップ直行圏', 'In Championship qualifying spots'], ['{n}위까지 직행', '{1}位まで直行', 'top {1} qualify'], ['지금 기준', '現時点', 'as of now'],
     ['지역마다 상위 2팀이 챔피언십으로', '各地域上位2チームがチャンピオンシップへ', 'top 2 per region go to the Championship'],
+    // 순위 탭 개선 (2026-11)
+    ['선수 보기', '選手を表示', 'Show players'], ['선수 접기', '選手を隠す', 'Hide players'], ['내 팀으로 이동', 'マイチームへ移動', 'Jump to my team'], ['관심 팀으로 이동', '注目チームへ移動', 'Jump to followed teams'],
+    ['컷', 'ボーダー', 'Cut'], ['컷 라인과 점수 차', 'ボーダーラインとの点差', 'Points from the cut line'],
+    ['경기 전이라 시드 순 출전 명단입니다.', '試合前のため、シード順の出場チーム一覧です。', 'The match hasn’t started, so this is the lineup in seed order.'], ['경기가 시작되면 순위·킬·종합 점수표로 바뀝니다.', '試合が始まると順位・キル・合計のスコア表に切り替わります。', 'Once it starts, this becomes the placement / kills / total scoreboard.'], ['{n}/{n}팀 확정', '{1}/{2}チーム確定', '{1}/{2} teams set'],
+    ["관심 팀은 선수 이름을 늘 보여 주고, 나머지 팀은 '선수 보기'로 펼칩니다.", '注目チームは選手名を常に表示し、他のチームは「選手を表示」で開きます。', 'Players are always shown for followed teams; for others, tap “Show players”.'],
     // POI 드래프트 지도 (LCQ 경기 탭)
     ['팀별 낙하 지점(POI) 선택입니다.', 'チームごとの降下地点（POI）の選択です。', 'Each team’s landing spot (POI) pick.'],
     ['핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.', 'ピンの番号はドラフトの指名順です。ピンにカーソルを合わせるかタップすると、チームと降下地点が表示されます。', 'Pin numbers show the draft pick order. Hover over or tap a pin to see the team and its landing spot.'],
