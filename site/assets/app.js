@@ -249,6 +249,9 @@ const ko = (s, map) => {
   return s.replace(/^Group ([A-D]) vs ([A-D])$/, '$1조 vs $2조');
 };
 const team = (short) => A.teams[short];
+// 공식 API 응답의 팀 → 사이트 약칭. 2부 팀 가운데 약칭이 프로리그 팀과 겹쳐 빌드가 바꾼 팀(GROW·BURG·FIH·VE·AURA2 등, A.shortFix: 팀 ID → 약칭)은
+//   브라우저가 공식 API를 직접 받을 때(실시간 점수·명단·다시보기)도 같은 약칭을 써야 다른 팀으로 보이지 않는다
+const apiShort = (t) => (t && (A.shortFix?.[t.teamId] || A.shortFix?.[t.id])) || t?.shortName || '';
 // 프로리그 밖 팀(LCQ 챌린저 서킷 팀): 이름·로고만 있고 팀 페이지는 없다
 const xteam = (short) => A.teams[short] || A.xteams?.[short];
 const krOf = (short) => lvlOf(short);
@@ -1314,7 +1317,7 @@ function vodLinks(D, num, shorts) {
   const out = [];
   if (main) out.push(`<a class="chip youtube" href="${esc(ytAt(main.vodProviderId, seg.start))}" target="_blank" rel="noopener"><i></i>메인 중계 (이 게임부터)</a>`);
   for (const sh of shorts) {
-    const tv = D.vods.find((x) => x.vodType === 'multiview_team' && x.team?.shortName === sh && x.vodProvider === 'youtube');
+    const tv = D.vods.find((x) => x.vodType === 'multiview_team' && apiShort(x.team) === sh && x.vodProvider === 'youtube');
     const s0 = tv?.segments?.[0];
     if (tv) out.push(`<a class="chip youtube" href="${esc(ytAt(tv.vodProviderId, s0 ? seg.start - s0.start + (s0.offset || 0) : 0))}" target="_blank" rel="noopener"><i></i>${esc(sh)} 팀 시점</a>`);
   }
@@ -1336,7 +1339,7 @@ function replayView(q) {
   const m = D.matches.at(g - 1), st = D.stats.at(g - 1);
   const tabs = `<div class="seg rp-games" role="group" aria-label="게임">${D.matches.map((x, i) => `<a href="${qsLink('/schedule/replay', q, { s: s.id, g: i + 1 })}" aria-current="${i + 1 === g}">G${x.matchNumber} <small>${esc(x.map?.name || '')}</small></a>`).join('')}</div>`;
   if (!st?.teams?.length) return head + tabs + '<p class="empty">이 게임의 결과가 아직 없습니다.</p>';
-  const teams = st.teams.map((t) => ({ short: t.shortName, name: t.name, place: t.placement, kills: t.kills, pts: t.points, players: (t.players || []).map((p) => ({ n: p.name, k: p.kills, lg: p.character?.name || '' })), kr: krOf(t.shortName) }));
+  const teams = st.teams.map((t) => ({ short: apiShort(t), name: t.name, place: t.placement, kills: t.kills, pts: t.points, players: (t.players || []).map((p) => ({ n: p.name, k: p.kills, lg: p.character?.name || '' })), kr: krOf(t.shortName) }));
   const N = teams.length;
   // 탈락 순서: 낮은 순위부터. step = 지금까지 탈락한 팀 수 (N-1이면 우승 확정)
   const order = teams.slice().sort((a, b) => b.place - a.place);
@@ -3415,7 +3418,7 @@ async function pollDirect() {
       if (r.status === 404) { s.live = false; continue; } // 아직 시작 전
       if (!r.ok) continue;
       const st = await r.json();
-      const results = (st.teams || []).map((t) => ({ pos: t.position, short: t.shortName, pts: t.points, kills: t.kills, kr: krOf(t.shortName), mpe: !!t.matchPointEligible, won: !!t.wonMatchPoint })).sort((a, b) => a.pos - b.pos);
+      const results = (st.teams || []).map((t) => ({ pos: t.position, short: apiShort(t), pts: t.points, kills: t.kills, kr: krOf(apiShort(t)), mpe: !!t.matchPointEligible, won: !!t.wonMatchPoint })).sort((a, b) => a.pos - b.pos);
       const games = Math.max(0, ...(st.teams || []).flatMap((t) => (t.players || []).map((p) => p.latestMatchNumber || 0)));
       const sig = JSON.stringify([st.seriesStatus, results.map((x) => [x.short, x.pts, x.pos])]);
       if (sig !== s._sig) { changed = true; s._sig = sig; }
@@ -3454,7 +3457,7 @@ async function refreshOfficial() {
   const lcqIds = new Set(lcqEvents().map((e) => e.eventId));
   for (const s of A.series.filter((x) => (x.eventId === A.intl?.eventId || lcqIds.has(x.eventId)) && x.status !== 'completed' && new Date(x.start) - now() < 12 * 3600e3)) {
     jobs.push(j(`/series/${s.id}/teams`).then((r) => {
-      const sh = (r?.teams || []).map((t) => t.shortName).filter(Boolean);
+      const sh = (r?.teams || []).map(apiShort).filter(Boolean);
       if (sh.length && JSON.stringify(sh) !== JSON.stringify(s.lineup)) { s.lineup = sh; changed = true; }
     }));
   }
@@ -3462,7 +3465,7 @@ async function refreshOfficial() {
   const gsLive = A.intl && A.api?.groupPhaseId && A.series.some((x) => x.eventId === A.intl.eventId && x.phase === 'Group Stage' && x.status !== 'completed' && new Date(x.start) <= now());
   if (gsLive) jobs.push(j(`/stats/phases/${A.api.groupPhaseId}/standings`).then((r) => {
     if (!r?.standings?.length) return;
-    const rows = r.standings.map((x) => ({ pos: x.position, short: x.shortName, name: x.name, id: x.teamId, group: x.group, pts: x.points, kills: x.kills, region: regionOf(x.teamId, x.region), kr: krOf(x.shortName), next: x.position <= A.intl.winnersCut ? 'Winners Round' : 'Elimination Round 1' }));
+    const rows = r.standings.map((x) => ({ pos: x.position, short: apiShort(x), name: x.name, id: x.teamId, group: x.group, pts: x.points, kills: x.kills, region: regionOf(x.teamId, x.region), kr: krOf(apiShort(x)), next: x.position <= A.intl.winnersCut ? 'Winners Round' : 'Elimination Round 1' }));
     if (JSON.stringify(rows.map((x) => [x.short, x.pts])) !== JSON.stringify(A.intl.rows.map((x) => [x.short, x.pts]))) { A.intl.rows = rows; changed = true; }
   }));
   // 3) 챔피언십 포인트 순위 (공식 페이지와 같은 조건). 국제전 진행·정산 중에만: 평소에는 5분마다 도는 빌드 값으로 충분하다
