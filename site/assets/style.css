@@ -1643,7 +1643,7 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
   .cp-tbl td.team .tl { display: inline-flex; max-width: calc(100% - 14px); vertical-align: middle; }
   .cp-tbl td.team .tl > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cp-tbl td.team small.reg { display: block; margin: 1px 0 0 25px; }
-  .cp-tbl .tie { white-space: normal; max-width: 76px; margin-left: auto; text-align: right; }
+  .cp-tbl .tie { white-space: normal; }
   .cp-tbl .krdot, .pts-side .krdot { vertical-align: middle; }
   .cp-tbl td.team .sub-note { white-space: normal; }
   /* 한국 관련 팀 요약: 차이는 팀 이름 아래로, 이름은 한 줄 */
@@ -1686,7 +1686,7 @@ tr.jumped > td { animation: cpJump 2s ease-out; }
   .pl-tbl .po-tag { display: none; }
   .pl-tbl .po-dot { display: inline-block; width: 7px; height: 7px; margin-left: 5px; border-radius: 50%; background: var(--ok); vertical-align: middle; }
   .pl-tbl td.team { white-space: nowrap !important; }
-  .pl-tbl .cut-label td { white-space: normal; }
+  .pl-tbl .cut-label td, .pl-tbl th { white-space: normal; }
   .pl-tbl td.team .tl { display: inline-flex; vertical-align: middle; }
-  .pl-tbl td.team .tl > span:last-child { display: inline-block; max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pl-tbl td.team .tl > span:last-child { display: inline-block; max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
