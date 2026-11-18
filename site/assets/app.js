@@ -2202,9 +2202,27 @@ function qualStrip(q, region) {
   const basis = BD.state === 'live' ? (finalsLivePos() ? '결승 실시간 정산 기준' : '최소 보장 정산 기준') : BD.state === 'pending' ? '최종 순위 정산 기준' : cpLock() ? '확정' : '현재 순위 기준';
   return `<section class="qual" aria-label="지역별 챔피언십 직행권 팀 수">
     <div class="qual-h"><b>챔피언십 직행권 ${src.filter((x) => x.d).length}팀</b><span>${basis} · ${lcqOver ? `<span>LCQ에서 지역별 ${lcq}팀이 더해져 ${A.season.cpDirectSlots + A.season.lcqSlots}팀 확정</span>` : `나머지 팀은 지역별 LCQ에서 ${lcq}자리씩`}</span></div>
-    <div class="qual-g">${QUAL_REGIONS.map((g) => `<a class="qual-c${region === g ? ' on' : ''}" href="${qsLink('/points/cp', q, { r: region === g ? 'all' : g })}" aria-current="${region === g}"><span class="qual-r">${REGION[g]}</span><b class="num">${n(g)}<small>팀</small></b><span class="qual-s">LCQ ${lcq}팀 더해 챔피언십 ${n(g) + lcq}팀</span></a>`).join('')}</div>
+    <div class="qual-g">${QUAL_REGIONS.map((g) => `<a class="qual-c${region === g ? ' on' : ''}" href="${qsLink('/points/cp', q, { r: region === g ? 'all' : g })}" aria-current="${region === g}"><span class="qual-r">${REGION[g]}</span><b class="num">${n(g)}<small data-tr="${n(g) === 1 ? '팀 (1개)' : '팀 (개수)'}">팀</small></b><span class="qual-s">LCQ ${lcq}팀 더해 챔피언십 ${n(g) + lcq}팀</span></a>`).join('')}</div>
   </section>`;
 }
+
+// 표에서 관심 팀 줄로 바로 가기 (117줄 표). 지금 표에 있는 관심 팀만, 대표 응원 팀이 맨 앞
+function jumpChips(rows) {
+  const here = new Set(rows.map((r) => r.short));
+  const mid = mainId();
+  const list = focusList().filter((k) => here.has(k.short)).sort((a, b) => (team(b.short)?.id === mid) - (team(a.short)?.id === mid) || (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999)).slice(0, 6);
+  if (!list.length) return '';
+  return `<div class="cp-jump" role="group" aria-label="표에서 팀 찾기"><span>표에서 찾기</span>${list.map((k) => `<button type="button" class="${CAT[lvlOf(k.short)] || ''}${team(k.short)?.id === mid ? ' main' : ''}" data-cp-jump="${esc(k.short)}">${logo(k.short)}<b>${esc(k.short)}</b></button>`).join('')}</div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-cp-jump]');
+  if (!b) return;
+  const row = [...document.querySelectorAll('tr[data-cpt]')].find((x) => x.dataset.cpt === b.dataset.cpJump);
+  if (!row) return;
+  row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  row.classList.remove('jumped'); void row.offsetWidth; row.classList.add('jumped');
+  row.focus({ preventScroll: true });
+});
 
 function cpView(q) {
   // 시즌 초: 첫 프로리그가 끝나기 전에는 챔피언십 포인트가 없다
@@ -2215,7 +2233,7 @@ function cpView(q) {
   const krNames = new Set(Object.values(A.teams).flatMap((t) => t.krPlayers || []));
   const regionSeg = `<div class="seg" role="group" aria-label="지역">${['all', 'apac-n', 'apac-s', 'emea', 'americas'].map((r) => `<a href="${qsLink('/points/cp', q, { r })}" aria-current="${region === r}">${r === 'all' ? '전체' : REGION[r]}</a>`).join('')}</div>`;
   const modeSeg = `<div class="seg" role="group" aria-label="단위"><a href="${qsLink('/points/cp', q, { m: 'teams' })}" aria-current="${mode === 'teams'}">팀</a><a href="${qsLink('/points/cp', q, { m: 'players' })}" aria-current="${mode === 'players'}">선수</a></div>`;
-  const krSummary = (focusList()).filter((k) => k.cp).map((k0) => ({ ...k0, cp: q.get('v') === 'now' && k0.cp.off ? { ...k0.cp, ...k0.cp.off } : k0.cp })).sort((a, b) => a.cp.rank - b.cp.rank).map((k) => `<tr class="${rowCls({ kr: k.level, short: k.short })}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}${coachBadge(k.level, k.short)}</td><td class="r num">${fmt(k.cp.total)}</td>${(() => { const d = (k.cp.status || (k.cp.rank <= cut ? 'direct' : 'lcq')) === 'direct'; return `<td class="r">${qualTag(d)}</td><td class="r small opt muted">${k.cp.gap == null ? '' : d ? `${cut + 1}위와 +${fmt(k.cp.gap)}` : `${cut}위까지 −${fmt(k.cp.gap)}`}</td>`; })()}</tr>`).join('');
+  const krSummary = (focusList()).filter((k) => k.cp).map((k0) => ({ ...k0, cp: q.get('v') === 'now' && k0.cp.off ? { ...k0.cp, ...k0.cp.off } : k0.cp })).sort((a, b) => a.cp.rank - b.cp.rank).map((k) => `<tr class="${rowCls({ kr: k.level, short: k.short })}"><td class="rank">${k.cp.rank}</td><td class="team">${krDot(k.level, k.short)}${teamLink(k.short, k.name)}${coachBadge(k.level, k.short)}${(() => { const d = (k.cp.status || (k.cp.rank <= cut ? 'direct' : 'lcq')) === 'direct'; const gap = k.cp.gap == null ? '' : d ? `${cut + 1}위와 +${fmt(k.cp.gap)}` : `${cut}위까지 −${fmt(k.cp.gap)}`; return `${gap ? `<small class="gap-sm">${gap}</small>` : ''}</td><td class="r num">${fmt(k.cp.total)}</td><td class="r">${qualTag(d)}</td><td class="r small opt muted">${gap}</td>`; })()}</tr>`).join('');
 
   const BD = board(), ST = BD.ST;
   const settling = BD.state === 'live' || BD.state === 'pending';
@@ -2234,12 +2252,18 @@ function cpView(q) {
   } else if (mode === 'teams') {
     let rows = A.cp.filter((r) => region === 'all' || r.region === region);
     if (opt.krOnly) rows = rows.filter((r) => isF(r.short));
-    table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r">상태</th></tr></thead><tbody>
+    // CP 막대(넓은 화면): 1위 CP를 끝으로, 세로선은 직행 마지막 자리(${cut}위) CP
+    const top = Math.max(1, ...A.cp.map((x) => x.total)), cutCp = A.cp.at(cut - 1)?.total ?? 0;
+    const cutAt = Math.min(100, (cutCp / top) * 100).toFixed(1);
+    table = `${jumpChips(rows)}<div class="tbl-wrap"><table class="tbl cp-tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r cpx">직행선과 차이</th><th class="cpx cp-barh">CP <small>│ <span>${cut}위</span></small></th><th class="r cp-st">상태</th></tr></thead><tbody>
       ${rows.map((r, i) => {
         const isCut = region === 'all' && !opt.krOnly && r.rank === cut;
-        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small>${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}</td><td class="r">${qualTag(r.status === 'direct')}</td></tr>
-        <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="3"${lazy(() => r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join(''))}></td></tr>
-        ${isCut ? `<tr class="cut-label"><td colspan="4">여기까지 챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`;
+        const d = r.status === 'direct';
+        // 직행 팀은 33위와의 차이(+), LCQ 팀은 32위까지 남은 차이(−). 직행 확정 뒤 32위보다 CP가 많은 LCQ 팀은 비움
+        const gap = r.gap == null || r.gap < 0 ? '' : d ? `+${fmt(r.gap)}` : `−${fmt(r.gap)}`;
+        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" data-cpt="${esc(r.short)}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small class="reg">${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}<small class="st-sm ${d ? 'ok' : 'lcq'}">${d ? '직행' : 'LCQ'}</small></td><td class="r small muted cpx num">${gap}</td><td class="cpx cp-barc"><span class="cp-bar" aria-hidden="true"><i class="${d ? 'ok' : 'lcq'}" style="width:${Math.min(100, (r.total / top) * 100).toFixed(1)}%"></i><b style="left:${cutAt}%"></b></span></td><td class="r cp-st">${qualTag(d)}</td></tr>
+        <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="5"${lazy(() => r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join(''))}></td></tr>
+        ${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`;
       }).join('')}
     </tbody></table></div>`;
   } else {
@@ -2265,15 +2289,16 @@ function cpEventsView(q) {
   const evs = A.cpEvents || [];
   if (!evs.length) return '<p class="empty">대회별 CP 데이터가 아직 없습니다.</p>';
   const cur = evs.find((e) => e.slug === q.get('e')) || evs.at(-1);
-  const groups = [...new Set(evs.map((e) => e.split))].map((sp) => `<div class="seg ev-seg" role="group" aria-label="Split ${sp}">${evs.filter((e) => e.split === sp).map((e) => `<a href="${qsLink('/points/events', q, { e: e.slug })}" aria-current="${e === cur}">${esc(e.short)}</a>`).join('')}</div>`).join('');
+  // 스플릿마다 한 줄(줄 머리 S1·S2), 버튼은 줄바꿈해서 모두 보이게. 버튼 이름에서는 줄 머리와 겹치는 'S1 ' 을 뺀다
+  const groups = [...new Set(evs.map((e) => e.split))].map((sp) => `<div class="ev-row" role="group" aria-label="Split ${sp}"><b>S${sp}</b>${evs.filter((e) => e.split === sp).map((e) => `<a href="${qsLink('/points/events', q, { e: e.slug })}" aria-current="${e === cur}" title="${esc(e.label)}">${esc(String(e.short).replace(/^S\d+\s+/, ''))}</a>`).join('')}</div>`).join('');
   let rows = cur.rows;
   if (opt.krOnly) rows = rows.filter((r) => isF(r.short));
   const open = cur.rows.filter((r) => !r.id).length;
   return `<p class="lead">어느 대회에서 어느 팀(선수)이 몇 CP를 받았는지 봅니다. 같은 팀 선수는 1인당 같은 CP를 받습니다.</p>
-    <div class="controls ev-controls">${groups}</div>
+    <div class="ev-pick">${groups}</div>
     ${spoil(`<section class="sec"><h2 class="h2">${esc(cur.label)}</h2>${open ? `<p class="lead"><span class="tag live">진행 중</span> ${open}자리는 아직 순위가 정해지지 않았습니다.</p>` : ''}
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>순위</th><th>팀</th><th class="r">1인당 CP</th><th>받은 선수</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td><td class="team">${r.id ? `${krDot(r.kr, r.short)}${r.short ? teamLink(r.short, r.name) : esc(r.name)}` : '<span class="muted">미정</span>'}</td><td class="r num">${fmt(r.cp)}</td><td class="small">${r.players.map(([id, n]) => `<a href="#/players/${encodeURIComponent(id)}">${esc(n)}</a>`).join(', ')}</td></tr>`).join('')}
+    <div class="tbl-wrap"><table class="tbl ev-tbl"><thead><tr><th>순위</th><th>팀</th><th class="r">1인당 CP</th><th class="ev-plc">받은 선수</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos}</td>${(() => { const pls = r.players.map(([id, n]) => `<a href="#/players/${encodeURIComponent(id)}">${esc(n)}</a>`).join(', '); return `<td class="team">${r.id ? `${krDot(r.kr, r.short)}${r.short ? teamLink(r.short, r.name) : esc(r.name)}` : '<span class="muted">미정</span>'}${pls ? `<small class="ev-pls">${pls}</small>` : ''}</td><td class="r num">${fmt(r.cp)}</td><td class="small ev-plc">${pls}</td>`; })()}</tr>`).join('')}
     </tbody></table></div></section>`, cur.id === A.api?.intlEventId ? intlKey() : null, '대회 결과')}`;
 }
 
@@ -2302,8 +2327,8 @@ function plView(q) {
   return `${controls}
     <p class="lead">${esc(P.label)}. 시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다. 진출 컷은 정규 시즌 순위 기준이고, 오른쪽 최종 순위는 리전 결승까지 반영한 값(챔피언십 포인트 기준)입니다.</p>
     ${krHere.length && !opt.krOnly ? `<div class="kr-strip" style="margin-top:12px">${krHere.map((r) => `<a class="kchip ${CAT[lvlOf(r.short)]}" href="#/teams/${encodeURIComponent(r.short)}">${logo(r.short)}<span><b>${esc(r.short)}</b><small>정규 ${r._rk}위 · 최종 ${r.pos}위${r.qualified ? ' · PO' : ''}</small></span></a>`).join('')}</div>` : ''}
-    <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>정규</th><th>팀</th><th class="c opt">조</th><th class="r">정규 점수</th><th class="r opt">킬</th><th class="r">최종</th><th class="r opt2">CP/인</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok">PO</span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r rank">${fin(r)}</td><td class="r opt2">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="7">${lines[r._rk]}</td></tr>` : ''}`).join('')}
+    <section class="sec"><div class="tbl-wrap"><table class="tbl pl-tbl"><thead><tr><th>정규</th><th>팀</th><th class="c opt">조</th><th class="r">정규 점수</th><th class="r opt">킬</th><th class="r">최종</th><th class="r opt2">CP/인</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok po-tag">PO</span><span class="po-dot" title="플레이오프 진출" aria-label="플레이오프 진출"></span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r rank">${fin(r)}</td><td class="r opt2">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="7">${lines[r._rk]}</td></tr>` : ''}`).join('')}
     </tbody></table></div></section>
     <div class="explain"><b>점수 계산</b>
       <table><tr><td>게임</td><td>순위 점수 + 킬당 1점 (1위 12, 2위 9, 3위 7, 4위 5, 5위 4 …)</td></tr>
