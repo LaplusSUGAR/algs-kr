@@ -1047,9 +1047,49 @@ table.rk th:first-child, table.rk td:first-child { width: 6.4em; white-space: no
 table.rk th, table.rk td { padding-left: 1px; padding-right: 1px; }
 table.rk td.num, table.rk th.c { font-size: 12px; }
 @container (max-width: 420px) { table.rk th:nth-child(n+8), table.rk td:nth-child(n+8) { display: none; } }
+/* 규칙 탭 (11-19 개선): 휴대폰 숫자 2×2, 세로 타임라인, 다음 대회 강조, 진행 그림 색 규칙(경기·순위 탭과 같음), 용어 카드 */
+.rules-grid:not(:has(*)) { display: none; }
+.rs li.nx1 { border-top-color: var(--apex); box-shadow: 0 0 0 1px var(--apex) inset; }
+.rs li.nx1 .rs-n { background: var(--apex); color: #fff; }
+@media (max-width: 599px) {
+  .rk-facts { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rk-f { padding: 10px 12px 9px; }
+  .rk-f b { font-size: 26px; }
+  .rk-f span { font-size: 12px; line-height: 1.35; }
+}
+@container (max-width: 560px) {
+  .rs { gap: 0; margin-top: 12px; }
+  .rs li { background: none; border: 0; box-shadow: none; padding: 7px 0 9px; position: relative; }
+  .rs li:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 32px; bottom: -6px; width: 2px; background: var(--rule); }
+  .rs li.done:not(:last-child)::after { background: var(--steel); }
+  .rs li.now, .rs li.nx1 { background: var(--paper); border-left: 3px solid var(--apex); border-radius: var(--r-sm); padding-left: 8px; margin-left: -11px; box-shadow: none; }
+  .rs li.now::after, .rs li.nx1::after { left: 19px; }
+  .rs-tags { margin-top: 2px; }
+}
+.tag.nxt { background: var(--apex); color: #fff; border-color: transparent; }
+.sb-a { background: var(--cyan); color: #fff; } .sb-b { background: var(--amber); color: #fff; }
+:root[data-theme='dark'] .sb-a { color: #06181B; } :root[data-theme='dark'] .sb-b { color: #1B1300; }
+.rf-e.up { stroke: var(--cyan); } .rf-l.up { fill: var(--cyan); }
+.rf-e.down { stroke: var(--steel); stroke-dasharray: 4 3; } .rf-l.down { fill: var(--steel); }
+.rf-o { fill: var(--apex); font-weight: 700; }
+.rf-node.goal rect { fill: var(--amber); } .rf-node.goal .rf-t { fill: #fff; transform: none; }
+:root[data-theme='dark'] .rf-node.goal .rf-t { fill: #111; }
+.rf-t { font-size: 14px; } .rf-s, .rf-o, .rf-l { font-size: 12px; }
+.rf-node.final .rf-t { font-size: 15px; }
+.rf-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: var(--fs-xs); font-weight: 700; margin: 10px 0 0 !important; max-width: none !important; }
+.rf-legend .up { color: var(--cyan); } .rf-legend .down { color: var(--steel); } .rf-legend .out { color: var(--apex); } .rf-legend .goal { color: var(--amber); }
+.gl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 0 28px; margin: 8px 0 0; }
+.gl div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+@container (max-width: 480px) { html:not([lang='ko']) .gl div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.gl dt { font-weight: 700; } .gl dd { margin: 0; font-size: var(--fs-sm); color: var(--steel); line-height: 1.5; }
+.now-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding: 10px 12px; background: var(--paper); border-left: 3px solid var(--apex); border-radius: var(--r-sm); }
+.now-box .go { margin-left: auto; font-weight: 700; color: var(--apex); text-decoration: none; }
+.now-box .go::after { content: ' ›'; }
+html:not([lang='ko']) table.rk { table-layout: auto; }
+html:not([lang='ko']) table.rk th:first-child, html:not([lang='ko']) table.rk td:first-child { width: auto; white-space: nowrap; padding-right: 8px; }
+html:not([lang='ko']) .grp-g { padding: 6px 10px; }
 @media (max-width: 400px) { .tbl th, .tbl td { padding-left: 3px; padding-right: 3px; } .tbl td { font-size: 13px; } }
 @container (min-width: 520px) { .rs { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); } }
-.sb-a { background: #2F6B4F; } .sb-b { background: #8A6D1F; }
 .mpg-steps b { background: var(--steel); color: var(--paper); }
 .mpg-steps li:last-child b { background: var(--apex); color: #fff; }
 .kr-hero h1 { max-width: 74%; }
