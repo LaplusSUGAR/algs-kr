@@ -140,10 +140,13 @@ function feedbackUrl(kind, ctx = '') {
     const body = `## 내용\n\n(여기에 적어 주세요)\n\n---\n- 종류: ${kind}\n- 보던 화면: ${page}\n- 화면 크기: ${innerWidth}×${innerHeight}${ctx ? `\n- 대상: ${ctx}` : ''}`;
     return `https://github.com/${C.feedbackRepo || 'LaplusSUGAR/algs-kr'}/issues/new?title=${encodeURIComponent(`[${kind}] ${ctx}`.trim())}&body=${encodeURIComponent(body)}`;
   }
+  // 구글 폼: 종류는 폼의 선택지 글자와 똑같아야 미리 선택된다(feedbackKinds 로 바꿔 넣음)
   const u = new URL(C.feedback), F = C.feedbackFormFields || {};
-  if (F.kind) u.searchParams.set(F.kind, kind);
+  u.searchParams.set('usp', 'pp_url');
+  if (F.kind) u.searchParams.set(F.kind, C.feedbackKinds?.[kind] || kind);
   if (F.page) u.searchParams.set(F.page, page);
   if (F.body && ctx) u.searchParams.set(F.body, ctx);
+  if (F.lang && C.feedbackLangs?.[I.lang]) u.searchParams.set(F.lang, C.feedbackLangs[I.lang]);
   return u.toString();
 }
 let fbCtx = '';
