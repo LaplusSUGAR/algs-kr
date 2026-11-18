@@ -2597,22 +2597,19 @@ function plView(q) {
     ${seg('스플릿', split, [...new Set(keys.map((k) => k.slice(1, 2)))].sort().map((n) => [n, `Split ${n}`, { s: n }]))}
   </div>`;
   if (!P) return controls + '<p class="empty">이 지역·스플릿 데이터가 아직 없습니다.</p>';
-  // 한 표: 정규 시즌 순위로 줄 세우고(진출 컷이 정규 시즌 기준), 리전 결승까지 반영한 최종 순위를 옆 칸에
-  let rows = P.rows.slice().sort((a, b) => (b.rs ?? 0) - (a.rs ?? 0) || (b.kills ?? 0) - (a.kills ?? 0));
-  rows.forEach((r, i) => (r._rk = i + 1));
+  // 순위는 하나: 리전 결승까지 반영한 최종 순위(챔피언십 포인트 기준). 플레이오프 진출은 PO 표시로
+  let rows = P.rows.slice().sort((a, b) => (a.pos ?? 999) - (b.pos ?? 999) || (b.rs ?? 0) - (a.rs ?? 0) || (b.kills ?? 0) - (a.kills ?? 0));
   if (opt.krOnly) rows = rows.filter((r) => isF(r.short));
-  const lines = !opt.krOnly ? { [P.playoffsLine]: `여기까지 정규 시즌 순위로 플레이오프 진출 (리전 결승 우승팀 1자리 추가)`, [P.rfLine]: '여기까지 리전 결승 진출' } : {};
   const krHere = rows.filter((r) => isF(r.short));
   // 시작 전(아무도 시리즈를 치르지 않음): 표는 출전 팀 명단이고 순서는 순위가 아니다
   const pre = P.rows.every((r) => !r.sp && !r.rs && !r.cpPP);
   if (pre) return `${controls}<p class="lead">${esc(P.label)}. <span>아직 시작 전입니다. 아래는 출전 팀 명단이며 순서는 순위가 아닙니다.</span></p>
     <section class="sec"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>팀</th><th class="c">조</th></tr></thead><tbody>${rows.map((r) => `<tr class="${rowCls(r)}"><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}</td><td class="c">${esc(r.group || '–')}</td></tr>`).join('')}</tbody></table></div></section>`;
-  const fin = (r) => (r.pos !== r._rk ? `<b>${r.pos}</b><small class="mv">${r.pos < r._rk ? '▲' + (r._rk - r.pos) : '▼' + (r.pos - r._rk)}</small>` : `<b>${r.pos}</b>`);
   return `${controls}
-    <p class="lead">${esc(P.label)}. 시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다. 진출 컷은 정규 시즌 순위 기준이고, 오른쪽 최종 순위는 리전 결승까지 반영한 값(챔피언십 포인트 기준)입니다.</p>
-    ${krHere.length && !opt.krOnly ? `<div class="kr-strip" style="margin-top:12px">${krHere.map((r) => `<a class="kchip ${CAT[lvlOf(r.short)]}" href="#/teams/${encodeURIComponent(r.short)}">${logo(r.short)}<span><b>${esc(r.short)}</b><small>정규 ${r._rk}위 · 최종 ${r.pos}위${r.qualified ? ' · PO' : ''}</small></span></a>`).join('')}</div>` : ''}
-    <section class="sec"><div class="tbl-wrap"><table class="tbl pl-tbl"><thead><tr><th>정규</th><th>팀</th><th class="c opt">조</th><th class="r">정규 점수</th><th class="r opt">킬</th><th class="r">최종</th><th class="r opt2">CP/인</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${lines[r._rk] ? 'cut' : ''}"><td class="rank">${r._rk}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok po-tag">PO</span><span class="po-dot" title="플레이오프 진출" aria-label="플레이오프 진출"></span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r rank">${fin(r)}</td><td class="r opt2">${fmt(r.cpPP)}</td></tr>${lines[r._rk] ? `<tr class="cut-label"><td colspan="7">${lines[r._rk]}</td></tr>` : ''}`).join('')}
+    <p class="lead">${esc(P.label)}. <span>시리즈(하루 6게임) 순위마다 프로리그 포인트를 받고, 9개 시리즈 합으로 정규 시즌 순위를 정합니다.</span> <span>순위는 리전 결승까지 반영한 최종 순위(챔피언십 포인트 기준)이고, PO는 플레이오프 진출 팀입니다.</span></p>
+    ${krHere.length && !opt.krOnly ? `<div class="kr-strip" style="margin-top:12px">${krHere.map((r) => `<a class="kchip ${CAT[lvlOf(r.short)]}" href="#/teams/${encodeURIComponent(r.short)}">${logo(r.short)}<span><b>${esc(r.short)}</b><small>${r.pos}위${r.qualified ? ' · PO' : ''}</small></span></a>`).join('')}</div>` : ''}
+    <section class="sec"><div class="tbl-wrap"><table class="tbl pl-tbl"><thead><tr><th>#</th><th>팀</th><th class="c opt">조</th><th class="r">정규 점수</th><th class="r opt">킬</th><th class="r opt2">CP/인</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok po-tag">PO</span><span class="po-dot" title="플레이오프 진출" aria-label="플레이오프 진출"></span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r opt2">${fmt(r.cpPP)}</td></tr>`).join('')}
     </tbody></table></div></section>
     <div class="explain"><b>점수 계산</b>
       <table><tr><td>게임</td><td>순위 점수 + 킬당 1점 (1위 12, 2위 9, 3위 7, 4위 5, 5위 4 …)</td></tr>
