@@ -270,24 +270,9 @@ const olink = (url, label) => `<a class="olink" href="${esc(url)}" target="_blan
 // 팀 로고 (없으면 약칭 상자). dark: 어두운 배경 위에 놓일 때
 // LOGO_PX: 크기별 화면 표시 너비(CSS px). 큰 로고(xl)는 큰 화면 확대(zoom)까지 생각해 넉넉히
 const LOGO_PX = { '': 18, lg: 30, xl: 100 };
-// 같은 로고를 쓰는 팀(예: RIDDLEORDER ZERO·ONE, 본 팀과 아카데미)은 로고 귀퉁이에 작은 표시를 붙여 구분한다
-//   이름 끝 숫자가 다르면 그 숫자(RID0 → 0, RID1 → 1), 아카데미는 A, 그 밖의 2부 팀은 2
-let LOGO_B = null, LOGO_B_SRC = null;
-function logoBadge(short) {
-  if (LOGO_B_SRC !== A) {
-    LOGO_B_SRC = A; LOGO_B = {};
-    const by = {};
-    for (const t of [...Object.values(A.teams).filter((x) => x.current), ...Object.values(A.xteams || {})]) { const l = t.logo && (t.logo[1] || t.logo[0]); if (l) (by[l] = by[l] || []).push(t); }
-    for (const g of Object.values(by)) {
-      if (g.length < 2) continue;
-      const digits = g.every((t) => /\d$/.test(t.short)) && new Set(g.map((t) => t.short.slice(-1))).size === g.length;
-      for (const t of g) { const b = digits ? t.short.slice(-1) : /academy/i.test(t.name) ? 'A' : t.d2 ? '2' : ''; if (b) LOGO_B[t.short] = b; }
-    }
-  }
-  return LOGO_B[short] || '';
-}
-const logo = (short, cls = '', dark) => { const b = logoBadge(short), h = logo0(short, cls, dark); return b && h.startsWith('<img') ? `<span class="lgb ${cls}" data-b="${esc(b)}">${h}</span>` : h; };
-const logo0 = (short, cls = '', dark) => {
+// 같은 로고를 쓰는 팀(RIDDLEORDER ZERO·ONE, 본 팀과 아카데미)은 화면에 표시를 덧붙이지 않고
+//   로고 그림 자체에 구분 띠를 넣은 파일을 logos-src/ 에 둔다 (logos-src/README.md)
+const logo = (short, cls = '', dark) => {
   const lg = xteam(short)?.logo;
   const d = dark ?? document.documentElement.dataset.theme === 'dark';
   // 공식 로고: [0] logoLight = 흰 로고(어두운 배경용), [1] logoDark = 어두운 로고(밝은 배경용).
@@ -1810,7 +1795,7 @@ function poiSection(B, st) {
     const t = byId.get(tid), disp = t?.name || name;
     const ic = (cls) => (hasLogo(t) ? logo(t.short, cls, true) : `<span class="poi-ph ${cls}">${esc(poiInit(disp))}</span>`);
     const pos = `${y < 28 ? 'b' : 't'}${x < 30 ? 'l' : x > 70 ? 'r' : 'c'}`;
-    return `<button type="button" class="poi-pin p-${pos}" style="left:${x}%;top:${y}%" data-n="${n}" aria-label="${esc(`#${n} ${disp} · ${spot}`)}"><span class="poi-dot">${ic('poi')}</span><i class="poi-num">${n}</i>${t && logoBadge(t.short) ? `<i class="poi-b">${esc(logoBadge(t.short))}</i>` : ''}
+    return `<button type="button" class="poi-pin p-${pos}" style="left:${x}%;top:${y}%" data-n="${n}" aria-label="${esc(`#${n} ${disp} · ${spot}`)}"><span class="poi-dot">${ic('poi')}</span><i class="poi-num">${n}</i>
       <span class="poi-tip" role="tooltip">${ic('lg')}<span class="poi-tt"><b>${esc(disp)}</b><small>#${n} · ${esc(spot)}</small></span></span></button>`;
   };
   const seg = src.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${src.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
