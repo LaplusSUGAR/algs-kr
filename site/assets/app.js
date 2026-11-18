@@ -2493,7 +2493,7 @@ function povTeam(l) { // 공식 팀 화면의 제목 속 팀 이름 → 팀 약�
   return POV_IX.get(flatName(l.pov)) || null;
 }
 const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
-const inFocus = (short) => { const t = team(short); return !!t && (t.id === mainId() || opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short)); };
+const inFocus = (short) => { const t = team(short); return !!t && (t.id === mainId() || (opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short))); };
 function liveShown(l) {
   if (liveId(l) === parseHash().q.get('play')) return true;
   if (l.kind === 'official') return opt.mode === 'apn' ? l.key === 'o:ja' : true;
