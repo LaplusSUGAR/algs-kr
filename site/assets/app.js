@@ -495,7 +495,7 @@ const krIn = (shorts) => shorts.filter((sh) => krOf(sh) !== 'none');
 // 게임 수 표시: 일반 경기 '치른 게임/전체'(0/6 → 6/6), 매치 포인트 결승은 시작 전 '결승', 시작하면 치른 게임 수가 붙는다
 function gameCount(s, final) {
   const done = s?.status === 'completed', live = !!s && (s.live || s.status === 'live');
-  const played = done ? s.matches || 0 : live ? s.games || 0 : 0;
+  const played = done ? s.matches || 0 : live ? s.gDone ?? s.games ?? 0 : 0; // 진행 중에는 끝난 게임 수(게임별 상태를 모르면 지금 게임 번호)
   if (final || s?.mp) return `<span class="gc fin${live ? ' live' : ''}${done ? ' done' : ''}"><span>결승</span>${played ? `<b>${played}</b>` : ''}</span>`;
   const tot = s?.matches || 6; // 시리즈 게임 수(공식 값, 보통 6)
   return `<span class="gc${live ? ' live' : ''}${done ? ' done' : ''}" title="치른 게임 / 전체 게임"><b>${Math.min(played, tot)}</b>/${tot}</span>`;
@@ -524,7 +524,7 @@ function flowV(items, label) {
   return `<ol class="bfv" aria-label="${esc(label)}">${items.map((n) => {
     const st = n.st, ks = krIn(st.teams || []);
     const chips = ks.length ? ks.map((sh) => { const a = n.adv(sh); return `<span class="bfv-chip ${CAT[krOf(sh)]} ${a === false ? 'out' : a ? 'up' : ''}">${esc(sh)}</span>`; }).join('') : `<span class="bfv-none">${st.teams?.length ? esc(ML().none) : '출전 팀 미정'}</span>`;
-    const tag = st.status === 'live' ? '<span class="tag live">LIVE</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+    const tag = st.status === 'live' ? gameNow(st.s) || '<span class="tag live">LIVE</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
     const ext = String(n.href).startsWith('http');
     const outs = n.outs.map(([lab, to]) => route(lab, to)).join('') + (n.note ? route(n.note) : '');
     const d = st.start ? dayLabel(dayKey(st.start)) : '';
@@ -596,7 +596,7 @@ function eventHome() {
   return `<section class="sec flow-sec" aria-labelledby="h-ev">
       <div class="sec-head"><h2 class="h2" id="h-ev">${esc(title)}</h2><a class="more" href="${qsLink(base, q, { m: 'groups' })}">전체 보기</a></div>
       <div class="flow-grid"><div>${spoil(stageFlow(B, L, (k) => qsLink(base, q, { m: k }), `${title} 진행 방식`), key, '진출 결과')}</div>
-      <div>${sts.map((st) => `<h3 class="h3 up-h">${esc(st.ko)} <small class="muted">${esc(stageState(st))}</small></h3>${spoil(stageGrid(B, st, 10), key, '점수표')}<a class="more" href="${qsLink(base, q, { m: st.key })}">전체 점수표</a>`).join('')}</div></div>
+      <div>${sts.map((st) => `<h3 class="h3 up-h">${esc(st.ko)} <small class="muted">${esc(stageState(st))}</small> ${gameCount(st.s, st.key === 'f')} ${gameNow(st.s)}</h3>${spoil(stageGrid(B, st, 10), key, '점수표')}<a class="more" href="${qsLink(base, q, { m: st.key })}">전체 점수표</a>`).join('')}</div></div>
     </section>`;
 }
 function home() {
@@ -659,7 +659,7 @@ function nextCard(upcoming) {
   const live = set.some((s) => s.live);
   const days = Math.round((Date.parse(dayKey(first.start)) - Date.parse(dayKey(new Date(now()).toISOString()))) / 864e5);
   const big = live ? 'LIVE' : days <= 0 ? '오늘' : `D-${days}`;
-  const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
+  const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}${s.live ? ` ${gameNow(s)}` : ''}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
   return `<section class="nx${live ? ' live' : ''}" aria-labelledby="h-nx">
     <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn() : ''}</div>
     <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : esc(hhmm(first.start))}</b></span></div>
@@ -776,7 +776,7 @@ function stageMini(B) {
   if (!st) return intlMini();
   const res = st.s?.results;
   const rows = res ? res.filter((r, i) => i < 5 || isF(r.short)) : (st.teams || []).map((sh) => ({ short: sh, kr: krOf(sh), seed: A.intl.rows.find((r) => r.short === sh)?.pos })).filter((r, i) => i < 5 || isF(r.short));
-  return `<p class="lead" style="margin-top:4px"><b>${esc(st.ko)}</b> · ${esc(stageState(st))}${st.s?.games ? ` · ${st.s.games}게임째` : ''}</p>
+  return `<p class="lead" style="margin-top:4px"><b>${esc(st.ko)}</b> · ${esc(stageState(st))} ${gameNow(st.s)}</p>
   <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${res ? PTS_TH : '<th class="r">조별 순위</th>'}${res && st.cut ? `<th class="r">${st.status === 'completed' ? '결과' : '현재 기준'}</th>` : ''}</tr></thead><tbody>
   ${rows.map((r, i) => `<tr class="${rowCls(r)}"><td class="rank">${res ? r.pos : i + 1}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${res ? ptsTd(r.pts, r.kills) : `<td class="r num">${r.seed ?? '–'}</td>`}${res && st.cut ? `<td class="r small muted">${r.pos <= st.cut ? esc(st.up) : esc(st.down)}</td>` : ''}</tr>`).join('')}
   </tbody></table></div>`;
@@ -958,7 +958,7 @@ function isKrSeries(s) {
 
 function matchItem(s) {
   const state = seriesState(s);
-  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE${s.games ? ` ${s.games}/${s.matches || '?'}게임` : ''}</span>${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
+  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
   let res = '';
   if (s.results?.length) {
     const top = s.results[0];
@@ -1281,6 +1281,17 @@ const schedTable = (B) => `<section class="sec" aria-labelledby="h-st-sch"><h2 c
   ${B.list.map((st) => `<tr><td><a href="${qsLink(B.base, B.q, { m: st.key })}">${esc(st.ko)}</a></td><td class="num">${esc(stWhen(st))}</td><td class="r">${st.key === 'gs' ? '' : gameCount(st.s, st.key === 'f')}</td><td class="r small">${esc(stageState(st))}</td></tr>`).join('')}
   </tbody></table></div></section>`;
 
+// 점수창의 진행 상황: 'N매치 진행 중'(게임 중) / 'N매치 완료'(게임 사이·끝) — 게임별 상태를 아직 모르면 'N게임째'
+function gameNow(s) {
+  if (!s) return '';
+  if (s.status === 'completed' && !s.live) return s.matches ? `<span class="gnow done">${s.matches}매치 완료</span>` : '';
+  if (!(s.live || s.status === 'live')) return '';
+  const g = GAMES[s.id]?.by, nums = g ? Object.keys(g).map(Number) : [];
+  const done = s.gDone ?? (nums.length ? nums.filter((n) => g[n].st === 'completed').length : null);
+  const live = s.gLive ?? (nums.length ? nums.find((n) => g[n].st === 'live') || 0 : null);
+  if (done == null) return s.games ? `<span class="gnow live">${s.games}게임째</span>` : '';
+  return live ? `<span class="gnow live"><i></i>${live}매치 진행 중</span>` : `<span class="gnow wait">${done}매치 완료</span>`;
+}
 // 그림(SVG) 안에 넣을 게임 수 글자 (gameCount 와 같은 규칙)
 const gcText = (st) => { const s = st.s, done = st.status === 'completed', played = done ? s?.matches || 0 : st.status === 'live' ? s?.games || 0 : 0; return st.key === 'f' ? (played ? `<tspan>결승</tspan> · ${played}G` : '<tspan>결승</tspan>') : `${played}/${s?.matches || 6}`; };
 // 진행 방식 그림 (LCQ·챔피언십 공통). 상자 = 경기(상태·시각·관심 팀), 화살표 = 진출. 상자를 누르면 그 경기 탭
@@ -1363,7 +1374,7 @@ const stTab = (st) => (st.tabText != null ? st.tabText : st.start && !st.tbd ? `
 // 경기 탭 머리 (LCQ·챔피언십 공통): 이름·상태·시각, 출전과 진출 규칙 한 줄, 점수표
 function stageMatch(B, st) {
   const x = st.s;
-  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
   const flow = B.FLOW[st.key];
   const from = st.from || (flow ? flow.map(([k, a, b]) => `<span>${esc(`${B[k].tab} ${a}~${b}위`)}</span>`).join(' + ') : '');
   const rule = st.key === 'f' ? `매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승${st.top ? ` · 상위 ${st.top}팀 챔피언십 진출` : ''}` : st.cut ? `1~${st.cut}위 → ${st.up} · ${st.cut + 1}~${st.n}위 → ${st.down}` : '';
@@ -1714,7 +1725,7 @@ function groupTable(ev) {
 // 브래킷 한 단계: 결과가 있으면 점수표, 없으면 출전 명단(확정 또는 예상)
 function stageTable(st) {
   const x = st.s;
-  const tag = st.status === 'live' ? `<span class="tag live">LIVE${x?.games ? ` ${x.games}/${x.matches || 6}게임` : ''}</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
+  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
   const top = `<div class="bk-stage-h"><h3 class="h3">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h3> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? dateTime(st.start) + ' ' + TZL : ''}</span></div>`;
   const res = x?.results;
   let body;
@@ -2814,6 +2825,15 @@ async function pollDirect() {
       s.kr = (s.results || []).filter((x) => x.kr !== 'none').map((x) => x.short);
       s.live = st.seriesStatus === 'live';
       s.liveAt = Date.now();
+      // 게임별 상태: 몇 게임이 끝났고 지금 몇 번째 게임이 진행 중인지 (점수창의 'N매치 진행 중 / N매치 완료')
+      if (s.live) {
+        const m = await fetch(`${LIVE.api}/series/${s.id}/matches`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+        if (m?.matches) {
+          const fin = (y) => y.status === 'completed' || y.inGameStatus === 'postmatch';
+          const gDone = m.matches.filter(fin).length, gLive = m.matches.find((y) => y.status === 'live' && !fin(y))?.matchNumber || 0;
+          if (gDone !== s.gDone || gLive !== s.gLive) { s.gDone = gDone; s.gLive = gLive; changed = true; }
+        }
+      }
       if (st.seriesStatus === 'completed' && s.status !== 'completed') { s.status = 'completed'; s.live = false; s.liveFinal = true; justDone = true; }
     } catch {}
   }

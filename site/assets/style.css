@@ -1539,3 +1539,10 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 .bf-arrow.up { fill: var(--up); } .bf-arrow.down { fill: var(--down); }
 .bf-elab.up { fill: var(--up); font-weight: 800; } .bf-elab.down { fill: var(--down); }
 .bf-note.out { fill: var(--out); font-weight: 800; } .bf-note.champ { fill: var(--champ); font-weight: 800; }
+/* 점수창 진행 상황: N매치 진행 중 / N매치 완료 */
+.gnow { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border-radius: 4px; font: 700 12px/1.6 var(--display, Inter), Pretendard, sans-serif; white-space: nowrap; vertical-align: 1px; }
+.gnow.live { color: #fff; background: var(--ring); }
+.gnow.live i { width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+@media (prefers-reduced-motion: no-preference) { .gnow.live i { animation: blink 1.6s ease-in-out infinite; } }
+.gnow.wait { color: var(--ink); background: var(--raise, var(--card)); border: 1px solid var(--rule); }
+.gnow.done { color: var(--steel); border: 1px solid var(--rule); }
