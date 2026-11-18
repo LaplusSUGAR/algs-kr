@@ -429,6 +429,7 @@ function render() {
   const on = app.querySelector('.lcq-tabs [aria-current="true"]');
   if (on) { const bar = on.closest('.lcq-tabs'); bar.scrollLeft = on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2; }
   { const ps = app.querySelector('.poi-scroll.big'); if (ps) ps.scrollLeft = (ps.scrollWidth - ps.clientWidth) / 2; } // POI 지도 크게 보기: 가운데부터
+  fitRing();
   setPageTitle(parts, q);
 }
 
@@ -906,37 +907,131 @@ function heroCard(k) {
   </section>`;
 }
 
-// 챔피언십 포인트 순위 위의 한국 팀 위치 (이 사이트의 대표 시각 요소)
+// 챔피언십 포인트 순위 위의 관심 팀 위치 (이 사이트의 대표 시각 요소)
+// 그림은 실제 화면 폭(px)에 맞춰 브라우저에서 그린다(fitRing): 글자 크기가 화면 폭에 따라 커지거나 작아지지 않고,
+// 이름표가 겹치지 않게 줄(최대 3줄)을 나눠 놓다가 자리가 모자라면 가장 가까운 팀끼리 묶어 'n팀 a~b위'로 보여 준다.
+// 묶인 팀이 있으면 그림 아래에 전체 팀을 순위 칩(직행권 / LCQ)으로 나열한다.
+let RING = null;
 function ringLine(krs) {
   const N = A.cp.length, cut = A.season.cpDirectSlots;
   if (!N) return '';
-  const W = 440, L = 12, R = 428, y = 72;
-  const x = (rank) => L + ((rank - 1) / (N - 1)) * (R - L);
-  const pts = krs.filter((k) => k.cp).sort((a, b) => a.cp.rank - b.cp.rank);
-  const lanesEnd = [-99, -99, -99, -99];
-  const marks = pts.map((k) => {
-    const px = x(k.cp.rank), half = (k.short.length + String(k.cp.rank).length + 1) * 3.6 + 4;
-    let lane = lanesEnd.findIndex((e) => px - half > e);
-    if (lane < 0) lane = 3;
-    lanesEnd[lane] = px + half;
-    const ly = y - 14 - lane * 15;
-    const filled = k.level === 'team';
-    const col = { team: 'var(--kr-team)', member: 'var(--kr-member)', coach: 'var(--coach)' }[k.level];
-    return `<g class="marker"><line x1="${px}" y1="${ly + 3}" x2="${px}" y2="${y - 6}" stroke="${col}" stroke-width="1"/>
-<circle cx="${px}" cy="${y}" r="5.5" fill="${col}" stroke="var(--paper)" stroke-width="1"/>
-      <text x="${px}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">${esc(k.short)} ${k.cp.rank}</text></g>`;
-  }).join('');
-  const ticks = [1, 32, 60, 90, N].map((r) => `<text x="${x(r)}" y="${y + 22}" text-anchor="middle" font-size="10.5" fill="var(--steel)">${r}위</text>`).join('');
-  return `<section class="ringline" aria-label="챔피언십 포인트 순위에서 한국 팀 위치">
-    <svg viewBox="0 0 ${W} 104" role="img" aria-label="챔피언십 포인트 ${N}팀 중 ${ML().group} 팀 위치, ${cut}위까지 직행">
-      <rect x="${L}" y="${y - 2}" width="${x(cut) - L}" height="4" rx="2" fill="var(--ink)"/>
-      <rect x="${x(cut)}" y="${y - 1}" width="${R - x(cut)}" height="2" rx="1" fill="var(--rule)"/>
-      <line x1="${x(cut) + 0.5}" y1="${y - 10}" x2="${x(cut) + 0.5}" y2="${y + 10}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 2"/>
-      ${ticks}${marks}
-    </svg>
+  const mid = mainId();
+  const pts = krs.filter((k) => k.cp).sort((a, b) => a.cp.rank - b.cp.rank)
+    .map((k) => ({ short: k.short, rank: k.cp.rank, level: k.level, main: !!mid && team(k.short)?.id === mid }));
+  RING = { N, cut, pts };
+  return `<section class="ringline" aria-label="챔피언십 포인트 순위에서 ${esc(ML().group)} 팀 위치">
+    <div class="rl-box" data-ring></div>
     <p class="caption">챔피언십 포인트 ${N}팀 중 위치 (${board().state === 'live' ? '실시간 정산' : board().state === 'pending' ? '최종 순위 정산' : '공식'} 기준). 굵은 선 안쪽(${cut}위까지)이 챔피언십 직행입니다.</p>
   </section>`;
 }
+const RING_COL = { team: 'var(--kr-team)', member: 'var(--kr-member)', coach: 'var(--coach)' };
+let ringCtx = null;
+function ringTextW(s, weight = 700, size = 11.5) {
+  try {
+    ringCtx ||= document.createElement('canvas').getContext('2d');
+    ringCtx.font = `${weight} ${size}px ${getComputedStyle(document.body).fontFamily}`;
+    return ringCtx.measureText(s).width;
+  } catch { return s.length * size * 0.62; }
+}
+// 이름표 놓기: 왼쪽부터 빈 줄을 찾고(위 줄의 세로선이 아래 줄 글자를 뚫지 않게), 못 놓으면 가장 가까운 두 묶음을 합쳐 처음부터 다시
+function ringLayout(W) {
+  const { N, pts } = RING, L = 14, R = W - 14, LANES = 3, GAP = 8;
+  const x = (rank) => L + ((rank - 1) / Math.max(1, N - 1)) * (R - L);
+  const tr = (s) => I.t(s);
+  let groups = pts.map((p) => ({ items: [p] }));
+  const label = (g) => {
+    const it = g.items;
+    if (it.length === 1) return { a: `${it[0].short} ${it[0].rank}`, b: '' };
+    return { a: tr(`${it.length}팀`), b: tr(`${it[0].rank}~${it[it.length - 1].rank}위`) };
+  };
+  for (let guard = 0; guard < 200; guard++) {
+    const lanes = Array(LANES).fill(-1e9), placed = [], stems = [];
+    let fail = -1;
+    for (let gi = 0; gi < groups.length; gi++) {
+      const g = groups[gi], it = g.items;
+      g.x0 = x(it[0].rank); g.x1 = x(it[it.length - 1].rank);
+      const lb = label(g);
+      g.la = lb.a; g.lb = lb.b;
+      g.w = ringTextW(lb.a) + (lb.b ? 4 + ringTextW(lb.b, 500, 10.5) : 0);
+      const mx = it.reduce((s, p) => s + x(p.rank), 0) / it.length;
+      g.cx = Math.min(Math.max(mx, g.w / 2 + 2), W - g.w / 2 - 2);
+      const lo = g.cx - g.w / 2, hi = g.cx + g.w / 2;
+      g.lane = -1;
+      for (let k = 0; k < LANES; k++) {
+        if (lo - GAP <= lanes[k]) continue;
+        if (stems.some((s) => s.lane > k && s.x >= lo - 3 && s.x <= hi + 3)) continue; // 위 줄 세로선을 덮지 않게
+        if (placed.some((p) => p.lane < k && g.cx >= p.lo - 3 && g.cx <= p.hi + 3)) continue; // 내 세로선이 아래 줄 글자를 뚫지 않게
+        g.lane = k; break;
+      }
+      if (g.lane < 0) { fail = gi; break; }
+      lanes[g.lane] = hi;
+      placed.push({ lane: g.lane, lo, hi });
+      stems.push({ lane: g.lane, x: g.cx });
+    }
+    if (fail < 0) return { groups, x, L, R, lanes: Math.max(1, ...groups.map((g) => g.lane + 1)) };
+    // 가장 가까운(점 사이 거리) 이웃 묶음 둘을 합친다. 대표 응원 팀은 따로 남기고, 직행선(cut)을 넘어서 묶지 않는다
+    let best = -1, bd = Infinity;
+    for (let i = 0; i < groups.length - 1; i++) {
+      const a = groups[i], b = groups[i + 1];
+      if (a.items.some((p) => p.main) || b.items.some((p) => p.main)) continue;
+      if ((a.items[0].rank <= RING.cut) !== (b.items[0].rank <= RING.cut)) continue; // 직행권과 LCQ 권은 섞지 않는다
+      const d = x(b.items[0].rank) - x(a.items[a.items.length - 1].rank);
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) return { groups: groups.map((g) => ({ ...g, lane: Math.max(0, g.lane) })), x, L, R, lanes: LANES };
+    groups.splice(best, 2, { items: [...groups[best].items, ...groups[best + 1].items] });
+  }
+  return null;
+}
+function ringSvg(W) {
+  const { N, cut } = RING;
+  const lay = ringLayout(W);
+  if (!lay) return '';
+  const { groups, x, L, R } = lay, LH = 17;
+  const y = 14 + lay.lanes * LH + 14, H = y + 26;
+  const ly = (lane) => y - 18 - lane * LH;
+  const marks = groups.map((g) => {
+    const it = g.items, multi = it.length > 1, top = ly(g.lane);
+    const tip = it.map((p) => `#${p.rank} ${p.short}`).join(', ');
+    const dots = it.map((p) => {
+      const px = x(p.rank), col = RING_COL[p.level] || RING_COL.team;
+      return `<circle cx="${px.toFixed(1)}" cy="${y}" r="${p.main ? 6.5 : multi ? 4.5 : 5.5}" fill="${col}" stroke="var(--paper)" stroke-width="${p.main ? 2 : 1}"${p.main ? ' class="rl-main"' : ''}/>`;
+    }).join('');
+    const stemTo = multi ? y - 10 : y - 6;
+    const bracket = multi ? `<path d="M${(g.x0).toFixed(1)} ${y - 7}V${y - 10}H${(g.x1).toFixed(1)}V${y - 7}" class="rl-br"/>` : '';
+    const stemX = multi ? Math.min(Math.max(g.cx, g.x0), g.x1) : x(it[0].rank);
+    const main = it.some((p) => p.main);
+    return `<g class="marker${multi ? ' grp' : ''}${main ? ' main' : ''}"><title>${esc(tip)}</title>${bracket}<path d="M${g.cx.toFixed(1)} ${top + 4}L${stemX.toFixed(1)} ${stemTo}" class="rl-stem"${multi ? '' : ` style="stroke:${RING_COL[it[0].level] || RING_COL.team}"`}/>${dots}
+      <text x="${g.cx.toFixed(1)}" y="${top}" text-anchor="middle" class="rl-lb"><tspan class="a">${esc(g.la)}</tspan>${g.lb ? `<tspan class="b" dx="4">${esc(g.lb)}</tspan>` : ''}</text></g>`;
+  }).join('');
+  const tickR = [...new Set([1, cut, 60, 90, N])].filter((r) => r >= 1 && r <= N);
+  const ticks = tickR.filter((r, i) => i === 0 || r === cut || r === N || (Math.abs(x(r) - x(cut)) > 34 && Math.abs(x(N) - x(r)) > 34))
+    .map((r) => `<text x="${x(r).toFixed(1)}" y="${y + 21}" text-anchor="middle" class="rl-tk">${r}위</text>`).join('');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="챔피언십 포인트 ${N}팀 중 ${esc(ML().group)} 팀 위치, ${cut}위까지 직행">
+      <rect x="${L}" y="${y - 2}" width="${(x(cut) - L).toFixed(1)}" height="4" rx="2" fill="var(--ink)"/>
+      <rect x="${x(cut).toFixed(1)}" y="${y - 1}" width="${(R - x(cut)).toFixed(1)}" height="2" rx="1" fill="var(--rule)"/>
+      <line x1="${(x(cut) + 0.5).toFixed(1)}" y1="${y - 10}" x2="${(x(cut) + 0.5).toFixed(1)}" y2="${y + 10}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 2"/>
+      ${ticks}${marks}
+    </svg>`;
+  // 묶인 팀이 있으면 전체 팀을 순위 칩으로 (직행권 / LCQ)
+  if (!groups.some((g) => g.items.length > 1)) return svg;
+  const chip = (p) => `<a class="rl-chip${p.main ? ' main' : ''}" href="#/teams/${encodeURIComponent(p.short)}" style="--c:${RING_COL[p.level] || RING_COL.team}"><i>${p.rank}</i>${esc(p.short)}</a>`;
+  const inn = RING.pts.filter((p) => p.rank <= cut), out = RING.pts.filter((p) => p.rank > cut);
+  const row = (h, sub, list) => (list.length ? `<div class="rl-row"><span class="rl-h"><b>${h}</b> <small>${sub ? `${sub} · ` : ''}${list.length}팀</small></span><div class="rl-chips">${list.map(chip).join('')}</div></div>` : '');
+  return `${svg}<div class="rl-list">${row('직행권', `1~${cut}위`, inn)}${row('LCQ', '', out)}</div>`;
+}
+let ringW = 0;
+function fitRing() {
+  const box = app.querySelector('.ringline [data-ring]');
+  if (!box || !RING) return;
+  const w = Math.round(box.clientWidth);
+  if (!w) return;
+  if (box.firstChild && Math.abs(w - ringW) < 2 && box.dataset.k === ringKey()) return;
+  ringW = w; box.dataset.k = ringKey();
+  box.innerHTML = ringSvg(w);
+  I.tree(box);
+}
+const ringKey = () => `${RING.N}|${RING.cut}|${RING.pts.map((p) => `${p.short}${p.rank}${p.level}${p.main ? '*' : ''}`).join(',')}`;
 
 function intlMini() {
   const rows = A.intl.rows;
@@ -2974,6 +3069,7 @@ function measureStick() {
 }
 measureStick();
 addEventListener('resize', measureStick);
+{ let rt = 0; addEventListener('resize', () => { cancelAnimationFrame(rt); rt = requestAnimationFrame(fitRing); }); }
 footer();
 loadStreamsCache();
 if (C.streamsUrl) pollStreams(); // 화면을 그리기 전에 요청부터 보낸다
