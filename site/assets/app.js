@@ -1745,7 +1745,7 @@ function stageMatch(B, st) {
 //   핀에 마우스를 올리거나(키보드 포커스·휴대폰은 누르기) 팀 로고·이름·낙하 지점이 뜨고, 같은 번호의 표 줄이 함께 강조된다.
 //   끝난 드래프트는 빌드가 확정해 둔 목록(A.poi[시리즈].maps)을 쓴다. 아직 안 끝난 드래프트는 시작 15분 전부터, 그 구역을 보고 있는 동안만
 //   브라우저가 공식 API에서 직접 받아 선택이 나오는 대로 보여 주고(경기 점수 실시간과 같은 방식), 끝나면 멈춘다. 빌드가 확정한 목록이 오면 그것으로 바뀐다.
-let poiBig = false; // 좁은 화면에서 지도를 크게 보는지 (가로로 밀어서 본다)
+let poiBig = false; // 크게 보기: 좁은 화면은 지도를 가로로 밀어서 보고, 넓은 화면(900px 이상)은 화면 전체에 왼쪽 지도·오른쪽 팀 목록
 const POI_LIVE = {}; // 시리즈 ID → { maps, picked, total, done, active, missed } (공식 API에서 직접 받은 진행 상황)
 let poiWatch = null, poiAsked = null; // 지금 화면에 있는 안 끝난 드래프트 { id, draft, date } / 방금 바로 확인을 요청한 시리즈
 const poiSlug = (x) => String(x || '').toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); // scripts/poi-maps.mjs 와 같은 규칙
@@ -1804,9 +1804,9 @@ function poiSection(B, st) {
   const seg = src.maps.length > 1 ? `<div class="seg" role="group" aria-label="지도">${src.maps.map((m) => `<a href="${qsLink(B.base, B.q, { pm: m.map })}" data-keep-scroll aria-current="${m === cur}">${esc(m.map)}</a>`).join('')}</div>` : '';
   const status = P.done ? '' : !L ? '' : L.done ? '<p class="poi-live"><span class="tag">종료</span> <span>드래프트가 끝났습니다. 공식 기록으로 곧 확정됩니다.</span></p>'
     : `<p class="poi-live"><span class="tag live">LIVE</span> <span>POI 드래프트 진행 중</span> <small class="muted">${L.picked}/${L.total}</small>${L.active ? ` <span>지금 고르는 팀:</span> <b>${esc(L.active)}</b>` : ''}</p>`;
-  return `${head}${status}
+  return `${poiBig ? head.replace('class="sec poi"', 'class="sec poi big"') : head}${status}
     <p class="caption"><span>팀별 낙하 지점(POI) 선택입니다.</span> <span>핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.</span> <span>출처: ALGS 공식 사이트</span></p>
-    <div class="poi-bar">${seg}<button type="button" class="link-btn poi-zoom" data-poi-zoom aria-pressed="${poiBig}">${poiBig ? '작게 보기' : '크게 보기'}</button></div>
+    <div class="poi-bar">${seg}<button type="button" class="link-btn poi-zoom" data-poi-zoom aria-pressed="${poiBig}">${poiBig ? '작게 보기' : '크게 보기'}</button>${poiBig ? '<button type="button" class="poi-close" data-poi-zoom aria-label="닫기">✕</button>' : ''}</div>
     <figure class="poi-fig"><div class="poi-scroll${poiBig ? ' big' : ''}"><div class="poi-map"><img class="poi-base" src="${esc(cur.base)}" width="1255" height="1255" alt="${esc(cur.map)}" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">${cur.picks.map(pin).join('')}</div></div></figure>
     <div class="tbl-wrap"><table class="tbl poi-tbl"><thead><tr><th>#</th><th>팀</th><th>낙하 지점</th></tr></thead><tbody>${cur.picks.map(row).join('')}${missed.join('')}</tbody></table></div></section>`;
 }
@@ -1821,9 +1821,19 @@ function poiSection(B, st) {
     const pin = e.target.closest?.('.poi-pin');
     document.querySelectorAll('.poi-pin.on').forEach((x) => { if (x !== pin) x.classList.remove('on'); });
     if (pin) pin.classList.toggle('on');
+    // 팀 목록 줄을 누르면(팀 이름 링크 말고) 지도에서 그 팀 핀의 설명을 연다
+    const tr = !pin && !e.target.closest?.('a') && e.target.closest?.('.poi-tbl tr[data-n]');
+    if (tr) tr.closest('.poi').querySelector(`.poi-pin[data-n="${tr.dataset.n}"]`)?.classList.add('on');
     if (e.target.closest?.('[data-poi-zoom]')) { poiBig = !poiBig; render(); }
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.poi-pin.on').forEach((x) => x.classList.remove('on')); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (document.querySelector('.poi-pin.on')) document.querySelectorAll('.poi-pin.on').forEach((x) => x.classList.remove('on'));
+    else if (poiBig && document.querySelector('.poi.big')) { poiBig = false; render(); } // 크게 보기 닫기
+  });
+  // 다른 경기·지역·화면으로 가면 크게 보기를 닫는다 (지도(pm)만 바꿀 때는 그대로)
+  let poiKey = location.hash.replace(/([?&])pm=[^&]*/, '$1');
+  addEventListener('hashchange', () => { const k = location.hash.replace(/([?&])pm=[^&]*/, '$1'); if (k !== poiKey) poiBig = false; poiKey = k; });
 }
 /* ---------- 순위 탭: 선택줄 고정 · 넘침 표시 · 탭 전환 스크롤 · 관심 팀 이동 · 선수 이름 펼치기 ---------- */
 // 지역·경기 선택줄은 스크롤해도 머리말 아래에 붙어 있다. 앞의 빈 표시(.st-stick-at)는 선택줄이 원래 있던 자리
