@@ -1655,3 +1655,78 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 .rp-err { padding: 14px; border: 1px solid var(--rule); border-radius: var(--r-sm, 6px); background: var(--card); font-size: 13.5px; margin-top: 12px; }
 .rp-err p { margin: 0; }
 .rp-retry { margin-top: 10px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font: 650 13px var(--body); cursor: pointer; }
+
+/* ---------- 포인트 탭 (11-19): 휴대폰에서 표가 화면 안에 들어오게, PC는 CP 막대 ---------- */
+/* 챔피언십 포인트 표: 상태 칸은 넓은 화면만, 휴대폰은 CP 숫자 아래 작은 글자 */
+.cp-tbl .st-sm, .pts-side .gap-sm { display: none; }
+.cp-tbl .st-sm { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; margin-top: 1px; }
+.cp-tbl .st-sm.ok { color: var(--ok); }
+.cp-tbl .st-sm.lcq { color: var(--steel); }
+.cp-tbl td.team small.reg { margin-left: 4px; }
+/* CP 막대와 직행선 차이: 768px 이상 */
+.cp-tbl .cpx { display: none; }
+@media (min-width: 768px) {
+  .cp-tbl .cpx { display: table-cell; }
+  .cp-tbl td.cp-barc { width: 34%; padding-right: 16px; }
+  .cp-tbl th.cp-barh { font-size: 11px; }
+  .cp-tbl th.cp-barh small { font-weight: 600; color: var(--steel); letter-spacing: 0; }
+  .cp-tbl td.cpx.num { white-space: nowrap; }
+}
+.cp-bar { position: relative; display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--steel) 16%, transparent); }
+.cp-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--ok); }
+.cp-bar i.lcq { background: color-mix(in srgb, var(--steel) 55%, transparent); }
+.cp-bar b { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink, currentColor); opacity: .75; }
+@media (max-width: 520px) {
+  .cp-tbl .cp-st { display: none; }
+  .cp-tbl .st-sm { display: block; }
+  .cp-tbl td.team { white-space: nowrap !important; max-width: 0; width: 100%; }
+  .cp-tbl td.team .tl { display: inline-flex; max-width: calc(100% - 14px); vertical-align: middle; }
+  .cp-tbl td.team .tl > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp-tbl td.team small.reg { display: block; margin: 1px 0 0 25px; }
+  .cp-tbl .tie { white-space: normal; }
+  .cp-tbl .krdot, .pts-side .krdot { vertical-align: middle; }
+  .cp-tbl td.team .sub-note { white-space: normal; }
+  /* 한국 관련 팀 요약: 차이는 팀 이름 아래로, 이름은 한 줄 */
+  .pts-side .tbl td.opt { display: none; }
+  .pts-side .gap-sm { display: block; margin: 1px 0 0 25px; font-size: 11px; color: var(--steel); font-weight: 500; }
+  .pts-side .tbl td.team { white-space: nowrap !important; max-width: 0; width: 100%; }
+  .pts-side .tbl td.team .tl { display: inline-flex; max-width: calc(100% - 14px); vertical-align: middle; }
+  .pts-side .tbl td.team .tl > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+/* 표에서 찾기 */
+.cp-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 4px; }
+.cp-jump > span { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--steel); margin-right: 2px; }
+.cp-jump button { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 3px 10px 3px 6px; border: 1px solid var(--rule); border-left: 3px solid var(--kc-col, var(--rule)); border-radius: 4px; background: var(--card, var(--paper)); color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; }
+.cp-jump button.main { border-color: var(--apex); border-left-color: var(--apex); }
+.cp-jump button:hover { background: var(--paper); }
+.cp-jump .tlogo { width: 18px; height: 18px; }
+@keyframes cpJump { 0%, 45% { background-color: color-mix(in srgb, var(--apex) 22%, transparent); } 100% { background-color: transparent; } }
+tr.jumped > td { animation: cpJump 2s ease-out; }
+@media (prefers-reduced-motion: reduce) { tr.jumped > td { animation: none; background-color: color-mix(in srgb, var(--apex) 16%, transparent); } }
+
+/* 대회별 CP 내역: 대회 고르기는 스플릿마다 한 줄(줄바꿈), 휴대폰은 받은 선수를 팀 이름 아래로 */
+.ev-pick { display: grid; gap: 6px; margin: 12px 0 4px; }
+.ev-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ev-row > b { width: 28px; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--steel); }
+.ev-row a { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 11px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card, var(--paper)); color: inherit; font-size: 12.5px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.ev-row a:hover { border-color: var(--steel); }
+.ev-row a[aria-current="true"] { background: var(--ink, #111); border-color: var(--ink, #111); color: var(--paper); }
+.tbl .ev-pls { display: none; }
+@media (max-width: 520px) {
+  .tbl .ev-plc { display: none; }
+  .tbl td.team .ev-pls { display: block; margin: 3px 0 0 25px; font-size: 11.5px; line-height: 1.45; white-space: normal; color: var(--steel); }
+  .tbl td.team .ev-pls a { color: inherit; }
+  .ev-tbl td.team { max-width: 0; width: 100%; }
+  .ev-tbl th { white-space: normal; }
+}
+
+/* 프로리그 포인트: 휴대폰은 PO 배지 대신 초록 점, 긴 팀 이름은 줄임 */
+.pl-tbl .po-dot { display: none; }
+@media (max-width: 520px) {
+  .pl-tbl .po-tag { display: none; }
+  .pl-tbl .po-dot { display: inline-block; width: 7px; height: 7px; margin-left: 5px; border-radius: 50%; background: var(--ok); vertical-align: middle; }
+  .pl-tbl td.team { white-space: nowrap !important; }
+  .pl-tbl .cut-label td, .pl-tbl th { white-space: normal; }
+  .pl-tbl td.team .tl { display: inline-flex; vertical-align: middle; }
+  .pl-tbl td.team .tl > span:last-child { display: inline-block; max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
