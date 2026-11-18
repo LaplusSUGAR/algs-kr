@@ -1987,6 +1987,6 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 /* 응원 팀 고르기 칩: 로고 종류(이미지·약칭 배지·같은 로고 표시)와 상관없이 모두 같은 크기 (로고는 왼쪽 두 줄, 약칭·이름은 오른쪽 위아래로 자리 고정) */
 .fav-chip { grid-template-columns: 28px minmax(0, 1fr); grid-template-rows: 1fr 1fr; height: 56px; box-sizing: border-box; row-gap: 2px; }
 .fav-chip > :first-child { grid-column: 1; grid-row: 1 / span 2; width: 28px; height: 28px; align-self: center; margin: 0; }
-.fav-chip > .lgb > .tlogo, .fav-chip > .tlogo { width: 28px; height: 28px; object-fit: contain; box-sizing: border-box; }
+.fav-chip > .tlogo { width: 28px; height: 28px; object-fit: contain; box-sizing: border-box; }
 .fav-chip > b { grid-column: 2; grid-row: 1; align-self: end; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fav-chip > small { grid-column: 2; grid-row: 2; align-self: start; }
