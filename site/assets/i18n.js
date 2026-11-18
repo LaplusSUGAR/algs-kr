@@ -195,6 +195,16 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
+    // 홈 대회 카드·다음 경기·대표 팀 카드 (2026-11-19)
+    ['진행 중인 대회', '開催中の大会', 'Event in progress'], ['다가오는 대회', '次の大会', 'Upcoming event'], ['지난 대회 결과', '前回の大会結果', 'Latest event results'],
+    ['지역 대회', '地域大会', 'Regional event'], ['세계 대회', '世界大会', 'Global event'], ['대회 결과', '大会結果', 'Event results'], ['시각은 {t} 기준입니다.', '時刻は{1}基準です。', 'Times in {1}.'],
+    ['진출', '通過', 'Qualified'], ['시작 전', '開始前', 'Not started'], ['첫 경기', '初戦', 'First match'], ['관심 팀', '注目チーム', 'Your teams'], ['남은 자리', '残り枠', 'Open spots'],
+    ['LCQ {n}팀', 'LCQ {1}チーム', 'LCQ {1} teams'], ['{t} 결정', '{1} 決定', 'decided {1}'], ['LCQ 진출', 'LCQ通過', 'via LCQ'],
+    ['{x} {n}위 ↑', '{1} {2}位 ↑', '{1} {2o} ↑'], ['{x} {n}위 ↓', '{1} {2}位 ↓', '{1} {2o} ↓'], ['{x} {n}위 탈락', '{1} {2}位 敗退', '{1} {2o}, out'], ['{x} {n}위 진출', '{1} {2}位 通過', '{1} {2o}, qualified'], ['{x} LIVE {n}위', '{1} LIVE {2}位', '{1} LIVE {2o}'], ['{x} LIVE', '{1} LIVE', '{1} LIVE'],
+    ['+{n}팀', '+{1}チーム', '+{1} teams'], ['출전', '出場', 'Entered'], ['내일', '明日', 'Tomorrow'], ['캘린더에 추가', 'カレンダーに追加', 'Add to calendar'],
+    ['대회 중', '大会中', 'Event day'], ['지금 Apex 방송 중인 채널이 없습니다.', '今Apexを配信中のチャンネルはありません。', 'No channels are streaming Apex right now.'], ['공식 중계 채널 보기', '公式配信チャンネルを見る', 'Official broadcast channels'],
+    ['챔피언십 직행 확정', 'チャンピオンシップ出場確定', 'Championship qualified'], ['챔피언십 직행권', 'チャンピオンシップ直行圏', 'In Championship qualifying spots'], ['{n}위까지 직행', '{1}位まで直行', 'top {1} qualify'], ['지금 기준', '現時点', 'as of now'],
+    ['지역마다 상위 2팀이 챔피언십으로', '各地域上位2チームがチャンピオンシップへ', 'top 2 per region go to the Championship'],
     // POI 드래프트 지도 (LCQ 경기 탭)
     ['팀별 낙하 지점(POI) 선택입니다.', 'チームごとの降下地点（POI）の選択です。', 'Each team’s landing spot (POI) pick.'],
     ['핀의 번호는 드래프트 선택 순서입니다. 핀에 마우스를 올리거나 누르면 팀과 낙하 지점이 보입니다.', 'ピンの番号はドラフトの指名順です。ピンにカーソルを合わせるかタップすると、チームと降下地点が表示されます。', 'Pin numbers show the draft pick order. Hover over or tap a pin to see the team and its landing spot.'],

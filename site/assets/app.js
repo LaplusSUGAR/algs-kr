@@ -619,7 +619,7 @@ function home() {
   const B = bracket();
   const evHome = eventHome();
   const showFlow = !evHome && B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
-  const upMix = [...upcoming.map((s) => ({ t: s.start, h: () => matchItem(s) })), ...extrasUpcoming().filter(isKrExtra).map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).slice(0, 3);
+  const upMix = [...upcoming.map((s) => ({ t: s.start, h: () => matchItem(s, { cd: true }) })), ...extrasUpcoming().filter(isKrExtra).map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).slice(0, 3);
   const upList = `<div class="up-list">${upMix.map((o) => o.h()).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
@@ -631,7 +631,7 @@ function home() {
     ${lead ? heroCard(lead) : '<p class="empty">현재 시즌에 한국 팀 데이터가 없습니다.</p>'}
     ${others.length ? krStrip(others) : ''}
     </div><div class="col-b">
-    ${lcqHome()}
+    ${evCard()}
     ${A.intl && !(champsDone() && /^champs/.test(A.intl.slug || '')) ? `<section class="sec" aria-labelledby="h-now">
       <div class="sec-head"><h2 class="h2" id="h-now">${intlCurrent() ? '지금 순위' : `${esc(ko(A.intl.name, EVENT_KO))} 결과`}</h2><a class="more" href="${intlCurrent() ? '#/standings' : '#/standings/past'}">자세히 보기</a></div>
       ${spoil(B?.started ? stageMini(B) : intlMini(), intlKey(), '순위')}
@@ -674,23 +674,163 @@ function nextCard(upcoming) {
   const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}${s.live ? ` ${gameNow(s)}` : ''}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
   return `<section class="nx${live ? ' live' : ''}" aria-labelledby="h-nx">
     <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn() : ''}</div>
-    <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : esc(hhmm(first.start))}</b></span></div>
+    <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : `${esc(hhmm(first.start))} <small class="nx-tz">${esc(TZL)}</small>`}</b>${live || first.timeTbd ? '' : `<small class="nx-rel">${rt(first.start, 'rel')}</small>`}</span></div>
     <ul class="nx-list">${rows}</ul>
-    <a class="nx-go" href="#/schedule">경기 일정 보기</a>
+    <div class="nx-act"><a class="nx-go" href="#/schedule">경기 일정 보기</a>${live || set.every((s) => s.timeTbd) ? '' : `<button type="button" class="nx-ics" data-ics="${esc(set.filter((s) => !s.timeTbd).map((s) => s.id).join(','))}" data-day="${esc(dayKey(first.start))}">캘린더에 추가</button>`}</div>
   </section>`;
 }
-function lcqHome() {
-  const evs = lcqEvents();
-  if (!evs.length || intlCurrent() || evs.every((e) => lcqBracket(e).done && now() - new Date(e.end) > 7 * 864e5)) return '';
-  const rows = evs.flatMap((e) => lcqBracket(e).E.list.filter((t) => isF(t.short)).map((t) => ({ ...t, region: e.region })));
-  const first = evs.map((e) => lcqBracket(e).list.find((st) => st.start && !st.tbd)?.start || e.start).sort()[0];
-  const max = 8;
-  return `<section class="sec" aria-labelledby="h-lcq"><div class="sec-head"><h2 class="h2" id="h-lcq">LCQ</h2><a class="more" href="#/standings">자세히 보기</a></div>
-    <p class="lead" style="margin-top:4px">${esc(dateTime(first))} 시작 · 지역마다 40팀 중 상위 2팀이 챔피언십에 갑니다.</p>
-    ${rows.length ? spoil(`<div class="tbl-wrap"><table class="tbl"><tbody>${rows.slice(0, max).map((t) => `<tr class="${rowCls(t)}"><td class="team">${krDot(null, t.short)}${teamLink(t.short, t.name)}<small>${esc(REGION[t.region])}</small></td><td class="r small">${esc(lcqState(t.short) || '')}</td></tr>`).join('')}</tbody></table></div>${rows.length > max ? `<p class="caption">외 ${rows.length - max}팀은 순위 탭에서 볼 수 있습니다.</p>` : ''}`, evs.some((e) => lcqBracket(e).started) ? `ev:${evs[0].eventId}` : null, 'LCQ 결과')
-      : `<p class="empty">LCQ에 나가는 ${esc(ML().group)} 팀이 없습니다.</p>`}
+/* ---------- 홈: 대회 카드 (지역 대회·세계 대회 공통) ---------- */
+// 시즌 일정표(A.season.timeline)에서 한 대회를 고른다: 진행 중 → 끝난 지 4일 안(다음 대회가 7일 안에 없을 때) → 다음 대회
+// 지역 대회(Online Open·Pro League·LCQ)는 지역마다 한 줄(지금 보기의 지역이 맨 위), 세계 대회(Playoffs·Championship)는 단계 + 관심 팀 위치
+// 제목은 상태에 따라 '다가오는 대회' · '진행 중인 대회' · '지난 대회 결과'
+const EV_REGIONS = ['apac-n', 'apac-s', 'emea', 'americas'];
+const EV_TITLE = { now: '진행 중인 대회', next: '다가오는 대회', done: '지난 대회 결과' };
+const evGlobal = (e) => /^s\dpo$|^champs$/.test(e.key) || /LAN/.test(e.where || '');
+const kstDay = (d) => Date.parse(`${d}T00:00:00+09:00`);
+const evDays = (d) => Math.round((kstDay(d) - Date.parse(dayKey(new Date(now()).toISOString()) + 'T00:00:00+09:00')) / 864e5);
+function evPick() {
+  const tl = A.season.timeline || [];
+  const cur = tl.find((e) => tlState(e) === 'now');
+  if (cur) return { e: cur, st: 'now' };
+  const nx = tl.find((e) => tlState(e) === 'next');
+  const last = tl.filter((e) => tlState(e) === 'done').at(-1);
+  if (last && last.key !== 'champs' && (!nx || evDays(nx.start) > 7) && now() - kstDay(last.end) < 4 * 864e5) return { e: last, st: 'done' };
+  return nx ? { e: nx, st: 'next' } : null; // 챔피언십이 끝난 뒤에는 시즌 결과(seasonEnd)가 대신한다
+}
+// 지금 보기의 지역: 한국 팀 → APAC North, 지역 보기 → 그 지역, 내 응원 팀 → 대표 팀 지역부터 고른 팀들의 지역
+function evMine() {
+  if (opt.mode !== 'custom') return [ML().region || 'apac-n'];
+  const rs = Object.values(A.teams).filter((t) => opt.fav.includes(t.id) && t.region).map((t) => t.region);
+  return [...new Set([lcqRegionDefault(), ...rs])];
+}
+const evChip = (sh, label) => `<span class="evc ${CAT[krOf(sh)] || ''}">${esc(sh)}${label ? ` <small>${esc(label)}</small>` : ''}</span>`;
+// LCQ 한 지역: 시작 전이면 첫 경기 시각, 진행 중이면 지금 단계·게임, 끝나면 진출 2팀
+function evLcqRow(r) {
+  const e = lcqEvents().find((x) => x.region === r);
+  if (!e) return null;
+  const B = lcqBracket(e);
+  const live = B.list.find((st) => st.status === 'live');
+  const nx = B.list.find((st) => st.status !== 'completed' && st.start && !st.tbd);
+  let st, cls = '';
+  if (B.done) { const top = (B.f.s?.results || []).filter((x) => x.pos <= (B.f.top || 2)).map((x) => x.short); st = top.length ? `<small>진출</small> ${top.map((sh) => esc(sh)).join(' · ')}` : '종료'; }
+  else if (live) { st = `${esc(LCQ_SHORT[live.key])} ${gameNow(live.s) || '<span class="gnow live">진행 중</span>'}`; cls = 'live'; }
+  else if (nx) st = `${B.started ? `<small>${esc(LCQ_SHORT[nx.key])}</small> ` : ''}${rt(nx.start, 'dt')}`;
+  else st = '<small>시각 미정</small>';
+  const chips = B.E.list.filter((t) => isF(t.short)).map((t) => evChip(t.short, (lcqState(t.short) || '').replace(/^LCQ /, '')));
+  return { st, cls, chips, href: `#/standings?r=${r}`, started: B.started, key: `ev:${e.eventId}` };
+}
+// 프로리그 한 지역: 경기 일정은 APAC North 것만 받으므로, 일정이 있으면 다음 경기, 없으면 지역 1위
+function evPlRow(r, split) {
+  const p = A.pl[`s${split}:${r}`];
+  if (!p) return null;
+  const ss = A.series.filter((s) => s.region === r && /pro-league/.test(s.eventSlug || '') && s.status !== 'completed').sort((a, b) => a.start.localeCompare(b.start));
+  const started = p.rows.some((x) => x.rs > 0);
+  const live = ss.find((s) => s.live || s.status === 'live');
+  let st, cls = '';
+  if (live) { st = `${esc(ko(live.name, PHASE_KO))} ${gameNow(live) || '<span class="gnow live">진행 중</span>'}`; cls = 'live'; }
+  else if (ss[0] && !ss[0].timeTbd) st = `<small>다음 경기</small> ${rt(ss[0].start, 'dt')}`;
+  else st = started && p.rows[0] ? `<small>1위</small> ${esc(p.rows[0].short)}` : '<small>시작 전</small>';
+  const chips = p.rows.filter((x) => isF(x.short)).map((x) => evChip(x.short, started ? `${x.pos}위` : ''));
+  return { st, cls, chips, href: `#/points/pl?s=${split}`, started, key: started ? `pl:${split}` : null };
+}
+function evRegional(e) {
+  const m = /^s(\d)pl$/.exec(e.key);
+  const one = e.key === 'lcq' ? evLcqRow : m ? (r) => evPlRow(r, +m[1]) : null;
+  if (!one) return '';
+  const mine = evMine();
+  const regs = [...mine.filter((r) => EV_REGIONS.includes(r)), ...EV_REGIONS.filter((r) => !mine.includes(r))];
+  const rows = regs.map((r) => [r, one(r)]).filter(([, x]) => x);
+  if (!rows.length) return '';
+  const me = ML().region ? '' : `<span class="me">${esc(ML().label)}</span>`; // 지역 보기는 지역 이름이 같아 표시 없이 줄 색으로만
+  const CH = 6; // 지역 보기에서는 그 지역 팀이 모두 관심 팀이라 칩을 줄인다
+  const chipsOf = (c) => (c.length > CH ? `${c.slice(0, CH - 1).join('')}<small>+${c.length - CH + 1}팀</small>` : c.join(''));
+  const html = `<ul class="evr">${rows.map(([r, x]) => `<li class="${mine.includes(r) ? 'mine' : ''}"><a class="evr-n" href="${x.href}">${esc(REGION[r])}${mine.includes(r) ? me : ''}</a><span class="evr-s ${x.cls}">${x.st}</span><span class="evr-t">${x.chips.length ? chipsOf(x.chips) : esc(ML().none)}</span></li>`).join('')}</ul>`;
+  const sk = rows.find(([r, x]) => mine.includes(r) && x.started)?.[1].key || rows.find(([, x]) => x.started)?.[1].key || null;
+  return spoil(html, sk, '대회 결과');
+}
+// 세계 대회: 이 대회의 브래킷(플레이오프는 지금 국제전, 챔피언십은 사이트 계산 대진)
+function evGlobalBody(e, state) {
+  const m = /^s(\d)po$/.exec(e.key);
+  const B = e.key === 'champs' ? champsBracket() : m && A.intl && new RegExp(`^split-${m[1]}-playoffs`).test(A.intl.slug || '') ? bracket() : null;
+  const grp = (k) => (k === 'f' ? 2 : /^(g\d*|gs)$/.test(k) ? 0 : 1);
+  const L = (B?.list || []).filter((x) => x && x.status && x.status !== 'none');
+  const steps = ['조별 리그', '브래킷', '결승'].map((n, i) => { const xs = L.filter((x) => grp(x.key) === i); return { n, done: xs.length > 0 && xs.every((x) => x.status === 'completed'), live: xs.some((x) => x.status === 'live') }; });
+  const cur = state === 'next' ? 0 : steps.findIndex((x) => !x.done);
+  const stepHtml = B ? `<ol class="evs">${steps.map((x, i) => `<li class="${x.done ? 'done' : ''}${i === cur ? ' on' : ''}${x.live ? ' live' : ''}">${esc(x.n)}</li>`).join('')}</ol>` : '';
+  const live = L.find((x) => x.status === 'live');
+  const nx = L.find((x) => x.status !== 'completed' && x.start && !x.tbd);
+  const lines = [];
+  if (B?.done && B.f?.s?.results?.[0]) lines.push(['우승', spoil(evChip(B.f.s.results[0].short, ''), intlKey(), '우승 팀')]);
+  else if (live) lines.push(['지금', `${esc(live.ko)} ${gameNow(live.s)}`]);
+  else if (nx) lines.push([B?.started ? '다음 단계' : '첫 경기', `${esc(nx.ko)} · ${rt(nx.start, 'dt')}`]);
+  else lines.push(['첫 경기', `${esc(dayLabel(e.start))} <small>시각 미정</small>`]);
+  // 관심 팀: 시작 전 챔피언십은 직행·LCQ 진출 팀, 그 밖에는 국제전 출전 팀의 지금 위치
+  let chips = [];
+  if (e.key === 'champs' && !B?.started) {
+    const S = champsSeeds();
+    chips = S.seeds.filter((t) => !t.tbd && isF(t.short)).map((t) => evChip(t.short, t.via === 'cp' ? '직행' : 'LCQ 진출'));
+    if (!S.allDone) { const lt = (A.season.timeline || []).find((x) => x.key === 'lcq'); lines.push(['남은 자리', `<b>LCQ ${A.season.lcqSlots}팀</b>${lt ? ` <small>${esc(dayLabel(lt.end))} 결정</small>` : ''}`]); }
+  } else if (B && A.intl?.rows?.length) chips = A.intl.rows.filter((r) => isF(r.short)).map((r) => evChip(r.short, B.started ? stageShort(r.short) : '출전'));
+  lines.splice(1, 0, ['관심 팀', chips.length ? `<span class="evr-t">${chips.length > 6 ? `${chips.slice(0, 5).join('')}<small>+${chips.length - 5}팀</small>` : chips.join('')}</span>` : `<small>${esc(ML().none)}</small>`]);
+  return `${stepHtml}<dl class="evg">${lines.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+}
+function evCard() {
+  const P = evPick();
+  if (!P) return '';
+  const { e, st } = P, glob = evGlobal(e);
+  const live = st === 'now' && A.series.some((s) => s.live);
+  const d = evDays(e.start);
+  const pill = st === 'done' ? '<span class="evp">종료</span>' : live ? '<span class="evp live">LIVE</span>' : st === 'now' ? '<span class="evp live">진행 중</span>' : `<span class="evp">${d <= 0 ? '오늘' : `D-${d}`}</span>`;
+  const body = glob ? evGlobalBody(e, st) : evRegional(e);
+  const href = stageHref(e) || '#/rules?s=format';
+  return `<section class="sec ev-sec" aria-labelledby="h-evc"><div class="sec-head"><h2 class="h2" id="h-evc">${EV_TITLE[st]}</h2><a class="more" href="${href}">자세히 보기</a></div>
+    <div class="evn"><div class="evn-top"><div><p class="evn-eye"><em>${glob ? '세계 대회' : '지역 대회'}</em> · <span>${esc(e.where || '')}</span></p><h3 class="evn-t">${esc(ko(e.name, EVENT_KO))}</h3><p class="evn-d">${esc(dayLabel(e.start))}–${esc(e.end.slice(5).replace('-', '.'))}</p></div>${pill}</div>
+    ${body}${body && !glob ? `<p class="evn-f">시각은 ${esc(TZL)} 기준입니다.</p>` : ''}</div>
   </section>`;
 }
+// 홈 시각 글자: 1분마다 홈 전체를 다시 그리지 않고 이 글자만 그 자리에서 바꾼다 (homeTick)
+function relDay(iso) {
+  const ms = new Date(iso) - now();
+  if (ms <= 0) return '';
+  const d = evDays(dayKey(iso)), day = d === 0 ? '오늘' : d === 1 ? '내일' : '';
+  const h = Math.floor(ms / 3.6e6), m = Math.floor(ms / 6e4);
+  return [day, ms < 3.6e6 ? `${Math.max(1, m)}분 후` : h < 48 ? `${h}시간 후` : ''].filter(Boolean).join(' · ');
+}
+const RT = { until: (iso) => until(iso) || '진행 중', rel: relDay, dt: (iso) => dateTime(iso) };
+const rt = (iso, f = 'until') => `<span data-rt="${esc(iso)}" data-rf="${f}">${esc(RT[f](iso))}</span>`;
+let homeKey = '';
+function homeTick() {
+  if (document.hidden || parseHash().parts[0]) return;
+  const t = now();
+  const soon = A.series.some((s) => s.status !== 'completed' && !s.live && Math.abs(new Date(s.start) - t) < 3.6e6);
+  // 날짜·시각(시)이 바뀌었거나, 1시간 안에 시작하는 경기가 있으면(분 단위 표시) 다시 그린다. 내용이 같으면 render 가 건너뛴다
+  const key = `${dayKey(new Date(t).toISOString())}|${Math.floor(t / 3.6e6)}${soon ? `|${Math.floor(t / 6e4)}` : ''}`;
+  if (key !== homeKey) { homeKey = key; render(); return; }
+  for (const el of app.querySelectorAll('[data-rt]')) { const v = I.t(RT[el.dataset.rf]?.(el.dataset.rt) ?? ''); if (el.textContent !== v) el.textContent = v; }
+}
+// 다음 경기를 캘린더에 (.ics 파일). 시리즈마다 일정 하나, 6게임 약 4시간
+function icsFor(ids) {
+  const ss = ids.split(',').map((id) => A.series.find((s) => s.id === id)).filter(Boolean);
+  const f = (d) => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ie = (s) => String(s).replace(/[\\,;]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
+  const url = `${location.origin}${location.pathname}#/schedule`;
+  const evs = ss.map((s) => {
+    const fs = (s.lineup || []).filter(isF);
+    return ['BEGIN:VEVENT', `UID:${s.id}@algs-kr`, `DTSTAMP:${f(now())}`, `DTSTART:${f(s.start)}`, `DTEND:${f(new Date(s.start).getTime() + 4 * 3.6e6)}`,
+      `SUMMARY:${ie(`ALGS ${I.t(ko(s.event, EVENT_KO))}${s.region !== 'global' ? ` ${REGION[s.region] || ''}` : ''} · ${I.t(ko(s.name, PHASE_KO))}`)}`,
+      `DESCRIPTION:${ie(`${fs.length ? `${I.t(ML().group)}: ${fs.join(', ')}\n` : ''}${url}`)}`, `URL:${url}`, 'END:VEVENT'].join('\r\n');
+  });
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//EASY ALGS KR//KO', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...evs, 'END:VCALENDAR'].join('\r\n') + '\r\n';
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-ics]');
+  if (!b) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([icsFor(b.dataset.ics)], { type: 'text/calendar;charset=utf-8' }));
+  a.download = `algs-${b.dataset.day || 'match'}.ics`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+});
 
 // 한국 선수·코치 팀: 홈에서는 작은 칩으로만, 자세한 내용은 팀 탭 '한국 관련'
 const STAGE_SHORT = { gs: '조별', wr: '승자R', er1: '패자1R', er2: '패자2R', f: '결승' };
@@ -884,6 +1024,19 @@ function teamUpcoming(short) {
   for (const B of Bs) { const st = B.list.find((x) => x.status !== 'completed' && x.s && (x.teams || []).includes(short)); if (st) return st.s; }
   return null;
 }
+// 대표 팀 카드 맨 위 한 줄: 챔피언십으로 가는 길 (직행권 / LCQ). 챔피언십이 시작되면 대회 성적이 대신한다
+function heroState(short) {
+  if (champsMain()) return '';
+  const c = cpStanding().find((r) => r.short === short);
+  if (!c) return '';
+  const locked = (A.season.timeline || []).filter((e) => /^s\dp[lo]$/.test(e.key)).every((e) => tlState(e) === 'done'); // CP가 걸린 대회가 모두 끝났는가
+  const cut = A.season.cpDirectSlots;
+  const box = (cls, icon, title, sub) => `<div class="hero-state ${cls}"><i aria-hidden="true">${icon}</i><span><b>${esc(title)}</b><small>${esc(sub)}</small></span></div>`;
+  if (c.direct) return box('direct', '★', locked ? '챔피언십 직행 확정' : '챔피언십 직행권', `CP ${c.rank}위 · ${cut}위까지 직행${locked ? '' : ' · 지금 기준'}`);
+  const l = lcqEvents().length ? lcqState(short) : null;
+  if (l) return box('lcq', '▲', l, `CP ${c.rank}위 · 지역마다 상위 2팀이 챔피언십으로`);
+  return '';
+}
 function heroCard(k) {
   const t = team(k.short);
   const ev = eventNow(k.short);
@@ -900,7 +1053,7 @@ function heroCard(k) {
     stats = `<div class="kr-stats">
       ${box({ big: cp ? `${cp.rank}위` : '–', label: `챔피언십 포인트<br>${cp ? `${fmt(cp.total)} CP` : ''}` })}
       ${box({ big: li?.pos ? `${li.pos}위` : '–', label: li ? `${esc(li.name)}<br>${li.pos ? (li.cp ? `+${fmt(li.cp)} CP` : '최종 순위') : '미출전'}` : '국제전 기록 없음' })}
-      ${box({ big: ll?.pos ? `${ll.pos}위` : '–', label: ll ? `${esc(ll.name)}<br>${ll.pos ? (ll.cp ? `+${fmt(ll.cp)} CP` : plOpen() ? '현재 순위' : '최종 순위') : '미출전'}` : '지역 리그 기록 없음' })}
+      ${box({ big: ll?.pos ? `${ll.pos}위` : '–', label: ll ? `${esc(ll.name.replace(/ · (APAC North|APAC South|EMEA|Americas)$/, ''))}<br>${ll.pos ? (ll.cp ? `+${fmt(ll.cp)} CP` : plOpen() ? '현재 순위' : '최종 순위') : '미출전'}` : '지역 리그 기록 없음' })}
     </div>`;
     key = intlKey();
   }
@@ -908,8 +1061,8 @@ function heroCard(k) {
     <span class="flag ${CAT[k.level] || ''}">${mainId() && team(k.short)?.id === mainId() ? '★ 대표 응원 팀' : opt.mode === 'kr' ? KR_LABEL[k.level] || '' : ML().label}</span>${outTag(k.short)}
     <div class="hero-id">${logo(k.short, 'xl', true)}<h1 id="h-hero"><a href="#/teams/${encodeURIComponent(k.short)}" style="text-decoration:none">${esc(k.name)}</a></h1></div>
     <p class="roster">${esc(roster)}</p>
-    ${spoil(`${stats}${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, key, '성적')}
-    ${next ? `<div class="kr-next"><span>${next.live || next.status === 'live' ? '진행 중' : '다음 경기'} · ${esc(ko(next.name, PHASE_KO))}<br><span style="opacity:.7">${next.timeTbd ? '시각 미정' : `${dateTime(next.start)} ${TZL}`}</span></span><b>${esc(next.timeTbd ? '' : until(next.start) || '진행 중')}</b></div>` : ''}
+    ${spoil(`${ev ? '' : heroState(k.short)}${stats}${si.text ? `<p class="kr-where">지금 위치 · ${esc(si.text)}</p>` : ''}`, key, '성적')}
+    ${next ? `<div class="kr-next"><span>${next.live || next.status === 'live' ? '진행 중' : '다음 경기'} · ${esc(ko(next.name, PHASE_KO))}<br><span style="opacity:.7">${next.timeTbd ? '시각 미정' : `${dateTime(next.start)} ${TZL}`}</span></span><b>${next.timeTbd ? '' : rt(next.start)}</b></div>` : ''}
   </section>`;
 }
 
@@ -2762,7 +2915,11 @@ function videoSection(q) {
 // 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다
 function liveStrip() {
   const L = liveList().filter((l) => l.kind !== 'partner');
-  if (!L.length) return '';
+  if (!L.length) {
+    // 대회 중(경기 중이거나 앞뒤 1시간)인데 방송 중인 채널이 없으면 공식 중계 채널로 가는 길만 한 줄
+    const on = ST && C.streamsUrl && A.series.some((s) => s.live || (s.status !== 'completed' && Math.abs(new Date(s.start) - now()) < 3.6e6));
+    return on ? `<p class="lv-none"><span class="tag live">대회 중</span> <span>지금 Apex 방송 중인 채널이 없습니다.</span> <a class="more" href="#/streams?s=official">공식 중계 채널 보기</a></p>` : '';
+  }
   return `<section class="sec lv lv-home" aria-labelledby="h-lvh"><div class="sec-head"><h2 class="h2" id="h-lvh">지금 방송 중 <small class="muted">${L.length}</small></h2><a class="more" href="#/streams">방송 전체</a></div>
     <div class="lv-grid">${L.slice(0, 3).map((l, i) => liveCard(l, i, true)).join('')}</div></section>`;
 }
@@ -3128,4 +3285,4 @@ if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.l
 else if (LIVE.mode === 'direct') { pollDirect(); refreshOfficial(); }
 updatePill();
 setInterval(() => { if (!document.hidden) updatePill(); }, 1000);
-setInterval(() => { if (!document.hidden && !parseHash().parts[0]) render(); }, 60000); // 홈 카운트다운 갱신
+setInterval(homeTick, 60000); // 홈 카운트다운: 시각 글자만 바꾸고, 날짜·시가 바뀔 때만 다시 그린다

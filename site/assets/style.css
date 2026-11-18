@@ -1615,3 +1615,74 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 .rp-err { padding: 14px; border: 1px solid var(--rule); border-radius: var(--r-sm, 6px); background: var(--card); font-size: 13.5px; margin-top: 12px; }
 .rp-err p { margin: 0; }
 .rp-retry { margin-top: 10px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font: 650 13px var(--body); cursor: pointer; }
+/* ── 홈 탭 개선 (2026-11-19) ── */
+/* 보기 모드: 휴대폰은 한 줄 알약, 옆으로 넘김 (잘리지 않게) */
+@media (max-width: 719px) {
+  .mode-bar .mode-seg { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: none; width: auto; border: 0; background: transparent; border-radius: 0; gap: 6px; padding: 0 16px 2px; margin: 0 -16px; }
+  .mode-bar .mode-seg::-webkit-scrollbar { display: none; }
+  .mode-bar .mode-seg button { flex: none; min-height: 38px; padding: 0 14px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); font-size: 13.5px; overflow: visible; }
+  .mode-bar .mode-seg button + button { border-left: 1px solid var(--rule); }
+  .mode-bar .mode-seg [aria-current='true'] { border-color: var(--ink); }
+}
+/* 다음 경기: 시간대·남은 시간, 팀 칩은 경기 이름 바로 옆, 캘린더 버튼 */
+.nx-tz { font-size: 12px; font-weight: 700; color: var(--steel); margin-left: 2px; }
+.nx-rel { font-size: 12.5px; font-weight: 600; color: var(--steel); }
+.nx-rel:empty { display: none; }
+.nx-list li { justify-content: flex-start; }
+.nx-list li > b { min-width: 10.5em; }
+.nx-act { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.nx-ics { min-height: 44px; padding: 0 14px; border-radius: var(--r-sm); border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: 700 13.5px var(--body); cursor: pointer; }
+.nx-ics:hover { border-color: var(--ink); }
+@media (min-width: 900px) { .nx-act { grid-template-columns: 1fr; } .nx-ics { min-height: 36px; } }
+/* 대표 팀 카드: 챔피언십으로 가는 길 한 줄, 세 숫자는 언제나 한 줄 */
+.hero-state { display: flex; align-items: center; gap: 10px; margin: 14px 0 0; padding: 10px 12px; border-radius: 6px; background: rgba(255, 174, 0, .12); border: 1px solid rgba(255, 174, 0, .45); }
+.hero-state i { font-style: normal; font-weight: 900; color: #FFAE00; font-size: 17px; line-height: 1; }
+.hero-state b { display: block; font-size: 14.5px; color: #FFD27A; }
+.hero-state small { display: block; font-size: 12px; opacity: .78; margin-top: 1px; }
+.hero-state.lcq { background: rgba(0, 229, 255, .1); border-color: rgba(0, 229, 255, .4); }
+.hero-state.lcq i { color: #00E5FF; } .hero-state.lcq b { color: #8CF3FF; }
+.kr-hero .kr-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@container (max-width: 330px) { .kr-hero .kr-stats b { font-size: 22px; } }
+/* 관심 팀 칩: 고른 격자, 범례는 작게 */
+.kr-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.kr-strip .kchip { min-width: 0; }
+.kr-strip .kchip small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kr-strip + .legend { font-size: 11.5px; gap: 4px 10px; }
+/* 대회 카드 (지역 대회·세계 대회 공통) */
+.evn { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; container-type: inline-size; }
+.evn-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.evn-eye { margin: 0; font-size: 11.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--steel); }
+.evn-eye em { font-style: normal; color: var(--apex); }
+.evn-t { margin: 4px 0 2px; font-size: 19px; font-weight: 800; }
+.evn-d { margin: 0; font-size: 12.5px; color: var(--steel); }
+.evp { flex: none; font-size: 12px; font-weight: 800; padding: 4px 9px; border-radius: 4px; background: var(--ink); color: var(--paper); letter-spacing: .04em; white-space: nowrap; }
+.evp.live { background: var(--apex); color: #fff; }
+.evn-f { margin: 10px 0 0; font-size: 12px; color: var(--steel); }
+.evr { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.evr li { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; align-items: center; padding: 9px 10px; border-radius: 4px; background: var(--paper); border-left: 3px solid var(--rule); font-size: 13px; }
+.evr li.mine { border-left-color: var(--apex); }
+.evr-n { font-weight: 800; font-size: 13.5px; color: inherit; text-decoration: none; }
+.evr-n:hover { text-decoration: underline; }
+.evr-n .me { font-size: 10.5px; font-weight: 800; color: var(--apex); margin-left: 6px; letter-spacing: .04em; }
+.evr-s { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.evr-s small, .evg small { font-weight: 600; color: var(--steel); }
+.evr-t { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; color: var(--steel); font-size: 12px; }
+.evc { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: var(--card); border: 1px solid var(--rule); color: var(--ink); }
+.evc::before { content: ''; width: 7px; height: 7px; border-radius: 2px; background: var(--steel); }
+.evc.k-team::before { background: var(--kr-team); } .evc.k-member::before { background: var(--kr-member); } .evc.k-coach::before { background: var(--coach); }
+.evc small { font-weight: 600; color: var(--steel); }
+.evs { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.evs li { font-size: 12px; font-weight: 700; text-align: center; padding: 7px 2px; border-radius: 4px; background: var(--paper); color: var(--steel); }
+.evs li.done { opacity: .6; }
+.evs li.done::before { content: '✓ '; }
+.evs li.on { background: var(--ink); color: var(--paper); }
+.evs li.live { background: var(--apex); color: #fff; }
+.evg { margin: 10px 0 0; display: grid; gap: 8px; font-size: 13px; }
+.evg > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.evg dt { color: var(--steel); flex: none; }
+.evg dd { margin: 0; text-align: right; font-weight: 700; }
+.evg dd .evr-t { justify-content: flex-end; }
+@container (min-width: 600px) { .evr { grid-template-columns: repeat(4, minmax(0, 1fr)); } .evr li { grid-template-columns: 1fr; align-content: start; } .evr-s { text-align: left; } }
+/* 대회 중인데 방송이 없을 때 */
+.lv-none { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 14px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--card); border: 1px solid var(--rule); font-size: 13px; }
+@container (max-width: 330px) { .nx-act { grid-template-columns: 1fr; } }
