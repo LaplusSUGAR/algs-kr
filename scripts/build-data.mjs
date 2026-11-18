@@ -575,6 +575,8 @@ const data = {
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
   poi,
+  // 약칭을 바꾼 팀 (팀 ID → 사이트 약칭, fetch-algs의 lcqShortFix). 화면이 공식 API를 직접 받을 때도 같은 약칭을 쓰게 한다 (app.js apiShort)
+  shortFix: algs.lcqShortFix || {},
   cpRosterAdd, cpRosterOut,
   rosterMoves: rosterMoves.map((m) => ({ team: m.team, out: m.out || [], in: m.in || [], date: m.date || null, ...(m.auto ? { auto: 1 } : {}) })),
   rosterLog: rosterLog.slice(0, 200),
