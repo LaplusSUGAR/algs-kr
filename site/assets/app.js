@@ -445,7 +445,7 @@ function subtabs(tab, parts, q) {
         ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']]
       : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
-    teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
+    teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].filter((r) => r !== ML().region).map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
     streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live']] : []), ['멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수·코치', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
@@ -2219,7 +2219,8 @@ function teams(parts, q) {
   };
   const byCp = (a, b) => (a.cp?.rank ?? 999) - (b.cp?.rank ?? 999);
   const order = { team: 0, member: 1, coach: 2 };
-  let groups = [[ML().group, all.filter((t) => isF(t.short)).sort((a, b) => ((b.id === mainId()) - (a.id === mainId())) || (order[lvlOf(a.short)] ?? 0) - (order[lvlOf(b.short)] ?? 0) || byCp(a, b))], ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && (g !== 'all' || !isF(t.short))).sort(byCp)])];
+  // 지역 보기에서는 관심 팀 묶음이 그 지역 묶음과 같으므로 따로 두지 않는다 (대표 응원 팀도 지역 묶음에 끼우지 않음)
+  let groups = [...(ML().region ? [] : [[ML().group, all.filter((t) => isF(t.short)).sort((a, b) => ((b.id === mainId()) - (a.id === mainId())) || (order[lvlOf(a.short)] ?? 0) - (order[lvlOf(b.short)] ?? 0) || byCp(a, b))]]), ...['apac-n', 'apac-s', 'emea', 'americas'].map((r) => [REGION[r], all.filter((t) => t.region === r && (g !== 'all' || ML().region || !isF(t.short))).sort(byCp)])];
   if (g !== 'all') groups = groups.filter(([n]) => n === REGION[g]);
   return `<h1 class="title">팀</h1>
     <p class="lead">현재 시즌 팀과 로스터입니다. <b class="krn">굵은 이름</b>은 한국 선수, <sup class="mix">계</sup>는 한국계(혼혈·이중국적 등) 선수입니다.</p>
@@ -2245,7 +2246,8 @@ const modeSwitch = () => `<div class="seg mode-seg" role="group" aria-label="보
 
 // 팀 탭 '한국 관련': 한국 팀·한국 선수 팀·한국 코치 팀의 자세한 카드
 function krTeams() {
-  const krs = focusList();
+  // 지역 보기에서는 그 지역 팀만 (다른 지역의 대표 응원 팀은 빼고, 그 팀은 자기 지역 목록에 나온다)
+  const krs = ML().region ? focusList().filter((k) => !outsider(k.short)) : focusList();
   const card = (k) => {
     const t = team(k.short) || {};
     const si = A.intl ? krStageInfo(k.short) : { text: '' };
