@@ -1143,10 +1143,6 @@ table.rl td.rl-at { white-space: nowrap; }
 .bfv-chip.k-team { background: var(--kr-team); } .bfv-chip.k-member { background: var(--kr-member); } .bfv-chip.k-coach { background: var(--coach); }
 .bfv-chip.out { opacity: .4; text-decoration: line-through; } .bfv-chip.up { outline: 1.5px solid var(--ink); }
 .bfv-none { font-size: var(--fs-xs, 12px); color: var(--steel); }
-.bfv-o { list-style: none; margin: 6px 0 0; padding: 0 0 0 4px; display: grid; gap: 2px; font-size: var(--fs-xs, 12px); color: var(--steel); }
-.bfv-o li { display: flex; gap: 6px; align-items: baseline; }
-.bfv-o i { font-style: normal; }
-.bfv-o .up b { color: var(--ink); } .bfv-o .down b { color: var(--steel); font-weight: 600; }
 @media (max-width: 640px) { .bf-both > .bf-wrap { display: none; } .bf-both > .bfv { display: grid; } }
 
 /* 경기 옆 중계 보기 */
@@ -1514,3 +1510,32 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 .lgb.poi::after { display: none; }
 .poi-b { position: absolute; left: 62%; top: 62%; min-width: 46%; height: 46%; padding: 0 2px; border-radius: 4px; background: #fff; color: #0b0f15; font: 800 clamp(8px, 1.3cqw, 14px)/1 var(--display, Inter), sans-serif; font-style: normal; display: grid; place-items: center; box-shadow: 0 0 0 1.5px #0b0f15; pointer-events: none; }
 .lgb::after { min-width: 11px; height: 11px; font-size: 8.5px; line-height: 11px; right: -6px; bottom: -4px; border-radius: 3px; }
+/* 게임 수 표시 (0/6 → 6/6, 결승은 '결승' → '결승 3') */
+.gc { display: inline-flex; align-items: center; gap: 0; padding: 1px 7px; border: 1px solid var(--rule); border-radius: 4px; font: 700 11.5px/1.5 var(--display, Inter), sans-serif; color: var(--steel); font-variant-numeric: tabular-nums; vertical-align: 1px; white-space: nowrap; }
+.gc b { color: var(--ink); font-weight: 800; }
+.gc.live { border-color: var(--ring); color: var(--ring); } .gc.live b { color: var(--ring); }
+.gc.done { background: var(--raise, var(--card)); }
+.gc.fin b { padding: 0 5px; border-radius: 3px; background: var(--ink); color: var(--paper); }
+.gc.fin.live b { background: var(--ring); color: #fff; }
+.bf-gc { font: 700 11px var(--display, Inter), sans-serif; fill: var(--steel); } .bf-gc.live { fill: var(--ring); }
+/* 휴대폰 진행 그림: 날짜 구분 + 진출 경로(▲ 다음 라운드 · ▼ 패자부활 · ✕ 탈락 · ★ 챔피언십) */
+.bf-both, .bfv { --up: #0B8A99; --down: #6B7A90; --out: #CF2A2A; --champ: #B7791F; }
+:root[data-theme='dark'] :is(.bf-both, .bfv) { --up: #00E5FF; --down: #8A99AD; --out: #FF4A4A; --champ: #FFAE00; }
+.bfv-day { display: flex; align-items: baseline; gap: 8px; padding: 6px 0 10px; list-style: none; }
+.bfv-day:not(:first-child) { padding-top: 14px; border-top: 1px dashed var(--rule); }
+.bfv-day b { font: 800 11px/1 var(--display, Inter), sans-serif; letter-spacing: .16em; color: var(--up); }
+.bfv-day span { font-weight: 800; font-size: 15px; }
+.bfv-t { display: inline-flex; align-items: center; gap: 6px; flex: none; }
+.bfv-o { list-style: none; margin: 8px 0 2px; padding: 0; display: grid; gap: 5px; }
+.bfv-o .rt { display: grid; grid-template-columns: 20px auto 1fr; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); background: color-mix(in srgb, var(--c) 10%, transparent); font-size: 13px; }
+.bfv-o .rt i { font-style: normal; font-size: 12px; color: var(--c); text-align: center; }
+.bfv-o .rt b { font-weight: 800; color: var(--c); white-space: nowrap; }
+.bfv-o .rt span { font-weight: 700; color: var(--ink); }
+.bfv-o .rt.up { --c: var(--up); } .bfv-o .rt.down { --c: var(--down); } .bfv-o .rt.out { --c: var(--out); } .bfv-o .rt.champ { --c: var(--champ); }
+.bfv-o .rt.out span { color: var(--out); }
+.bfv-o .rt.down span { font-weight: 600; }
+.gc.fin { gap: 5px; }
+.bf-edge.up { stroke: var(--up); opacity: .9; stroke-width: 1.8; } .bf-edge.down { stroke: var(--down); opacity: .75; stroke-dasharray: 5 4; }
+.bf-arrow.up { fill: var(--up); } .bf-arrow.down { fill: var(--down); }
+.bf-elab.up { fill: var(--up); font-weight: 800; } .bf-elab.down { fill: var(--down); }
+.bf-note.out { fill: var(--out); font-weight: 800; } .bf-note.champ { fill: var(--champ); font-weight: 800; }

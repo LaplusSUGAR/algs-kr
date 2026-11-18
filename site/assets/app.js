@@ -492,6 +492,14 @@ function bracket(ev = A.intl) {
 }
 const stageState = (st) => (st.status === 'completed' ? '종료' : st.status === 'live' ? 'LIVE' : st.tbd ? '시각 미정' : st.start ? until(st.start) || '시작 대기' : st.date ? until(`${st.date}T00:00:00+09:00`) || '시작 대기' : '일정 미정');
 const krIn = (shorts) => shorts.filter((sh) => krOf(sh) !== 'none');
+// 게임 수 표시: 일반 경기 '치른 게임/전체'(0/6 → 6/6), 매치 포인트 결승은 시작 전 '결승', 시작하면 치른 게임 수가 붙는다
+function gameCount(s, final) {
+  const done = s?.status === 'completed', live = !!s && (s.live || s.status === 'live');
+  const played = done ? s.matches || 0 : live ? s.games || 0 : 0;
+  if (final || s?.mp) return `<span class="gc fin${live ? ' live' : ''}${done ? ' done' : ''}"><span>결승</span>${played ? `<b>${played}</b>` : ''}</span>`;
+  const tot = s?.matches || 6; // 시리즈 게임 수(공식 값, 보통 6)
+  return `<span class="gc${live ? ' live' : ''}${done ? ' done' : ''}" title="치른 게임 / 전체 게임"><b>${Math.min(played, tot)}</b>/${tot}</span>`;
+}
 // 단계 결과에서 팀이 위로 갔는지 (null = 아직 모름)
 const advanced = (st, short) => {
   if (st.key === 'gs') return st.status === 'completed' ? ((st.ev || A.intl).rows.find((r) => r.short === short)?.pos ?? 99) <= 20 : null;
@@ -505,13 +513,25 @@ const advanced = (st, short) => {
 //   items: [{ key, title, st(단계), cls, href, when, adv(short) → true|false|null, outs: [[라벨, 도착 단계 키]], note }]
 function flowV(items, label) {
   const title = Object.fromEntries(items.map((n) => [n.key, n.title]));
+  // 진출 경로 한 줄: 위로(다음 라운드) / 아래로(패자부활) / 탈락 / 챔피언십 을 색·기호로 구분한다
+  const route = (lab, to) => {
+    const kind = /탈락/.test(lab) ? 'out' : /챔피언십/.test(lab) ? 'champ' : /하위/.test(lab) ? 'down' : 'up';
+    const ico = { up: '▲', down: '▼', out: '✕', champ: '★' }[kind];
+    const [who, where] = to ? [lab, title[to] || ''] : kind === 'out' ? [lab.replace(/\s*탈락$/, ''), '탈락'] : kind === 'champ' ? [lab.replace(/\s*챔피언십.*$/, ''), '챔피언십 진출'] : [lab, ''];
+    return `<li class="rt ${kind}"><i aria-hidden="true">${ico}</i><b>${esc(who)}</b><span>${esc(where)}</span></li>`;
+  };
+  let day = '', dn = 0;
   return `<ol class="bfv" aria-label="${esc(label)}">${items.map((n) => {
     const st = n.st, ks = krIn(st.teams || []);
     const chips = ks.length ? ks.map((sh) => { const a = n.adv(sh); return `<span class="bfv-chip ${CAT[krOf(sh)]} ${a === false ? 'out' : a ? 'up' : ''}">${esc(sh)}</span>`; }).join('') : `<span class="bfv-none">${st.teams?.length ? esc(ML().none) : '출전 팀 미정'}</span>`;
     const tag = st.status === 'live' ? '<span class="tag live">LIVE</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
     const ext = String(n.href).startsWith('http');
-    const outs = n.outs.map(([lab, to]) => `<li class="${/하위/.test(lab) ? 'down' : 'up'}"><b>${esc(lab)}</b><i aria-hidden="true">→</i><span>${esc(title[to] || '')}</span></li>`).join('') + (n.note ? `<li class="note"><span>${esc(n.note)}</span></li>` : '');
-    return `<li class="bfv-n ${n.cls}"><a class="bfv-a" href="${esc(n.href)}"${ext ? ' target="_blank" rel="noopener"' : ''}><span class="bfv-h"><b>${esc(n.title)}</b>${tag}</span><span class="bfv-s">${st.n}팀${n.when ? ' · ' + esc(n.when) : ''}</span><span class="bfv-c">${chips}</span></a>${outs ? `<ul class="bfv-o">${outs}</ul>` : ''}</li>`;
+    const outs = n.outs.map(([lab, to]) => route(lab, to)).join('') + (n.note ? route(n.note) : '');
+    const d = st.start ? dayLabel(dayKey(st.start)) : '';
+    const dh = d && d !== day ? `<li class="bfv-day"><b>DAY ${++dn}</b><span>${esc(d)}</span></li>` : '';
+    if (d) day = d;
+    const gc = st.key === 'gs' ? '' : gameCount(st.s, st.key === 'f');
+    return `${dh}<li class="bfv-n ${n.cls}"><a class="bfv-a" href="${esc(n.href)}"${ext ? ' target="_blank" rel="noopener"' : ''}><span class="bfv-h"><b>${esc(n.title)}</b><span class="bfv-t">${gc}${tag}</span></span><span class="bfv-s">${st.n}팀${n.when ? ' · ' + esc(n.when) : ''}</span><span class="bfv-c">${chips}</span></a>${outs ? `<ul class="bfv-o">${outs}</ul>` : ''}</li>`;
   }).join('')}</ol>`;
 }
 const flowOrder = (keys, pos) => keys.slice().sort((a, b) => pos[a][0] - pos[b][0] || pos[a][1] - pos[b][1]);
@@ -951,7 +971,7 @@ function matchItem(s) {
   const mt = mainTeam(), mine = !!mt && ((s.lineup || []).includes(mt.short) || (s.results || []).some((r) => r.short === mt.short));
   return `<article class="match${mine ? ' mine' : ''}">
     <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}</time>
-    <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
+    <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${gameCount(s)} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
       <div class="meta">${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(', '))}</div>
       ${res || lineupLine(s)}</div>
   </article>`;
@@ -1257,10 +1277,12 @@ function lcqGroups(B) {
 
 // 일정표 (LCQ·챔피언십 조 편성 탭)
 const schedTable = (B) => `<section class="sec" aria-labelledby="h-st-sch"><h2 class="h2" id="h-st-sch">일정</h2>
-  <div class="tbl-wrap"><table class="tbl lcq-sch"><thead><tr><th>경기</th><th>시각</th><th class="r">상태</th></tr></thead><tbody>
-  ${B.list.map((st) => `<tr><td><a href="${qsLink(B.base, B.q, { m: st.key })}">${esc(st.ko)}</a></td><td class="num">${esc(stWhen(st))}</td><td class="r small">${esc(stageState(st))}</td></tr>`).join('')}
+  <div class="tbl-wrap"><table class="tbl lcq-sch"><thead><tr><th>경기</th><th>시각</th><th class="r">게임</th><th class="r">상태</th></tr></thead><tbody>
+  ${B.list.map((st) => `<tr><td><a href="${qsLink(B.base, B.q, { m: st.key })}">${esc(st.ko)}</a></td><td class="num">${esc(stWhen(st))}</td><td class="r">${st.key === 'gs' ? '' : gameCount(st.s, st.key === 'f')}</td><td class="r small">${esc(stageState(st))}</td></tr>`).join('')}
   </tbody></table></div></section>`;
 
+// 그림(SVG) 안에 넣을 게임 수 글자 (gameCount 와 같은 규칙)
+const gcText = (st) => { const s = st.s, done = st.status === 'completed', played = done ? s?.matches || 0 : st.status === 'live' ? s?.games || 0 : 0; return st.key === 'f' ? (played ? `<tspan>결승</tspan> · ${played}G` : '<tspan>결승</tspan>') : `${played}/${s?.matches || 6}`; };
 // 진행 방식 그림 (LCQ·챔피언십 공통). 상자 = 경기(상태·시각·관심 팀), 화살표 = 진출. 상자를 누르면 그 경기 탭
 //   L = { h: 그림 높이, nodes: { 단계: [x, y, 제목] }, edges: [[출발, 도착, 출발 y, 도착 y, 라벨]], notes: [[단계, 글]] (상자 아래 한 줄) }
 function stageFlow(B, L, href, label) {
@@ -1271,7 +1293,8 @@ function stageFlow(B, L, href, label) {
   const edge = ([a, b, oy, iy, lab]) => {
     const [ax, ay] = L.nodes[a], [bx, by] = L.nodes[b];
     const x1 = ax + W, y1 = ay + oy, x2 = bx, y2 = by + iy, mx = (x1 + x2) / 2;
-    return `<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2 - 3} ${y2}" class="bf-edge" marker-end="url(#sfArrow)"/><text x="${x1 + 6}" y="${y1 - 5}" class="bf-elab">${esc(lab)}</text>`;
+    const k = /하위/.test(lab) ? 'down' : 'up';
+    return `<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2 - 3} ${y2}" class="bf-edge ${k}" marker-end="url(#sfArrow-${k})"/><text x="${x1 + 6}" y="${y1 - 5}" class="bf-elab ${k}">${esc(lab)}</text>`;
   };
   const node = (k) => {
     const x0 = st(k); if (!x0) return '';
@@ -1288,15 +1311,16 @@ function stageFlow(B, L, href, label) {
     return `<a href="${esc(href(k))}" class="${cls}" aria-label="${esc(title)} ${esc(stageState(x0))}${ks.length ? ', ' + ks.join(' ') : ''}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10" class="bf-box"/>
       <text x="${x + 12}" y="${y + 21}" class="bf-title">${esc(title)}</text>
+      <text x="${x + W - 10}" y="${y + 21}" text-anchor="end" class="bf-gc${x0.status === 'live' ? ' live' : ''}">${gcText(x0)}</text>
       <text x="${x + 12}" y="${y + 38}" class="bf-state">${esc(stageState(x0))}</text>
       <text x="${x + 12}" y="${y + 53}" class="bf-sub">${x0.n}팀${when ? ' · ' + esc(when) : ''}</text>
       ${ks.length ? chips : `<text x="${x + 12}" y="${y + 79}" class="bf-sub2">${x0.teams?.length ? esc(ML().none) : '출전 팀 미정'}</text>`}</a>`;
   };
-  const note = ([k, t]) => { const [x, y] = L.nodes[k]; return `<text x="${x + 12}" y="${y + H + 16}" class="bf-note">${esc(t)}</text>`; };
+  const note = ([k, t]) => { const [x, y] = L.nodes[k]; return `<text x="${x + 12}" y="${y + H + 16}" class="bf-note ${/탈락/.test(t) ? 'out' : /챔피언십/.test(t) ? 'champ' : ''}">${/탈락/.test(t) ? '✕ ' : /챔피언십/.test(t) ? '★ ' : ''}${esc(t)}</text>`; };
   const notes = Object.fromEntries(L.notes || []);
   const vert = flowV(flowOrder(Object.keys(L.nodes).filter((k) => st(k)), L.nodes).map((k) => { const x0 = st(k); return { key: k, title: L.nodes[k][2], st: x0, cls: [x0.status === 'completed' ? 'done' : '', x0.status === 'live' ? 'live' : '', k === nextKey && x0.status !== 'live' ? 'next' : ''].join(' '), href: href(k), when: stTab(x0), adv: (sh) => adv(x0, sh), outs: L.edges.filter((e) => e[0] === k).map((e) => [e[4], e[1]]), note: notes[k] }; }), label);
   return `<div class="bf-both"><div class="bf-wrap"><svg class="bf" viewBox="0 0 880 ${L.h}" role="group" aria-label="${esc(label)}">
-    <defs><marker id="sfArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow"/></marker></defs>
+    <defs>${['up', 'down'].map((k) => `<marker id="sfArrow-${k}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="bf-arrow ${k}"/></marker>`).join('')}</defs>
     ${L.edges.map(edge).join('')}${Object.keys(L.nodes).map(node).join('')}${(L.notes || []).map(note).join('')}</svg></div>${vert}</div>`;
 }
 // 홈 점수표: 지금(진행 중 → 마지막으로 끝난 → 출전 팀이 정해진 다음) 경기. 같은 시각에 함께 열리는 경기(예: 그룹 A·B)도 함께
