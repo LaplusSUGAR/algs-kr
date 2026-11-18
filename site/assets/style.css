@@ -1474,6 +1474,20 @@ dialog { border: 1px solid var(--rule); }
   .tabbar a[aria-current='page']::before { display: none; }
   .tabbar .tab-pc { display: flex; }
 }
+/* PC 헤더가 좁을 때(768~1280px 안팎, 언어·대표 팀 칩에 따라 다름) 메뉴가 잘리지 않게 단계적으로 줄인다.
+   app.js 의 fitHeader() 가 메뉴가 넘칠 때만 .top 에 f1…f5 를 차례로 붙인다(누적).
+   f1 메뉴 여백 줄이기 → f2 갱신 표시는 점만 → f3 메뉴 아이콘 숨김 → f4 로고 글자 숨김 → f5 아이콘 위·글자 아래 작은 메뉴 */
+@media (min-width: 768px) {
+  .top.f1 { gap: 12px; }
+  .top.f1 .tabbar a { padding: 9px 10px; gap: 6px; }
+  .top.f2 .pill #refreshText { display: none; }
+  .top.f2 .pill { padding: 9px; }
+  .top.f3 .tabbar svg { display: none; }
+  .top.f4 .brand > span { display: none; }
+  .top.f5 .tabbar svg { display: block; width: 18px; height: 18px; }
+  .top.f5 .tabbar { gap: 0; }
+  .top.f5 .tabbar a { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 2px; padding: 5px 4px; font-size: 11px; letter-spacing: -.01em; }
+}
 .dlg-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 4px 0 16px; }
 
 /* 2026-11 구조 개편 ② 페이지 머리·세부 메뉴 */
