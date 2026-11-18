@@ -1546,3 +1546,14 @@ a, button, summary, .seg a, .seg button { -webkit-tap-highlight-color: transpare
 @media (prefers-reduced-motion: no-preference) { .gnow.live i { animation: blink 1.6s ease-in-out infinite; } }
 .gnow.wait { color: var(--ink); background: var(--raise, var(--card)); border: 1px solid var(--rule); }
 .gnow.done { color: var(--steel); border: 1px solid var(--rule); }
+
+/* 보기 모드 6칸(한국 팀 · 지역 4곳 · 내 응원 팀): 휴대폰은 3칸씩 두 줄, 넓은 화면은 한 줄 */
+.mode-bar .mode-seg { max-width: 460px; }
+.mode-bar .mode-seg button:nth-child(n + 4) { border-top: 1px solid var(--rule); }
+.mode-bar .mode-seg button:nth-child(3n + 1) { border-left: 0; }
+@media (min-width: 720px) {
+  .mode-bar .mode-seg { grid-template-columns: repeat(6, minmax(0, auto)); width: auto; max-width: none; }
+  .mode-bar .mode-seg button { padding: 0 16px; }
+  .mode-bar .mode-seg button:nth-child(n + 4) { border-top: 0; }
+  .mode-bar .mode-seg button:nth-child(3n + 1) { border-left: 0; }
+}

@@ -49,11 +49,16 @@ const I = window.I18N || { lang: 'ko', info: { tz: 'KST' }, t: (x) => x, tree() 
 const TZL = I.info.tz;
 const opt = { spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []), main: store.get('main', null) };
 
-/* ---------- 보기 모드: 한국 팀 · APAC North · 내 응원 팀 ----------
+/* ---------- 보기 모드: 한국 팀 · 지역(APAC North · APAC South · EMEA · Americas) · 내 응원 팀 ----------
    모드마다 '관심 팀'이 달라지고, 홈 카드·표 강조·필터·진출 구조 칩이 모두 관심 팀 기준으로 바뀐다 */
+// 지역 보기: 그 지역 팀이 관심 팀. region 이 있으면 지역 보기다 (APAC North · APAC South · EMEA · Americas)
+const regionMode = (region, label, tag) => ({ label, tag, region, group: label, strip: `${label} 팀`, title: `${label} 팀`, only: `${label} 경기만`, none: `${label} 팀 없음` });
 const MODES = {
   kr: { label: '한국 팀', tag: '한국', group: '한국 관련', strip: '한국 선수·코치 팀', title: '한국 관련 팀', only: '한국 팀 경기만', none: '한국 관련 팀 없음' },
-  apn: { label: 'APAC North', tag: 'APN', group: 'APAC North', strip: 'APAC North 팀', title: 'APAC North 팀', only: 'APAC North 경기만', none: 'APAC North 팀 없음' },
+  apn: regionMode('apac-n', 'APAC North', 'APN'),
+  aps: regionMode('apac-s', 'APAC South', 'APS'),
+  emea: regionMode('emea', 'EMEA', 'EMEA'),
+  amer: regionMode('americas', 'Americas', 'AMER'),
   custom: { label: '내 응원 팀', tag: '응원', group: '내 응원 팀', strip: '내 응원 팀', title: '내 응원 팀', only: '응원 팀 경기만', none: '응원 팀 없음' },
 };
 const ML = () => MODES[opt.mode] || MODES.kr;
@@ -65,9 +70,9 @@ const mainId = () => (opt.main && opt.fav.includes(opt.main) ? opt.main : null);
 function outsider(short) {
   const t = A.teams?.[short];
   if (!t || !mainId() || t.id !== mainId()) return false;
-  return opt.mode === 'kr' ? !t.krLevel || t.krLevel === 'none' : opt.mode === 'apn' ? t.region !== 'apac-n' : false;
+  return opt.mode === 'kr' ? !t.krLevel || t.krLevel === 'none' : ML().region ? t.region !== ML().region : false;
 }
-const outTag = (short) => (outsider(short) ? `<span class="oreg" title="${esc(opt.mode === 'kr' ? '한국 관련 팀이 아닙니다' : 'APAC North 팀이 아닙니다')}">${esc(REGION[A.teams[short].region] || '')}</span>` : '');
+const outTag = (short) => (outsider(short) ? `<span class="oreg" title="${esc(opt.mode === 'kr' ? '한국 관련 팀이 아닙니다' : `${ML().label} 팀이 아닙니다`)}">${esc(REGION[A.teams[short].region] || '')}</span>` : '');
 function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; render(); }
 // 대표 응원 팀: 팀 로고에서 뽑은 색(A.teams[].color)으로 사이트 강조색을 바꾸고, 헤더에 팀 칩을 단다. 색이 없는 팀은 기본 빨강
 const mainTeam = () => (opt.main && opt.fav.includes(opt.main) ? Object.values(A.teams).find((x) => x.id === opt.main && x.current) || null : null);
@@ -91,7 +96,7 @@ function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : 
 function lvlOf(short) {
   const t = A.teams?.[short];
   if (!t) return 'none';
-  const base = opt.mode === 'apn' ? (t.region === 'apac-n' ? 'team' : 'none') : opt.mode === 'custom' ? (opt.fav.includes(t.id) ? 'team' : 'none') : t.krLevel || 'none';
+  const base = ML().region ? (t.region === ML().region ? 'team' : 'none') : opt.mode === 'custom' ? (opt.fav.includes(t.id) ? 'team' : 'none') : t.krLevel || 'none';
   return base === 'none' && t.id === mainId() ? 'team' : base;
 }
 const isF = (short) => lvlOf(short) !== 'none';
@@ -307,7 +312,7 @@ const XKIND = { 'poi-draft': ['POI 드래프트', '낙하 지점(POI) 선택 시
 const XEVENT = { lcq: 'LCQ', playoffs: '플레이오프', champs: '챔피언십' };
 const extrasUpcoming = () => (A.extras || []).filter((x) => now() - new Date(x.start) < 3 * 3600e3);
 const extraName = (x) => x.name || XKIND[x.kind]?.[0] || '일정';
-function isKrExtra(x) { if (!x.region) return true; const regions = new Set(focusList().map((k) => team(k.short)?.region)); return opt.mode === 'kr' ? x.region === 'apac-n' : regions.has(x.region); }
+function isKrExtra(x) { if (!x.region) return true; const regions = new Set(focusList().map((k) => team(k.short)?.region)); return opt.mode === 'kr' ? x.region === 'apac-n' : ML().region ? x.region === ML().region : regions.has(x.region); }
 function extraItem(x) {
   const started = new Date(x.start) <= now();
   return `<article class="match extra">
@@ -951,7 +956,7 @@ function isKrSeries(s) {
     if (focusList().some((k) => k.intl && s.eventId === A.intl?.eventId && k.intl.next === s.name)) return true;
     if (s.eventId === A.intl?.eventId && s.mp && focusList().length) return true;
     const regions = new Set(focusList().map((k) => team(k.short)?.region));
-    if (opt.mode === 'kr' ? s.region === 'apac-n' : regions.has(s.region)) return true;
+    if (opt.mode === 'kr' ? s.region === 'apac-n' : ML().region ? s.region === ML().region : regions.has(s.region)) return true;
   }
   return false;
 }
@@ -1241,7 +1246,7 @@ function lcqBracket(ev) {
 const lcqDest = (st, pos) => (st.top ? (pos <= st.top ? st.up : '') : pos <= st.cut ? st.up : st.down);
 const lcqRegionDefault = () => {
   if (opt.mode === 'custom') { const t = Object.values(A.teams).find((x) => x.id === mainId()) || Object.values(A.teams).find((x) => opt.fav.includes(x.id)); if (t?.region) return t.region; }
-  return 'apac-n';
+  return ML().region || 'apac-n';
 };
 
 // 조 편성 탭: 그룹 A·B 시드 표
@@ -2253,7 +2258,7 @@ function krTeams() {
     </a>`;
   };
   if (opt.mode === 'custom' && !krs.length) return `<h1 class="title">내 응원 팀</h1>${favPicker()}`;
-  return `<h1 class="title">${ML().title}</h1>${opt.mode === 'custom' ? `<p class="lead"><a class="btn-link ghost" href="#/teams/pick">응원 팀 고르기</a></p>` : ''}<p class="lead">${opt.mode === 'kr' ? '한국 선수 또는 한국 코치가 있는 팀입니다.' : opt.mode === 'apn' ? 'APAC North 지역 팀입니다.' : '내가 고른 응원 팀입니다.'} 카드를 누르면 팀 상세로 갑니다.</p>${krLegend()}
+  return `<h1 class="title">${ML().title}</h1>${opt.mode === 'custom' ? `<p class="lead"><a class="btn-link ghost" href="#/teams/pick">응원 팀 고르기</a></p>` : ''}<p class="lead">${opt.mode === 'kr' ? '한국 선수 또는 한국 코치가 있는 팀입니다.' : ML().region ? `${ML().label} 지역 팀입니다.` : '내가 고른 응원 팀입니다.'} 카드를 누르면 팀 상세로 갑니다.</p>${krLegend()}
     ${spoil(`<div class="kcards">${krs.map(card).join('') || '<p class="empty">없음</p>'}</div>`, intlKey(), '한국 팀 성적')}`;
 }
 
@@ -2480,7 +2485,7 @@ const starred = (short) => { const t = team(short); return !!t && opt.fav.includ
 const APEX_RE = /apex|에이펙스|에펙|エーペックス/i;
 const apexLive = (l) => !(l.kind === 'player' || l.kind === 'creator') || l.platform === 'youtube' || APEX_RE.test(l.game || '');
 const setStreams = (j) => { ST = { ...j, live: (j.live || []).filter(apexLive) }; };
-// 카드로 보여 줄 방송: 선수·코치는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 드는 팀과 별표한 팀만. 스트리머·전 프로, 공식 중계·파트너는 보기와 상관없이 항상
+// 카드로 보여 줄 방송: 선수·코치는 지금 고른 보기(한국 관련 / 지역 / 내 응원 팀)에 드는 팀과 별표한 팀만. 스트리머·전 프로, 공식 중계·파트너는 보기와 상관없이 항상
 // 보기에 따라 카드로 보여 줄 방송 (나머지는 방송 탭의 접힌 '그 밖의 방송' 목록):
 //   한국 관련  : 한국 선수·코치(한국 국적·한국계) + 한국 스트리머·전 프로 / 대회 때는 영어·일본어 공식 중계 + 한국 관련 팀의 공식 팀 화면
 //   APAC North: APAC North 팀 선수 / 대회 때는 일본어 공식 중계 + APAC North 팀의 공식 팀 화면
@@ -2493,13 +2498,13 @@ function povTeam(l) { // 공식 팀 화면의 제목 속 팀 이름 → 팀 약�
   return POV_IX.get(flatName(l.pov)) || null;
 }
 const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
-const inFocus = (short) => { const t = team(short); return !!t && (t.id === mainId() || opt.mode === 'apn' ? t.region === 'apac-n' : opt.mode === 'custom' ? opt.fav.includes(t.id) : isF(short)); };
+const inFocus = (short) => !!team(short) && isF(short);
 function liveShown(l) {
   if (liveId(l) === parseHash().q.get('play')) return true;
-  if (l.kind === 'official') return opt.mode === 'apn' ? l.key === 'o:ja' : true;
+  if (l.kind === 'official') return opt.mode === 'apn' ? l.key === 'o:ja' : ML().region ? l.key === 'o:en' : true; // 지역 보기: APAC North 는 일본어, 나머지 지역은 영어 공식 중계
   if (l.kind === 'pov') return !l.map && inFocus(povTeam(l));
-  if (l.kind === 'creator') return opt.mode !== 'apn' && opt.mode !== 'custom';
-  if (l.kind === 'player') return opt.mode === 'apn' || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
+  if (l.kind === 'creator') return !ML().region && opt.mode !== 'custom';
+  if (l.kind === 'player') return ML().region || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
   return false; // 공식 파트너 등
 }
 const liveRank = (l) => ({ official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4); // 공식 중계 → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
@@ -2580,7 +2585,7 @@ function liveSection() {
   if (!ST) return '<section class="sec lv" id="lv"><h2 class="h2">지금 방송 중</h2><p class="lead">방송 상태를 확인하는 중입니다.</p></section>';
   const L = liveList();
   const rest = ST.live.filter((l) => !liveShown(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
-  const others = rest.length ? `<details class="lv-rest"><summary>그 밖의 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / APAC North / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.</p>
+  const others = rest.length ? `<details class="lv-rest"><summary>그 밖의 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / 지역 / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.</p>
     <ul>${rest.map((l) => `<li>${l.embed ? `<button class="lv-add" type="button" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생"><b>${liveWho(l)}</b></button>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.who)}</b></a>`}${l.kind === 'player' && team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
   const bad = Object.entries(ST.ok || {}).filter(([, v]) => v === false).map(([k]) => PLAT[k]);
   const foot = `<p class="caption"><span>마지막 확인 ${hhmm(ST.at)}</span>${bad.length ? ` · <span>확인하지 못한 곳: ${bad.join(', ')}</span>` : ''} · <span>방송 시작과 종료는 1~2분 늦게 반영됩니다.</span></p>`;
