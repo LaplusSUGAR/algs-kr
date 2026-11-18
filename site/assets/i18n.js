@@ -67,6 +67,9 @@
     // 경기
     ['예정 경기', '今後の試合', 'Upcoming'], ['지난 결과', '過去の結果', 'Results'], ['게임 다시보기', '試合リプレイ', 'Game replay'],
     ['모든 시간은 한국 시간(KST)입니다. 한 시리즈는 보통 {n}게임입니다.', '時刻はすべて日本時間（JST）です。1シリーズは通常{1}試合です。', 'All times are KST (UTC+9). A series is usually {1} games.'],
+    ['한국 시간(KST) 기준', '日本時間（JST）基準', 'Times in KST (UTC+9)'], ['한 시리즈는 보통 {n}게임', '1シリーズは通常{1}試合', 'A series is usually {1} games'], ['전체 지역', '全地域', 'All regions'], ['경기 필터', '試合フィルター', 'Match filters'],
+    ['{n}시간 후', '{1}時間後', 'in {1}h'], ['이전 결과 더 보기 ({n}일)', '以前の結果をもっと見る（{1}日分）', 'Show earlier results ({1} days)'],
+    ['공식 경기 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.', '公式の試合記録を読み込めませんでした。しばらくしてから再度お試しください。', "Couldn't load the official match records. Please try again shortly."], ['다시 불러오기', '再読み込み', 'Retry'],
     ['조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.', '条件に合う試合はありません。フィルターを外すとすべての試合が見られます。', 'No matches match the filter. Turn it off to see all matches.'],
     ['전체 {n}팀 결과', '全{1}チームの結果', 'All {1} teams'], ['출전 팀 미정', '出場チーム未定', 'Teams TBD'], ['출전 {n}팀 확정', '出場{1}チーム確定', '{1} teams confirmed'],
     ['끝난 경기가 아직 없습니다.', '終了した試合はまだありません。', 'No finished matches yet.'], ['시리즈 고르기', 'シリーズを選ぶ', 'Pick a series'],

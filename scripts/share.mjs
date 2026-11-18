@@ -48,6 +48,7 @@ const STATES = [ // [화면 경로, 이름, 값들 {값: 제목}, 설명]
   ['streams', 's', { live: '방송 중·영상', mv: '멀티뷰', official: '공식 중계', players: '선수·코치 방송', creators: '스트리머·전 프로' }, 'ALGS 방송과 영상을 확인합니다.'],
   ['rules', 's', { video: '규칙 영상', format: '대회 방식', points: '점수·포인트' }, 'ALGS 대회 규정을 확인합니다.'],
   ['schedule', 'view', { results: '지난 결과' }, 'ALGS 지난 경기 결과를 한국 팀 중심으로 확인합니다.'],
+  ['schedule', 'r', { 'apac-n': 'APAC North', 'apac-s': 'APAC South', emea: 'EMEA', americas: 'Americas' }, 'ALGS 지역별 예정 경기를 확인합니다.'],
 ];
 
 // teams: 지금 팀(약칭 → 팀). lcq: [{ region, maps: { 경기 키: [지도 이름…] } }]. lcqStages: [{ key, tab }] (규칙 파일 brackets.lcq.stages)
