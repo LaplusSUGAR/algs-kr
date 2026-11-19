@@ -4,6 +4,7 @@
 
 | 시각 (KST) | 종류 | 지역 | 팀 | 빠진 선수 | 들어온 선수 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-19 19:03 | 자동 반영 (Liquipedia) | EMEA | WAR (Team WaR) |  | Mysi |
 | 2026-11-18 19:01 | 2부 팀 이름 변경 | Americas | Project Heavener |  | 구 PawSocksUnited |
 | 2026-11-16 01:01 | 2부 팀 이름 변경 | APAC North | CAC EST |  | 구 waked |
 | 2026-11-15 00:00 | 수동 반영 (config) | APAC North | FNC (FNATIC) |  | sedna |
