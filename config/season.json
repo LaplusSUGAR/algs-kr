@@ -91,6 +91,34 @@
         ]
       ],
       "apexOnly": true
+    },
+    {
+      "key": "aps",
+      "label": "APAC South 공식 중계",
+      "note": "APAC South 지역 공식 방송 (Battlegrounds HQ)",
+      "links": [
+        [
+          "Twitch",
+          "https://www.twitch.tv/battlegroundhq"
+        ],
+        [
+          "YouTube",
+          "https://www.youtube.com/@BattlegroundsOCE"
+        ]
+      ],
+      "apexOnly": true
+    },
+    {
+      "key": "escl",
+      "label": "ESCL 일본어 중계",
+      "note": "일본어 스크림과 2부 리그 방송. APAC North 대회 기간에만 보입니다",
+      "links": [
+        [
+          "YouTube",
+          "https://www.youtube.com/@escl-official"
+        ]
+      ],
+      "when": "apac-n"
     }
   ],
   "multiview": {
@@ -137,7 +165,7 @@
       "https://liquipedia.net/apexlegends/ALGS/2026-27"
     ]
   ],
-  "_broadcasts": "공식 중계 채널. apexOnly: true면 여러 게임을 다루는 채널이라 Apex 방송·영상만 방송 탭과 홈에 보인다(Twitch는 게임 이름, YouTube는 제목·태그에 Apex·ALGS가 있을 때).",
+  "_broadcasts": "공식 중계 채널. when: 지역(예 apac-n)이면 그 지역 대회 기간(첫 경기 하루 전 ~ 마지막 경기 12시간 뒤)에만 방송 탭·홈에 보인다. apexOnly: true면 여러 게임을 다루는 채널이라 Apex 방송·영상만 방송 탭과 홈에 보인다(Twitch는 게임 이름, YouTube는 제목·태그에 Apex·ALGS가 있을 때).",
   "_povChannels": "ALGS 공식 '팀 화면' Twitch 채널(algs1_team1 … algsN_team20, algsN_map). 대회 때만 켜지고, 방송 제목 맨 앞이 그 화면의 팀 이름이다(예: 'Team Falcons | ALGS Year 6 …'). prefixes × 1~teams 번 + map 채널을 방송 서버가 확인한다. 평소에는 꺼져 있어 아무것도 안 보인다.",
   "povChannels": {
     "prefixes": [

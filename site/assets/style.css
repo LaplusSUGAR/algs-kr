@@ -2013,3 +2013,15 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
   .poi-close { display: inline-grid; place-items: center; order: 3; width: 34px; height: 34px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); color: var(--ink); font-size: 15px; cursor: pointer; }
   .poi-close:hover { border-color: var(--apex); color: var(--apex); }
 }
+
+/* 공식 중계가 Twitch·YouTube 에서 함께 켜졌을 때: 카드 하나 + 아래 볼 곳 고르기 (liveCard → .lv-pick) */
+.lv-pick { display: grid; grid-template-rows: 1fr auto; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden; min-width: 0; }
+.lv-pick > .lv-card { border: 0; border-radius: 0; background: none; }
+.lv-pick > .lv-card.on { box-shadow: none; }
+.lv-pick:has(> .lv-card.on) { border-color: var(--apex); box-shadow: var(--glow); }
+.lv-plat { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 0 12px 12px; }
+.lv-plat small { font-size: var(--fs-xs); color: var(--steel); font-weight: 600; }
+.lv-plat .seg button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12.5px; }
+.lv-plat i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.lv-plat i.twitch { background: #9146FF; } .lv-plat i.youtube { background: #FF0033; }
+@media (max-width: 520px) { .lv-plat { padding: 0 10px 10px; } }
