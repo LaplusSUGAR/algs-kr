@@ -3013,7 +3013,15 @@ const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
 const inFocus = (short) => !!team(short) && isF(short);
 // 공식 중계 카드: 지역 보기는 그 지역 중계(APAC North 는 일본어, APAC South 는 영어 + Battlegrounds HQ, 나머지는 영어)
 //   한국 관련·내 응원 팀 보기는 영어·일본어 공식 중계. APAC South 중계는 응원 팀(대표 팀)이 APAC South 팀일 때만 함께 (그 밖에는 '그 밖의 방송'으로)
-const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja'], 'apac-s': ['o:en', 'o:aps'] };
+const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:en', 'o:aps'] };
+// 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회마다 첫 경기 하루 전부터 마지막 경기 12시간 뒤까지
+function regionEventOn(region) {
+  const by = new Map();
+  for (const s of A.series) if (s.region === region && s.start) { const g = by.get(s.event); by.set(s.event, g ? [s.start < g[0] ? s.start : g[0], s.start > g[1] ? s.start : g[1]] : [s.start, s.start]); }
+  const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) - 864e5 && t <= Date.parse(b) + 432e5);
+}
+const bcOn = (b) => !b.when || regionEventOn(b.when);
+const bcOffKeys = () => new Set((A.streams.broadcasts || []).filter((b) => !bcOn(b)).map((b) => `o:${b.key}`));
 function officialShown(key) {
   const r = ML().region;
   if (r) return (OFFICIAL_BY_REGION[r] || ['o:en']).includes(key);
@@ -3024,7 +3032,7 @@ function officialShown(key) {
 //   고른 적이 없으면 시청자가 많은 쪽(같으면 Twitch). 고르지 않은 쪽은 목록·'그 밖의 방송'·배지 수에서 빠진다
 const bcPick = (key) => store.get('bcPlat', {})[key];
 function liveAll() {
-  const L = ST?.live || [], G = new Map();
+  const off = bcOffKeys(), L = (ST?.live || []).filter((l) => !(l.kind === 'official' && off.has(l.key))), G = new Map();
   for (const l of L) if (l.kind === 'official' && l.embed) G.set(l.key, [...(G.get(l.key) || []), l]);
   const out = [];
   for (const l of L) {
@@ -3167,7 +3175,7 @@ const liveHead = () => { const n = ST ? liveList().length : 0; return `지금 �
 function liveNone() {
   const up = FROZEN ? [] : A.series.filter((s) => s.status !== 'completed' && s.start && Date.parse(s.start) > now() - 6 * 3600e3).sort((a, b) => a.start.localeCompare(b.start));
   const s = up.find((x) => isKrSeries(x)) || up[0];
-  const bcs = (A.streams.broadcasts || []).filter((b) => b.links.length);
+  const bcs = (A.streams.broadcasts || []).filter((b) => b.links.length && bcOn(b));
   return `<div class="lv-empty"><b>지금 방송 중인 채널이 없습니다.</b>
     ${s ? `<p>다음 공식 경기: <span>${esc(ko(s.event, EVENT_KO))}</span> <span>${esc(REGION[s.region] || '')}</span> · <span>${esc(dayLabel(dayKey(s.start)))}</span> <span>${s.timeTbd ? '시간 미정' : esc(hhmm(s.start))}</span></p>` : ''}
     ${bcs.length ? `<div class="lv-bcs">${bcs.map((b) => `<span><small>${esc(b.label)}</small>${b.links.map(([n, u]) => chip(n.toLowerCase(), u)).join('')}</span>`).join('')}</div>` : ''}</div>`;
@@ -3302,7 +3310,7 @@ function streams(parts, q) {
       </section>` : ''}
     ${show('official') ? `<section class="sec"><h2 class="h2">공식 중계</h2>
         <div class="ch-grid wide">
-        ${S.broadcasts.map((b) => `<div class="bc"><h3>${esc(b.label)}</h3><p>${esc(b.note)}</p><div class="chips">${b.links.length ? b.links.map(([n, u]) => `<a class="chip ${n.toLowerCase()}" href="${esc(u)}" target="_blank" rel="noopener"><i></i>${esc(n)}</a>`).join('') : '<span class="chip off">등록된 채널 없음</span>'}</div></div>`).join('')}
+        ${S.broadcasts.filter(bcOn).map((b) => `<div class="bc"><h3>${esc(b.label)}</h3><p>${esc(b.note)}</p><div class="chips">${b.links.length ? b.links.map(([n, u]) => `<a class="chip ${n.toLowerCase()}" href="${esc(u)}" target="_blank" rel="noopener"><i></i>${esc(n)}</a>`).join('') : '<span class="chip off">등록된 채널 없음</span>'}</div></div>`).join('')}
         ${S.partners.length ? `<div class="bc"><h3>공식 파트너 워치 파티</h3><p>공식 일정에 파트너로 등록된 채널입니다.</p><div class="chips">${S.partners.filter((p) => p.url).map((p) => `<a class="chip ${p.provider}" href="${esc(p.url)}" target="_blank" rel="noopener"><i></i>${esc(p.name)}</a>`).join('')}</div></div>` : ''}
         </div>
       </section>` : ''}
