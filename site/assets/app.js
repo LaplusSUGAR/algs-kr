@@ -3014,11 +3014,11 @@ const inFocus = (short) => !!team(short) && isF(short);
 // 공식 중계 카드: 지역 보기는 그 지역 중계(APAC North 는 일본어, APAC South 는 영어 + Battlegrounds HQ, 나머지는 영어)
 //   한국 관련·내 응원 팀 보기는 영어·일본어 공식 중계. APAC South 중계는 응원 팀(대표 팀)이 APAC South 팀일 때만 함께 (그 밖에는 '그 밖의 방송'으로)
 const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:en', 'o:aps'] };
-// 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회마다 첫 경기 하루 전부터 마지막 경기 12시간 뒤까지
+// 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회마다 첫 경기 시작 시각부터 마지막 경기 12시간 뒤까지
 function regionEventOn(region) {
   const by = new Map();
   for (const s of A.series) if (s.region === region && s.start) { const g = by.get(s.event); by.set(s.event, g ? [s.start < g[0] ? s.start : g[0], s.start > g[1] ? s.start : g[1]] : [s.start, s.start]); }
-  const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) - 864e5 && t <= Date.parse(b) + 432e5);
+  const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) && t <= Date.parse(b) + 432e5);
 }
 const bcOn = (b) => !b.when || regionEventOn(b.when);
 const bcOffKeys = () => new Set((A.streams.broadcasts || []).filter((b) => !bcOn(b)).map((b) => `o:${b.key}`));
