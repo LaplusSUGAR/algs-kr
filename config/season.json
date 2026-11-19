@@ -91,6 +91,22 @@
         ]
       ],
       "apexOnly": true
+    },
+    {
+      "key": "aps",
+      "label": "APAC South 공식 중계",
+      "note": "APAC South 지역 공식 방송 (Battlegrounds HQ)",
+      "links": [
+        [
+          "Twitch",
+          "https://www.twitch.tv/battlegroundhq"
+        ],
+        [
+          "YouTube",
+          "https://www.youtube.com/@BattlegroundsOCE"
+        ]
+      ],
+      "apexOnly": true
     }
   ],
   "multiview": {
