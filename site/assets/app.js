@@ -918,10 +918,9 @@ function seasonEnd() {
 const pastSeasons = () => (!FROZEN && A.seasons?.length ? `<p class="caption past-seasons">지난 시즌: ${A.seasons.map((x) => `<a href="?y=${encodeURIComponent(x.slug)}#/">${esc(x.name)}</a>`).join(' · ')}</p>` : '');
 // 홈: 시즌 일정은 지금·다음 일정 한 줄만. 이번 시즌 일정이 모두 끝났으면 다음 시즌 첫 일정을 보여 준다
 function seasonNext() {
-  const t = now();
   const tl = A.season.timeline;
-  const cur = tl.find((e) => t >= new Date(e.start + 'T00:00:00+09:00') && t <= new Date(e.end + 'T23:59:59+09:00'));
-  const nx = tl.find((e) => new Date(e.start + 'T00:00:00+09:00') > t);
+  const cur = tl.find((e) => tlState(e) === 'now');
+  const nx = tl.find((e) => tlState(e) === 'next');
   const row = (e, tag) => e ? `<li><span class="tag ${tag === '진행 중' ? 'live' : ''}">${tag}</span> ${e.url ? olink(e.url, esc(e.name)) : esc(e.name)} <span class="when">${e.start.slice(5).replace('-', '.')}–${e.end.slice(5).replace('-', '.')} · ${esc(e.where)}</span></li>` : '';
   return `<section class="sec" aria-labelledby="h-season"><div class="sec-head"><h2 class="h2" id="h-season">${esc(A.season.name)} 일정</h2><a class="more" href="#/rules?s=format">전체 일정</a></div>
     <ul class="season-next">${row(cur, '진행 중')}${row(nx, '다음')}${!cur && !nx && !FROZEN && A.next?.timeline?.length ? A.next.timeline.slice(0, 2).map((e) => row(e, '다음 시즌')).join('') : ''}${!cur && !nx && (FROZEN || !A.next?.timeline?.length) ? '<li><span class="tag">종료</span> 이번 시즌 일정이 모두 끝났습니다.</li>' : ''}</ul>${pastSeasons()}</section>`;
@@ -1929,7 +1928,19 @@ const champsTab = () => !!champsTimeline() && !champsMain() && A.cp.length > 0;
 const champsDone = () => !!champsTimeline() && champsSeries().some((x) => x.phase === 'Match Point Finals' && x.status === 'completed');
 const champsMain = () => champsNow() || champsDone();
 // 시즌 일정표 한 줄의 상태(끝남·진행 중·예정)와 사이트 안에서 그 단계를 보는 곳
-const tlState = (e) => { const t = new Date(now()).toLocaleDateString('sv-SE', { timeZone: 'America/Los_Angeles' }); return t > e.end ? 'done' : t >= e.start ? 'now' : 'next'; };
+//   공식 경기가 있으면 시각 기준: 첫 경기 시작 시각부터 마지막 경기 시작 12시간 뒤까지(공식 중계 표시 기간 regionEventOn 과 같은 규칙).
+//   모든 경기가 끝났으면 그때 끝. 마지막 날 경기가 아직 공식에 없을 수 있어, 끝은 마지막 날(미국 서부 날짜)이 시작되기 전으로는 당기지 않는다.
+//   경기가 없으면 날짜 기준(미국 서부 날짜)
+const TL_SLUG = { open: /^online-open/, lcq: /^last-chance-qualifier/, champs: /^champs/ };
+const tlSeries = (e) => { const m = /^s(\d)(pl|po)$/.exec(e.key); const re = m ? new RegExp(`^split-${m[1]}-${m[2] === 'pl' ? 'pro-league' : 'playoffs'}`) : TL_SLUG[e.key]; return re ? A.series.filter((s) => s.start && re.test(s.eventSlug || '')) : []; };
+const tlState = (e) => {
+  const ss = tlSeries(e), t = now();
+  if (!ss.length) { const d = new Date(t).toLocaleDateString('sv-SE', { timeZone: 'America/Los_Angeles' }); return d > e.end ? 'done' : d >= e.start ? 'now' : 'next'; }
+  const ms = ss.map((s) => Date.parse(s.start)), a = Math.min(...ms), b = Math.max(...ms);
+  if (t < a) return 'next';
+  if (ss.every((s) => s.status === 'completed') && !ss.some((s) => s.live)) return 'done';
+  return t > Math.max(b + 432e5, Date.parse(`${e.end}T00:00:00-08:00`)) ? 'done' : 'now';
+};
 function stageHref(e) {
   let m;
   if ((m = /^s(\d)pl$/.exec(e.key))) return A.pl && Object.values(A.pl).some((p) => p.split === +m[1]) ? `#/points/pl?s=${m[1]}` : null;
