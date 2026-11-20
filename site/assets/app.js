@@ -3090,6 +3090,25 @@ function officialShown(key) {
 // 같은 공식 중계가 Twitch·YouTube 에서 함께 켜지면 카드 하나로 묶는다. 카드 아래 버튼으로 볼 곳을 고르고(이 브라우저에 저장),
 //   고른 적이 없으면 시청자가 많은 쪽(같으면 Twitch). 고르지 않은 쪽은 목록·'그 밖의 방송'·배지 수에서 빠진다
 const bcPick = (key) => store.get('bcPlat', {})[key];
+// 같은 채널이 같은 플랫폼에서 방송을 둘 이상 켜면(예: ESCL 이 LCQ 로비 A·B 를 YouTube 두 곳에서) 영상 ID 로 구분한다.
+//   하나뿐이면 예전처럼 플랫폼 이름만 쓴다(재생 주소 'key|youtube' 가 그대로 열리도록)
+let DUP_SRC = null, DUP = new Set();
+function liveVar(l) {
+  if (DUP_SRC !== ST?.live) { DUP_SRC = ST?.live; DUP = new Set(); const seen = new Set(); for (const x of DUP_SRC || []) { const k = `${x.key}|${x.platform}`; if (seen.has(k)) DUP.add(k); seen.add(k); } }
+  return l.platform === 'youtube' && l.embed?.id && DUP.has(`${l.key}|youtube`) ? `youtube:${l.embed.id}` : l.platform;
+}
+// 같은 플랫폼 방송끼리 구분하는 짧은 이름: 제목의 로비·그룹(LOBBY A, Group B, ロビーA …), 없으면 제목에서 서로 다른 토막, 그것도 없으면 번호
+function altTag(l, g) {
+  const same = g.filter((y) => y.platform === l.platform); if (same.length < 2) return '';
+  const lob = (x) => { const t = x.title || '', m = t.match(/\b(lobby|group|grp)\s*[-#:]?\s*([A-Z0-9]{1,2})\b/i) || t.match(/(ロビー|グループ|로비|그룹)\s*([A-Z0-9Ａ-Ｚ０-９]{1,2})/i); return m ? [/^(lobby|ロビー|로비)$/i.test(m[1]) ? '로비' : '그룹', m[2].normalize('NFKC').toUpperCase()] : null; };
+  const tags = same.map(lob);
+  if (tags.every(Boolean) && new Set(tags.map((x) => x.join(' '))).size === same.length) { const [w, v] = tags[same.indexOf(l)]; return `<span>${w}</span> ${esc(v)}`; }
+  const segs = same.map((x) => String(x.title || '').split(/\s*[|｜/／]\s*/).filter(Boolean));
+  for (let i = 0; i < Math.max(...segs.map((s) => s.length)); i++) {
+    const v = segs.map((s) => s[i] || ''); if (v.every(Boolean) && new Set(v).size === same.length) { const t = v[same.indexOf(l)]; return esc(t.length > 18 ? `${t.slice(0, 17)}…` : t); }
+  }
+  return String(same.indexOf(l) + 1);
+}
 function liveAll() {
   const off = bcOffKeys(), L = (ST?.live || []).filter((l) => !(l.kind === 'official' && off.has(l.key))), G = new Map();
   for (const l of L) if (l.kind === 'official' && l.embed) G.set(l.key, [...(G.get(l.key) || []), l]);
@@ -3097,14 +3116,14 @@ function liveAll() {
   for (const l of L) {
     const g = l.kind === 'official' && l.embed ? G.get(l.key) : null;
     if (!g || g.length < 2) { out.push(l); continue; }
-    const pick = g.find((x) => x.platform === bcPick(l.key)) || g.slice().sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || (a.platform !== 'twitch') - (b.platform !== 'twitch'))[0];
-    if (l === pick) out.push({ ...l, alts: g.map((x) => x.platform) });
+    const pick = g.find((x) => liveVar(x) === bcPick(l.key)) || g.slice().sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || (a.platform !== 'twitch') - (b.platform !== 'twitch'))[0];
+    if (l === pick) out.push({ ...l, alts: g.slice().sort((a, b) => a.platform.localeCompare(b.platform) || String(a.title || '').localeCompare(String(b.title || ''))) });
   }
   return out;
 }
 // 볼 곳을 바꾸면: 그 중계를 플레이어로 보고 있었으면 고른 쪽으로 바꿔 틀고, 카드를 다시 그린다
 function pickPlat(key, plat) {
-  const old = liveAll().find((l) => l.key === key && l.alts); if (!old || old.platform === plat) return;
+  const old = liveAll().find((l) => l.key === key && l.alts); if (!old || liveVar(old) === plat) return;
   store.set('bcPlat', { ...store.get('bcPlat', {}), [key]: plat });
   const oid = liveId(old), nid = `${key}|${plat}`, tiles = lvBox()?.querySelector('.lv-tiles');
   const tile = tiles && [...tiles.children].find((t) => t.dataset.id === oid);
@@ -3135,7 +3154,7 @@ const newVideos = () => (ST?.videos || []).filter((v) => !v.short && v.platform 
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
 const liveWho = (l) => (l.kind === 'pov' ? `${esc(xteam(povTeam(l))?.name || l.who)} <small>팀 화면</small>` : l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e, muted) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true${muted ? '&muted=true' : ''}` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0${muted ? '&mute=1' : ''}`); // 두 번째 화면부터는 소리를 끄고 시작한다(소리가 겹치지 않게)
-const liveId = (l) => `${l.key}|${l.platform}`;
+const liveId = (l) => `${l.key}|${liveVar(l)}`;
 // ── 사이트 안 플레이어 ──
 //   멀티뷰: 켜면 카드를 누를 때마다 화면이 추가된다(최대 4개, 다시 누르면 빠진다). 끄면 누른 방송 하나로 바뀐다
 //   시네마 모드: 플레이어가 브라우저 창 전체를 채운다(Esc 또는 버튼으로 나온다)
@@ -3182,7 +3201,9 @@ function lvBig() { // 미니 플레이어 → 원래 자리로
   window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - top - 8, behavior: motionOK() ? 'smooth' : 'auto' });
 }
 function playLive(id) {
-  const l = (ST?.live || []).find((x) => liveId(x) === id), box = lvBox(); if (!l?.embed || !box) return;
+  const L = ST?.live || [], l = L.find((x) => liveId(x) === id) || L.find((x) => `${x.key}|${x.platform}` === id), box = lvBox(); if (!l?.embed || !box) return; // 뒤쪽: 예전 재생 주소(같은 플랫폼 방송이 하나였을 때)
+  id = liveId(l);
+  const tag = altTag(l, L.filter((x) => x.key === l.key));
   if (!box.querySelector('.lv-tiles')) {
     box.hidden = false;
     box.innerHTML = `<div class="lv-bar"><b>방송 보기</b><span class="lv-tools"><button class="lv-btn" type="button" data-mv aria-pressed="false" title="켜면 방송 카드를 누를 때마다 화면이 추가됩니다 (최대 4개)">멀티뷰</button><button class="lv-btn" type="button" data-cinema aria-pressed="false">시네마 모드</button><button class="lv-close" type="button" data-close-all aria-label="플레이어 닫기">닫기</button></span></div>
@@ -3198,7 +3219,7 @@ function playLive(id) {
   if (!mvOn) tiles.innerHTML = '';
   else if (tiles.children.length >= MV_MAX) tiles.firstElementChild.remove(); // 꽉 찼으면 가장 먼저 연 화면을 뺀다
   const tile = document.createElement('div'); tile.className = 'lv-tile'; tile.dataset.id = id;
-  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button">크게 보기</button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
+  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}${tag ? ` · ${tag}` : ''}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button">크게 보기</button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
     <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed, tiles.children.length > 0))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   tile.querySelector('.lv-x').addEventListener('click', () => { tile.remove(); lvSync(); });
   tile.querySelector('.lv-big').addEventListener('click', lvBig);
@@ -3217,8 +3238,9 @@ function liveCard(l, i, asLink) {
     <span class="lv-meta"><b>${liveWho(l)}${l.embed ? '' : `<span class="lv-extn">${PLAT[l.platform]} ↗</span>`}</b><span class="lv-title"${!hide && liveTitle(l) !== (l.title || '') ? ` title="${esc(l.title)}"` : ''}>${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(liveTitle(l))}</span>
     <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
   if (asLink && l.embed) return `<a class="lv-card" href="${playHref(l)}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
+  // 여러 방송 고르기: 플랫폼이 다르면 플랫폼 이름, 같은 플랫폼이 둘 이상이면 구분 이름(로비 A …)을 붙이고, 모두 같은 플랫폼이면 플랫폼 이름은 뺀다(카드에 이미 있다)
   if (l.alts && l.embed) return `<div class="lv-pick"><button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>
-    <div class="lv-plat"><small>두 곳에서 방송 중</small><div class="seg" role="group" aria-label="방송 볼 곳 고르기">${l.alts.map((p) => `<button type="button" data-bckey="${esc(l.key)}" data-bcplat="${esc(p)}" aria-pressed="${p === l.platform}"><i class="${esc(p)}" aria-hidden="true"></i>${PLAT[p]}</button>`).join('')}</div></div></div>`;
+    <div class="lv-plat"><small>${new Set(l.alts.map((x) => x.platform)).size === l.alts.length ? (l.alts.length === 2 ? '두 곳에서 방송 중' : `${l.alts.length}곳에서 방송 중`) : `방송 ${l.alts.length}개 동시 진행`}</small><div class="seg" role="group" aria-label="방송 볼 곳 고르기">${l.alts.map((x) => { const tag = altTag(x, l.alts), one = new Set(l.alts.map((y) => y.platform)).size === 1; return `<button type="button" data-bckey="${esc(l.key)}" data-bcplat="${esc(liveVar(x))}" aria-pressed="${liveVar(x) === liveVar(l)}"${x.title ? ` title="${esc(liveTitle(x))}"` : ''}><i class="${esc(x.platform)}" aria-hidden="true"></i>${!tag ? PLAT[x.platform] : one ? tag : `${PLAT[x.platform]} ${tag}`}</button>`; }).join('')}</div></div></div>`;
   return l.embed
     ? `<button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
     : `<a class="lv-card" href="${esc(l.url)}" target="_blank" rel="noopener">${inner}<span class="lv-ext">${PLAT[l.platform]}에서 보기</span></a>`;
