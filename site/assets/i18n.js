@@ -130,7 +130,7 @@
     ['상위 {n}', '上位{1}', 'Top {1}'], ['하위 {n}', '下位{1}', 'Bottom {1}'], ['하위 {n} 탈락', '下位{1} 敗退', 'Bottom {1} out'], ['매치 포인트 우승', 'マッチポイントで優勝', 'Match point win'],
     ['승자 {n}R 그룹 {w}', 'ウィナーズ{1}R グループ{2}', 'Winners R{1} Group {2}'], ['조별 리그 (4개 조)', 'グループステージ（4組）', 'Group stage (4 groups)'], ['조마다 다른 세 조와 한 번씩 ({n}경기)', '各組がほかの3組と1回ずつ（{1}シリーズ）', 'Each group meets the other three once ({1} series)'],
     ['LCQ 진행 방식', 'LCQの進行方式', 'LCQ format'], ['챔피언십 진행 방식', 'チャンピオンシップの進行方式', 'Championship format'], ['{t} LCQ 진행 방식', '{1} LCQの進行方式', '{1} LCQ format'],
-    ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
+    ['전체 점수표', 'スコア表全体', 'Full scoreboard'], ['첫 매치가 끝나면 순위가 나옵니다.', '最初のマッチが終わると順位が表示されます。', 'Standings appear after the first match ends.'], ['아직 결과가 없습니다.', 'まだ結果がありません。', 'No results yet.'], ['점수표', 'スコア表', 'Scoreboard'], ['진출 결과', '進出結果', 'Results'],
     ['구 {t}', '旧 {1}', 'formerly {1}'],
     ['(서브)', '(サブ)', '(sub)'],
     // 대표 팀 카드
