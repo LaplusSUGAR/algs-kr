@@ -3839,7 +3839,343 @@
       "name": "Elimination Round 1",
       "draft": "01M796Y6WBFZ03ATN8ZVHHP48T",
       "date": "2026-11-20T12:45:00.000Z",
-      "checked": 83110
+      "completedAt": "2026-11-20T12:55:13.016Z",
+      "done": true,
+      "checked": 83110,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              2,
+              "01KHPREYF197FBMPQBY0AKNF59",
+              "Outside",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              4,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              5,
+              "01KTSJNA8N6GKE7W1HAYG9JT14",
+              "SAT",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              6,
+              "01KJSEK7SCXK8JYAP8W3WF8VZV",
+              "TEC Black",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              7,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              8,
+              "01M78QZ2RTDTZ8G4RVVGR5QZHS",
+              "HKUF",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              9,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              10,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              11,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              13,
+              "01M6ZJMS1P3Z0N05FM3B8JY3TK",
+              "TripleP",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              14,
+              "01M6ZJMSANF042KQ8AMEHKM7KX",
+              "SeNioR",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              16,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              19,
+              "01M6ZJMS3T4RR50CS7XQXRJ388",
+              "mr greedy",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              20,
+              "01KME2AH2D6TNG9D1321DKVFZ5",
+              "Inside The Ring",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              23,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              32,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              35,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              37,
+              "01KTSJNA7ASK8GGCQ4N4CFD09G",
+              "LAST STAND",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              38,
+              "01KTSJN9G77TZFPY7FCJFVA7TE",
+              "DMA",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              3,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              12,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              15,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              17,
+              "01KTSJNA7ASK8GGCQ4N4CFD09G",
+              "LAST STAND",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              18,
+              "01KTSJN9G77TZFPY7FCJFVA7TE",
+              "DMA",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              21,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              22,
+              "01KHPREYF197FBMPQBY0AKNF59",
+              "Outside",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              24,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              25,
+              "01KTSJNA8N6GKE7W1HAYG9JT14",
+              "SAT",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              26,
+              "01KJSEK7SCXK8JYAP8W3WF8VZV",
+              "TEC Black",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              27,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              28,
+              "01M78QZ2RTDTZ8G4RVVGR5QZHS",
+              "HKUF",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              29,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              30,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              31,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              33,
+              "01M6ZJMS1P3Z0N05FM3B8JY3TK",
+              "TripleP",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              34,
+              "01M6ZJMSANF042KQ8AMEHKM7KX",
+              "SeNioR",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              36,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              39,
+              "01M6ZJMS3T4RR50CS7XQXRJ388",
+              "mr greedy",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              40,
+              "01KME2AH2D6TNG9D1321DKVFZ5",
+              "Inside The Ring",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1M8ZEGT5P8MGB1BRVWNX": {
       "region": "apac-s",
