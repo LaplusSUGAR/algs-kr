@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-18T22:25:57.471Z",
+  "at": "2026-11-20T22:06:31.748Z",
   "teams": [
     {
       "key": "id:01KHPREWRGXCYNBGJVNSGD6ZBY",
@@ -1523,13 +1523,14 @@
     },
     {
       "key": "id:01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
-      "short": "PAW",
-      "name": "PawSocksUnited",
+      "short": "HVNR",
+      "name": "Project Heavener",
       "region": "americas",
       "src": null,
       "lp": {
-        "name": "PawSocksUnited",
-        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
       }
     },
     {
@@ -1711,20 +1712,21 @@
       }
     },
     {
-      "key": "id:01M6ZJMRGN40Y6WPN7NGHAT2M9",
-      "short": "LT",
-      "name": "Laugh Tale",
-      "region": "apac-n",
-      "src": null,
-      "lp": {
-        "name": "Laugh Tale",
-        "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
-      }
-    },
-    {
       "key": "id:01M6ZJMRDDVCAP5D9B7T7J7HFC",
       "short": "NOVA",
       "name": "NovaCroatia",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "why": "Liquipedia 표에서 같은 이름·선수를 찾지 못함",
+        "name": null,
+        "overlap": null
+      }
+    },
+    {
+      "key": "id:01M6ZJMRGN40Y6WPN7NGHAT2M9",
+      "short": "ORBG",
+      "name": "ORB GARDEN JP",
       "region": "apac-n",
       "src": null,
       "lp": {
@@ -2199,6 +2201,16 @@
       "lp": {
         "name": "TripleP",
         "by": "이름 같음 (우리 쪽 로스터 정보 없음)"
+      }
+    },
+    {
+      "key": "cc:laughtale",
+      "name": "Laugh Tale",
+      "region": "apac-n",
+      "src": null,
+      "lp": {
+        "name": "Laugh Tale",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Lemon, YuRyo, Aqua)"
       }
     },
     {
@@ -2999,6 +3011,16 @@
       "lp": {
         "name": "Everborn",
         "by": "Liquipedia 서킷 순위표의 팀 (선수: Excentis, HUGOwolfy, Themokad)"
+      }
+    },
+    {
+      "key": "cc:pawsocksunited",
+      "name": "PawSocksUnited",
+      "region": "americas",
+      "src": null,
+      "lp": {
+        "name": "PawSocksUnited",
+        "by": "Liquipedia 서킷 순위표의 팀 (선수: Moonp0rtals, Immu, Vodery)"
       }
     },
     {
