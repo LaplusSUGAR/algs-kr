@@ -283,7 +283,8 @@ const evById = Object.fromEntries(algs.events.map(([id, slug, name, region, star
 const series = algs.series.map(([id, eventId, phase, name, status, start, regionName, mp, matches, res]) => {
   const ev = evById[eventId] || { name: '', slug: '' };
   const region = normRegion(regionName) || ev.region;
-  const results = res ? res.map(([pos, short, pts, kills, m]) => ({ pos, short, pts, kills, kr: teams[shortToId[short]]?.krLevel || 'none', ...(m === 2 ? { won: true, mpe: true } : m === 1 ? { mpe: true } : {}) })).sort((a, b) => a.pos - b.pos) : null;
+  // 첫 게임이 끝나기 전 진행 중 시리즈는 순위(pos)가 비어 있다: 결과 없음으로 두고 출전 명단을 쓴다
+  const results = res?.some((r) => r[0]) ? res.map(([pos, short, pts, kills, m]) => ({ pos, short, pts, kills, kr: teams[shortToId[short]]?.krLevel || 'none', ...(m === 2 ? { won: true, mpe: true } : m === 1 ? { mpe: true } : {}) })).sort((a, b) => a.pos - b.pos) : null;
   const lineup = algs.lineups?.[id] || lcqLineups[id] || null;
   return { id, eventId, event: ev.name, eventSlug: ev.slug, phase, name, status, start, region, mp: !!mp, matches, results, lineup,
     kr: results ? results.filter((r) => r.kr !== 'none').map((r) => r.short) : [] };
