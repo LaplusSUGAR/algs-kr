@@ -219,6 +219,7 @@
     ['{n}위 · 킬 {n} · 순위 점수 {n}', '{1}位 · キル{2} · 順位ポイント{3}', '#{1} · {2} kills · {3} placement pts'], ['이 페이지 링크 공유', 'このページのリンクを共有', 'Share this page'], ['링크를 복사했습니다', 'リンクをコピーしました', 'Link copied'], ['아래 주소를 복사하세요', 'このアドレスをコピーしてください', 'Copy this link'],
     ['POI 드래프트가 곧 시작되거나 진행 중입니다.', 'POIドラフトはまもなく開始、または進行中です。', 'The POI draft is about to start or in progress.'], ['선택이 나오면 이곳에 바로 나타납니다.', '指名が出ると、ここにすぐ表示されます。', 'Picks will appear here as soon as they are made.'],
     ['POI 드래프트는 {t} 시작 예정입니다.', 'POIドラフトは{1}開始予定です。', 'The POI draft is scheduled to start at {1}.'],
+    ['POI 드래프트는 앞 라운드가 끝나고 1시간 안에 진행됩니다.', 'POIドラフトは前のラウンド終了後1時間以内に行われます。', 'The POI draft takes place within an hour after the previous round ends.'],
     ['POI 드래프트 진행 중', 'POIドラフト進行中', 'POI draft in progress'], ['지금 고르는 팀:', '現在指名中のチーム:', 'Picking now:'],
     ['드래프트가 끝났습니다. 공식 기록으로 곧 확정됩니다.', 'ドラフトが終了しました。まもなく公式記録に確定されます。', 'The draft has ended. It will be confirmed from the official record shortly.'],
     ['출처: ALGS 공식 사이트', '出典: ALGS公式サイト', 'Source: official ALGS site'],
