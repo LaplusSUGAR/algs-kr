@@ -3496,7 +3496,343 @@
       "name": "Winners Round 2",
       "draft": "01M796X7KVHGETFZFNF0K28MG4",
       "date": "2026-11-20T12:45:00.000Z",
-      "checked": 83110
+      "completedAt": "2026-11-20T12:53:45.926Z",
+      "done": true,
+      "checked": 83110,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              2,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              3,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              4,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              5,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              6,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              7,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              10,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              11,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              13,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              16,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              18,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              19,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              20,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              28,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              29,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              32,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              34,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              35,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              37,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              8,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              9,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              12,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              14,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              15,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              17,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              21,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              22,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              23,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              24,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              25,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              26,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              27,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              30,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              31,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              33,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              36,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              38,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              39,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              40,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1M8X9AQXS0JKF9K3VH3X": {
       "region": "apac-s",
