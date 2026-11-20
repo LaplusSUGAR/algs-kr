@@ -2025,3 +2025,96 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .lv-plat i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 .lv-plat i.twitch { background: #9146FF; } .lv-plat i.youtube { background: #FF0033; }
 @media (max-width: 520px) { .lv-plat { padding: 0 10px 10px; } }
+
+/* ===== 2026-11 화면 전환·애니메이션 (docs/transitions-plan.md) =====
+   움직이는 것은 transform 계열(translate·scale)과 opacity 만. 효과는 사용자가 바꿨을 때만 붙는 클래스(#app.anim-*)·상태에 건다.
+   - 헤더(.top)·메뉴(.tabbar) 자체와 #app 에는 transform 을 걸지 않는다 (하단 고정 메뉴, 미니 플레이어·시네마 모드의 position: fixed 가 풀린다)
+   - 움직임은 모두 '동작 줄이기'가 아니고 설정의 '애니메이션 줄이기'(html.no-motion)도 아닐 때만. 색 강조(.flash .jumped .upd)는 남긴다 */
+:root { --dur-1: 120ms; --dur-2: 180ms; --dur-3: 240ms; --ease-out: cubic-bezier(.2, .8, .2, 1); --ease-in: cubic-bezier(.4, 0, 1, 1); --ease-std: cubic-bezier(.4, 0, .2, 1); --rise: 6px; }
+@keyframes mvRise { from { opacity: 0; translate: 0 var(--rise); } }
+@keyframes mvFade { from { opacity: 0; } }
+@keyframes mvDim { from { opacity: .4; } }
+@keyframes mvSoft { from { opacity: .6; } }
+@keyframes mvDrop { from { opacity: 0; translate: 0 -4px; } }
+@keyframes mvWipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes mvLine { from { scale: 0 1; } }
+@keyframes mvSel { from { scale: .94; opacity: .6; } }
+@keyframes mvPop { from { scale: .8; opacity: 0; } }
+@keyframes mvPin { from { scale: .6; opacity: 0; } }
+@keyframes mvPinNew { 0% { scale: 1.45; } 100% { scale: 1; } }
+@keyframes mvMini { from { opacity: 0; translate: 0 16px; } }
+@keyframes mvTile { from { opacity: 0; scale: .97; } }
+@keyframes mvReveal { from { filter: blur(6px); opacity: .55; } }
+/* 색 강조: 실시간 점수 갱신으로 바뀐 칸 · '내 팀으로 이동' 줄 (동작 줄이기에서도 남긴다, 한 번만) */
+@keyframes mvUpd { from { background-color: color-mix(in srgb, var(--apex) 20%, transparent); } }
+.upd, tr.upd > td { animation: mvUpd 1s var(--ease-out); }
+@keyframes stFlash { 0%, 35% { outline-color: var(--apex); background-color: color-mix(in srgb, var(--apex) 18%, transparent); } 100% { outline-color: transparent; background-color: transparent; } }
+.toast { opacity: 0; }
+.toast.show { opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ① 주 메뉴 탭 전환: 위쪽 몇 조각만 차례로 떠오른다 (긴 표 화면에서 수백 줄을 움직이지 않게). 플레이어가 든 조각은 투명도만 */
+  :root:not(.no-motion) #app.anim-page > :nth-child(-n+5) { animation: mvRise var(--dur-2) var(--ease-out) backwards; }
+  :root:not(.no-motion) #app.anim-page > :nth-child(-n+5):has(#lvPlayer) { animation-name: mvFade; }
+  :root:not(.no-motion) #app.anim-page > :nth-child(2) { animation-delay: 30ms; }
+  :root:not(.no-motion) #app.anim-page > :nth-child(3) { animation-delay: 60ms; }
+  :root:not(.no-motion) #app.anim-page > :nth-child(4) { animation-delay: 90ms; }
+  :root:not(.no-motion) #app.anim-page > :nth-child(5) { animation-delay: 120ms; }
+  :root:not(.no-motion) #app.anim-page .ph .title { animation: mvWipe 220ms var(--ease-out) 40ms backwards; }
+  /* ② 같은 메뉴 안 이동(세부 메뉴·지역·경기): 머리·세부 메뉴·고정 선택줄은 가만히, 본문만 흐렸다 나타난다 */
+  :root:not(.no-motion) #app.anim-sub > :not(.ph, .subtabs, .st-stick, .st-stick-at, .season-bar) { animation: mvDim 150ms var(--ease-std); }
+  :root:not(.no-motion) #app.anim-sub :is(.subtabs, .seg, .lcq-tabs) [aria-current='page'], :root:not(.no-motion) #app.anim-sub :is(.seg, .lcq-tabs) [aria-current='true'] { animation: mvSel var(--dur-2) var(--ease-out); }
+  /* ③ 같은 주소에서 내용만 바뀜(보기 모드·응원 팀·스포일러·지도 크게 보기) */
+  :root:not(.no-motion) #app.anim-soft > :not(.ph, .subtabs, .st-stick, .st-stick-at) { animation: mvSoft var(--dur-1) var(--ease-std); }
+  /* 주 메뉴: 휴대폰 위쪽 빨간 선이 가운데서 펼쳐진다(::before 만 움직이므로 헤더 고정에 영향 없음), PC 는 배경색 전환, 누르면 아이콘이 살짝 작아진다 */
+  :root:not(.no-motion) .tabbar a[aria-current='page']::before { animation: mvLine var(--dur-2) var(--ease-out); }
+  :root:not(.no-motion) .tabbar a { transition: color var(--dur-1) var(--ease-std), background-color var(--dur-1) var(--ease-std), box-shadow var(--dur-1) var(--ease-std); }
+  :root:not(.no-motion) .tabbar svg { transition: scale 100ms var(--ease-std), color var(--dur-1) var(--ease-std); }
+  :root:not(.no-motion) .tabbar a:active svg { scale: .92; }
+  :root:not(.no-motion) :is(.subtabs a, .seg a, .seg button) { transition: background-color var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std), border-color var(--dur-1) var(--ease-std); }
+  /* 대화상자(설정·제보): 살짝 커지며 나타나고 더 짧게 사라진다. 지원 안 하는 브라우저는 그냥 바로 열고 닫는다 */
+  :root:not(.no-motion) dialog { opacity: 0; scale: .98; transition: opacity 140ms var(--ease-in), scale 140ms var(--ease-in), translate 140ms var(--ease-in), overlay 140ms allow-discrete, display 140ms allow-discrete; }
+  :root:not(.no-motion) dialog[open] { opacity: 1; scale: 1; translate: 0 0; transition-duration: var(--dur-3); transition-timing-function: var(--ease-out); }
+  :root:not(.no-motion) dialog::backdrop { opacity: 0; transition: opacity 140ms var(--ease-in), overlay 140ms allow-discrete, display 140ms allow-discrete; }
+  :root:not(.no-motion) dialog[open]::backdrop { opacity: 1; transition-duration: var(--dur-3); }
+  @starting-style {
+    :root:not(.no-motion) dialog[open] { opacity: 0; scale: .96; translate: 0 8px; }
+    :root:not(.no-motion) dialog[open]::backdrop { opacity: 0; }
+  }
+  /* 토스트: 아래에서 8px 올라오며 나타난다 */
+  :root:not(.no-motion) .toast { translate: 0 8px; transition: opacity 160ms var(--ease-in), translate 160ms var(--ease-in); }
+  :root:not(.no-motion) .toast.show { translate: 0 0; transition-duration: var(--dur-2); transition-timing-function: var(--ease-out); }
+  /* 펼치기: 표 내역 줄은 투명도만, 그 밖은 4px 내려오며. 높이는 움직이지 않는다 */
+  :root:not(.no-motion) .anim-open:not(tr), :root:not(.no-motion) details.anim-open[open] > :not(summary) { animation: mvDrop var(--dur-2) var(--ease-out); }
+  :root:not(.no-motion) tr.anim-open { animation: mvFade var(--dur-2) var(--ease-out); }
+  :root:not(.no-motion) .anim-more { animation: mvSoft 200ms var(--ease-std); }
+  /* 방송 플레이어: 나타날 때 흐렸다 선명, 멀티뷰 칸 추가, 미니 플레이어는 오른쪽 아래에서 올라온다, 시네마 모드는 검은 바탕이 흐렸다 나타난다 (iframe 크기는 움직이지 않는다) */
+  :root:not(.no-motion) .lv-player { animation: mvFade var(--dur-3) var(--ease-out); }
+  :root:not(.no-motion) .lv-player.mini { animation: mvMini 220ms var(--ease-out); }
+  :root:not(.no-motion) .lv-player.cinema { animation: mvFade 200ms var(--ease-out); }
+  :root:not(.no-motion) .lv-tile { animation: mvTile var(--dur-2) var(--ease-out); }
+  /* POI 지도: 바탕 그림이 흐렸다 나타나고 핀이 고른 순서대로 톡 튀어나온다(15ms 간격). 진행 중 드래프트에서 새로 생긴 핀은 크게 튀었다 돌아온다 */
+  :root:not(.no-motion) #app.anim-poi .poi-base { animation: mvFade 220ms var(--ease-out); }
+  :root:not(.no-motion) #app.anim-poi .poi-pin { animation: mvPin var(--dur-2) var(--ease-out) calc(var(--i, 0) * 15ms) backwards; }
+  :root:not(.no-motion) .poi-pin.pin-new { animation: mvPinNew 600ms var(--ease-out); }
+  /* 핀 툴팁: display 대신 투명도·보임으로 바꿔 살짝 떠오른다 (위치용 transform 은 그대로 두고 translate 만 쓴다) */
+  :root:not(.no-motion) .poi-tip { display: flex; visibility: hidden; opacity: 0; translate: 0 4px; transition: opacity 80ms var(--ease-in), translate 80ms var(--ease-in), visibility 0s linear 80ms; }
+  :root:not(.no-motion) :is(.poi-pin:hover, .poi-pin:focus-visible, .poi-pin.on) .poi-tip { visibility: visible; opacity: 1; translate: 0 0; transition: opacity var(--dur-1) var(--ease-out), translate var(--dur-1) var(--ease-out), visibility 0s; }
+  :root:not(.no-motion) .p-bl .poi-tip, :root:not(.no-motion) .p-bc .poi-tip, :root:not(.no-motion) .p-br .poi-tip { translate: 0 -4px; }
+  /* 스포일러: 누르면 흐림이 걷힌 뒤 다시 그린다(이 상자 하나만) */
+  :root:not(.no-motion) .spoil-box .spoil-hidden { transition: filter 300ms var(--ease-out), opacity 300ms var(--ease-out); }
+  :root:not(.no-motion) .spoil-box.opening .spoil-hidden { filter: none; opacity: 1; }
+  :root:not(.no-motion) .spoil-box .spoil-btn { transition: opacity 200ms var(--ease-in); }
+  :root:not(.no-motion) .spoil-box.opening .spoil-btn { opacity: 0; }
+  /* 대표 응원 팀 칩: 새로 고르면 톡 나타난다. 강조색(--apex)은 서서히 바꾸지 않는다(사이트 전체 스타일 재계산) */
+  :root:not(.no-motion) .brand-team.pop { animation: mvPop 220ms var(--ease-out); }
+  /* 카드: 마우스가 있는 기기는 2px 떠오르고, 누르면 살짝 작아진다 */
+  :root:not(.no-motion) :is(.lv-card, .team-tile, .vid, .kchip, .fav-chip) { transition: translate var(--dur-1) var(--ease-std), scale 80ms var(--ease-std), border-color var(--dur-1) var(--ease-std), background-color var(--dur-1) var(--ease-std); }
+  :root:not(.no-motion) .lv-thumb img { transition: opacity var(--dur-2) var(--ease-std); }
+  :root:not(.no-motion) :is(.lv-card, .team-tile, .kchip, .fav-chip):active { scale: .98; }
+  /* 밝은↔어두운 모드: 지원 브라우저는 화면 전체 교차 전환 (app.js 의 startViewTransition) */
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 250ms; animation-timing-function: var(--ease-std); }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  :root:not(.no-motion) :is(.lv-card, .team-tile, .vid):hover { translate: 0 -2px; }
+}

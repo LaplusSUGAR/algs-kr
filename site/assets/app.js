@@ -62,7 +62,7 @@ const MODES = {
   custom: { label: '내 응원 팀', tag: '응원', group: '내 응원 팀', strip: '내 응원 팀', title: '내 응원 팀', only: '응원 팀 경기만', none: '응원 팀 없음' },
 };
 const ML = () => MODES[opt.mode] || MODES.kr;
-function setMode(m) { opt.mode = MODES[m] ? m : 'kr'; store.set('mode', opt.mode); FOCUS = null; render(); }
+function setMode(m) { opt.mode = MODES[m] ? m : 'kr'; store.set('mode', opt.mode); FOCUS = null; animNext = 'soft'; render(); }
 // 대표 응원 팀: 응원 팀 중 하나를 홈 맨 위 큰 카드와 표 맨 앞 강조로
 // 대표 응원 팀은 어느 보기(한국 팀·APAC North·내 응원 팀)에서도 관심 팀으로 치고 가장 먼저 보여 준다
 const mainId = () => (opt.main && opt.fav.includes(opt.main) ? opt.main : null);
@@ -73,7 +73,7 @@ function outsider(short) {
   return opt.mode === 'kr' ? !t.krLevel || t.krLevel === 'none' : ML().region ? t.region !== ML().region : false;
 }
 const outTag = (short) => (outsider(short) ? `<span class="oreg" title="${esc(opt.mode === 'kr' ? '한국 관련 팀이 아닙니다' : `${ML().label} 팀이 아닙니다`)}">${esc(REGION[A.teams[short].region] || '')}</span>` : '');
-function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; render(); }
+function setMain(id) { opt.main = opt.main === id ? null : id; if (opt.main && !opt.fav.includes(id)) { opt.fav = [...opt.fav, id]; store.set('fav', opt.fav); } store.set('main', opt.main); FOCUS = null; animNext = 'soft'; render(); }
 // 대표 응원 팀: 팀 로고에서 뽑은 색(A.teams[].color)으로 사이트 강조색을 바꾸고, 헤더에 팀 칩을 단다. 색이 없는 팀은 기본 빨강
 const mainTeam = () => (opt.main && opt.fav.includes(opt.main) ? Object.values(A.teams).find((x) => x.id === opt.main && x.current) || null : null);
 const TEAM_VARS = ['--apex', '--apex-hot', '--ring', '--ring-soft'];
@@ -89,9 +89,9 @@ function applyTeamTheme() {
   if (!t) { chip?.remove(); return; }
   if (!chip) { chip = document.createElement('a'); chip.id = 'brandTeam'; chip.className = 'brand-team'; brand.after(chip); }
   const html = `${logo(t.short, '', true)}<b>${esc(t.short)}</b>`;
-  if (chip.dataset.k !== t.short + document.documentElement.dataset.theme) { chip.dataset.k = t.short + document.documentElement.dataset.theme; chip.href = `#/teams/${encodeURIComponent(t.short)}`; chip.title = `대표 응원 팀: ${t.name}`; chip.innerHTML = html; }
+  if (chip.dataset.k !== t.short + document.documentElement.dataset.theme) { const nu = chip.dataset.t !== t.short; chip.dataset.k = t.short + document.documentElement.dataset.theme; chip.dataset.t = t.short; chip.href = `#/teams/${encodeURIComponent(t.short)}`; chip.title = `대표 응원 팀: ${t.name}`; chip.innerHTML = html; if (nu) pulseCls(chip, 'pop', 300); } // 새 팀을 고르면 칩이 톡 나타난다
 }
-function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : s.add(id); opt.fav = [...s]; store.set('fav', opt.fav); FOCUS = null; render(); }
+function toggleFav(id) { const s = new Set(opt.fav); s.has(id) ? s.delete(id) : s.add(id); opt.fav = [...s]; store.set('fav', opt.fav); FOCUS = null; animNext = 'soft'; render(); }
 // 관심 팀 단계: kr 모드는 한국 팀/한국 선수 소속/한국 코치 팀, 다른 모드는 관심 팀이면 'team'
 function lvlOf(short) {
   const t = A.teams?.[short];
@@ -131,7 +131,12 @@ function spoil(html, key, label = '결과') {
   if (!opt.spoiler || !key || revealed.has(key)) return html;
   return `<div class="spoil-box"><button type="button" class="spoil-btn" data-reveal="${esc(key)}"><b>${esc(label)} 가림</b><span>스포일러 방지 중 · 눌러서 이 대회 결과 보기</span></button><div class="spoil-hidden" inert aria-hidden="true">${html}</div></div>`;
 }
-function reveal(key) { revealed.add(key); store.set('revealed', [...revealed].slice(-50)); render(); }
+function reveal(key, btn) {
+  revealed.add(key); store.set('revealed', [...revealed].slice(-50));
+  // 가림이 걷히는 모습을 먼저 보여 주고 다시 그린다 (흐림은 이 상자 하나에만, 한 번)
+  const box = btn?.closest('.spoil-box');
+  if (box && motionOK()) { box.classList.add('opening'); setTimeout(() => { animNext = 'soft'; render(); }, 300); } else render();
+}
 
 /* ---------- 문의·피드백 ---------- */
 function feedbackUrl(kind, ctx = '') {
@@ -371,7 +376,8 @@ function toast(msg) {
   let el = document.getElementById('toast');
   if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.append(el); }
   el.textContent = I.t(msg); el.hidden = false;
-  clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2200);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show'))); // 나타남: 아래에서 살짝 올라온다
+  clearTimeout(toastT); toastT = setTimeout(() => { el.classList.remove('show'); toastT = setTimeout(() => { el.hidden = true; }, 200); }, 2200);
 }
 async function sharePage() {
   const url = shareUrl();
@@ -379,7 +385,7 @@ async function sharePage() {
   try { await navigator.clipboard.writeText(url); toast('링크를 복사했습니다'); } catch { window.prompt(I.t('아래 주소를 복사하세요'), url); }
 }
 
-let lastHtml = '', lastHash = null;
+let lastHtml = '', lastHash = null, lastHashPrev = null;
 // 펼쳐야 보이는 내용(포인트 표의 팀·선수별 내역 등)은 펼칠 때 만든다: 표를 그릴 때 수천 줄을 미리 만들지 않는다
 //   틀 안에서 ${lazy(() => html)} 를 속성 자리에 쓰면 data-lazy 번호가 붙고, 펼칠 때 fillLazy 가 채운다
 let LAZY = [], lazyNext = [];
@@ -387,6 +393,8 @@ let RGEN = 0; // 그리기 번호 (render 마다 1씩): 한 번 그리는 동안
 const lazy = (make) => ` data-lazy="${lazyNext.push(make) - 1}"`;
 // 접힌 <details class="lz"> 는 펼칠 때 채운다 (toggle 은 거품이 안 올라와 잡기 단계에서 받는다)
 app.addEventListener('toggle', (e) => { if (e.target.open && e.target.matches?.('details.lz')) fillLazy(e.target); }, true);
+// 접힌 항목을 사용자가 펼치면 내용이 살짝 내려오며 나타난다 (요약 줄을 누를 때만: 다시 그릴 때 열린 채로 생긴 항목은 움직이지 않는다)
+document.addEventListener('click', (e) => { const sm = e.target.closest?.('details > summary'); const d = sm?.parentElement; if (d && !d.open) pulseCls(d, 'anim-open', 400); });
 function fillLazy(root) {
   for (const el of root.matches?.('[data-lazy]') ? [root] : root.querySelectorAll('[data-lazy]')) {
     const make = LAZY[+el.dataset.lazy]; el.removeAttribute('data-lazy');
@@ -421,14 +429,50 @@ function patchApp(html) {
     return true;
   };
   if (!plan(app, lastTpl.content, tpl.content, 0) || !ops.length) return false;
-  for (const [d, n] of ops) { const c = n.cloneNode(true); d.replaceWith(c); I.tree(c); stickInit(c.parentElement || app); }
+  const mark = ops.length <= 20; // 한꺼번에 많이 바뀌면(게임이 끝나 표 전체가 바뀔 때 등) 강조하지 않는다
+  for (const [d, n] of ops) {
+    const c = n.cloneNode(true); d.replaceWith(c); I.tree(c); stickInit(c.parentElement || app);
+    if (mark && c.nodeType === 1 && !c.matches('table, .poi, .poi-fig') && !c.querySelector('table, .poi-pin') && c.textContent.length <= 160) pulseCls(c, 'upd', 1000, true);
+  }
   lastTpl = tpl;
   return true;
 }
 let lastNav = null;
+/* ---------- 화면 전환 애니메이션 (docs/transitions-plan.md) ----------
+   사용자가 바꿨을 때만 움직인다: 주소 이동(hashchange)·보기 모드·응원 팀 같은 직접 조작에서만 animNext 를 세우고,
+   render() 가 그린 직후 #app 에 anim-* 클래스를 잠깐 붙인다. 주기적 갱신(점수·방송·데이터)으로 다시 그릴 때는 붙지 않는다.
+   기기의 '동작 줄이기' 또는 설정의 '애니메이션 줄이기'(html.no-motion)면 움직이지 않는다 (CSS 도 같은 조건) */
+let animNext = null, animT = 0;
+const motionOK = () => !document.documentElement.classList.contains('no-motion') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ANIM_CLS = ['anim-page', 'anim-sub', 'anim-soft'];
+function animApp(kind) {
+  if (!kind || !motionOK()) return;
+  clearTimeout(animT);
+  app.classList.remove(...ANIM_CLS, 'anim-poi');
+  void app.offsetWidth; // 같은 효과를 이어서 다시 시작할 수 있게
+  const pins = kind === 'soft' ? [] : [...app.querySelectorAll('.poi-pin')];
+  pins.forEach((el, i) => el.style.setProperty('--i', String(Math.min(i, 40))));
+  app.classList.add(`anim-${kind}`, ...(pins.length ? ['anim-poi'] : []));
+  animT = setTimeout(() => app.classList.remove(...ANIM_CLS, 'anim-poi'), pins.length ? 260 + Math.min(pins.length, 40) * 15 : 420);
+}
+// 한 요소에 한 번만 도는 효과: 클래스를 붙였다가 끝나면 뗀다 (색 강조는 동작 줄이기에서도 남긴다)
+function pulseCls(el, cls, ms = 600, always = false) {
+  if (!el || (!always && !motionOK())) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  clearTimeout(el._pc); el._pc = setTimeout(() => el.classList.remove(cls), ms);
+}
+// POI 드래프트 진행 중 새로 생긴 핀만 강조한다 (같은 주소에서 다시 그릴 때)
+let poiPinSeen = null;
+function markNewPins(sameAddr) {
+  const pins = [...app.querySelectorAll('.poi-pin[data-n]')];
+  const keys = pins.map((p) => `${p.closest('.poi')?.querySelector('.poi-base')?.getAttribute('src') || ''}|${p.dataset.n}`);
+  if (sameAddr && poiPinSeen && motionOK()) pins.forEach((p, i) => { if (!poiPinSeen.has(keys[i])) pulseCls(p, 'pin-new', 900); });
+  poiPinSeen = pins.length ? new Set(keys) : null;
+}
 const H_SCROLL = ['.subtabs-in', '.seg', '.kr-strip'];
 function render() {
   applyTeamTheme();
+  const an = animNext; animNext = null;
   lazyNext = []; poiWatch = null; GWATCH.clear(); RGEN++;
   const { parts, q } = parseHash();
   const tab = parts[0] || 'home';
@@ -448,19 +492,21 @@ function render() {
   // 주기적 갱신(데이터 확인·방송 상태·홈 카운트다운)으로 다시 불렸는데 내용이 그대로면 화면을 건드리지 않는다: 스크롤·펼친 항목·재생이 유지되고 그리는 비용도 없다
   if (html === lastHtml && location.hash === lastHash && app.firstChild) return;
   // 순위 탭을 보는 중 주기적 갱신(같은 주소)으로 내용 일부만 바뀌었으면 바뀐 조각만 바꾼다 (POI 핀 툴팁·지도 위치·펼친 항목 유지). 못 하면 아래처럼 전부 다시 그린다
-  if (tab === 'standings' && location.hash === lastHash && app.firstChild && patchApp(html)) { lastHtml = html; LAZY = lazyNext; fitRing(); setPageTitle(parts, q); return; }
+  if (tab === 'standings' && location.hash === lastHash && app.firstChild && patchApp(html)) { lastHtml = html; LAZY = lazyNext; fitRing(); setPageTitle(parts, q); markNewPins(true); return; }
   lastTpl = null;
   lastHtml = html; lastHash = location.hash; LAZY = lazyNext;
   const keep = ['teamSearch', 'favSearch'].map((id) => [id, document.getElementById(id)?.value]).filter(([, v]) => v);
   // 가로로 스크롤되는 줄(세부 메뉴·보기 버튼·팀 칩): 같은 탭 안에서 다시 그릴 때 스크롤 위치를 유지한다 (휴대폰에서 메뉴를 밀어 둔 뒤 누르면 처음으로 돌아가던 문제)
   const sameTab = navTab === lastNav; lastNav = navTab;
+  const sameAddr = location.hash === lastHashPrev; lastHashPrev = location.hash;
   const hx = sameTab ? H_SCROLL.map((sel) => [...app.querySelectorAll(sel)].map((el) => el.scrollLeft)) : null;
   app.innerHTML = html;
   if (tab === 'standings') { lastTpl = document.createElement('template'); lastTpl.innerHTML = html; }
   if (hx) H_SCROLL.forEach((sel, i) => app.querySelectorAll(sel).forEach((el, j) => { if (hx[i][j]) el.scrollLeft = hx[i][j]; }));
   // 고른 세부 메뉴가 화면 밖이면 보이는 곳까지만 민다
   { const on = app.querySelector('.subtabs [aria-current="page"]'), bar = on?.closest('.subtabs-in');
-    if (bar) { const l = on.offsetLeft - bar.offsetLeft, r = l + on.offsetWidth; if (l < bar.scrollLeft) bar.scrollLeft = l - 16; else if (r > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = r - bar.clientWidth + 16; } }
+    if (bar) { const l = on.offsetLeft - bar.offsetLeft, r = l + on.offsetWidth, go = (x) => (an && motionOK() ? bar.scrollTo({ left: x, behavior: 'smooth' }) : (bar.scrollLeft = x));
+      if (l < bar.scrollLeft) go(l - 16); else if (r > bar.scrollLeft + bar.clientWidth) go(r - bar.clientWidth + 16); } }
   bind();
   for (const [id, v] of keep) { const el = document.getElementById(id); if (el) { el.value = v; el.dispatchEvent(new Event('input')); } } // 데이터 갱신으로 다시 그려도 검색어 유지
   I.tree(app);
@@ -470,6 +516,8 @@ function render() {
   { const ps = app.querySelector('.poi-scroll.big'); if (ps) ps.scrollLeft = (ps.scrollWidth - ps.clientWidth) / 2; } // POI 지도 크게 보기: 가운데부터
   fitRing();
   setPageTitle(parts, q);
+  markNewPins(sameAddr);
+  animApp(an === 'nav' ? (sameTab ? 'sub' : 'page') : an);
 }
 
 /* ---------- 세부 탭 (각 탭 안의 하위 분류) ---------- */
@@ -1823,7 +1871,7 @@ function poiSection(B, st) {
     // 팀 목록 줄을 누르면(팀 이름 링크 말고) 지도에서 그 팀 핀의 설명을 연다
     const tr = !pin && !e.target.closest?.('a') && e.target.closest?.('.poi-tbl tr[data-n]');
     if (tr) tr.closest('.poi').querySelector(`.poi-pin[data-n="${tr.dataset.n}"]`)?.classList.add('on');
-    if (e.target.closest?.('[data-poi-zoom]')) { poiBig = !poiBig; render(); }
+    if (e.target.closest?.('[data-poi-zoom]')) { poiBig = !poiBig; animNext = 'soft'; render(); }
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -1877,7 +1925,7 @@ document.addEventListener('click', (e) => {
     const i = (+j.dataset.i || 0) % rows.length, row = rows[i];
     j.dataset.i = String(i + 1);
     const top = row.getBoundingClientRect().top + scrollY - stickY() - (app.querySelector('.st-stick')?.offsetHeight || 0) - 12;
-    window.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    window.scrollTo({ top, behavior: motionOK() ? 'smooth' : 'auto' });
     row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash');
     return;
   }
@@ -2512,7 +2560,7 @@ document.addEventListener('click', (e) => {
   if (!b) return;
   const row = [...document.querySelectorAll('tr[data-cpt]')].find((x) => x.dataset.cpt === b.dataset.cpJump);
   if (!row) return;
-  row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  row.scrollIntoView({ block: 'center', behavior: motionOK() ? 'smooth' : 'auto' });
   row.classList.remove('jumped'); void row.offsetWidth; row.classList.add('jumped');
   row.focus({ preventScroll: true });
 });
@@ -3131,7 +3179,7 @@ function lvBig() { // 미니 플레이어 → 원래 자리로
   const box = lvBox(); if (!box) return; const slot = box.parentElement;
   lvMini(false);
   const top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')) || 0;
-  window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - top - 8, behavior: 'smooth' });
+  window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - top - 8, behavior: motionOK() ? 'smooth' : 'auto' });
 }
 function playLive(id) {
   const l = (ST?.live || []).find((x) => liveId(x) === id), box = lvBox(); if (!l?.embed || !box) return;
@@ -3156,7 +3204,7 @@ function playLive(id) {
   tile.querySelector('.lv-big').addEventListener('click', lvBig);
   I.tree(tile); tiles.append(tile); lvSync();
   if (box.classList.contains('mini')) return; // 미니 플레이어로 보고 있으면 화면을 옮기지 않는다
-  if (!box.classList.contains('cinema')) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (!box.classList.contains('cinema')) box.scrollIntoView({ block: 'nearest', behavior: motionOK() ? 'smooth' : 'auto' });
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lvBox()?.classList.contains('cinema')) lvCinema(false); });
 window.addEventListener('hashchange', () => { document.documentElement.classList.remove('lv-cinema'); mvOn = false; });
@@ -3346,7 +3394,7 @@ function streams(parts, q) {
 /* ---------- 이벤트 연결 ---------- */
 function bind() {
   app.querySelectorAll('[data-toggle]').forEach((tr) => {
-    const go = () => { const d = document.getElementById(tr.dataset.toggle); if (d.hidden) fillLazy(d); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); };
+    const go = () => { const d = document.getElementById(tr.dataset.toggle); if (d.hidden) fillLazy(d); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); if (!d.hidden) pulseCls(d, 'anim-open', 400); };
     tr.addEventListener('click', (e) => { if (e.target.closest('a')) return; go(); });
     tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
@@ -3368,7 +3416,7 @@ function bind() {
   app.querySelectorAll('[data-fav-clear]').forEach((b) => b.addEventListener('click', () => { opt.fav = []; store.set('fav', []); opt.main = null; store.set('main', null); FOCUS = null; render(); }));
   const fs = document.getElementById('favSearch');
   if (fs) fs.addEventListener('input', () => { const v = flatName(fs.value); app.querySelectorAll('.fav-chip').forEach((c) => { c.hidden = !!v && !flatName(c.textContent + ' ' + (c.dataset.name || '')).includes(v); }); });
-  app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal)));
+  app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal, b)));
   bindLive(app);
   { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
     const want = parseHash().q.get('play'), box = document.getElementById('lvPlayer');
@@ -3380,7 +3428,7 @@ function bind() {
     f.title = b.getAttribute('aria-label'); f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
     f.className = 'yt-frame'; b.replaceWith(f);
   }));
-  app.querySelectorAll('[data-unclip]').forEach((b) => { b.onclick = () => { b.closest('.clip')?.classList.remove('clip'); b.remove(); }; });
+  app.querySelectorAll('[data-unclip]').forEach((b) => { b.onclick = () => { const g = b.closest('.clip'); g?.classList.remove('clip'); b.remove(); pulseCls(g, 'anim-more', 400); }; });
   const search = document.getElementById('teamSearch');
   if (search) search.addEventListener('input', () => {
     const v = flatName(search.value);
@@ -3408,13 +3456,20 @@ function setupSettings() {
   document.getElementById('settingsBtn').addEventListener('click', () => {
     dark.checked = document.documentElement.dataset.theme === 'dark';
     sp.checked = opt.spoiler; kr.checked = opt.krOnly;
+    const mo = document.getElementById('optMotion'); if (mo) mo.checked = document.documentElement.classList.contains('no-motion');
     document.getElementById('dataInfo').innerHTML = dataInfo();
     document.getElementById('refreshInfo').innerHTML = refreshInfo();
     I.tree(document.getElementById('dataInfo')); I.tree(document.getElementById('refreshInfo'));
     dlg.showModal();
   });
   document.getElementById('refreshPill').addEventListener('click', () => document.getElementById('settingsBtn').click());
-  dark.addEventListener('change', () => { const t = dark.checked ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('algskr.theme', t); } catch {} });
+  dark.addEventListener('change', () => {
+    const t = dark.checked ? 'dark' : 'light', set = () => { document.documentElement.dataset.theme = t; };
+    if (document.startViewTransition && motionOK()) document.startViewTransition(set); else set(); // 지원 브라우저는 화면 전체를 교차 전환
+    try { localStorage.setItem('algskr.theme', t); } catch {}
+  });
+  const mo = document.getElementById('optMotion');
+  mo?.addEventListener('change', () => { document.documentElement.classList.toggle('no-motion', mo.checked); try { mo.checked ? localStorage.setItem('algskr.motion', 'off') : localStorage.removeItem('algskr.motion'); } catch {} });
   sp.addEventListener('change', () => { opt.spoiler = sp.checked; store.set('spoiler', sp.checked); render(); });
   kr.addEventListener('change', () => { opt.krOnly = kr.checked; store.set('krOnly', kr.checked); render(); });
   // 언어: 고르면 저장하고 새로 불러온다 (고정 영역까지 처음부터 그 언어로)
@@ -3633,7 +3688,7 @@ document.addEventListener('click', (e) => {
   }
   keepY = window.scrollY; clearTimeout(keepT); keepT = setTimeout(() => { keepY = null; }, 600);
 });
-window.addEventListener('hashchange', () => { const y = keepY; keepY = null; render(); app.focus({ preventScroll: true }); window.scrollTo(0, y ?? 0); });
+window.addEventListener('hashchange', () => { const y = keepY; keepY = null; animNext = 'nav'; render(); app.focus({ preventScroll: true }); window.scrollTo(0, y ?? 0); });
 setupSettings();
 setupFeedback();
 // 세부 탭이 머리말(웹은 머리말+탭) 바로 아래에 붙도록 높이를 잰다
