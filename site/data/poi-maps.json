@@ -692,28 +692,28 @@
       "name": "Winners Round 2",
       "draft": "01M794EPX8A0NG8JB8NZ3WK5HS",
       "date": "2026-11-21T05:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AVMY8W75AACGB8H6B7KKBM": {
       "region": "americas",
       "name": "Elimination Round 1",
       "draft": "01M794FV8B8RR3EM9PH4Y63ZYM",
       "date": "2026-11-21T05:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AVNSER58QR64HRKPB5GHPW": {
       "region": "americas",
       "name": "Elimination Round 2",
       "draft": "01M794J92AKHVC7VX2GETKTGYN",
       "date": "2026-11-22T00:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AVSHN0QD8GRH2RV8WPC6BN": {
       "region": "americas",
       "name": "Match Point Finals",
       "draft": "01M794KSSR9EV9EHGD5204K0Q7",
       "date": "2026-11-22T05:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1TSX8DG9TT3W1FK0PAFQ": {
       "region": "apac-n",
@@ -1405,29 +1405,701 @@
       "region": "apac-n",
       "name": "Winners Round 2",
       "draft": "01M795S9PGCVPHYG4SA74WD9QJ",
-      "date": "2026-11-21T03:00:00.000Z",
-      "checked": 83109
+      "date": "2026-11-20T11:30:00.000Z",
+      "completedAt": "2026-11-20T11:39:14.860Z",
+      "done": true,
+      "checked": 83110,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              2,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              3,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              4,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              5,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              6,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              7,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              8,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              9,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              11,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              12,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              13,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              14,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              17,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              30,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              35,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              36,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "Laugh Tale",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              38,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              39,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              40,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              10,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              15,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              16,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "Laugh Tale",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              18,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              19,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              20,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              21,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              22,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              23,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              24,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              25,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              26,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              27,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              28,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              29,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              31,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              32,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "Old Town",
+              64,
+              90
+            ],
+            [
+              33,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              34,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              37,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "Blossom Drive",
+              12,
+              53
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1TT6G4R3PWJYF7RGV49V": {
       "region": "apac-n",
       "name": "Elimination Round 1",
       "draft": "01M795TD2DS1879GY268NBJFHF",
-      "date": "2026-11-21T03:00:00.000Z",
-      "checked": 83109
+      "date": "2026-11-20T11:30:00.000Z",
+      "completedAt": "2026-11-20T11:41:39.017Z",
+      "done": true,
+      "checked": 83110,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREY2Q30PNMWXNRJF2KSSZ",
+              "FNATIC",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              2,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              3,
+              "01KTSJN9EEDKVNFF7XNN188HZ6",
+              "SOTEN",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              4,
+              "01KTSJN9DZM96H1S7BDZR53W4M",
+              "GROWGaming",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              6,
+              "01M6ZJMSGP3Q7VC3NGTFK6144T",
+              "Cuticle",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              8,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              9,
+              "01KTSJNA350MXM4N2G21X0FQES",
+              "ETiAS",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              11,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              12,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              16,
+              "01M6ZJMREJNC9SQ8F407MXJ961",
+              "rerereta",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              17,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              19,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              25,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              27,
+              "01M6ZJMRYVGQBDX9JJAB5T7P78",
+              "RIGALRISEJYASHIN",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              30,
+              "01M6ZJMRHM0PSWJ9TXGPX3J4PV",
+              "VAMOS",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              33,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              34,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              35,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              38,
+              "01M6ZJMRDDVCAP5D9B7T7J7HFC",
+              "NovaCroatia",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              40,
+              "01KTSJN9FCV6Q57S7410RHJC1Z",
+              "noEND",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              5,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              7,
+              "01M6ZJMRYVGQBDX9JJAB5T7P78",
+              "RIGALRISEJYASHIN",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              10,
+              "01M6ZJMRHM0PSWJ9TXGPX3J4PV",
+              "VAMOS",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              13,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              14,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              15,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              18,
+              "01M6ZJMRDDVCAP5D9B7T7J7HFC",
+              "NovaCroatia",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              20,
+              "01KTSJN9FCV6Q57S7410RHJC1Z",
+              "noEND",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              21,
+              "01KHPREY2Q30PNMWXNRJF2KSSZ",
+              "FNATIC",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              22,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              23,
+              "01KTSJN9EEDKVNFF7XNN188HZ6",
+              "SOTEN",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              24,
+              "01KTSJN9DZM96H1S7BDZR53W4M",
+              "GROWGaming",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              26,
+              "01M6ZJMSGP3Q7VC3NGTFK6144T",
+              "Cuticle",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              28,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              29,
+              "01KTSJNA350MXM4N2G21X0FQES",
+              "ETiAS",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              31,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              32,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              36,
+              "01M6ZJMREJNC9SQ8F407MXJ961",
+              "rerereta",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              37,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              39,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1TT8B3GE0QP89WNNWC1X": {
       "region": "apac-n",
       "name": "Elimination Round 2",
       "draft": "01M795VRM7SHJSNKD3Z79V6F9Q",
       "date": "2026-11-21T07:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1TTA13PP4VV1JTQPKGGQ": {
       "region": "apac-n",
       "name": "Match Point Finals",
       "draft": "01M795WXJ35GHH6RBBWCAK8661",
       "date": "2026-11-21T12:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW2AFX89DTFAZNWW3MXGQM": {
       "region": "emea",
@@ -2110,28 +2782,28 @@
       "name": "Winners Round 2",
       "draft": "01M7951TPBVEWRHE0TG0H5BY9D",
       "date": "2026-11-20T21:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW2AG3S4MACVZW2Q5T1R6A": {
       "region": "emea",
       "name": "Elimination Round 1",
       "draft": "01M7952TPPAGN4MZCSVMT832X6",
       "date": "2026-11-20T21:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW2AG52Y60BYQZ7MTFAP61": {
       "region": "emea",
       "name": "Elimination Round 2",
       "draft": "01M7954B0A4G80G83MMCT46GWF",
       "date": "2026-11-21T17:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW2AG6MJP4NKB4AT49WM7C": {
       "region": "emea",
       "name": "Match Point Finals",
       "draft": "01M795578NNWEY453B4FPPK86H",
       "date": "2026-11-21T21:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1M8MF3J70S1Q32P8FE18": {
       "region": "apac-s",
@@ -2824,28 +3496,28 @@
       "name": "Winners Round 2",
       "draft": "01M796X7KVHGETFZFNF0K28MG4",
       "date": "2026-11-21T04:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1M8X9AQXS0JKF9K3VH3X": {
       "region": "apac-s",
       "name": "Elimination Round 1",
       "draft": "01M796Y6WBFZ03ATN8ZVHHP48T",
       "date": "2026-11-21T04:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1M8ZEGT5P8MGB1BRVWNX": {
       "region": "apac-s",
       "name": "Elimination Round 2",
       "draft": "01M796YX0SJ8E9G4NP5YR12Y1S",
       "date": "2026-11-21T08:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     },
     "01M3AW1M9221ZW688QWHX8RTS7": {
       "region": "apac-s",
       "name": "Match Point Finals",
       "draft": "01M7970CEQDVY7HMFZH9HM7W1G",
       "date": "2026-11-21T13:00:00.000Z",
-      "checked": 83109
+      "checked": 83110
     }
   }
 }
