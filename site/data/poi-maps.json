@@ -2782,14 +2782,686 @@
       "name": "Winners Round 2",
       "draft": "01M7951TPBVEWRHE0TG0H5BY9D",
       "date": "2026-11-20T20:15:00.000Z",
-      "checked": 83111
+      "completedAt": "2026-11-20T20:24:22.401Z",
+      "done": true,
+      "checked": 83111,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              2,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "Majin",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              3,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              4,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              5,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              6,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              7,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              8,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              9,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              10,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              11,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              12,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              13,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              14,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              17,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              19,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              20,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              35,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              36,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              38,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              15,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              16,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              18,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              21,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              22,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "Majin",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              23,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              24,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              25,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              26,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              27,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              28,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              29,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              30,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              31,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              32,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              33,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              34,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              37,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              39,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              40,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW2AG3S4MACVZW2Q5T1R6A": {
       "region": "emea",
       "name": "Elimination Round 1",
       "draft": "01M7952TPPAGN4MZCSVMT832X6",
       "date": "2026-11-20T20:15:00.000Z",
-      "checked": 83111
+      "completedAt": "2026-11-20T20:25:28.016Z",
+      "done": true,
+      "checked": 83111,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREW26WW7WFZ1H5YMJXWN2",
+              "Ben",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              2,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              3,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              5,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              6,
+              "01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+              "OnChikken",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              7,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              8,
+              "01KHPREZ9GPCDSSQKNVXNEACVV",
+              "FUL",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              10,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              11,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              12,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              13,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              14,
+              "01KTSJNAA5CR05C7HPH72X4AEM",
+              "Shadows Of Nine",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              15,
+              "01M6ZJMR6CEA2RTM8KNQHG1KWM",
+              "ForFun",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              19,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              24,
+              "01M6ZJMSCQ1R8NAE4XQ5XVTZRS",
+              "Nemesis",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ],
+            [
+              29,
+              "01M6ZJMS520CH2N35AXE21CZQW",
+              "Si Vis Pacem",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              36,
+              "01KTSJN9K4MV4KZM8GE7E6566V",
+              "Clocks",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              37,
+              "01KTSJNA93DA8WPMXGWNGH1ZNY",
+              "QSM",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              38,
+              "01M6ZJMQATFXKMNR48B08J3W41",
+              "Daikoku",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              40,
+              "01KHPREWQ7ZZGP8S40W48MFHF9",
+              "Blessed",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              4,
+              "01M6ZJMSCQ1R8NAE4XQ5XVTZRS",
+              "Nemesis",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              9,
+              "01M6ZJMS520CH2N35AXE21CZQW",
+              "Si Vis Pacem",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              16,
+              "01KTSJN9K4MV4KZM8GE7E6566V",
+              "Clocks",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              17,
+              "01KTSJNA93DA8WPMXGWNGH1ZNY",
+              "QSM",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              18,
+              "01M6ZJMQATFXKMNR48B08J3W41",
+              "Daikoku",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              20,
+              "01KHPREWQ7ZZGP8S40W48MFHF9",
+              "Blessed",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              21,
+              "01KHPREW26WW7WFZ1H5YMJXWN2",
+              "Ben",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              22,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              23,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              25,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              26,
+              "01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+              "OnChikken",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              27,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Old Town",
+              64,
+              90
+            ],
+            [
+              28,
+              "01KHPREZ9GPCDSSQKNVXNEACVV",
+              "FUL",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              30,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              31,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              32,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              33,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              34,
+              "01KTSJNAA5CR05C7HPH72X4AEM",
+              "Shadows Of Nine",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              35,
+              "01M6ZJMR6CEA2RTM8KNQHG1KWM",
+              "ForFun",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              39,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "Settlement",
+              65,
+              63
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW2AG52Y60BYQZ7MTFAP61": {
       "region": "emea",
