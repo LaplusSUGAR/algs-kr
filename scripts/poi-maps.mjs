@@ -3,11 +3,13 @@
 // 팀 핀을 좌표(%)로 얹어 그린다. 그림 파일은 만들지 않는다.
 //
 //   입력 : raw/algs/snapshot.json (LCQ 시리즈 목록), 공식 API /series/{id}, /poi-drafts/{draftId}[/pick|/locations]
-//   출력 : site/data/poi-maps.json  { ver, series: { 시리즈ID: { region, name, draft, date, done, maps: [{ map, base, picks }], missed } } }
+//   출력 : site/data/poi-maps.json  { ver, series: { 시리즈ID: { region, name, draft, date, done, maps: [{ map, base, picks }], missed } }, ends: { 대회ID: { n, at } } }
 //          picks = [[선택 순서, 팀 ID, 팀 이름, 낙하 지점, x(%), y(%)]]
 //
 // 끝난 드래프트(completed)만 적는다. 한 번 적은 시리즈는 다시 받지 않는다(--force로 모두 다시).
-// 아직 시작 전인 드래프트는 시작 시각 가까이(앞 2시간~뒤 6시간)일 때만 확인하고, 그 밖에는 6시간에 한 번만 확인한다.
+// 드래프트는 앞 라운드가 끝나고 1시간 안에 열린다(운영자 확인, 11-20). 공식 API의 드래프트 시각(date)은 경기 시각을 넣어 둔 값이라 믿지 않는다.
+// 그래서 대회마다 끝난 시리즈 수가 늘어난 때를 ends[대회 ID] = { n, at } 로 적고, 그때부터 2시간 동안은 안 끝난 드래프트를 매 실행 확인한다.
+// 그 밖에는 드래프트 시각 가까이(앞 2시간~뒤 6시간)일 때만, 아니면 6시간에 한 번만 확인한다.
 // 받을 때마다 좌표를 공식 낙하 지점 목록과 대조해 어긋나면 [poi] 경고를 남긴다(빌드는 멈추지 않는다).
 // 새 지도가 나오면 바탕 그림을 site/poi/base/<지도 이름: 소문자·하이픈>.webp 로 넣는다 (예: worlds-edge.webp).
 // 사용: node scripts/poi-maps.mjs [--force]
@@ -25,12 +27,15 @@ const snap = readJson('raw/algs/snapshot.json', null);
 if (!snap) { console.log('[poi] 스냅샷이 없어 건너뜀'); process.exit(0); }
 let man = readJson(MANIFEST, null);
 if (!man || man.ver !== VER) man = { ver: VER, series: {} };
+man.ends ||= {};
 const live = new Set(snap.series.map((s) => s[0]));
 for (const id of Object.keys(man.series)) if (!live.has(id)) delete man.series[id]; // 지난 시즌 것은 지운다
+for (const id of Object.keys(man.ends || {})) if (!snap.events.some((e) => e[0] === id)) delete man.ends[id];
 
 const now = Date.now();
 const bucket = Math.floor(now / (6 * 3600e3)); // 6시간 구간 번호: 파일이 매번 바뀌어 커밋이 생기지 않게 시각 대신 구간만 적는다
 let checked = 0, added = 0;
+const AFTER_MS = 2 * 3600e3; // 앞 라운드 종료 뒤 확인하는 시간 (드래프트는 1시간 안에 열리므로 여유를 둔다)
 
 // 좌표 점검: 범위, 공식 낙하 지점 목록과의 일치, 한 지점 중복 선택, 한 팀의 같은 지도 중복 선택
 function audit(label, chosen, locs) {
@@ -51,12 +56,16 @@ function audit(label, chosen, locs) {
 
 for (const ev of snap.events.filter((e) => /^last-chance-qualifier/.test(e[1]))) {
   const region = normRegion(ev[3]);
+  // 앞 라운드 종료 감지: 끝난 시리즈 수가 늘어난 때를 적는다 (끝난 시각이 API에 없어 처음 본 때로)
+  const nDone = snap.series.filter((x) => x[1] === ev[0] && x[4] === 'completed').length;
+  if (nDone && nDone !== man.ends[ev[0]]?.n) man.ends[ev[0]] = { n: nDone, at: new Date(now).toISOString() };
+  const after = man.ends[ev[0]]?.at, fresh = after && now < Date.parse(after) + AFTER_MS;
   for (const s of snap.series.filter((x) => x[1] === ev[0])) {
     const [id, , , name] = s;
     const old = man.series[id] || {};
     if (old.done && !FORCE) continue;
     // 시작 전 드래프트는 시각 가까이(앞 2시간~뒤 6시간)일 때만, 그 밖에는 6시간에 한 번만 확인
-    const near = old.date && now > Date.parse(old.date) - 2 * 3600e3 && now < Date.parse(old.date) + 6 * 3600e3;
+    const near = fresh || (old.date && now > Date.parse(old.date) - 2 * 3600e3 && now < Date.parse(old.date) + 6 * 3600e3);
     if (!FORCE && old.checked === bucket && !near) continue;
     checked++;
     try {
