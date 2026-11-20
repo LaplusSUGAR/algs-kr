@@ -36,6 +36,7 @@
     ['본문 바로가기', '本文へ移動', 'Skip to content'], ['주 메뉴', 'メインメニュー', 'Main menu'], ['세부 메뉴', 'サブメニュー', 'Sub menu'],
     ['갱신 주기 보기', '更新間隔を見る', 'Update interval'], ['문의·피드백', 'お問い合わせ・フィードバック', 'Feedback'], ['설정 열기', '設定を開く', 'Open settings'],
     ['정기 갱신', '定期更新', 'Scheduled'], ['설정', '設定', 'Settings'], ['닫기', '閉じる', 'Close'], ['다크 모드', 'ダークモード', 'Dark mode'],
+    ['애니메이션 줄이기', 'アニメーションを減らす', 'Reduce animations'], ["화면 전환 효과를 끕니다. 기기의 '동작 줄이기'를 켜도 꺼집니다", '画面切り替えの効果をオフにします。端末の「視差効果を減らす」設定でもオフになります', "Turns off transition effects. Your device's reduce-motion setting also turns them off"],
     ['결과 가리기 (스포일러 방지)', '結果を隠す（ネタバレ防止）', 'Hide results (no spoilers)'],
     ['점수·순위·진출 결과를 가리고, 대회별로 눌러서 공개합니다', 'スコア・順位・進出結果を隠し、大会ごとにタップで表示します', 'Hides scores, standings and advancement; reveal per event with a tap'],
     ['표에서 관심 팀만 보기', '表で注目チームだけ表示', 'Show only focus teams in tables'], ['표에서 찾기', '表で探す', 'Jump to'], ['표에서 팀 찾기', '表でチームを探す', 'Jump to a team in the table'], ['직행선과 차이', '直行ラインとの差', 'Gap to cut'], ['플레이오프 진출', 'プレイオフ進出', 'Playoffs qualified'],
