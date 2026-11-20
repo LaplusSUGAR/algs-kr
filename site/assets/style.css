@@ -2118,3 +2118,16 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
   :root:not(.no-motion) :is(.lv-card, .team-tile, .vid):hover { translate: 0 -2px; }
 }
+
+/* 경기 중 홈 (11-20): 진행 방식 그림 대신 지금 경기마다 짧은 점수표 (상위 3팀 + 컷 경계 + 관심 팀) */
+.lvm-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
+.lvm { min-width: 0; }
+.tbl.lcq-grid.mini td { padding-top: 7px; padding-bottom: 7px; }
+.tbl.lcq-grid.mini tr.gap td { padding: 0 6px; line-height: 1.1; color: var(--steel); text-align: center; letter-spacing: .3em; border-bottom: 0; background: transparent; box-shadow: none; }
+.lvm-wait { margin: 6px 0; font-size: 13px; color: var(--steel); }
+.lvm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 6px; }
+.lvm-next { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; }
+.lvm-next > span:first-child { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--steel); margin-right: 4px; }
+.tbl.lcq-grid.mini .cutgap { display: inline-block; margin: 0 0 0 4px; }
+.tbl.lcq-grid.mini td.r.small { white-space: normal; }
+.lvm .tbl-wrap + .more, .lvm > .more { display: inline-block; margin-top: 6px; }

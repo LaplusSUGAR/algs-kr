@@ -687,10 +687,24 @@ function eventHome() {
   } else return '';
   B.base = base; B.q = q;
   const sts = homeStages(B);
+  // 점수표는 짧게(상위 3팀 + 컷 경계 + 관심 팀). 전체는 '전체 점수표'(순위 탭)
+  const board = (st) => `<div class="lvm"><h3 class="h3 up-h">${esc(st.ko)} ${st.status === 'live' ? '' : `<small class="muted">${esc(stageState(st))}</small> `}${gameCount(st.s, st.key === 'f')} ${gameNow(st.s)}</h3>${spoil(stageGrid(B, st, 0, true), key, '점수표')}<a class="more" href="${qsLink(base, q, { m: st.key })}">전체 점수표</a></div>`;
+  if (sts.some((st) => st.status === 'live')) {
+    // 관심 팀이 나가는 경기가 있으면 그 경기만 (나머지 조는 '전체 보기')
+    const mineSts = sts.filter((st) => (st.teams || st.s?.lineup || []).some(isF));
+    if (mineSts.length) sts.splice(0, sts.length, ...mineSts);
+    // 경기 중: 진행 방식 그림·일정 없이 지금 경기 점수만. 다음 단계는 한 줄
+    const nx = B.list.find((st) => st.key !== 'gs' && st.status !== 'completed' && st.status !== 'live' && st.start);
+    return `<section class="sec flow-sec lvm-sec" aria-labelledby="h-ev">
+      <div class="sec-head"><h2 class="h2" id="h-ev">${esc(title)} <span class="tag live">LIVE</span></h2><a class="more" href="${qsLink(base, q, { m: 'groups' })}">전체 보기</a></div>
+      <div class="lvm-grid">${sts.map(board).join('')}</div>
+      ${nx ? `<p class="lvm-next"><span>다음 경기</span> <b>${esc(nx.ko)}</b> · ${rt(nx.start, 'dt')}</p>` : ''}
+    </section>`;
+  }
   return `<section class="sec flow-sec" aria-labelledby="h-ev">
       <div class="sec-head"><h2 class="h2" id="h-ev">${esc(title)}</h2><a class="more" href="${qsLink(base, q, { m: 'groups' })}">전체 보기</a></div>
       <div class="flow-grid"><div>${spoil(stageFlow(B, L, (k) => qsLink(base, q, { m: k }), `${title} 진행 방식`), key, '진출 결과')}</div>
-      <div>${sts.map((st) => `<h3 class="h3 up-h">${esc(st.ko)} <small class="muted">${esc(stageState(st))}</small> ${gameCount(st.s, st.key === 'f')} ${gameNow(st.s)}</h3>${spoil(stageGrid(B, st, 10), key, '점수표')}<a class="more" href="${qsLink(base, q, { m: st.key })}">전체 점수표</a>`).join('')}</div></div>
+      <div>${sts.map(board).join('')}</div></div>
     </section>`;
 }
 function home() {
@@ -701,7 +715,8 @@ function home() {
   const B = bracket();
   const evHome = eventHome();
   const showFlow = !evHome && B && B.list.some((st) => st.status !== 'completed') && upcoming.some((s) => s.eventId === A.intl.eventId);
-  const upMix = [...upcoming.map((s) => ({ t: s.start, h: () => matchItem(s, { cd: true }) })), ...extrasUpcoming().filter(isKrExtra).map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).slice(0, 3);
+  const evLive = evHome.includes('lvm-sec');
+  const upMix = [...upcoming.filter((s) => !(evLive && s.live)).map((s) => ({ t: s.start, h: () => matchItem(s, { cd: true }) })), ...extrasUpcoming().filter(isKrExtra).map((x) => ({ t: x.start, h: () => extraItem(x) }))].sort((a, b) => a.t.localeCompare(b.t)).slice(0, 3);
   const upList = `<div class="up-list">${upMix.map((o) => o.h()).join('') || '<p class="empty">예정된 경기가 없습니다.</p>'}</div>`;
   const modeBar = `<div class="mode-bar">${modeSwitch()}${opt.mode === 'custom' ? `<a class="more" href="#/teams/pick">${opt.fav.length ? '응원 팀 바꾸기' : '응원 팀 고르기'}</a>` : ''}</div>`;
   if (opt.mode === 'custom' && !opt.fav.length) return modeBar + `<section class="sec"><h1 class="title">내 응원 팀</h1>${favPicker()}</section>`;
@@ -735,7 +750,7 @@ function lcqState(short, Bs) {
     let last = null;
     for (const st of B.list) if (st.teams?.includes(short)) last = st;
     if (!last) return `LCQ 출전${t.cp ? ` · CP ${t.cp.rank}위` : ''}`;
-    const r = last.s?.results?.find((x) => x.short === short);
+    const r = last.s?.results?.find((x) => x.short === short && x.pos);
     if (last.status === 'completed' && r) return `LCQ ${LCQ_SHORT[last.key]} ${r.pos}위${last.key === 'f' ? (r.pos <= last.top ? ' 진출' : '') : r.pos <= last.cut ? ' ↑' : last.down === '탈락' ? ' 탈락' : ' ↓'}`;
     if (last.status === 'live') return `LCQ ${LCQ_SHORT[last.key]} LIVE${r ? ` ${r.pos}위` : ''}`;
     return `LCQ ${LCQ_SHORT[last.key]} 대기`;
@@ -1735,8 +1750,13 @@ const jumpBar = (rows) => (rows.length > 10 && rows.some((r) => r.short && isF(r
 
 // 점수표 (LCQ·챔피언십 공통): 경기 전에는 자리 칸, 결과가 들어오면 순위 / 킬 / 종합
 //   다음(결과) 칸: 진출 규칙(cut)이 있는 단계와 결승만
-function stageGrid(B, st, limit = 0) {
-  const x = st.s, res = x?.results?.length ? x.results : null;
+//   mini: 홈 요약 — 상위 3팀 + 컷 경계 두 팀 + 관심 팀만, 시드 글자·게임별 칸 없이. 결과가 아직 없으면 출전 관심 팀만 (stageMini 참고)
+function stageGrid(B, st, limit = 0, mini = false) {
+  const x = st.s, res = x?.results?.some((r) => r.pos) ? x.results : null;
+  if (mini && !res) {
+    const fs = (st.teams || x?.lineup || []).filter(isF);
+    return `<p class="lvm-wait">${st.status === 'live' ? '첫 매치가 끝나면 순위가 나옵니다.' : '아직 결과가 없습니다.'}</p>${fs.length ? `<p class="lvm-chips">${fs.map((sh) => `<span class="evc ${CAT[krOf(sh)] || ''}">${esc(sh)}</span>`).join('')}</p>` : ''}`;
+  }
   const slotOf = new Map(st.slots.filter((y) => y.short).map((y) => [y.short, y.label]));
   let rows;
   if (res) rows = res.map((r) => ({ ...r, label: slotOf.get(r.short) || B.seed(r.short)?.label || '' }));
@@ -1745,10 +1765,11 @@ function stageGrid(B, st, limit = 0) {
   while (rows.length < st.n) rows.push({ short: null, label: '' });
   if (opt.krOnly) rows = rows.filter((r) => r.short && isF(r.short));
   if (limit) rows = rows.filter((r, i) => i < limit || (r.short && isF(r.short)));
+  if (mini) rows = rows.filter((r) => r.pos && (r.pos <= 3 || (st.cut && st.status !== 'completed' && (r.pos === st.cut || r.pos === st.cut + 1)) || isF(r.short))).map((r) => ({ ...r, label: '' }));
   const hasDest = !!st.cut || st.key === 'f';
   // 순위 탭의 경기 화면(limit 없음)에서 시작 전이면: 빈 점수 칸 없이 시드 순 출전 명단을 두 줄로 (시작하면 아래 점수표)
   if (!limit && !res && st.status !== 'live') return preGrid(B, st, rows);
-  const G = gameCols(x, st.key === 'f');
+  const G = mini ? null : gameCols(x, st.key === 'f');
   // 진행 중: 컷 라인과의 점수 차 (위는 바로 아래 팀(cut+1위)보다 몇 점 앞서는지, 아래는 cut위까지 몇 점 모자라는지). 동점 규칙은 따지지 않은 단순 점수 차
   const tp = (pos) => { const y = res?.find((z) => z.pos === pos); return y ? ptsOf(y.pts, y.kills).tp : null; };
   const lineIn = st.cut && st.status === 'live' ? tp(st.cut) : null, lineOut = st.cut && st.status === 'live' ? tp(st.cut + 1) : null;
@@ -1764,12 +1785,13 @@ function stageGrid(B, st, limit = 0) {
     const d = lcqDest(st, r.pos);
     return `<span class="adv ${r.pos <= st.cut ? 'up' : d === '탈락' ? 'out' : 'down'}">${d === '탈락' ? '탈락' : `→ ${esc(d)}`}</span>${gap(r)}`;
   };
-  const body = rows.map((r) => {
+  const body = rows.map((r, i) => {
+    const skip = mini && i > 0 && r.pos > rows[i - 1].pos + 1 ? `<tr class="gap"><td colspan="${hasDest ? 4 : 3}" aria-hidden="true">⋯</td></tr>` : '';
     const cutHere = !opt.krOnly && st.cut && (res ? r.pos === st.cut : false);
-    return `<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
+    return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
   }).join('');
   const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다.' : '';
-  return `${limit ? '' : jumpBar(rows)}<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>${cap ? `<p class="caption">${esc(cap)}</p>` : ''}`;
+  return `${limit || mini ? '' : jumpBar(rows)}<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid${mini ? ' mini' : ''}"><thead><tr><th>#</th><th>팀</th>${mini ? '<th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>' : PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>${cap && !mini ? `<p class="caption">${esc(cap)}</p>` : ''}`;
 }
 // 단계 시각 (LCQ·챔피언십 공통): 'MM.DD (요일) HH:mm KST'. 공식 시각이 임시값이면 '시각 미정', 날짜만 알면 날짜
 const stWhen = (st) => (st.whenText ? st.whenText : st.start && !st.tbd ? `${dateTime(st.start)} ${TZL}` : st.date ? `${dayLabel(st.date)} 시각 미정` : st.tbd ? '시각 미정' : '일정 미정');
@@ -3543,7 +3565,7 @@ async function pollDirect() {
       const games = Math.max(0, ...(st.teams || []).flatMap((t) => (t.players || []).map((p) => p.latestMatchNumber || 0)));
       const sig = JSON.stringify([st.seriesStatus, results.map((x) => [x.short, x.pts, x.pos])]);
       if (sig !== s._sig) { changed = true; s._sig = sig; }
-      s.results = results.length ? results : s.results; s.games = games;
+      s.results = results.some((x) => x.pos) ? results : s.results; s.games = games; // 첫 게임이 끝나기 전에는 순위(position)가 비어 있다: 출전 명단 그대로
       s.kr = (s.results || []).filter((x) => x.kr !== 'none').map((x) => x.short);
       s.live = st.seriesStatus === 'live';
       s.liveAt = Date.now();
@@ -3660,7 +3682,7 @@ function applyLive() {
     const l = live.series[s.id];
     if (!l) continue;
     s.live = l.status === 'live';
-    if (l.results) s.results = l.results.map((r) => ({ ...r, kr: krOf(r.short), mpe: !!r.mp }));
+    if (l.results?.some((r) => r.pos)) s.results = l.results.map((r) => ({ ...r, kr: krOf(r.short), mpe: !!r.mp }));
     s.liveAt = l.checkedAt ? Date.parse(l.checkedAt) : Date.now(); LIVE.lastAt = s.liveAt;
     if (l.status === 'completed') { s.status = 'completed'; s.liveFinal = true; }
     s.kr = (s.results || []).filter((r) => isF(r.short)).map((r) => r.short);
