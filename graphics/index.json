@@ -8,8 +8,8 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "952f69410bb5",
-   "made": "2026-11-21T11:24:16.685Z",
+   "hash": "62f211f7cdbd",
+   "made": "2026-11-21T11:37:25.372Z",
    "series": [
     "~l8"
    ]
@@ -32,8 +32,8 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "787dc64ad85d",
-   "made": "2026-11-21T11:24:22.209Z",
+   "hash": "6001f07b7b41",
+   "made": "2026-11-21T11:37:28.503Z",
    "series": [
     "~l9"
    ]
@@ -56,8 +56,8 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "4813408483de",
-   "made": "2026-11-21T11:24:32.594Z",
+   "hash": "a59dc7b0a34a",
+   "made": "2026-11-21T11:37:35.356Z",
    "series": [
     "~lb"
    ]
@@ -80,8 +80,8 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "2419efe04065",
-   "made": "2026-11-21T11:24:27.521Z",
+   "hash": "8494a242209c",
+   "made": "2026-11-21T11:37:31.918Z",
    "series": [
     "~la"
    ]
@@ -104,8 +104,8 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "874d7ad1a1a2",
-   "made": "2026-11-21T11:24:37.464Z",
+   "hash": "a1728da6338d",
+   "made": "2026-11-21T11:37:38.877Z",
    "series": [
     "~lc"
    ]
@@ -120,6 +120,18 @@
    "made": "2026-11-21T11:24:34.051Z",
    "series": [
     "~lc"
+   ]
+  },
+  "year-6/lcq/apac-n/20261122-1700-f-poi.png": {
+   "kind": "poi",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-22T08:00:00.000Z",
+   "title": "POI 드래프트",
+   "hash": "578190f56e07",
+   "made": "2026-11-21T11:37:43.413Z",
+   "series": [
+    "~ld"
    ]
   }
  }

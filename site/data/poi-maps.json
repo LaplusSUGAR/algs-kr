@@ -3087,7 +3087,509 @@
       "name": "Match Point Finals",
       "draft": "01M795WXJ35GHH6RBBWCAK8661",
       "date": "2026-11-21T11:20:00.000Z",
-      "checked": 83113
+      "completedAt": "2026-11-21T11:32:32.463Z",
+      "done": true,
+      "checked": 83113,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              3,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              5,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              7,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              14,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              16,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              17,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "ORB GARDEN JP",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              24,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              28,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              30,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              33,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              40,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              42,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              46,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              49,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              51,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              52,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              55,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              58,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              59,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        },
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              2,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              4,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              6,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              8,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              9,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              10,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              12,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              13,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              15,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              18,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              19,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              25,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              27,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              31,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              34,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              37,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "ORB GARDEN JP",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              41,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              43,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              56,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              60,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Mountain Lift",
+              60,
+              47
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              11,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              20,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              21,
+              "01KHPREXKPB1ZHBC2S31AN0P7E",
+              "RIDDLEORDER ZERO",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              22,
+              "01KME2AGN68R686YAX6GHNHJHX",
+              "FCN YAMABUN",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              23,
+              "01KTSJN9E6HENNGMP9TC1HV5AA",
+              "SLEEPY",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              26,
+              "01KHPREXR9RN3TFMXM8PE4MRB7",
+              "RIDDLEORDER ONE",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              29,
+              "01KHPREY171TGAJBD2NNB8SVFY",
+              "ALTERNATIVE",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              32,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              35,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              36,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              38,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              39,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              44,
+              "01KHPREYY3VBJ72QFHDHTGFV3K",
+              "KINOTROPE gaming",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              45,
+              "01M6ZJMRP578DPEEQKVKT7BT5D",
+              "UNLIMIT ACADEMY",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              47,
+              "01KHPREXY6ACYJFDBYCH61WC8E",
+              "LawsonTicketXone",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              48,
+              "01KJSEK7G2AAFZS9C17W5T6DGH",
+              "RRX",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              50,
+              "01KTSJNA2Y21PNF3VHANB97EMK",
+              "UNFAZED",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              53,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              54,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              57,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "ORB GARDEN JP",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW2AFX89DTFAZNWW3MXGQM": {
       "region": "emea",
