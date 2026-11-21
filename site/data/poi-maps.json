@@ -2744,7 +2744,343 @@
       "name": "Elimination Round 2",
       "draft": "01M795VRM7SHJSNKD3Z79V6F9Q",
       "date": "2026-11-21T06:45:00.000Z",
-      "checked": 83113
+      "completedAt": "2026-11-21T06:53:47.058Z",
+      "done": true,
+      "checked": 83113,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              1,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              4,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              5,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              6,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "ORB GARDEN JP",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              8,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              9,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              10,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              11,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              13,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              16,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              17,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              19,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              20,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              22,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              23,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              27,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              32,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              34,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              35,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              38,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "Outpost North",
+              39,
+              22
+            ]
+          ]
+        },
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              2,
+              "01KHPREV02KZK07880PESMKJ3V",
+              "REALIZE",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              3,
+              "01KTSJN9FSFV7WCPFRY5P76R31",
+              "CAC_EST",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              7,
+              "01KHPREXNNT22QYHC28MBPEAT8",
+              "REIGNITE",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              12,
+              "01M6ZJMS2XNVS567C1DDBG8ZW2",
+              "iAM",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              14,
+              "01KHPREXJ8WBZW7KTGMW23GHTS",
+              "SYRALE",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              15,
+              "01KTSJN9DSBGY29GVSMXNNHT5D",
+              "RED Rams",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              18,
+              "01KHPREYVAK3KCYDMH8PMXA0GZ",
+              "NOEZ FOXX",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              21,
+              "01KTSJN9FK1SE98BD2N5JM97ZZ",
+              "4QuattroFormaggi",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              24,
+              "01KHPREV1T302YDPPGD1DA2391",
+              "BLACK Sheeps",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              25,
+              "01KHPREWZZYVXJSJ489BJRNRR9",
+              "TIE",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              26,
+              "01M6ZJMRGN40Y6WPN7NGHAT2M9",
+              "ORB GARDEN JP",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              28,
+              "01KTSJN9DK2KHF835B3JJX52DC",
+              "0nionz",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              29,
+              "01KME2AGXES54T9244CGWABRHZ",
+              "TIR GAMING",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              30,
+              "01KTSJNA3H7NEGVZK3D60YX1PB",
+              "XECT",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              31,
+              "01KHPREYJ7SDGPZQ8EDBXJ2FNP",
+              "SBI eSports",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              33,
+              "01M6ZJMRBW7DR7E7PMHS6VERRQ",
+              "Salmon and SANMA",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              36,
+              "01KHPREXVANAQTNCBJWW7TNBY1",
+              "FENNEL",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              37,
+              "01KHPREXZXP4CYR54DGSY5VW4Q",
+              "Meteor",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              39,
+              "01M6ZJMR95EX2ASVT4M8TY5NBT",
+              "SchweinRequiem",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              40,
+              "01KKCH1ZW9RYJD6VCEJGVN790J",
+              "GUNSO",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1TTA13PP4VV1JTQPKGGQ": {
       "region": "apac-n",
