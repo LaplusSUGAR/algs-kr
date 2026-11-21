@@ -6687,7 +6687,507 @@
       "name": "Match Point Finals",
       "draft": "01M7970CEQDVY7HMFZH9HM7W1G",
       "date": "2026-11-21T12:30:00.000Z",
-      "checked": 83114
+      "completedAt": "2026-11-21T12:41:58.017Z",
+      "done": true,
+      "checked": 83114,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              3,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              7,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              8,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              10,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              12,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              13,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              15,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              16,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              17,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              18,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              22,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              25,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              26,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              29,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              39,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              40,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              44,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "Basin Armory",
+              25,
+              57
+            ],
+            [
+              51,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              54,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Coastal Camp",
+              52,
+              84
+            ]
+          ]
+        },
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              2,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              4,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              5,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              20,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              21,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              23,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              27,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              31,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              32,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              33,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              34,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              46,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              48,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              49,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              50,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              55,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ],
+            [
+              56,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              57,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              58,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              59,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              6,
+              "01KTSJN9GKA6D49D581M3M0BZ5",
+              "KOU PI YAN",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              9,
+              "01KTSJN9GDNKT7BSYE5DEMW1R4",
+              "GenZ",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              11,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              14,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              19,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              24,
+              "01KHPREY6S6581HS9ZDSYXQJ31",
+              "Kirisame",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              28,
+              "01KME2AHE4FYSB8AJPMJVY4REK",
+              "UBI CILEMBU",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              30,
+              "01KME2AH4NG8W8G65J2H899XP4",
+              "DreamFire",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              35,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              36,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              37,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              38,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              41,
+              "01KHPREZ4208EN3K1VJB0G8S6N",
+              "Daylight Savings",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              42,
+              "01KTSJN9HSBXC8Y8JF0FW1WHGC",
+              "Void Esports OCE",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              43,
+              "01KHPREZ5K85VCBMCJVQY1MYNC",
+              "TEC-Academy",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              45,
+              "01KHPREV4ZS8N3WZ0D5ACHCJ37",
+              "CPR",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              47,
+              "01KHPREVFR66EX54TN3WXASC3F",
+              "TitanEsportsClub",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              52,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              53,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ],
+      "missed": [
+        [
+          "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+          "2c1m"
+        ]
+      ]
     }
   },
   "ends": {
