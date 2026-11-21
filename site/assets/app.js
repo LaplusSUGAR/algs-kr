@@ -2646,6 +2646,7 @@ document.addEventListener('click', (e) => {
   row.focus({ preventScroll: true });
 });
 
+const CP_SHOW = 40; // 포인트 표 처음 보이는 줄 수 (직행 32 + 바로 아래 LCQ 팀들)
 function cpView(q) {
   // 시즌 초: 첫 프로리그가 끝나기 전에는 챔피언십 포인트가 없다
   if (!A.cp.length) return `<p class="empty">아직 챔피언십 포인트가 없습니다. 첫 프로리그가 끝나면 순위가 표시됩니다.</p><p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다.</p>`;
@@ -2677,27 +2678,30 @@ function cpView(q) {
     // CP 막대(넓은 화면): 1위 CP를 끝으로, 세로선은 직행 마지막 자리(${cut}위) CP
     const top = Math.max(1, ...A.cp.map((x) => x.total)), cutCp = A.cp.at(cut - 1)?.total ?? 0;
     const cutAt = Math.min(100, (cutCp / top) * 100).toFixed(1);
-    table = `${jumpChips(rows)}<div class="tbl-wrap"><table class="tbl cp-tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r cpx">직행선과 차이</th><th class="cpx cp-barh">CP <small>│ <span>${cut}위</span></small></th><th class="r cp-st">상태</th></tr></thead><tbody>
+    // 휴대폰에서 117줄은 너무 길어 처음엔 ${CP_SHOW}위까지만(관심 팀 줄은 늘 보임) + '더 보기'
+    const clip = rows.length > CP_SHOW + 10;
+    table = `${jumpChips(rows)}<div class="cp-clip${clip ? ' clip' : ''}"><div class="tbl-wrap"><table class="tbl cp-tbl"><thead><tr><th>#</th><th>팀</th><th class="r">CP</th><th class="r cpx">직행선과 차이</th><th class="cpx cp-barh">CP <small>│ <span>${cut}위</span></small></th><th class="r cp-st">상태</th></tr></thead><tbody>
       ${rows.map((r, i) => {
         const isCut = region === 'all' && !opt.krOnly && r.rank === cut;
         const d = r.status === 'direct';
         // 직행 팀은 33위와의 차이(+), LCQ 팀은 32위까지 남은 차이(−). 직행 확정 뒤 32위보다 CP가 많은 LCQ 팀은 비움
         const gap = r.gap == null || r.gap < 0 ? '' : d ? `+${fmt(r.gap)}` : `−${fmt(r.gap)}`;
-        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}" data-toggle="cp-${i}" data-cpt="${esc(r.short)}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small class="reg">${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}<small class="st-sm ${d ? 'ok' : 'lcq'}">${d ? '직행' : 'LCQ'}</small></td><td class="r small muted cpx num">${gap}</td><td class="cpx cp-barc"><span class="cp-bar" aria-hidden="true"><i class="${d ? 'ok' : 'lcq'}" style="width:${Math.min(100, (r.total / top) * 100).toFixed(1)}%"></i><b style="left:${cutAt}%"></b></span></td><td class="r cp-st">${qualTag(d)}</td></tr>
+        return `<tr class="expandable ${rowCls(r)} ${isCut ? 'cut' : ''}${clip && i >= CP_SHOW && !isF(r.short) ? ' more' : ''}" data-toggle="cp-${i}" data-cpt="${esc(r.short)}" tabindex="0" aria-expanded="false"><td class="rank">${r.rank}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${coachBadge(r.kr, r.short)}<small class="reg">${esc(REGION[r.region] || '')}</small>${moveNote(r)}</td><td class="r num">${fmt(r.total)}${tieNote(rows, i, 'total')}<small class="st-sm ${d ? 'ok' : 'lcq'}">${d ? '직행' : 'LCQ'}</small></td><td class="r small muted cpx num">${gap}</td><td class="cpx cp-barc"><span class="cp-bar" aria-hidden="true"><i class="${d ? 'ok' : 'lcq'}" style="width:${Math.min(100, (r.total / top) * 100).toFixed(1)}%"></i><b style="left:${cutAt}%"></b></span></td><td class="r cp-st">${qualTag(d)}</td></tr>
         <tr class="detail" id="cp-${i}" hidden><td></td><td colspan="5"${lazy(() => r.players.map(([n, p, id]) => cpBreak(id, n, p, r.short)).join(''))}></td></tr>
         ${isCut ? `<tr class="cut-label"><td colspan="6">여기까지 챔피언십 직행권 · 아래는 LCQ</td></tr>` : ''}`;
       }).join('')}
-    </tbody></table></div>`;
+    </tbody></table></div>${clip ? `<button type="button" class="more-days" data-unclip>나머지 ${rows.filter((r, i) => i >= CP_SHOW && !isF(r.short)).length}팀 더 보기</button>` : ''}</div>`;
   } else {
     const ps = A.cp.filter((r) => region === 'all' || r.region === region).flatMap((r) => r.players.map(([n, p, id]) => ({ n, p, id, short: r.short, kr: opt.mode === 'kr' ? krNames.has(n) : isF(r.short) })))
       .filter((x) => !opt.krOnly || x.kr).sort((a, b) => b.p - a.p).slice(0, 150);
-    table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>선수</th><th>팀</th><th class="r">CP</th></tr></thead><tbody>
-      ${ps.map((x, i) => `<tr class="expandable ${x.kr ? 'kr k-team' : ''}" data-toggle="cpp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${i + 1}</td><td class="team">${x.kr ? krDot('team') : ''}${esc(x.n)}</td><td>${teamLink(x.short)}</td><td class="r num">${fmt(x.p)}</td></tr>
+    const clip = ps.length > CP_SHOW + 10;
+    table = `<div class="cp-clip${clip ? ' clip' : ''}"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>선수</th><th>팀</th><th class="r">CP</th></tr></thead><tbody>
+      ${ps.map((x, i) => `<tr class="expandable ${x.kr ? 'kr k-team' : ''}${clip && i >= CP_SHOW && !x.kr ? ' more' : ''}" data-toggle="cpp-${i}" tabindex="0" aria-expanded="false"><td class="rank">${i + 1}</td><td class="team">${x.kr ? krDot('team') : ''}${esc(x.n)}</td><td>${teamLink(x.short)}</td><td class="r num">${fmt(x.p)}</td></tr>
         <tr class="detail" id="cpp-${i}" hidden><td></td><td colspan="3"${lazy(() => cpBreak(x.id, x.n, x.p, x.short))}></td></tr>`).join('')}
-    </tbody></table></div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
+    </tbody></table></div>${clip ? `<button type="button" class="more-days" data-unclip>나머지 ${ps.filter((x, i) => i >= CP_SHOW && !x.kr).length}명 더 보기</button>` : ''}</div><p class="lead">공식 순위표가 팀별로 공개하는 합산 대상 선수(상위 3인)만 표시합니다.</p>`;
   }
   const cpKey = BD.state === 'live' || BD.state === 'pending' ? intlKey() : null;
-  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${cpLock() ? '<p class="board-note">직행 32팀은 Split 2 플레이오프가 끝난 시점의 CP로 확정되었습니다. 이후의 로스터 변경은 LCQ·챔피언십 시드에만 반영되고 직행 여부는 바꾸지 않습니다 (공식 규정 3.6.3, C6.5).</p>' : ''}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split ${tieN()} 플레이오프 최종 순위, 그다음 프로리그 Split ${lastSplit()} 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>
+  return `${spoil(qualStrip(q, region), cpKey, '지역별 직행권 팀 수')}${boardNote()}${cpLock() ? '<p class="board-note">직행 32팀은 Split 2 플레이오프가 끝난 시점의 CP로 확정되었습니다. 이후의 로스터 변경은 LCQ·챔피언십 시드에만 반영되고 직행 여부는 바꾸지 않습니다 (공식 규정 3.6.3, C6.5).</p>' : ''}${spoil(ringLine(focusList()), cpKey, 'CP 위치')}${cpLock() ? '<p class="lead">팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 동점 처리 등 자세한 계산은 <a href="#/rules">규칙</a> 탭에 있습니다.</p>' : `<p class="lead">${A.season.cpDirectSlots}위까지 챔피언십 직행, 나머지 ${A.season.lcqSlots}자리는 LCQ에서 정합니다. 팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. CP가 같으면 Split ${tieN()} 플레이오프 최종 순위, 그다음 프로리그 Split ${lastSplit()} 최종 순위가 좋은 팀이 위입니다(공식 규정 C7.3).</p>`}
     ${spoil(`<div class="pts-cols"><div class="pts-side">${krSummary ? `<section class="sec"><h2 class="h2">${ML().title}</h2><div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><tbody>${krSummary}</tbody></table></div></section>` : ''}</div>
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>`, cpKey, '챔피언십 포인트 순위')}
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
