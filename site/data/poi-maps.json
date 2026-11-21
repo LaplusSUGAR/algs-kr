@@ -1025,7 +1025,333 @@
       "name": "Elimination Round 1",
       "draft": "01M794FV8B8RR3EM9PH4Y63ZYM",
       "date": "2026-11-21T04:30:00.000Z",
-      "checked": 83112
+      "completedAt": "2026-11-21T04:46:21.128Z",
+      "done": true,
+      "checked": 83112,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              3,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              4,
+              "01KTSJN8PB2AZA3G55MWWNF7PT",
+              "LICS",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              5,
+              "01KJSEK7XNMD7VYXNHJKRPBFV3",
+              "Unreal Nightmare",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              7,
+              "01KTSJN8Z8J301NM94Z8DZVCMZ",
+              "ZQ7",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              8,
+              "01M6ZJMRTNPZME85FY6RWHBTFJ",
+              "sequence",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              9,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              10,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              11,
+              "01M6ZJMQZV75FWERKM1PFSPGYC",
+              "GC8",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              13,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              15,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              16,
+              "01M6ZJMQ7PN60DGR2FC86Q2X9J",
+              "chronic",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              17,
+              "01M5WKA5RKG0DVP2RR80FGXFM4",
+              "Full Send",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              18,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              22,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              26,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              32,
+              "01KTSJN9W1QPJFXEJBSC01R9W3",
+              "Coughing Baby",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              34,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              39,
+              "01M6ZJMSHV0VKS24G49BYEE07E",
+              "Mugs",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              2,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              6,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              12,
+              "01KTSJN9W1QPJFXEJBSC01R9W3",
+              "Coughing Baby",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              14,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              19,
+              "01M6ZJMSHV0VKS24G49BYEE07E",
+              "Mugs",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              21,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              23,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              24,
+              "01KTSJN8PB2AZA3G55MWWNF7PT",
+              "LICS",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              25,
+              "01KJSEK7XNMD7VYXNHJKRPBFV3",
+              "Unreal Nightmare",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              27,
+              "01KTSJN8Z8J301NM94Z8DZVCMZ",
+              "ZQ7",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              28,
+              "01M6ZJMRTNPZME85FY6RWHBTFJ",
+              "sequence",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              29,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              30,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              31,
+              "01M6ZJMQZV75FWERKM1PFSPGYC",
+              "GC8",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              33,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              35,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              36,
+              "01M6ZJMQ7PN60DGR2FC86Q2X9J",
+              "chronic",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              37,
+              "01M5WKA5RKG0DVP2RR80FGXFM4",
+              "Full Send",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              38,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "Stadium",
+              79,
+              59
+            ]
+          ]
+        }
+      ],
+      "missed": [
+        [
+          "01KKCH1ZQ2PBZQ3NRKKV8QTVV5",
+          "Free Thinkers"
+        ]
+      ]
     },
     "01M3AVNSER58QR64HRKPB5GHPW": {
       "region": "americas",
