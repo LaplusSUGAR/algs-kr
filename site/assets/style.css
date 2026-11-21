@@ -1418,36 +1418,48 @@ dialog { border: 1px solid var(--rule); }
 @media (min-width: 768px) { .toast { bottom: 24px; } }
 /* 아주 좁은 화면(320px대): 헤더 아이콘이 4개(상태·공유·문의·설정)라 간격을 줄여 브랜드 글자와 붙지 않게 */
 
-/* 게임별 점수 (G1…): 점수표 틀 .gview 가 컨테이너. 720px 이상이면 종합 옆에 늘 보이고, 좁으면 '종합 | 게임별' 전환(.gv-bar)으로 고른다.
-   게임별 보기(.gv-game, 좁은 화면): 순위·킬·다음 칸을 접고 #·팀 칸을 고정한 채 게임 칸을 가로로 민다.
-   칸: 게임 점수(굵게) + 작은 줄 'N위 K킬'. 1·2·3위는 금·은·동 글자 + 옅은 바탕. 진행 중 게임은 머리글 빨간 점 + 옅은 빨강 열 */
+/* 게임별 점수 (G1…): 점수표 틀 .gview 가 컨테이너. 720px 이상이면 종합 옆에 열(.gc)로 늘 보인다.
+   좁으면(휴대폰) 열은 숨기고, 팀 줄(tr.gx)을 누르면 아래 줄(tr.gdet)에 게임 카드(.gx-c: 지도·점수·순위·킬)가 펼쳐진다.
+   1·2·3위는 금·은·동 글자 + 옅은 바탕. 진행 중 게임은 빨간 점 + 옅은 빨강 */
 .gview { container-type: inline-size; }
-.gv-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin: 0 0 8px; }
-.gv-bar .seg button { padding: 5px 14px; font-weight: 600; min-height: 32px; }
-.gv-key { font-size: 11.5px; color: var(--steel); display: inline-flex; align-items: center; gap: 3px; }
+.gv-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin: 0 0 6px; font-size: 11.5px; color: var(--steel); }
+.gv-tip::before { content: '▾ '; }
+.gv-key { display: inline-flex; align-items: center; gap: 3px; }
 .gv-key i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; background: var(--gold); }
 .gv-key i.m2 { background: var(--silver); } .gv-key i.m3 { background: var(--bronze); margin-right: 3px; }
 .tbl .gc { display: none; }
-.gview.gv-game .tbl .gc { display: table-cell; }
-.gview.gv-game .tbl .pp, .gview.gv-game .tbl .kp, .gview.gv-game .tbl .dest { display: none; }
-.gview.gv-game .tbl td.team small { display: none; }
-.gview.gv-game .tbl td.team { white-space: nowrap; max-width: 118px; overflow: hidden; text-overflow: ellipsis; }
-.gview.gv-game .tbl .tp { border-right: 1px solid var(--rule); }
-/* #·팀 칸 고정: 바탕을 칠해야 밀려 지나가는 칸이 비치지 않는다. 줄 강조색(한국 팀·응원 팀)은 그 위에 겹쳐 칠한다 */
-.gview.gv-game .tbl tr > .rank, .gview.gv-game .tbl tr > th:first-child { position: sticky; left: 0; z-index: 1; min-width: 26px; background-color: var(--paper); background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent)); }
-.gview.gv-game .tbl tr > .team, .gview.gv-game .tbl tr > th:nth-child(2) { position: sticky; left: 26px; z-index: 1; background-color: var(--paper); background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent)); box-shadow: 6px 0 6px -6px rgba(0, 0, 0, .25); }
-.gview.gv-game .tbl tr.kr { --tint: var(--ring-soft); }
-.gview.gv-game .tbl tr.kr.k-team, .gview.gv-game .tbl tr.kr.k-member, .gview.gv-game .tbl tr.kr.k-coach { --tint: var(--kc-soft); }
-.gview.gv-game .tbl tr.kr.main { --tint: color-mix(in srgb, var(--apex) 18%, transparent); }
+.tbl tr.gx { cursor: pointer; }
+.gx-chev { display: inline-block; width: 6px; height: 6px; margin: 0 2px 3px 7px; border-right: 1.5px solid var(--steel); border-bottom: 1.5px solid var(--steel); transform: rotate(45deg); transition: transform .15s; vertical-align: middle; }
+.tbl tr.gx[aria-expanded='true'] .gx-chev { transform: rotate(-135deg); margin-bottom: -1px; }
+.tbl tr.gx[aria-expanded='true'] > td { border-bottom-color: transparent; }
+.tbl tr.gdet > td { padding: 0 0 10px; background: transparent; box-shadow: none; white-space: normal; }
+.gx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+@container (min-width: 520px) { .gx-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.gx-c { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; min-width: 0; }
+.gx-c .gx-h { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; color: var(--steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.gx-c .gx-h small { font-weight: 500; letter-spacing: 0; }
+.gx-c > b { font-size: 18px; font-weight: 800; line-height: 1.15; }
+.gx-c > b small { font-size: 10.5px; font-weight: 600; margin-left: 1px; color: var(--steel); }
+.gx-c > small { font-size: 11px; color: var(--steel); white-space: nowrap; }
+.gx-c.none { opacity: .5; }
+.gx-c.m1 { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, var(--card)); } .gx-c.m1 > b, .gx-c.m1 > small { color: var(--gold); }
+.gx-c.m2 { border-color: var(--silver); background: color-mix(in srgb, var(--silver) 14%, var(--card)); } .gx-c.m2 > b, .gx-c.m2 > small { color: var(--silver); }
+.gx-c.m3 { border-color: var(--bronze); background: color-mix(in srgb, var(--bronze) 13%, var(--card)); } .gx-c.m3 > b, .gx-c.m3 > small { color: var(--bronze); }
+.gx-c.glive { border-color: var(--apex); background: color-mix(in srgb, var(--apex) 7%, var(--card)); } .gx-c.glive > b { font-style: italic; }
+.gx-dot { display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: var(--apex); vertical-align: 1px; animation: gcPulse 1.4s ease-in-out infinite; }
+.gx-wait { margin: 0; padding: 6px 2px; font-size: 12px; color: var(--steel); }
+/* 선수 명단 (펼침 줄 맨 위) */
+.gx-ros .lcq-roster { display: block; margin: 0 0 7px; padding: 0 2px; white-space: normal; font-size: 12.5px; line-height: 1.5; color: var(--steel); font-weight: 500; }
+.gx-ros .lcq-roster .kr-p { color: var(--ink); font-weight: 650; }
+.gv-tip.w { display: none; }
 @container (min-width: 720px) {
-  .gview .gv-bar .seg { display: none; }
-  .gview:not(.has-g) .gv-bar { display: none; }
+  .gview .gv-tip.n { display: none; }
+  .gview .gv-tip.w { display: inline; }
   .gview .tbl .gc { display: table-cell; }
-  .gview.gv-game .tbl .pp, .gview.gv-game .tbl .kp, .gview.gv-game .tbl .dest { display: table-cell; }
-  .gview.gv-game .tbl td.team small { display: block; }
-  .gview.gv-game .tbl td.team { max-width: none; }
-  .gview.gv-game .tbl tr > .rank, .gview.gv-game .tbl tr > th:first-child, .gview.gv-game .tbl tr > .team, .gview.gv-game .tbl tr > th:nth-child(2) { position: static; box-shadow: none; }
+  .gview .tbl tr.gdet .gx-games { display: none; }
+  .gview .tbl tr.gdet > td { padding-left: 36px; }
   .gview .tbl .tp { border-right: 1px solid var(--rule); }
+}
 }
 /* 주의: .gc 는 게임 수 칩(gameCount)과 이름이 같아 칩 모양(테두리·글꼴·inline-flex)이 표 칸에 묻지 않게 여기서 다시 정한다 */
 .tbl th.gc, .tbl td.gc { min-width: 44px; padding: 7px 3px; text-align: center; border: 0; border-left: 1px solid var(--rule); border-bottom: 1px solid var(--rule); border-radius: 0; font: inherit; white-space: nowrap; }
@@ -1464,7 +1476,7 @@ dialog { border: 1px solid var(--rule); }
 .tbl th.gc.glive a::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: var(--apex); vertical-align: 2px; animation: gcPulse 1.4s ease-in-out infinite; }
 .tbl td.gc.glive { background-color: color-mix(in srgb, var(--apex) 7%, transparent); font-style: italic; }
 @keyframes gcPulse { 50% { opacity: .25; } }
-@media (prefers-reduced-motion: reduce) { .tbl th.gc.glive a::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tbl th.gc.glive a::before, .gx-dot { animation: none; } .gx-chev { transition: none; } }
 
 /* 한 게임(매치) 1·2·3위 팀의 점수: 금·은·동 글자색 (게임별 점수 열 g1…, 게임 다시보기의 게임 결과 표). 색만으로 구분하지 않게 굵게도 */
 :root { --gold: #A6780B; --silver: #6C84A8; --bronze: #B05A2B; } /* 밝은 배경에서 대비 3.2~4:1, 은은 일반 회색 숫자와 구분되게 푸른빛 */
