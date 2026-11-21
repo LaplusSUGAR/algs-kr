@@ -662,7 +662,9 @@ function flowV(items, label) {
     return `<li class="rt ${kind}"><i aria-hidden="true">${ico}</i><b>${esc(who)}</b><span>${esc(where)}</span></li>`;
   };
   let day = '', dn = 0;
-  return `<ol class="bfv" aria-label="${esc(label)}">${items.map((n) => {
+  // 대회가 진행 중이면(끝나지 않은 단계가 있으면) 끝난 단계는 진출 경로 줄을 접어 짧게: 관심 팀 칩의 ▲·취소선이 결과를 말해 준다
+  const going = items.some((n) => n.st.status !== 'completed') && items.some((n) => n.st.status === 'completed');
+  return `<ol class="bfv${going ? ' going' : ''}" aria-label="${esc(label)}">${items.map((n) => {
     const st = n.st, ks = krIn(st.teams || []);
     const chips = ks.length ? ks.map((sh) => { const a = n.adv(sh); return `<span class="bfv-chip ${CAT[krOf(sh)]} ${a === false ? 'out' : a ? 'up' : ''}">${esc(sh)}</span>`; }).join('') : `<span class="bfv-none">${st.teams?.length ? esc(ML().none) : '출전 팀 미정'}</span>`;
     const tag = st.status === 'live' ? gameNow(st.s) || '<span class="tag live">LIVE</span>' : `<span class="tag">${esc(stageState(st))}</span>`;
@@ -887,7 +889,7 @@ function evRegional(e) {
   const me = ML().region ? '' : `<span class="me">${esc(ML().label)}</span>`; // 지역 보기는 지역 이름이 같아 표시 없이 줄 색으로만
   const CH = 6; // 지역 보기에서는 그 지역 팀이 모두 관심 팀이라 칩을 줄인다
   const chipsOf = (c) => (c.length > CH ? `${c.slice(0, CH - 1).join('')}<small>+${c.length - CH + 1}팀</small>` : c.join(''));
-  const html = `<ul class="evr">${rows.map(([r, x]) => `<li class="${mine.includes(r) ? 'mine' : ''}"><a class="evr-n" href="${x.href}">${esc(REGION[r])}${mine.includes(r) ? me : ''}</a><span class="evr-s ${x.cls}">${x.st}</span><span class="evr-t">${x.chips.length ? chipsOf(x.chips) : esc(ML().none)}</span></li>`).join('')}</ul>`;
+  const html = `<ul class="evr">${rows.map(([r, x]) => `<li class="${mine.includes(r) ? 'mine' : ''}"><a class="evr-n" href="${x.href}">${esc(REGION[r])}${mine.includes(r) ? me : ''}</a><span class="evr-s ${x.cls}">${x.st}</span>${x.chips.length ? `<span class="evr-t">${chipsOf(x.chips)}</span>` : ''}</li>`).join('')}</ul>${rows.some(([, x]) => !x.chips.length) ? `<p class="evr-none">${esc(rows.filter(([, x]) => !x.chips.length).map(([r]) => REGION[r]).join(' · '))}: ${esc(ML().none)}</p>` : ''}`;
   const sk = rows.find(([r, x]) => mine.includes(r) && x.started)?.[1].key || rows.find(([, x]) => x.started)?.[1].key || null;
   return spoil(html, sk, '대회 결과');
 }

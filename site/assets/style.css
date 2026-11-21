@@ -2199,3 +2199,9 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .tbl.lcq-grid.mini td.r.small { white-space: normal; }
 .lvm .tbl-wrap + .more, .lvm > .more { display: inline-block; margin-top: 6px; }
 @media (max-width: 520px) { .tbl td.dest { white-space: normal; min-width: 64px; } } /* 긴 번역(エリミネーション2R 등)으로 표가 화면 밖으로 밀리지 않게 */
+
+/* 홈 개편(11-21): 대회 진행 중에는 끝난 단계의 진출 경로 줄을 접어 짧게 (관심 팀 칩 ▲·취소선이 결과), 한국 관련 팀이 없는 지역은 한 줄로 모아 적는다 */
+.bfv.going .bfv-n.done .bfv-o { display: none; }
+.bfv.going .bfv-n.done .bfv-a { padding-top: 8px; padding-bottom: 8px; }
+.bfv.going .bfv-n.done { padding-bottom: 8px; }
+.evr-none { margin: 8px 0 0; font-size: 12px; color: var(--steel); }
