@@ -5842,7 +5842,343 @@
       "name": "Elimination Round 2",
       "draft": "01M796YX0SJ8E9G4NP5YR12Y1S",
       "date": "2026-11-21T07:30:00.000Z",
-      "checked": 83113
+      "completedAt": "2026-11-21T07:37:06.078Z",
+      "done": true,
+      "checked": 83113,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              1,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              5,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              7,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              8,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              9,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              11,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              12,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              13,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              14,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              15,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              17,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              18,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              20,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              22,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              23,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              24,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              26,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "Basin Armory",
+              25,
+              57
+            ],
+            [
+              30,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              36,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              39,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "Devastated Coast",
+              82,
+              73
+            ]
+          ]
+        },
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              2,
+              "01KHPREVKC6EEY344B6ENY3GHM",
+              "SaWeiQi",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              3,
+              "01KTSJNA72958BY5HZC4TC9ASN",
+              "Orange",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              4,
+              "01KKW8ZE49ZZKWV4ZPSWRNH7X6",
+              "2c1m",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              6,
+              "01M6ZJMS7M3T9WTHE96QBKHT8J",
+              "Sohai",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              10,
+              "01KTSJN9GTB6VQJBFKC8JQ3DB6",
+              "MEOWERS",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              16,
+              "01M6ZJMSBXJ15GZKXC8C14PPPM",
+              "PanCakeGaming",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              19,
+              "01KME2AH0B3CKM5VXXCHSH3G3M",
+              "HAB",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              21,
+              "01KK8VGFSV46119MRVWFS1T5JH",
+              "black hole",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              25,
+              "01KHPREVHTW9Y3A7FRCKDE8N9C",
+              "Dogred",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              27,
+              "01KHPREWEXHYMAN629M2QBZTB8",
+              "ASC3NT",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              28,
+              "01KME2AHCFT4C53BNA6E2Z9FD6",
+              "ARAM",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              29,
+              "01M6ZJMQWKMWSPYVMTYE44RFYZ",
+              "BBZ",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              31,
+              "01KHPREW5FG3P1Y4J66PFX67E4",
+              "RENDANG",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              32,
+              "01M6ZJMQYM2BBN4D9T3ATT2XGM",
+              "KMK",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              33,
+              "01M6ZJMS9T32QQSVS210XEDK5T",
+              "BlackJack",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              34,
+              "01M6ZJMSM0BMV9APNHWQKHXV19",
+              "SLG APS",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              35,
+              "01KTSJN9HZF6VQ73RXXTM4XPS9",
+              "TuBoShu",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ],
+            [
+              37,
+              "01KHPREVNDKME8CCMTZ5K982KG",
+              "KAKKOII",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              38,
+              "01KTSJNA886ZZ7GB2SV5EK08R1",
+              "FURY",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              40,
+              "01KHPREWGJW7FR5G2XGYTE15TM",
+              "MaMa Clubs",
+              "THE DOME",
+              72.3,
+              92.2
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1M9221ZW688QWHX8RTS7": {
       "region": "apac-s",
