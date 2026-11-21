@@ -4958,7 +4958,343 @@
       "name": "Elimination Round 2",
       "draft": "01M7954B0A4G80G83MMCT46GWF",
       "date": "2026-11-21T15:05:00.000Z",
-      "checked": 83114
+      "completedAt": "2026-11-21T15:15:26.400Z",
+      "done": true,
+      "checked": 83114,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              2,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "JOB",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              5,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              6,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              8,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              10,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              11,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              12,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              13,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              15,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              16,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              19,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              21,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              23,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              24,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              27,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              29,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              34,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              37,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              38,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              40,
+              "01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+              "OnChikken",
+              "Mountain Lift",
+              60,
+              47
+            ]
+          ]
+        },
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01M6ZJMQRZ0R5Z6319MXH7BB0T",
+              "Burger Boys",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              3,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              4,
+              "01KTSJNA9AWZ5WVGXCMVHV0P87",
+              "REDRAGON",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              7,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              9,
+              "01M6ZJMQQT856Y37DX38KTDCCB",
+              "KDV",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              14,
+              "01M6ZJMSNJFMGSQXG1NC83J479",
+              "Toros",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              17,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              18,
+              "01KME84BNZF9VA8WAKE2K048P4",
+              "3 MEN",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              20,
+              "01M6ZJMS8W5E4VEN8H4XAJRE5Q",
+              "OnChikken",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              22,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "JOB",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              25,
+              "01M6ZJMRQVJFCGK0QD7RFQ602F",
+              "GlamurniePadonki",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              26,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              28,
+              "01KTSJN9M6X8E7JR1A73R88E07",
+              "MEOW",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              30,
+              "01KTSJN9JW27TZSF9G5810CXTY",
+              "BPR",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              31,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              32,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              33,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              35,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              36,
+              "01KTSJNA9YTACQ35510GKMSRK2",
+              "Bacalhau",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ],
+            [
+              39,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW2AG6MJP4NKB4AT49WM7C": {
       "region": "emea",
