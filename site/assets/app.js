@@ -1060,10 +1060,12 @@ function krStageInfo(short) {
   return { text: `${last.ko} ${last.src === 'projected' ? '진출 예정' : '출전'}, ${stageState(last)}`, next: last.s };
 }
 const krStage = (short) => krStageInfo(short).text;
-function lineupLine(s) {
+// short: 경기 탭 — '출전 N팀 확정'은 모든 카드에 같아 빼고 관심 팀만 (없으면 줄 없음)
+function lineupLine(s, short = false) {
   if (!s.lineup?.length) return '';
   const ks = krIn(s.lineup).sort((a, b) => (team(b)?.id === mainId()) - (team(a)?.id === mainId()));
-  return `<div class="meta lineup">출전 ${s.lineup.length}팀 확정${ks.length ? ` · ${ML().group} ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}${outTag(sh)}${coachBadge(krOf(sh), sh)}`).join(' ')}` : ''}</div>`;
+  if (short && !ks.length) return '';
+  return `<div class="meta lineup">${short ? '' : `출전 ${s.lineup.length}팀 확정`}${ks.length ? `${short ? '' : ' · '}${ML().group} ${ks.map((sh) => `${krDot(krOf(sh), sh)}${teamLink(sh)}${outTag(sh)}${coachBadge(krOf(sh), sh)}`).join(' ')}` : ''}</div>`;
 }
 
 // 홈: 지금(또는 가장 최근) 브래킷 단계 요약
@@ -1381,7 +1383,9 @@ function schCd(s) {
 // o.cd: 경기 탭 — 남은 시간을 시각 아래로 옮기고 설명 줄은 ' · ' 로 나눈다 (홈 카드는 그대로)
 function matchItem(s, o = {}) {
   const state = o.cd ? '' : seriesState(s);
-  const tags = [s.mp ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
+  // 경기 탭(o.cd): 이름이 '매치 포인트 결승'이면 '매치 포인트' 표, 관심 팀 줄이 있으면 '한국' 표는 겹쳐서 뺀다
+  const nm = ko(s.name, PHASE_KO), krLine = o.cd && !s.results?.length && krIn(s.lineup || []).length;
+  const tags = [s.mp && !(o.cd && /매치 포인트/.test(nm)) ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) && !krLine ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
   let res = '';
   if (s.results?.length) {
     const top = s.results[0];
@@ -1395,8 +1399,10 @@ function matchItem(s, o = {}) {
   return `<article class="match${mine ? ' mine' : ''}">
     <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}${o.cd ? schCd(s) : ''}</time>
     <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${gameCount(s)} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
-      <div class="meta">${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(o.cd ? ' · ' : ', '))}</div>
-      ${res || lineupLine(s)}</div>
+      <div class="meta">${o.cd
+        ? `${REGION[s.region] ? `<span class="mreg r-${esc(s.region)}">${esc(REGION[s.region])}</span>` : ''}${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' || /Bracket Stage|Match Point Finals/.test(s.phase || '') ? '' : ko(s.phase, PHASE_KO)].filter(Boolean).join(' · '))}` // 지역을 맨 앞 작은 표로, 이름과 겹치는 단계(브래킷·매치 포인트 결승)는 뺀다
+        : esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(', '))}</div>
+      ${res || lineupLine(s, !!o.cd)}</div>
   </article>`;
 }
 
@@ -1537,7 +1543,7 @@ function schedule(parts, q) {
       <div class="sch-chips" role="group" aria-label="경기 필터">${chip({ kr: kronly ? null : '1' }, kronly, `<i aria-hidden="true">★</i> ${ML().only}`, 'kr')}${regs.length > 1 ? `<span class="sep" aria-hidden="true"></span>${chip({ r: null }, !reg, '전체 지역')}${regs.map((r) => chip({ r }, reg === r, SCH_REG[r])).join('')}` : ''}</div>
       <div class="sch-note"><span>한국 시간(KST) 기준 · 한 시리즈는 보통 6게임</span>${refreshNote(true)}</div>
     </div>
-    ${keys.length ? `<div class="days">${shown.map(day).join('')}</div>${more}` : '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}`;
+    ${keys.length ? `<div class="days sch-days">${shown.map(day).join('')}</div>${more}` : '<p class="empty">조건에 맞는 경기가 없습니다. 필터를 끄면 전체 경기를 볼 수 있습니다.</p>'}`;
 }
 
 /* ---------- 순위 (진행 중 국제전) ---------- */

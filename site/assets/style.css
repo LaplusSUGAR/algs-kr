@@ -2205,3 +2205,11 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .bfv.going .bfv-n.done .bfv-a { padding-top: 8px; padding-bottom: 8px; }
 .bfv.going .bfv-n.done { padding-bottom: 8px; }
 .evr-none { margin: 8px 0 0; font-size: 12px; color: var(--steel); }
+
+/* 경기 탭 개편(11-21): 지역을 설명 줄 맨 앞 작은 표로, PC는 날짜를 위에서 아래로 한 줄씩(날짜 안에서 카드 두 칸) 읽게 */
+.mreg { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--rule); font-size: 11px; font-weight: 800; letter-spacing: .02em; color: var(--ink); line-height: 18px; vertical-align: 1px; }
+@media (min-width: 900px) {
+  .days.sch-days { grid-template-columns: minmax(0, 1fr); }
+  .sch-days .day { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); column-gap: 10px; align-items: start; }
+  .sch-days .day > .day-h { grid-column: 1 / -1; }
+}
