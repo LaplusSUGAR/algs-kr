@@ -196,7 +196,7 @@
     ['지금 방송 중', '配信中', 'Live now'],
     ['방송 전체', '配信一覧', 'All streams'],
     ['더보기', 'その他', 'More'],
-    ['나머지 {n}팀 더 보기', '残り{1}チームを表示', 'Show {1} more teams'], ['나머지 {n}명 더 보기', '残り{1}人を表示', 'Show {1} more players'], ['팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 동점 처리 등 자세한 계산은', 'チームCPは現ロスターでCPが高い3選手の合計です。同点の扱いなど詳しい計算は', 'Team CP is the sum of the three highest-CP players on the current roster. Tiebreaks and details are in the'], ['탭에 있습니다.', 'タブにあります。', 'tab.'],
+    ['나머지 {n}팀 더 보기', '残り{1}チームを表示', 'Show {1} more teams'], ['나머지 {n}명 더 보기', '残り{1}人を表示', 'Show {1} more players'], ['지난 경기 {n}개 더 보기', '過去の試合をあと{1}件表示', 'Show {1} more results'], ['팀 CP는 현재 로스터에서 CP가 높은 선수 3명의 합입니다. 동점 처리 등 자세한 계산은', 'チームCPは現ロスターでCPが高い3選手の合計です。同点の扱いなど詳しい計算は', 'Team CP is the sum of the three highest-CP players on the current roster. Tiebreaks and details are in the'], ['탭에 있습니다.', 'タブにあります。', 'tab.'],
     ['팀을 누르면 선수·게임별 점수', 'チームをタップで選手・試合別スコア', 'Tap a team for players and per-game scores'], ['팀을 누르면 선수 명단', 'チームをタップで選手一覧', 'Tap a team for its roster'], ['선수 명단 정보가 없습니다.', '選手情報がありません。', 'No roster info.'], ['기록 없음', '記録なし', 'No record'], ['게임 점수 = 순위 점수 + 킬(1킬 1점)', '試合スコア = 順位ポイント + キル(1キル1点)', 'Game score = placement pts + kills (1 pt each)'], ['진행 중 {n}킬', '進行中 {1}K', 'Live {1}K'], ['게임 1·2·3위', '試合1・2・3位', 'Game 1st·2nd·3rd'], ['게임별 점수를 받는 중…', '試合別スコアを取得中…', 'Loading per-game scores…'],
     ['{n}위 {n}킬', '{1}位 {2}K', '#{1} {2}K'], ['{n}킬', '{1}K', '{1}K'],
     // 홈 대회 카드·다음 경기·대표 팀 카드 (2026-11-19)
