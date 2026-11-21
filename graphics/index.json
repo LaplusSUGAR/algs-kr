@@ -65,6 +65,18 @@
    "series": [
     "~lc"
    ]
+  },
+  "year-6/lcq/apac-n/20261121-1700-er2-results.png": {
+   "kind": "results",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-21T08:00:00.000Z",
+   "title": "패자부활 2라운드 결과",
+   "hash": "d122ba9d752c",
+   "made": "2026-11-21T11:16:34.775Z",
+   "series": [
+    "~lc"
+   ]
   }
  }
 }
