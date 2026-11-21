@@ -1429,16 +1429,19 @@ dialog { border: 1px solid var(--rule); }
 .gv-key i.m2 { background: var(--silver); } .gv-key i.m3 { background: var(--bronze); margin-right: 3px; }
 .tbl .gc { display: none; }
 .tbl tr.gx { cursor: pointer; }
-.gx-chev { display: inline-block; width: 6px; height: 6px; margin: 0 2px 3px 7px; border-right: 1.5px solid var(--steel); border-bottom: 1.5px solid var(--steel); transform: rotate(45deg); transition: transform .15s; vertical-align: middle; }
-.tbl tr.gx[aria-expanded='true'] .gx-chev { transform: rotate(-135deg); margin-bottom: -1px; }
+.gx-chev { display: block; width: 6px; height: 6px; margin: 5px 0 0 2px; border-right: 1.5px solid var(--steel); border-bottom: 1.5px solid var(--steel); transform: rotate(45deg); transition: transform .15s; vertical-align: middle; }
+.tbl tr.gx[aria-expanded='true'] .gx-chev { transform: rotate(-135deg); margin-top: 8px; }
 .tbl tr.gx[aria-expanded='true'] > td { border-bottom-color: transparent; }
-.tbl tr.gdet > td { padding: 0 0 10px; background: transparent; box-shadow: none; white-space: normal; }
+.tbl tr.gdet > td { padding: 0 6px 10px 10px; white-space: normal; } /* 바탕·왼쪽 막대는 팀 줄과 같은 강조(rowCls)를 그대로 받는다 */
+.tbl tr.gx:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+/* 표가 화면보다 넓어 옆으로 밀려도(긴 번역 등) 펼친 내용은 보이는 폭 안에: 컨테이너(.gview) 폭 기준으로 고정 */
+.tbl tr.gdet .gx-ros, .tbl tr.gdet .gx-games { position: sticky; left: 10px; max-width: calc(100cqw - 20px); }
 .gx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
 @container (min-width: 520px) { .gx-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
-.gx-c { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; min-width: 0; }
+.gx-c { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 4px 6px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; min-width: 0; }
 .gx-c .gx-h { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; color: var(--steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .gx-c .gx-h small { font-weight: 500; letter-spacing: 0; }
-.gx-c > b { font-size: 18px; font-weight: 800; line-height: 1.15; }
+.gx-c > b { font-size: 17px; font-weight: 800; line-height: 1.15; }
 .gx-c > b small { font-size: 10.5px; font-weight: 600; margin-left: 1px; color: var(--steel); }
 .gx-c > small { font-size: 11px; color: var(--steel); white-space: nowrap; }
 .gx-c.none { opacity: .5; }
@@ -2195,3 +2198,4 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .tbl.lcq-grid.mini .cutgap { display: inline-block; margin: 0 0 0 4px; }
 .tbl.lcq-grid.mini td.r.small { white-space: normal; }
 .lvm .tbl-wrap + .more, .lvm > .more { display: inline-block; margin-top: 6px; }
+@media (max-width: 520px) { .tbl td.dest { white-space: normal; min-width: 64px; } } /* 긴 번역(エリミネーション2R 등)으로 표가 화면 밖으로 밀리지 않게 */

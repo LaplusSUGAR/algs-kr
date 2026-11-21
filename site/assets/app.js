@@ -263,14 +263,18 @@ const gamesOk = (x) => !!(x?.id && !FROZEN && (x.results?.length || x.live || x.
 // 점수표를 감싸는 틀(.gview, 컨테이너): 게임 1·2·3위 범례 + 표. 좁으면 팀 줄을 눌러 게임별 카드를 펼친다는 안내
 function gview(x, G, table) {
   if (!gamesOk(x)) return table;
-  const key = '<span class="gv-key"><i class="m1"></i><i class="m2"></i><i class="m3"></i> 게임 1·2·3위</span>';
+  const key = '<span class="gv-key"><i class="m1"></i><i class="m2"></i><i class="m3"></i> 게임 1·2·3위</span><span class="gv-key">게임 점수 = 순위 점수 + 킬(1킬 1점)</span>';
   return `<div class="gview${G ? ' has-g' : ''}"><div class="gv-bar"><span class="gv-tip n">팀을 누르면 선수·게임별 점수</span><span class="gv-tip w">팀을 누르면 선수 명단</span>${G ? key : ''}</div>${table}</div>`;
 }
 // 게임별 펼침 줄: 팀 줄 바로 아래. 넓은 화면에서는 CSS가 숨긴다. G가 없으면(아직 받는 중) 안내
 //   선수 명단: LCQ는 조 편성과 같은 자료(rosterLine: 프로리그는 공식 로스터, 2부는 Liquipedia 참가 명단), 그 밖은 프로리그 공식 로스터. 없으면 없다고 적는다
 const gxRoster = (B, sh) => { const t = B?.E?.list?.find((y) => y.short === sh) || { pl: !!team(sh), short: sh }; return rosterLine(t, B?.ev || {}) || '<small class="lcq-roster muted">선수 명단 정보가 없습니다.</small>'; };
-const gxRow = (B, x, G, sh, open) => `<tr class="gdet"${open ? '' : ' hidden'}><td colspan="99"><div class="gx-ros">${open ? gxRoster(B, sh) : ''}</div><div class="gx-games">${G ? G.det(sh) : '<p class="gx-wait">게임별 점수를 받는 중…</p>'}</div></td></tr>`;
-const gxAttr = (x, sh) => (gamesOk(x) && sh ? ` data-gx="${x.id}|${esc(sh)}" aria-expanded="${GOPEN.has(x.id + '|' + sh)}"` : '');
+//   cls: 팀 줄과 같은 강조(한국 팀·응원 팀 바탕·왼쪽 막대)와 컷 줄. 펼치면 컷 선이 팀 줄과 내역 사이가 아니라 내역 아래에 온다
+const gxRow = (B, x, G, sh, open, cls = '') => `<tr class="gdet ${cls}"${open ? '' : ' hidden'}><td colspan="99"><div class="gx-ros">${open ? gxRoster(B, sh) : ''}</div><div class="gx-games">${G ? G.det(sh) : '<p class="gx-wait">게임별 점수를 받는 중…</p>'}</div></td></tr>`;
+const gxAttr = (x, sh) => (gamesOk(x) && sh ? ` data-gx="${x.id}|${esc(sh)}" tabindex="0" aria-expanded="${GOPEN.has(x.id + '|' + sh)}"` : '');
+const gxOpen = (x, sh) => !!(x?.id && GOPEN.has(x.id + '|' + sh));
+// 키보드: 팀 줄에서 Enter·Space로 펼치기
+document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('tr[data-gx]')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('click', (e) => {
   const tr = e.target.closest?.('tr[data-gx]');
   if (!tr || e.target.closest('a, button')) return;
@@ -1831,8 +1835,8 @@ function stageGrid(B, st, limit = 0, mini = false) {
   const body = rows.map((r, i) => {
     const skip = mini && i > 0 && r.pos > rows[i - 1].pos + 1 ? `<tr class="gap"><td colspan="${hasDest ? 4 : 3}" aria-hidden="true">⋯</td></tr>` : '';
     const cutHere = !opt.krOnly && st.cut && (res ? r.pos === st.cut : false);
-    const gx = !mini && r.short && r.pos && gamesOk(x);
-    return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}${gx ? ' gx' : ''}"${gx ? gxAttr(x, r.short) : ''}><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}${gx ? '<i class="gx-chev" aria-hidden="true"></i>' : ''}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small dest">${dest(r)}</td>` : ''}</tr>${gx ? gxRow(B, x, G, r.short, GOPEN.has(x.id + '|' + r.short)) : ''}${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
+    const gx = !mini && r.short && r.pos && gamesOk(x), open = gx && gxOpen(x, r.short);
+    return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere && !open ? 'cut' : ''}${gx ? ' gx' : ''}"${gx ? gxAttr(x, r.short) : ''}><td class="rank">${r.pos ?? '–'}${gx ? '<i class="gx-chev" aria-hidden="true"></i>' : ''}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small dest">${dest(r)}</td>` : ''}</tr>${gx ? gxRow(B, x, G, r.short, open, `${rowCls(r)} ${cutHere ? 'cut' : ''}`) : ''}${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
   }).join('');
   const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다.' : '';
   const table = `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid${mini ? ' mini' : ''}"><thead><tr><th>#</th><th>팀</th>${mini ? '<th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>' : PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r dest">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>`;
@@ -2290,7 +2294,7 @@ function stageTable(st) {
     const out = (r) => (st.cut ? (r.pos <= st.cut ? `<span class="adv up">${esc(st.up)}</span>` : `<span class="adv ${st.down === '탈락' ? 'out' : 'down'}">${esc(st.down)}</span>`)
       : st.top && st.status === 'completed' && r.pos <= st.top ? `<span class="tag ok">챔피언십 진출</span>${r.won ? ' <span class="tag mpe">우승</span>' : ''}` : r.won ? '<span class="tag mpe">우승</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '');
     body = gview(x, G, `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}<th class="r dest">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''} gx"${gxAttr(x, r.short)}><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}<i class="gx-chev" aria-hidden="true"></i></td>${ptsTd(r.pts, r.kills)}${G ? G.td(r.short) : ''}<td class="r small dest">${out(r)}</td></tr>${gxRow(st.B || null, x, G, r.short, GOPEN.has(x.id + '|' + r.short))}${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="${6 + (G ? G.n : 0)}">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut && !gxOpen(x, r.short) ? 'cut' : ''} gx"${gxAttr(x, r.short)}><td class="rank">${r.pos}<i class="gx-chev" aria-hidden="true"></i></td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}${G ? G.td(r.short) : ''}<td class="r small dest">${out(r)}</td></tr>${gxRow(st.B || null, x, G, r.short, gxOpen(x, r.short), `${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}`)}${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="${6 + (G ? G.n : 0)}">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
     </tbody></table></div>`) + (x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : '');
   } else if (st.teams?.length) {
     const seedOf = st.seed || ((sh) => { const g = (st.ev || A.intl)?.rows?.find((r) => r.short === sh); return g ? { n: g.pos, label: `조별 ${g.pos}위` } : null; });
