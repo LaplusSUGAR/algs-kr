@@ -183,7 +183,7 @@
 | D4C |  | Faenex, Nono |  |
 | MIH (Made In Heaven) | EMEA | Yanzz |  |
 | SH (Summer Haze) | EMEA | CalamityVX | Calamitous |
-| MAJN (Majin) | EMEA | Ixren |  |
+| MAJN |  | Ixren |  |
 | BEN (Ben) | EMEA |  | Zuni |
 | 3MEN (3 MEN) | EMEA | tyhr |  |
 | RON (Ronin) | EMEA | ChaoticMuch |  |
