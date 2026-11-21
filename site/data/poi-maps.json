@@ -5301,7 +5301,509 @@
       "name": "Match Point Finals",
       "draft": "01M795578NNWEY453B4FPPK86H",
       "date": "2026-11-21T20:00:00.000Z",
-      "checked": 83115
+      "completedAt": "2026-11-21T20:15:43.187Z",
+      "done": true,
+      "checked": 83115,
+      "maps": [
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              1,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              2,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              3,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              4,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              5,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              6,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              8,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              9,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              10,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              13,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              15,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              16,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "JOB",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              27,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              34,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              39,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              51,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              52,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              57,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              58,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              60,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Mountain Lift",
+              60,
+              47
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              7,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              17,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              22,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              28,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              30,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              31,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              32,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              35,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              36,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "JOB",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              38,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              40,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              41,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              43,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              44,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              45,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              46,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              49,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              53,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              54,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              59,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        },
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              11,
+              "01KKCH1ZXT5QVN3B73FS9ZS1PQ",
+              "ZIPLINE MAFIA",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              12,
+              "01KHPREYN75Y400N800M8NCTSV",
+              "Ronin",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              14,
+              "01M6ZJMRRK8RDNMMCQRDMA485Y",
+              "Ball Busters",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              18,
+              "01KHPREVYF1NA2MVWBPZDR7J23",
+              "PlayFor2nd",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              19,
+              "01M6ZJMR7MF6NX3JBDGJA22YC3",
+              "FORGED IN HELL",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              20,
+              "01KTSJN9JPC99AJFDDXPESJWTM",
+              "Take Flyte",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              21,
+              "01KHPREWKQ5W4FDQCRGX4KDCAN",
+              "Infinite",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              23,
+              "01KME84B9DFWTQWPTCTEXRHSD0",
+              "Team WaR",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              24,
+              "01KHPREYKNXC01C0G2S5H19F38",
+              "TLN PIRATES",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              25,
+              "01KHPREW40F3JGV2MKBYXYW5RK",
+              "Made In Heaven",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              26,
+              "01KME84BHFFPVPK9WN4TC9HC9Z",
+              "Havoc legends",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              29,
+              "01KTSJNABFW0TWT5B8E9AW4X64",
+              "VOID ESPORTS",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              33,
+              "01KHPREZ17WVRXCCZD256CRP5C",
+              "TEAM ECLIPSE",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              37,
+              "01KTSJN9KPK3JT213PMP606X99",
+              "Fear the Lamb",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              42,
+              "01KTSJN9JEEE9MTYJWA3P7TPHJ",
+              "DN",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              47,
+              "01KTSJNABRTD7BVQV2647Y9HHN",
+              "asd",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              48,
+              "01KME84BM2K6S5120YXYV4NZ75",
+              "Glacier",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              50,
+              "01KHPREZ2JRAK2RGDG62J3AEEW",
+              "Pixel Lumina",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              55,
+              "01KHPREYGFHD5EYT03ZQN9A8QR",
+              "Summer Haze",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              56,
+              "01KTSJN9J6TVW8D1T8J1BS4MS0",
+              "JOB",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1M8MF3J70S1Q32P8FE18": {
       "region": "apac-s",
