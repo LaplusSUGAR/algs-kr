@@ -2215,3 +2215,5 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 }
 /* 포인트 탭 개편(11-21): 117줄 표는 처음 40줄만(관심 팀 줄은 늘 보임), '더 보기'로 나머지 */
 .cp-clip.clip tr.more, .cp-clip.clip tr.more + tr.detail { display: none; }
+/* 팀 탭 개편(11-21): 팀 상세 경기 결과는 최근 5개만 먼저 */
+.td-res-sec.clip .td-res > li:nth-child(n+6) { display: none; }
