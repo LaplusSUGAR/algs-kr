@@ -77,12 +77,18 @@ jobs:
         run: node scripts/build-data.mjs
       - name: 규칙 파일(config/rules)과 실제 데이터 대조 (어긋나도 멈추지 않고 경고만)
         run: node scripts/check-rules.mjs || true
+      # 라운드 묶음이 끝나면 결과 그래픽, 그 라운드의 POI 드래프트가 끝나면 POI 그래픽을 graphics/ 에 PNG 로 만든다
+      # (scripts/graphics.mjs, 규격 docs/graphics-spec.md). 새로 만들 그림이 있을 때만 도구를 설치하고, 실패해도 빌드는 계속
+      - name: 결과·POI 그래픽
+        continue-on-error: true
+        run: node scripts/graphics.mjs --plan || (npm i --no-save --no-package-lock pretendard@1.3.9 sharp@0.33 playwright-core@1.47.2 && node scripts/graphics.mjs)
       - name: 바뀐 데이터만 커밋
         id: commit
         run: |
           git config user.name "algs-kr-bot"
           git config user.email "actions@users.noreply.github.com"
           git add raw logs site/data site/index.html site/logos site/s site/404.html
+          if [ -d graphics ]; then git add graphics; fi   # 결과·POI 그래픽 (scripts/graphics.mjs)
           if [ -d archive ]; then git add archive; fi   # 지난 시즌 보관본 (시즌이 바뀔 때 한 번 생김)
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
