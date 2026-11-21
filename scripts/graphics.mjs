@@ -1,6 +1,6 @@
 // 라운드 결과·POI 드래프트 그래픽 자동 생성 (규격: docs/graphics-spec.md)
-//   빌드가 만든 site/data/algs-data.js 를 읽어, 한 '라운드 묶음'(같은 대회·지역·시작 시각의 시리즈들)이
-//   ⓐ 모두 끝나면 결과 그래픽, ⓑ 그 묶음의 POI 드래프트가 모두 끝나면 POI 그래픽을 graphics/ 에 PNG 로 만든다.
+//   빌드가 만든 site/data/algs-data.js 를 읽어, 경기(시리즈) 하나가
+//   ⓐ 끝나면 결과 그래픽(표는 좌 1~10위·우 11~20위), ⓑ 그 경기의 POI 드래프트가 끝나면 POI 그래픽을 graphics/ 에 PNG 로 만든다.
 //   실제 데이터만 쓴다: 결과가 비었거나 드래프트 선택이 다 나오지 않았으면 만들지 않는다.
 //   같은 데이터로 이미 만든 그림은 다시 만들지 않는다(graphics/index.json 에 데이터 지문을 적어 둠).
 //   공식 데이터가 나중에 고쳐지면(벌점 등) 지문이 바뀌어 같은 파일 이름으로 다시 만든다.
@@ -20,7 +20,7 @@ import { createRequire } from 'node:module';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const OUT_DIR = path.join(ROOT, 'graphics');
 const INDEX = path.join(OUT_DIR, 'index.json');
-const SPEC_VER = 1; // 규격(디자인)을 바꾸면 올린다 → 모든 그림을 새 규격으로 다시 만든다
+const SPEC_VER = 2; // 규격(디자인)을 바꾸면 올린다 → 모든 그림을 새 규격으로 다시 만든다
 const args = process.argv.slice(2);
 const PLAN = args.includes('--plan'), FORCE = args.includes('--force'), HTML_ONLY = args.includes('--html');
 const ONLY = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
@@ -75,9 +75,11 @@ const koDest = (kind, label) => { const st = stageByTab(kind, label); return st 
 const lobbyOf = (st) => (/Lobby ([A-Z])$/.exec(st?.name || '') || [])[1] || null;
 const srcAbbr = (st) => st.tab.replace('승자 ', '승').replace('패자 ', '패');
 const srcLabel = (st, pos) => (lobbyOf(st) ? `${lobbyOf(st)}${pos}` : `${srcAbbr(st)} ${pos}위`);
-const stageKeySlug = (keys) => [...new Set(keys.map((k) => (k === 'a' || k === 'b' ? 'wr1' : k)))].join('-');
+// 파일 이름의 단계: 승자 1R 로비 A·B 는 wr1a·wr1b, 그 밖은 규칙 파일의 단계 키
+const stageKeySlug = (keys) => keys.map((k) => (k === 'a' || k === 'b' ? `wr1${k}` : k)).join('-');
+const stageTitle = (st) => st.ko.replace(/ 그룹 ([A-Z])$/, ' 로비 $1');
 
-// ───────── 라운드 묶음 ─────────
+// ───────── 경기 단위 (예전엔 같은 시작 시각을 묶었으나 11-21 부터 한 경기 = 한 장) ─────────
 const allSeries = (A.series || []).filter((s) => kindOf(s) && stageOf(kindOf(s), s.name));
 function eventSeries(s) { return allSeries.filter((x) => x.eventId === s.eventId && x.region === s.region); }
 function seriesOfStage(s, key) { const k = kindOf(s); return eventSeries(s).find((x) => stageOf(k, x.name)?.key === key) || null; }
@@ -92,7 +94,7 @@ function slots() {
   const m = new Map();
   for (const s of allSeries) {
     if (!regionWanted(s)) continue;
-    const key = `${s.eventId}|${s.region}|${s.start}`;
+    const key = s.id; // 경기(시리즈) 하나당 그림 한 장 (11-21 운영자 요청)
     if (!m.has(key)) m.set(key, []);
     m.get(key).push(s);
   }
@@ -170,6 +172,7 @@ h1{font-weight:900;font-size:60px;line-height:1.12;letter-spacing:-.02em}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px 18px 12px}
 .pt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
 .pt h2{font-weight:800;font-size:26px}.pt h2:before{content:'/';color:var(--red);margin-right:6px;font-weight:800}
+.pt .cutl{font-size:16px}
 .pt .when{color:var(--amber);font-weight:800;font-size:20px}
 table{width:100%;border-collapse:collapse}
 th{font-size:12.5px;font-weight:600;color:var(--mut);text-align:left;padding:4px 6px 8px;border-bottom:1px solid var(--line)}
@@ -295,20 +298,25 @@ function noKrNote(slot) {
   return `<div class="note"><p>${head}</p><small>이번 라운드에는 한국 팀이 없어요${where ? ` · ${where}` : ''}</small></div>`;
 }
 
-function resultTable(slot, s, st) {
+// 결과 표: 왼쪽 1~10위, 오른쪽 11~20위 (세로를 줄이려고 반씩 나눔, 11-21 운영자 요청)
+//   진출선이 마침 가운데(10위)면 선 대신 두 판의 머리에 '▲ 승자 2R' / '▼ 패자부활 1R' 을 단다
+function resultTables(slot, s, st) {
   const rows = (s.results || []).slice().sort((a, b) => a.pos - b.pos);
   const cut = st.cut || st.top || 0;
-  const cutRow = () => {
-    const u = st.cut ? `▲ ${koDest(slot.kind, st.up)}` : `★ ${st.up || '챔피언십'}`;
-    const d = st.cut ? (st.down === '탈락' ? `<span class="x">▼ 탈락</span>` : `<span class="d">▼ ${esc(koDest(slot.kind, st.down))}</span>`) : '';
-    return `<tr class="cut"><td colspan="4"><div class="cutl"><span class="${st.cut ? 'u' : 'c'}">${esc(u)}</span><i></i>${d}</div></td></tr>`;
-  };
-  const body = rows.map((r) => `${cut && r.pos === cut + 1 ? cutRow() : ''}<tr class="${r.pos > cut && cut ? 'lo' : ''}${isKr(r.short) ? ' kr' : ''}">
+  const half = Math.ceil(Math.max(rows.length, st.n || 0) / 2);
+  const atHalf = st.cut && st.cut === half;
+  const upTxt = st.cut ? `▲ ${koDest(slot.kind, st.up)}` : `★ ${st.up || '챔피언십'}`;
+  const downTag = st.cut ? (st.down === '탈락' ? `<span class="x">▼ 탈락</span>` : `<span class="d">▼ ${esc(koDest(slot.kind, st.down))}</span>`) : '';
+  const cutRow = () => `<tr class="cut"><td colspan="4"><div class="cutl"><span class="${st.cut ? 'u' : 'c'}">${esc(upTxt)}</span><i></i>${downTag}</div></td></tr>`;
+  const tr = (r) => `${cut && !atHalf && r.pos === cut + 1 && r.pos !== half + 1 ? cutRow() : ''}<tr class="${r.pos > cut && cut ? 'lo' : ''}${isKr(r.short) ? ' kr' : ''}">
     <td class="pos">${r.pos}</td>
     <td class="tm">${logo(r.short)}<div><b>${esc(r.short)}</b><span class="full">${esc(teamName(r.short))}</span></div>${isKr(r.short) ? KR_BADGE : ''}</td>
-    <td class="k r">${r.kills}</td><td class="p r">${r.pts}</td></tr>`).join('');
-  return `<div class="panel"><div class="pt"><h2>${esc(lobbyOf(st) ? `로비 ${lobbyOf(st)}` : st.ko)}</h2></div>
-    <table><thead><tr><th>#</th><th>팀</th><th class="r">킬</th><th class="r">점수</th></tr></thead><tbody>${body}</tbody></table></div>`;
+    <td class="k r">${r.kills}</td><td class="p r">${r.pts}</td></tr>`;
+  const panel = (part, title, tag) => `<div class="panel"><div class="pt"><h2>${esc(title)}</h2>${tag ? `<span class="cutl">${tag}</span>` : ''}</div>
+    <table><thead><tr><th>#</th><th>팀</th><th class="r">킬</th><th class="r">점수</th></tr></thead><tbody>${part.map(tr).join('')}</tbody></table></div>`;
+  const left = rows.filter((r) => r.pos <= half), right = rows.filter((r) => r.pos > half);
+  const lastPos = rows.length ? rows.at(-1).pos : st.n;
+  return `<div class="cols" style="grid-template-columns:1fr 1fr">${panel(left, `1~${half}위`, atHalf ? `<span class="u">${esc(upTxt)}</span>` : '')}${panel(right, `${half + 1}~${Math.max(lastPos, half + 1)}위`, atHalf ? downTag : '')}</div>`;
 }
 
 // 이 묶음이 넘겨주는 다음 단계들의 명단 (아직 안 끝난 단계에서 올 자리는 '?')
@@ -348,26 +356,20 @@ function nextHtml(slot, n) {
 
 function resultsSpec(slot) {
   const { list, stages, kind } = slot;
-  const lobbies = stages.every(lobbyOf);
-  const title = lobbies ? `${stages[0].ko.replace(/ 그룹 [A-Z]$/, '')} 결과` : stages.length === 1 ? `${stages[0].ko} 결과` : `${stages.map((st) => koShort(st)).join(' · ')} 결과`;
-  const st0 = stages[0], games = list[0].matches;
-  const sizes = [...new Set(list.map((s) => (s.results || []).length))];
-  const parts = [dLong(slot.start)];
-  if (lobbies) parts.push(`로비 ${stages.map(lobbyOf).join('·')} 각 ${sizes.length === 1 ? sizes[0] : st0.n}팀`);
-  else if (list.length > 1) parts.push(`${list.length === 2 ? '두' : list.length} 경기 동시 진행`, `각 ${st0.n}팀`);
-  else parts.push(`${sizes[0]}팀`);
-  parts.push(`${games}게임`);
-  if (lobbies && st0.cut) parts.push(`상위 ${st0.cut}팀 ${koDest(kind, st0.up)}, 하위 ${st0.n - st0.cut}팀 ${koDest(kind, st0.down)}`);
+  const s = list[0], st0 = stages[0];
+  const title = `${stageTitle(st0)} 결과`;
+  const parts = [dLong(slot.start), `${(s.results || []).length}팀`, `${s.matches}게임`];
+  if (st0.cut) parts.push(`상위 ${st0.cut}팀 ${koDest(kind, st0.up)}, 하위 ${st0.n - st0.cut}팀 ${koDest(kind, st0.down)}`);
+  else if (st0.top) parts.push(`상위 ${st0.top}팀 ${st0.up || '챔피언십'} 진출`);
   const kr = krCards(slot);
-  const cols = list.length === 1 ? 1 : 2;
   const next = nextStages(slot);
   const asOf = A.sources?.algs || A.generated;
   const body = header(slot, title, parts.join(' · '))
     + (kr.length ? krCardsHtml(kr) : noKrNote(slot))
-    + `<div class="cols" style="grid-template-columns:repeat(${cols},1fr)">${list.map((s, i) => resultTable(slot, s, stages[i])).join('')}</div>`
+    + resultTables(slot, s, st0)
     + (next.length ? `<div class="cols" style="grid-template-columns:repeat(${Math.min(2, next.length)},1fr)">${next.map((n) => nextHtml(slot, n)).join('')}</div>` : '')
     + footer(`시각은 한국 시간 · 점수·킬·다음 경기 명단: ALGS 공식 데이터 (${dShort(asOf)} 기준)`);
-  const fp = JSON.stringify(list.map((s) => [s.id, s.status, s.results]));
+  const fp = JSON.stringify(list.map((x) => [x.id, x.status, x.results]));
   return { kind: 'results', title, html: page(body), fp };
 }
 
@@ -408,7 +410,7 @@ function poiSection(slot, s, st) {
   const tbl = (part) => `<table><thead><tr><th>팀</th>${maps.map((m) => `<th>${esc(m.map)}</th>`).join('')}</tr></thead><tbody>${part.map((t) => `<tr class="${isKr(t.sh) ? 'kr' : ''}">
     <td class="tm">${logo(t.sh)}<b>${esc(t.sh)}</b>${isKr(t.sh) ? KR_BADGE : ''}</td>
     ${maps.map((_, mi) => { const pk = t.picks[mi]; return `<td class="pk">${pk ? `<i>${pk[0]}</i>${esc(poiName(pk[3]))}` : '–'}</td>`; }).join('')}</tr>`).join('')}</tbody></table>`;
-  return `<div class="panel sec"><div class="pt"><h2>${esc(st.ko.replace(/ 그룹 ([A-Z])$/, ' 로비 $1'))}</h2><span class="when">${esc(dShort(s.start))}</span></div>
+  return `<div class="panel sec"><div class="pt"><h2>${esc(stageTitle(st))}</h2><span class="when">${esc(dShort(s.start))}</span></div>
     <div class="maps2">${mapsHtml}</div><div class="ptab">${tbl(rows.slice(0, half))}${tbl(rows.slice(half))}</div></div>`;
 }
 function poiKrCards(slot) {
@@ -428,8 +430,7 @@ function poiKrCards(slot) {
 function poiSpec(slot) {
   const { list, stages } = slot;
   const maps = [...new Set(list.flatMap((s) => poiOf(s).maps.map((m) => m.map)))];
-  const lobbies = stages.every(lobbyOf);
-  const what = lobbies ? `${stages[0].ko.replace(/ 그룹 [A-Z]$/, '')} 로비 ${stages.map(lobbyOf).join('·')}` : stages.map((st) => st.ko).join(' · ');
+  const what = stages.map(stageTitle).join(' · ');
   const n = list[0].lineup?.length || stages[0].n;
   const sub = [what, dLong(slot.start), ...maps, `${list.length > 1 ? '각 ' : ''}${n}팀`].join(' · ');
   const cards = poiKrCards(slot);
