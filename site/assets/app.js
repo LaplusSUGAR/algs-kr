@@ -3118,15 +3118,14 @@ const FIND = {
 };
 const findChip = (p, name) => `<a class="chip ${p} find" href="${esc(FIND[p](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[p]}에서 이름으로 검색합니다"><i></i>${PLAT[p]} 검색</a>`;
 // 한국 스트리머·전 프로 (대회 선수 아님): 이름, 구분, 소속, 채널. Apex 방송 중이면 LIVE
-// 방송 탭의 한 줄 행 목록용 작은 칩: YouTube 는 'YT', 확인된 채널이 없으면 점선 + '?'(이름 검색)
+// 방송 탭의 한 줄 행 목록용 작은 칩: YouTube 는 'YT'. 확인된 채널만 보여 준다(11-21 운영자 결정, 이름 검색 칩 제거)
 const rowLabel = (k) => (k === 'youtube' ? 'YT' : PLAT[k]);
 const rowChip = (k, url) => (url ? `<a class="chip ${k}" href="${esc(url)}" target="_blank" rel="noopener" title="${PLAT[k]}"><i></i>${rowLabel(k)}</a>` : '');
-const rowFind = (k, name) => `<a class="chip ${k} find" href="${esc(FIND[k](name))}" target="_blank" rel="noopener" title="확인된 채널이 없어 ${PLAT[k]}에서 이름으로 검색합니다"><i></i>${rowLabel(k)}?</a>`;
 const creatorLive = (c) => (ST?.live || []).find((x) => x.kind === 'creator' && x.who === c.name);
 const creatorRow = (c) => { const l = creatorLive(c); return `<div class="pl-row"><span class="nm"><b>${esc(c.name)}</b>${l ? ` <a class="tag live" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'} aria-label="${esc(c.name)} 방송 중, 방송 보기">LIVE</a>` : ''}<small><span>${c.kind === 'expro' ? '전 프로' : '스트리머'}</span>${c.org ? ` · ${esc(c.org)}` : ''}</small></span><span class="chips">${PLATFORM_KEYS.filter((k) => c.links[k]).map((k) => rowChip(k, c.links[k])).join('')}</span></div>`; };
 const PLATFORM_KEYS = ['twitch', 'chzzk', 'youtube', 'soop'];
 // 방송 탭 '선수·코치 방송' 한 줄 행 (팀·선수 화면은 아래 streamRow 를 그대로 쓴다)
-const playerRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveTag(p.name, p.team)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => rowChip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? rowChip(k, p.links[k]) : rowFind(k, p.name))).join('')}</span></div>`;
+const playerRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveTag(p.name, p.team)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => rowChip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => rowChip(k, p.links[k])).join('')}</span></div>`;
 const streamRow = (p) => `<div class="pl-row"><span class="nm"><span class="krdot ${p.role === 'coach' ? 'k-coach' : 'k-team'}"></span>${playerLink(p.name)}${p.mix ? '<sup class="mix">계</sup>' : ''}${liveTag(p.name, p.team)}<small>${teamLink(p.team)}${p.role === 'coach' ? ', 코치' : ''}</small></span><span class="chips">${['twitch', 'soop'].map((k) => chip(k, p.links[k])).join('')}${['chzzk', 'youtube'].map((k) => (p.links[k] ? chip(k, p.links[k]) : findChip(k, p.name))).join('')}</span></div>`;
 /* ---------- 방송 상태 (worker/streams → C.streamsUrl) ---------- */
 // ST = { at, ok, live: [...], videos: [...] } | null(아직 못 받음). 60초마다 다시 받는다(화면이 보일 때만)
