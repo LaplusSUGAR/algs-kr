@@ -1,0 +1,70 @@
+{
+ "ver": 1,
+ "spec": "docs/graphics-spec.md",
+ "items": {
+  "year-6/lcq/apac-n/20261120-1700-wr1-poi.png": {
+   "kind": "poi",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-20T08:00:00.000Z",
+   "title": "POI 드래프트",
+   "hash": "71787b252c4c",
+   "made": "2026-11-21T11:11:05.819Z",
+   "series": [
+    "~l8",
+    "~l9"
+   ]
+  },
+  "year-6/lcq/apac-n/20261120-1700-wr1-results.png": {
+   "kind": "results",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-20T08:00:00.000Z",
+   "title": "승자 1라운드 결과",
+   "hash": "1316e2ff55a7",
+   "made": "2026-11-21T11:10:59.946Z",
+   "series": [
+    "~l8",
+    "~l9"
+   ]
+  },
+  "year-6/lcq/apac-n/20261121-1200-wr2-er1-poi.png": {
+   "kind": "poi",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-21T03:00:00.000Z",
+   "title": "POI 드래프트",
+   "hash": "d229571eec45",
+   "made": "2026-11-21T11:11:13.733Z",
+   "series": [
+    "~la",
+    "~lb"
+   ]
+  },
+  "year-6/lcq/apac-n/20261121-1200-wr2-er1-results.png": {
+   "kind": "results",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-21T03:00:00.000Z",
+   "title": "승자 2R · 패자부활 1R 결과",
+   "hash": "6a917f7b7228",
+   "made": "2026-11-21T11:11:07.946Z",
+   "series": [
+    "~la",
+    "~lb"
+   ]
+  },
+  "year-6/lcq/apac-n/20261121-1700-er2-poi.png": {
+   "kind": "poi",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-21T08:00:00.000Z",
+   "title": "POI 드래프트",
+   "hash": "52060822122c",
+   "made": "2026-11-21T11:11:17.264Z",
+   "series": [
+    "~lc"
+   ]
+  }
+ }
+}

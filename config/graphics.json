@@ -1,0 +1,4 @@
+{
+  "_about": "결과·POI 그래픽(scripts/graphics.mjs, 규격 docs/graphics-spec.md)을 만들 지역. \"kr\" = 한국 관련 팀(선수·코치 포함)이 출전한 지역, \"all\" = 모든 지역, 또는 \"apac-n\"·\"apac-s\"·\"emea\"·\"americas\" 를 직접 적는다",
+  "regions": ["kr"]
+}
