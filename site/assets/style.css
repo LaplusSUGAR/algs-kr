@@ -1418,17 +1418,53 @@ dialog { border: 1px solid var(--rule); }
 @media (min-width: 768px) { .toast { bottom: 24px; } }
 /* 아주 좁은 화면(320px대): 헤더 아이콘이 4개(상태·공유·문의·설정)라 간격을 줄여 브랜드 글자와 붙지 않게 */
 
-/* 게임별 점수 열(g1…): 표가 충분히 넓을 때만 보인다 (좁으면 순위·킬·종합만). 이긴 게임(1위)은 굵게, 진행 중인 게임은 점 */
-.tbl-wrap.gtab { container-type: inline-size; }
+/* 게임별 점수 (G1…): 점수표 틀 .gview 가 컨테이너. 720px 이상이면 종합 옆에 늘 보이고, 좁으면 '종합 | 게임별' 전환(.gv-bar)으로 고른다.
+   게임별 보기(.gv-game, 좁은 화면): 순위·킬·다음 칸을 접고 #·팀 칸을 고정한 채 게임 칸을 가로로 민다.
+   칸: 게임 점수(굵게) + 작은 줄 'N위 K킬'. 1·2·3위는 금·은·동 글자 + 옅은 바탕. 진행 중 게임은 머리글 빨간 점 + 옅은 빨강 열 */
+.gview { container-type: inline-size; }
+.gv-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin: 0 0 8px; }
+.gv-bar .seg button { padding: 5px 14px; font-weight: 600; min-height: 32px; }
+.gv-key { font-size: 11.5px; color: var(--steel); display: inline-flex; align-items: center; gap: 3px; }
+.gv-key i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; background: var(--gold); }
+.gv-key i.m2 { background: var(--silver); } .gv-key i.m3 { background: var(--bronze); margin-right: 3px; }
 .tbl .gc { display: none; }
-@container (min-width: 720px) { .tbl .gc { display: table-cell; } }
-.tbl th.gc, .tbl td.gc { min-width: 38px; }
-.tbl th.gc { text-transform: none; } /* 'g1' 처럼 소문자로 (표 머리글 기본은 대문자) */
-.tbl td.gc { color: var(--steel); font-variant-numeric: tabular-nums; }
-.tbl th.gc.live::after { content: ''; display: inline-block; width: 6px; height: 6px; margin-left: 4px; border-radius: 50%; background: var(--apex); vertical-align: 2px; animation: gcPulse 1.4s ease-in-out infinite; }
-.tbl td.gc.live { font-style: italic; }
+.gview.gv-game .tbl .gc { display: table-cell; }
+.gview.gv-game .tbl .pp, .gview.gv-game .tbl .kp, .gview.gv-game .tbl .dest { display: none; }
+.gview.gv-game .tbl td.team small { display: none; }
+.gview.gv-game .tbl td.team { white-space: nowrap; max-width: 118px; overflow: hidden; text-overflow: ellipsis; }
+.gview.gv-game .tbl .tp { border-right: 1px solid var(--rule); }
+/* #·팀 칸 고정: 바탕을 칠해야 밀려 지나가는 칸이 비치지 않는다. 줄 강조색(한국 팀·응원 팀)은 그 위에 겹쳐 칠한다 */
+.gview.gv-game .tbl tr > .rank, .gview.gv-game .tbl tr > th:first-child { position: sticky; left: 0; z-index: 1; min-width: 26px; background-color: var(--paper); background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent)); }
+.gview.gv-game .tbl tr > .team, .gview.gv-game .tbl tr > th:nth-child(2) { position: sticky; left: 26px; z-index: 1; background-color: var(--paper); background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent)); box-shadow: 6px 0 6px -6px rgba(0, 0, 0, .25); }
+.gview.gv-game .tbl tr.kr { --tint: var(--ring-soft); }
+.gview.gv-game .tbl tr.kr.k-team, .gview.gv-game .tbl tr.kr.k-member, .gview.gv-game .tbl tr.kr.k-coach { --tint: var(--kc-soft); }
+.gview.gv-game .tbl tr.kr.main { --tint: color-mix(in srgb, var(--apex) 18%, transparent); }
+@container (min-width: 720px) {
+  .gview .gv-bar .seg { display: none; }
+  .gview:not(.has-g) .gv-bar { display: none; }
+  .gview .tbl .gc { display: table-cell; }
+  .gview.gv-game .tbl .pp, .gview.gv-game .tbl .kp, .gview.gv-game .tbl .dest { display: table-cell; }
+  .gview.gv-game .tbl td.team small { display: block; }
+  .gview.gv-game .tbl td.team { max-width: none; }
+  .gview.gv-game .tbl tr > .rank, .gview.gv-game .tbl tr > th:first-child, .gview.gv-game .tbl tr > .team, .gview.gv-game .tbl tr > th:nth-child(2) { position: static; box-shadow: none; }
+  .gview .tbl .tp { border-right: 1px solid var(--rule); }
+}
+/* 주의: .gc 는 게임 수 칩(gameCount)과 이름이 같아 칩 모양(테두리·글꼴·inline-flex)이 표 칸에 묻지 않게 여기서 다시 정한다 */
+.tbl th.gc, .tbl td.gc { min-width: 44px; padding: 7px 3px; text-align: center; border: 0; border-left: 1px solid var(--rule); border-bottom: 1px solid var(--rule); border-radius: 0; font: inherit; white-space: nowrap; }
+.tbl th.gc { padding-top: 6px; padding-bottom: 6px; border-bottom: 1.5px solid var(--ink); font-size: 11px; font-weight: 700; }
+.tbl th.gc { text-transform: none; letter-spacing: .02em; line-height: 1.15; vertical-align: bottom; }
+.tbl th.gc a { color: inherit; text-decoration: none; display: block; }
+.tbl th.gc a:hover { color: var(--ink); }
+.tbl th.gc small { display: block; font-size: 9.5px; font-weight: 600; letter-spacing: .04em; color: var(--steel); opacity: .8; }
+.tbl td.gc { color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.15; vertical-align: middle; }
+.tbl td.gc b { display: block; font-size: 14px; font-weight: 750; }
+.tbl td.gc small { display: block; margin-top: 2px; font-size: 10px; font-weight: 500; color: var(--steel); white-space: nowrap; }
+.tbl td.gc.muted { color: var(--steel); }
+.tbl th.gc.glive { color: var(--apex); }
+.tbl th.gc.glive a::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: var(--apex); vertical-align: 2px; animation: gcPulse 1.4s ease-in-out infinite; }
+.tbl td.gc.glive { background-color: color-mix(in srgb, var(--apex) 7%, transparent); font-style: italic; }
 @keyframes gcPulse { 50% { opacity: .25; } }
-@media (prefers-reduced-motion: reduce) { .tbl th.gc.live::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tbl th.gc.glive a::before { animation: none; } }
 
 /* 한 게임(매치) 1·2·3위 팀의 점수: 금·은·동 글자색 (게임별 점수 열 g1…, 게임 다시보기의 게임 결과 표). 색만으로 구분하지 않게 굵게도 */
 :root { --gold: #A6780B; --silver: #6C84A8; --bronze: #B05A2B; } /* 밝은 배경에서 대비 3.2~4:1, 은은 일반 회색 숫자와 구분되게 푸른빛 */
@@ -1436,6 +1472,10 @@ dialog { border: 1px solid var(--rule); }
 .tbl .m1, .tbl td.gc.m1 { color: var(--gold); font-weight: 800; }
 .tbl .m2, .tbl td.gc.m2 { color: var(--silver); font-weight: 800; }
 .tbl .m3, .tbl td.gc.m3 { color: var(--bronze); font-weight: 800; }
+.tbl td.gc.m1 { background-color: color-mix(in srgb, var(--gold) 15%, transparent); }
+.tbl td.gc.m2 { background-color: color-mix(in srgb, var(--silver) 15%, transparent); }
+.tbl td.gc.m3 { background-color: color-mix(in srgb, var(--bronze) 13%, transparent); }
+.tbl td.gc.m1 small, .tbl td.gc.m2 small, .tbl td.gc.m3 small { color: inherit; font-weight: 650; }
 
 /* ===== 2026-11 구조 개편 ① 헤더·메뉴 (OWticker 구조 참고, 색·글꼴은 HUD 그대로) =====
    메뉴(.tabbar)는 헤더 안에 있다. 휴대폰: 화면 아래 고정 7칸, PC: 로고 | 메뉴 7개 | 도구 한 줄.

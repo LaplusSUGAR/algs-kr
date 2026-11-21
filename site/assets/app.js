@@ -47,7 +47,7 @@ const store = {
 // 언어 (assets/i18n.js): 화면은 한국어로 그리고, 다른 언어면 그린 뒤 문구를 바꾼다
 const I = window.I18N || { lang: 'ko', info: { tz: 'KST' }, t: (x) => x, tree() {}, chrome() {}, setLang() {} };
 const TZL = I.info.tz;
-const opt = { spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []), main: store.get('main', null) };
+const opt = { gv: store.get('gv', 'sum'), spoiler: store.get('spoiler', false), krOnly: store.get('krOnly', false), mode: store.get('mode', 'kr'), fav: store.get('fav', []), main: store.get('main', null) };
 
 /* ---------- 보기 모드: 한국 팀 · 지역(APAC North · APAC South · EMEA · Americas) · 내 응원 팀 ----------
    모드마다 '관심 팀'이 달라지고, 홈 카드·표 강조·필터·진출 구조 칩이 모두 관심 팀 기준으로 바뀐다 */
@@ -183,17 +183,21 @@ const fmt = (n) => (typeof n === 'number' ? NF.format(n) : (n ?? '–').toLocale
 //   표의 등수 칸은 '#'로 적어 '순위'(순위 점수) 칸과 헷갈리지 않게 한다
 const ptsOf = (pts, kills) => ({ pp: pts != null && kills != null ? pts - kills : null, kp: kills ?? null, tp: pts ?? null });
 // data-tr: 번역 사전 키 (메뉴의 '순위'(Standings)와 구분)
-const PTS_TH = '<th class="r pts-h" title="순위 점수" data-tr="순위 점수 칸">순위</th><th class="r pts-h" title="킬 점수" data-tr="킬 점수 칸">킬</th><th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>';
+//   칸마다 pp(순위 점수)·kp(킬 점수)·tp(종합) 클래스: 게임별 보기(.gview.gv-game)가 좁은 화면에서 순위·킬 칸을 접을 때 쓴다
+const PTS_TH = '<th class="r pts-h pp" title="순위 점수" data-tr="순위 점수 칸">순위</th><th class="r pts-h kp" title="킬 점수" data-tr="킬 점수 칸">킬</th><th class="r pts-h tp" title="종합 점수" data-tr="종합 점수 칸">종합</th>';
 // place: 한 게임(매치)의 결과 표일 때 그 게임 순위. 1·2·3위의 종합 점수는 금·은·동 글자색(.m1 .m2 .m3)
-const ptsTd = (pts, kills, place) => { const p = ptsOf(pts, kills); return `<td class="r num">${p.pp ?? '–'}</td><td class="r num">${p.kp ?? '–'}</td><td class="r num"><b${place >= 1 && place <= 3 ? ` class="m${place}"` : ''}>${p.tp ?? '–'}</b></td>`; };
+const ptsTd = (pts, kills, place) => { const p = ptsOf(pts, kills); return `<td class="r num pp">${p.pp ?? '–'}</td><td class="r num kp">${p.kp ?? '–'}</td><td class="r num tp"><b${place >= 1 && place <= 3 ? ` class="m${place}"` : ''}>${p.tp ?? '–'}</b></td>`; };
 const ptsLine = (pts, kills) => { const p = ptsOf(pts, kills); return p.pp == null ? `종합 ${p.tp ?? '–'}점` : `순위 ${p.pp} / 킬 ${p.kp} / 종합 ${p.tp}점`; };
-// 게임별 점수 열 (g1, g2, …): 시리즈(단계)의 게임마다 팀의 그 게임 점수. 표가 충분히 넓을 때만 보인다(CSS 컨테이너 쿼리 .gtab, 모자라면 숨김).
-//   데이터는 공식 API 게임 통계(/stats/series/{id}/match/number/{n}: 팀별 points·kills·placement)를 그 시리즈를 보고 있을 때만, 넓은 화면에서만 받는다.
+// 게임별 점수 열 (G1, G2, …): 시리즈(단계)의 게임마다 팀의 그 게임 점수와 그 게임 순위·킬. 머리글은 게임 번호 + 지도 약자(누르면 그 게임 다시보기).
+//   표가 충분히 넓으면(CSS 컨테이너 쿼리 .gview 720px 이상) 종합 점수 옆에 늘 보이고, 좁으면(휴대폰) 표 위 '종합 | 게임별' 전환으로 고른다(opt.gv, 브라우저에 저장).
+//   휴대폰 게임별 보기는 순위·킬·다음 칸을 접고 #·팀 칸을 고정한 채 게임 칸을 가로로 민다.
+//   데이터는 공식 API 게임 통계(/stats/series/{id}/match/number/{n}: 팀별 points·kills·placement)를 그 시리즈를 보고 있을 때만, 넓은 화면이거나 게임별 보기를 골랐을 때만 받는다.
 //   끝난 게임은 다시 받지 않고, 끝난 시리즈는 브라우저에 저장해 둔다. 진행 중인 시리즈는 실시간 주기(livePollMs)로 새 게임·진행 중 게임을 받는다.
 //   그 게임 1·2·3위 팀의 점수는 금·은·동 글자색. 열: 일반 경기는 g1~g6 고정(시리즈의 게임 수), 결승(Match Point Finals)은 게임이 진행될 때마다 g1부터 하나씩 생긴다.
 const GAMES = {}; // 시리즈 ID → { by: { 게임 번호: { st, map, t: { 팀 ID: [점수, 킬, 순위, 순위 점수] } } }, settled, loading }
 const GWATCH = new Map(); // 지금 화면에 있는 시리즈 ID → 시리즈
 const gamesWide = () => window.matchMedia('(min-width: 800px)').matches;
+const gamesWant = () => gamesWide() || opt.gv === 'game';
 const GM_KEEP = 40; // 브라우저에 저장해 두는 끝난 시리즈 수
 function gamesStored(id) { const v = store.get('gm:' + id, null); if (v?.by) GAMES[id] = { by: v.by, settled: true }; return !!GAMES[id]; }
 async function loadGames(x) {
@@ -225,18 +229,41 @@ async function loadGames(x) {
 (function gamesLoop() { setTimeout(() => { Promise.all([...GWATCH.values()].map((x) => (GAMES[x.id]?.settled ? null : loadGames(x)))).catch(() => {}).finally(gamesLoop); }, (C.livePollMs || 10000) + Math.random() * 3000); })();
 // x: 시리즈, final: 결승이면 true. 열 정의 { n, th, td(short) } 또는 null(좁은 화면·아직 받지 못함·시작 전)
 function gameCols(x, final) {
-  if (!x?.id || FROZEN || !gamesWide() || !(x.results?.length || x.live || x.status === 'live' || x.status === 'completed')) return null;
+  if (!x?.id || FROZEN || !gamesWant() || !gamesOk(x)) return null;
   GWATCH.set(x.id, x);
   if (!GAMES[x.id] && !gamesStored(x.id)) { GAMES[x.id] = { by: {}, settled: false }; setTimeout(() => loadGames(x).catch(() => {}), 50); } // 처음 보면 바로 한 번 받는다
   const by = GAMES[x.id].by, nums = Object.keys(by).map(Number).sort((a, b) => a - b);
   if (!nums.length) return null;
   const N = final ? nums.at(-1) : Math.min(12, Math.max(x.matches || 6, nums.at(-1)));
   const idOf = (sh) => team(sh)?.id || A.xteams?.[sh]?.id || null;
-  const th = Array.from({ length: N }, (_, i) => { const d = by[i + 1]; return `<th class="r gc${d?.st === 'live' ? ' live' : ''}"${d?.map ? ` title="G${i + 1} · ${esc(d.map)}"` : ''}>g${i + 1}</th>`; }).join('');
-  const td = (sh) => { const id = idOf(sh); return Array.from({ length: N }, (_, i) => { const v = id && by[i + 1]?.t[id]; return v ? `<td class="r num gc${v[2] >= 1 && v[2] <= 3 ? ' m' + v[2] : ''}${by[i + 1].st === 'live' ? ' live' : ''}" title="${v[2]}위 · 킬 ${v[1]} · 순위 점수 ${v[3]}">${v[0]}</td>` : '<td class="r num gc muted">–</td>'; }).join(''); };
+  const th = Array.from({ length: N }, (_, i) => {
+    const d = by[i + 1], lab = `G${i + 1}${d?.map ? `<small>${esc(poiInit(d.map))}</small>` : ''}`;
+    return `<th class="c gc${d?.st === 'live' ? ' glive' : ''}"${d?.map ? ` title="G${i + 1} · ${esc(d.map)}"` : ''}>${d ? `<a href="${qsLink('/schedule/replay', new URLSearchParams(), { s: x.id, g: i + 1 })}">${lab}</a>` : lab}</th>`;
+  }).join('');
+  // 칸: 그 게임 점수(굵게) + 아래 작은 줄 'N위 K킬'. 1·2·3위는 금·은·동 바탕. 진행 중 게임은 순위 없이 지금까지의 킬 점수만
+  const td = (sh) => { const id = idOf(sh); return Array.from({ length: N }, (_, i) => {
+    const v = id && by[i + 1]?.t[id], live = by[i + 1]?.st === 'live';
+    if (!v) return `<td class="c num gc muted${live ? ' glive' : ''}">–</td>`;
+    const pl = v[2] >= 1 ? v[2] : 0;
+    return `<td class="c num gc${pl && pl <= 3 && !live ? ' m' + pl : ''}${live ? ' glive' : ''}" title="${pl ? `${pl}위 · ` : ''}킬 ${v[1]} · 순위 점수 ${v[3]}"><b>${v[0]}</b><small>${pl && !live ? `${pl}위 ` : ''}${v[1]}킬</small></td>`;
+  }).join(''); };
   return { n: N, th, td };
 }
 window.matchMedia('(min-width: 800px)').addEventListener?.('change', () => render()); // 화면 폭이 넓어지면 게임별 점수를 받아 보여 준다
+// 게임별 점수를 보여 줄 수 있는 시리즈인가 (시작했거나 끝남)
+const gamesOk = (x) => !!(x?.id && !FROZEN && (x.results?.length || x.live || x.status === 'live' || x.status === 'completed'));
+// 점수표를 감싸는 틀: 좁은 화면용 '종합 | 게임별' 전환 + 표. G: gameCols 결과, wait: 게임별을 골랐는데 아직 받는 중
+function gview(x, G, table) {
+  if (!gamesOk(x)) return table;
+  const game = opt.gv === 'game';
+  const bar = `<div class="gv-bar"><div class="seg" role="group" aria-label="점수 보기"><button type="button" data-gv="sum" aria-pressed="${!game}">종합</button><button type="button" data-gv="game" aria-pressed="${game}">게임별</button></div>${G ? '<span class="gv-key"><i class="m1"></i><i class="m2"></i><i class="m3"></i> 게임 1·2·3위</span>' : game ? '<span class="gv-key">게임별 점수를 받는 중…</span>' : ''}</div>`;
+  return `<div class="gview${game ? ' gv-game' : ''}${G ? ' has-g' : ''}">${bar}${table}</div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-gv]');
+  if (!b || opt.gv === b.dataset.gv) return;
+  opt.gv = b.dataset.gv; store.set('gv', opt.gv); render();
+});
 const REGION = { 'apac-n': 'APAC North', 'apac-s': 'APAC South', emea: 'EMEA', americas: 'Americas', global: '국제전' };
 const PHASE_KO = {
   'Group Stage': '조별 리그', 'Bracket Stage': '브래킷', 'Match Point Finals': '매치 포인트 결승', 'Survival Stage': '서바이벌 스테이지',
@@ -1788,10 +1815,11 @@ function stageGrid(B, st, limit = 0, mini = false) {
   const body = rows.map((r, i) => {
     const skip = mini && i > 0 && r.pos > rows[i - 1].pos + 1 ? `<tr class="gap"><td colspan="${hasDest ? 4 : 3}" aria-hidden="true">⋯</td></tr>` : '';
     const cutHere = !opt.krOnly && st.cut && (res ? r.pos === st.cut : false);
-    return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
+    return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere ? 'cut' : ''}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small dest">${dest(r)}</td>` : ''}</tr>${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
   }).join('');
   const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다.' : '';
-  return `${limit || mini ? '' : jumpBar(rows)}<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid${mini ? ' mini' : ''}"><thead><tr><th>#</th><th>팀</th>${mini ? '<th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>' : PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>${cap && !mini ? `<p class="caption">${esc(cap)}</p>` : ''}`;
+  const table = `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid${mini ? ' mini' : ''}"><thead><tr><th>#</th><th>팀</th>${mini ? '<th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>' : PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r dest">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>`;
+  return `${limit || mini ? '' : jumpBar(rows)}${mini ? table : gview(x, G, table)}${cap && !mini ? `<p class="caption">${esc(cap)}</p>` : ''}`;
 }
 // 단계 시각 (LCQ·챔피언십 공통): 'MM.DD (요일) HH:mm KST'. 공식 시각이 임시값이면 '시각 미정', 날짜만 알면 날짜
 const stWhen = (st) => (st.whenText ? st.whenText : st.start && !st.tbd ? `${dateTime(st.start)} ${TZL}` : st.date ? `${dayLabel(st.date)} 시각 미정` : st.tbd ? '시각 미정' : '일정 미정');
@@ -2244,9 +2272,9 @@ function stageTable(st) {
     const G = gameCols(x, st.key === 'f');
     const out = (r) => (st.cut ? (r.pos <= st.cut ? `<span class="adv up">${esc(st.up)}</span>` : `<span class="adv ${st.down === '탈락' ? 'out' : 'down'}">${esc(st.down)}</span>`)
       : st.top && st.status === 'completed' && r.pos <= st.top ? `<span class="tag ok">챔피언십 진출</span>${r.won ? ' <span class="tag mpe">우승</span>' : ''}` : r.won ? '<span class="tag mpe">우승</span>' : r.mpe ? '<span class="tag mpe">MP</span>' : '');
-    body = `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}<th class="r">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}${G ? G.td(r.short) : ''}<td class="r small">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="${6 + (G ? G.n : 0)}">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
-    </tbody></table></div>${x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : ''}`;
+    body = gview(x, G, `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl"><thead><tr><th>#</th><th>팀</th>${PTS_TH}${G ? G.th : ''}<th class="r dest">${st.cut ? (st.status === 'completed' ? '결과' : '현재 기준') : ''}</th></tr></thead><tbody>
+      ${rows.map((r) => `<tr class="${rowCls(r)} ${!opt.krOnly && st.cut && r.pos === st.cut ? 'cut' : ''}"><td class="rank">${r.pos}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short)}${coachBadge(r.kr, r.short)}</td>${ptsTd(r.pts, r.kills)}${G ? G.td(r.short) : ''}<td class="r small dest">${out(r)}</td></tr>${!opt.krOnly && st.cut && r.pos === st.cut ? `<tr class="cut-label"><td colspan="${6 + (G ? G.n : 0)}">여기까지 ${esc(st.up)}</td></tr>` : ''}`).join('')}
+    </tbody></table></div>`) + (x.liveAt ? `<p class="caption">${ago(x.liveAt)} 공식 API 확인</p>` : '');
   } else if (st.teams?.length) {
     const seedOf = st.seed || ((sh) => { const g = (st.ev || A.intl)?.rows?.find((r) => r.short === sh); return g ? { n: g.pos, label: `조별 ${g.pos}위` } : null; });
     let ts = st.teams.map((sh) => ({ short: sh, kr: krOf(sh), g: seedOf(sh) }));
