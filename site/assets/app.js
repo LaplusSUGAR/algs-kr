@@ -3018,7 +3018,7 @@ function rules(parts, q) {
   const exPs = exRow ? exRow.players.slice().sort((a, b) => b[1] - a[1]) : [];
   const cpSum = exRow ? `<div class="cs"><span class="cs-h">예: ${esc(exRow.name)}</span><div class="cs-r">${exPs.slice(0, 3).map((p, i) => `${i ? '<i>+</i>' : ''}<span class="cs-p"><b>${fmt(p[1])}</b><em>${esc(p[0])}</em></span>`).join('')}<i>=</i><span class="cs-p sum"><b>${fmt(exPs.slice(0, 3).reduce((a, p) => a + p[1], 0))}</b><em>팀 CP</em></span></div>${exPs.length > 3 ? `<p class="caption">네 번째 선수부터는 더하지 않습니다.</p>` : ''}</div>` : '';
   // 매치 포인트 그림
-  const mpFig = `<div class="mpg" role="img" aria-label="매치 포인트 진행 그림"><div class="mpg-bar"><span class="mpg-fill"></span><span class="mpg-line"><b>${mp}점</b></span></div><ol class="mpg-steps"><li><b>1</b><span>게임을 거듭하며 점수를 쌓습니다</span></li><li><b>2</b><span>${mp}점을 넘기면 매치 포인트</span></li><li><b>3</b><span>그다음 게임부터 1위를 하면 우승</span></li></ol></div>`;
+  const mpFig = `<div class="mpg" role="img" aria-label="매치 포인트 진행 그림"><div class="mpg-bar"><span class="mpg-fill"></span><span class="mpg-line"><b>${mp}점</b></span></div><ol class="mpg-steps"><li><b>1</b><span>게임을 거듭하며 점수를 쌓습니다</span></li><li><b>2</b><span>${mp}점 이상이면 매치 포인트</span></li><li><b>3</b><span>그다음 게임부터 1위를 하면 우승</span></li></ol></div>`;
   const fact = (big, unit, label) => `<div class="rk-f"><b>${big}<small${unit === '팀' ? ' data-tr="팀(단위)"' : ''}>${unit}</small></b><span>${label}</span></div>`;
   const card = (k, title, body, cls = '') => sv !== 'all' && k !== sv ? '' : `<section class="sec rule-card ${cls}" data-k="${k}"><h2 class="h2">${title}</h2>${body}</section>`;
   const P = B.prize;
@@ -3034,10 +3034,10 @@ function rules(parts, q) {
       ['시리즈', `같은 로비가 보통 ${PL.games}게임을 치르고 점수를 더해 순위를 정합니다.`],
       ['링', '시간이 지나면 좁아지는 안전 구역입니다. 밖에 있으면 체력이 줄어, 결국 모든 팀이 한곳에서 싸웁니다.'],
       ['POI', '팀마다 정해 둔 맵의 낙하 지점입니다. 경기 전 드래프트로 고릅니다.'],
-      ['매치 포인트 (MP)', `결승에서 ${mp}점을 넘긴 상태입니다. 그다음 게임에서 1위를 하면 우승합니다.`],
+      ['매치 포인트 (MP)', `결승에서 ${mp}점 이상을 모은 상태입니다. 그다음 게임에서 1위를 하면 우승합니다.`],
       ['CP', '챔피언십 포인트입니다. 선수 개인이 받고, 상위 3명의 합이 팀 CP입니다.'],
       ['패자부활', '한 번 밀려도 다시 결승에 오를 수 있는 길입니다. 하위 10팀은 탈락합니다.'],
-      ['시드', '대진을 짤 때 쓰는 순번입니다. LCQ 시드는 CP 순서로 정해집니다.'],
+      ['시드', '대진을 짤 때 쓰는 순번입니다. LCQ 시드는 팀 CP 순서이고, 2부 팀은 챌린저 서킷 포인트 순서입니다.'],
     ].map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join('')}</dl>`, 'wide')}
     ${card('format', '한 시즌의 흐름', `
       <p>지역 프로리그에서 성적을 내 플레이오프(국제전)에 나가고, 네 대회에서 모은 챔피언십 포인트(CP)로 챔피언십 출전이 정해집니다.</p>
@@ -3051,8 +3051,9 @@ function rules(parts, q) {
       </div><figure class="rfig">${placeBars}<figcaption>게임 순위별 순위 점수</figcaption></figure></div>`, 'wide')}
     ${card('format', '매치 포인트', `
       <div class="rc-2"><div>
-      <p>결승은 정해진 게임 수가 없습니다. ${mp}점을 넘긴 팀이 그다음 게임부터 1위(챔피언)를 하면 그 자리에서 우승입니다.</p>
+      <p>결승은 정해진 게임 수가 없습니다. ${mp}점 이상이 된 팀이 그다음 게임부터 1위(챔피언)를 하면 그 자리에서 우승입니다.</p>
       <p class="caption"><span>매치 포인트 팀이 1위를 못 하면 게임이 계속됩니다.</span> <span>나머지 순위는 결승 점수 합계 순입니다.</span></p>
+      <p class="caption"><span>LCQ와 프로리그 리전 결승은 우승팀이 일찍 나와도 나머지 팀이 ${PL.games}게임째까지 마저 치르고, 그 결승 점수로 2위부터 순위를 정합니다.</span> <span>LCQ는 2위도 챔피언십에 갑니다.</span></p>
       <p class="caption">경기 화면의 <span class="tag mpe">MP</span>는 매치 포인트 도달, <span class="tag mpe">우승</span>은 우승을 뜻합니다.</p>
       </div>${mpFig}</div>`, 'wide')}
     ${card('format', '프로리그', `
@@ -3060,6 +3061,8 @@ function rules(parts, q) {
       <div class="grp" role="img" aria-label="프로리그 조 구성">${['A', 'B', 'C'].slice(0, PL.groups).map((g) => `<span class="grp-g"><b>${g}조</b><em>${PL.size}팀</em></span>`).join('<i>×</i>')}<i>→</i><span class="grp-g rf-go"><b>리전 결승</b><em>상위 ${PL.rf}팀</em></span></div>
       <p>지역마다 ${PL.teams}팀이 ${PL.groups}개 조로 나뉩니다. 두 조씩 만나 ${PL.games}게임 시리즈를 치르고, 팀마다 시리즈를 ${PL.series}번 뜁니다.</p>
       <p>시리즈 순위마다 프로리그 포인트를 받고, 상위 ${PL.rf}팀이 매치 포인트 방식의 리전 결승에 나갑니다.</p>
+      <p class="caption"><span>시리즈에서 1위가 2위보다 50점 이상 앞서면 +1, 게임의 절반 이상에서 1위를 하면 +1(그 위로 1승마다 +1) 보너스가 붙습니다.</span> <span>그래서 공식 순위표 포인트가 표의 합과 다를 수 있습니다.</span></p>
+      <p class="caption">Split 1 프로리그 하위 8팀은 프로리그 예선(PLQ)에서 2부 상위 팀과 함께 Split 2 자리 8개를 다툽니다.</p>
       </div><div>
       ${rankTbl([['정규 시리즈', sc.plRegular], ['리전 결승', sc.plFinals]], 10)}
       <p class="caption">11위부터는 1~2점씩 줄어 20위는 0점입니다. 포인트 합계 상위 팀과 리전 결승 우승팀이 플레이오프에 갑니다.</p>
@@ -3079,8 +3082,10 @@ function rules(parts, q) {
       <p>챔피언십에 직행하지 못한 프로리그 팀과 2부(챌린저 서킷) 상위 팀이 지역마다 ${LQ.teams}팀씩 나와, 지역별 ${LQ.adv}자리를 겨루는 마지막 기회입니다.</p>
       <ul><li>시드 순서대로 지그재그로 나눠 승자 1라운드 A·B를 치릅니다.</li>
       <li>로비마다 상위 10팀은 승자 2라운드, 하위 10팀은 패자부활 1라운드로 갑니다.</li>
-      <li>이후는 플레이오프와 같습니다. 결승 상위 ${LQ.adv}팀이 챔피언십에 갑니다.</li>
-      <li>시드는 CP 순서입니다. 선수를 바꿔도 시드는 올라가지 않습니다.</li></ul>
+      <li>승자 2라운드 상위 10팀은 결승에 직행하고, 하위 10팀은 패자부활 2라운드로 갑니다.</li>
+      <li>패자부활 라운드는 하위 10팀이 탈락하고, 2라운드 상위 10팀이 결승에 합류합니다.</li>
+      <li>${LQ.adv === 2 ? '결승 20팀이 매치 포인트 방식으로 겨루고, 우승팀과 나머지 팀 중 결승 점수가 가장 높은 팀이 챔피언십에 갑니다.' : `결승 20팀이 매치 포인트 방식으로 겨루고, 우승팀과 나머지 팀 중 결승 점수 상위 ${LQ.adv - 1}팀이 챔피언십에 갑니다.`}</li>
+      <li><span>규정상 시드는 프로리그 팀은 팀 CP 순, 2부 팀은 챌린저 서킷 포인트 순입니다.</span> <span>이번 시즌 실제 조 편성은 선수 이적(영입 포함)과 2부 팀의 챌린저 시리즈 포인트까지 반영해 정해졌습니다.</span></li></ul>
       ${lcqSoon ? `<div class="now-box"><span class="tag ${lcqSt === 'now' ? 'live' : 'nxt'}">${lcqSt === 'now' ? '진행 중' : '이번 주'}</span><b>LCQ ${lcqE.start.slice(5).replace('-', '.')} – ${lcqE.end.slice(5).replace('-', '.')}</b><a class="go" href="${lcqSoon}">LCQ 경기 보기</a></div>` : ''}
       </div><figure class="rfig">${lcqFig}${legend}<figcaption>지역별 LCQ 진행 방식</figcaption></figure></div>`, 'wide')}
     ${card('points', '챔피언십 포인트 (CP)', `
@@ -3088,7 +3093,7 @@ function rules(parts, q) {
       <p>CP는 선수 개인이 받습니다. 팀 CP는 로스터에서 CP가 높은 선수 3명의 합입니다.</p>
       ${cpSum}
       <ul><li>프로리그와 플레이오프, 네 대회의 최종 순위로 받습니다.</li>
-      <li>프로리그는 ${B.cpMin || 12}게임 이상 뛴 선수만 받습니다.</li>
+      <li>프로리그와 플레이오프 모두 그 대회에서 ${B.cpMin || 12}게임 이상 뛴 선수만 받습니다.</li>
       <li>Split ${tieN()} 플레이오프가 끝난 시점의 CP 상위 ${CH.direct}팀이 챔피언십에 직행합니다. 그 뒤의 이적은 직행 여부를 바꾸지 않습니다.</li></ul>
       </div><div>
       ${rankTbl([['프로리그', sc.cpProLeague], ['플레이오프', sc.cpPlayoffs]], 8)}
@@ -3101,7 +3106,8 @@ function rules(parts, q) {
       <ol class="pz-top">${P.champs.slice(1).map((v, i) => `<li><span>${i === 0 ? '우승' : i === 1 ? '준우승' : '3위'}</span><b>${usd(v)}</b></li>`).join('')}</ol></div>
       <p class="caption">플레이오프는 대회마다 총상금 ${usd(P.po[0])}(우승 ${usd(P.po[1])}), 프로리그는 Split마다 네 지역 합계 ${usd(P.pl)}입니다.</p>`) : ''}
     ${card('format', '레전드 밴 · POI 드래프트', `
-      <p>경기 전 일부 레전드를 쓸 수 없게 막는 레전드 밴과, 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져가는 POI 드래프트가 있습니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p>
+      <p>레전드 밴: 게임이 끝날 때마다 그 게임에서 가장 많이 쓰인 레전드가 그 시리즈의 남은 게임에서 빠집니다. 첫 게임은 모든 레전드를 쓸 수 있습니다.</p>
+      <p>POI 드래프트: 팀마다 맵의 낙하 지점(POI)을 순서대로 골라 가져갑니다. 진행 방식은 위 영상에서 1분 만에 볼 수 있습니다.</p>
       ${lcqSoon ? `<p><a class="more" href="${lcqSoon}">LCQ 경기 화면에서 POI 드래프트 지도 보기</a></p>` : ''}`)}
     </div>
     <section class="sec"><h2 class="h2">공식 규정과 참고 자료</h2><div class="chips" style="margin-top:10px">${(S.rulesLinks || []).map(([n, u]) => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div></section>`;
