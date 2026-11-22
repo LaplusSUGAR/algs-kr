@@ -2092,8 +2092,8 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .lv-plat i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 .lv-plat i.twitch { background: #9146FF; } .lv-plat i.youtube { background: #FF0033; }
 /* 동시에 보기 · 맵 화면과 같이 보기 (playMany) */
-.lv-plat .lv-many { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 12px; font-size: 12.5px; }
-.lv-plat .lv-many .lv-ic { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.lv-many { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 12px; font-size: 12.5px; }
+.lv-many .lv-ic { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; }
 .lv-plat + .lv-plat { padding-top: 0; }
 @media (max-width: 520px) { .lv-plat { padding: 0 10px 10px; } }
 
@@ -2230,3 +2230,22 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 /* 일본어(11-22): 경기·단계 이름이 가타카나 단어 중간(エリミネーションラウ/ンド)에서 끊기지 않게. i18n.js 가 합성어 사이에 줄바꿈 자리를 넣고,
    짧은 이름표만 그 자리와 띄어쓰기에서 줄을 바꾼다. 그래도 한 줄에 안 들어가면 어디서든 끊어 화면 밖으로 넘치지 않게 한다 */
 :lang(ja) :is(.match .what a, .seg a, .seg button, .subtabs a, .h2, .title, .tag, .day-h, .lv-meta b) { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 공식 개인화면(11-22, povSection): ALGS 팀 시점 채널을 묶음(algsN)별 격자로. 누르면 플레이어에 더하고 뺀다(aria-pressed) */
+.pov-group { margin-top: 14px; }
+.pov-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 8px; }
+.pov-head b { font-size: var(--fs-sm); letter-spacing: .04em; }
+.pov-head .lv-many { margin-left: auto; }
+.pov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 6px; }
+.pov-tile { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 44px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: var(--r-sm, 6px); background: var(--card); color: inherit; font: inherit; text-align: left; cursor: pointer; min-width: 0; }
+.pov-tile:hover { border-color: var(--steel); }
+.pov-tile b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pov-tile small { font-size: 11px; color: var(--steel); font-variant-numeric: tabular-nums; }
+.pov-logo { width: 28px; height: 28px; display: grid; place-items: center; }
+.pov-logo img, .pov-logo .logo { max-width: 28px; max-height: 28px; }
+.pov-logo svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linejoin: round; }
+.pov-tile.focus { border-color: var(--apex); box-shadow: inset 3px 0 0 var(--apex); }
+.pov-tile.map { grid-column: span 2; }
+.pov-tile[aria-pressed='true'] { border-color: var(--apex); background: var(--apex); color: #fff; }
+.pov-tile[aria-pressed='true'] small { color: rgba(255, 255, 255, .85); }
+@media (max-width: 380px) { .pov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pov-tile { grid-template-columns: 24px minmax(0, 1fr); } .pov-tile small { display: none; } .pov-logo { width: 24px; height: 24px; } }

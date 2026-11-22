@@ -77,5 +77,6 @@ jobs:
             sleep 10
           done
           echo "$body" | jq '{at, ok, err, calls, liveAll: (.live | length), translated: ([.live[] | select(.tr)] | length), trSample: ([.live[] | select(.tr)][:4] | map({title, tr})), live: [.live[] | select(.intl | not) | {who, platform, viewers, title, tr}], videos: (.videos | length), shorts: ([.videos[] | select(.short)] | length), intlLive: ([.live[] | select(.intl)] | length), firstVideos: [.videos[:3][] | {who, platform, title, published}]}'
-          echo "Twitch 채널 찾기:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/twitch?q=algs,playapex,algs%20pov,apex%20legends%20global%20series,rage%20apex,algs%20apac" | jq . || true
+          echo "공식 개인화면(algsN_team·map) 켜진 채널:"; echo "$body" | jq -c '[.live[]? | select(.kind == "pov") | {key, pov, map, viewers}]' || true
+          echo "Twitch 채널 찾기:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/twitch?q=algs1_,algs2_,algs,playapex,algs%20pov,rage%20apex" | jq . || true
           echo "치지직 점검:"; curl -sS -m 25 "https://algs-kr-streams.$SUB.workers.dev/debug/chzzk" | jq -c '.[]' || true

@@ -67,6 +67,7 @@ JSON 을 고친 뒤에는 꼭 문법을 확인한다(운영자가 따옴표 없�
    - (11-22) 공동 중계: 공식 파트너 `x:nicewigg`·`x:greek`(공식 API partnerStreams 의 Twitch 채널)는 `config/season.json` 의 `coStreams` 규칙대로 '공동 중계' 카드로 공식 중계 바로 다음(`coOn`·`coShown`). `global: true` 면 국제전 기간(`mainEventOn`, 지역 global 대회), `lcq`·`pro` 는 그 지역 LCQ·프로리그 기간(`kindOn`). 지역 대회 때는 그 지역 보기와 영어 중계가 보이는 한국 관련·내 응원 팀 보기에서만. 지금: NiceWigg = 국제전 + Americas LCQ·프로리그, Greek = 국제전만(운영자 확정 11-22). 그 밖에는 '그 밖의 방송'.
    - (11-22) 공식 맵 화면(`algsN_map`)은 늘 카드로 보이고, 영어·일본어·APAC South 공식 중계 카드에 '맵 화면과 같이 보기'(멀티뷰로 둘 다 연다).
    - (11-22) 같은 채널의 서로 다른 방송(같은 플랫폼에 둘 이상, 예: ESCL 로비 A·B, `simulSet`)은 버튼을 누를 때마다 플레이어에 더하고 빼며 '동시에 보기'로 한 번에 연다(`playMany`·`toggleLive`). 플랫폼만 다른 같은 방송(Twitch·YouTube 동시 송출)은 예전처럼 볼 곳 고르기. 주소 `#/streams?play=a,b` 로 여러 방송을 함께 열 수 있다.
+4. **공식 개인화면 모아 보기**(11-22, `povSection`·`povGroups`, 방송 탭 '전체' 안과 세부 메뉴 '개인화면' `#/streams?s=pov`): 켜진 `algsN_teamM`·`algsN_map` 을 묶음(algsN)별 격자로. 묶음 이름표는 그 묶음 팀들의 지역(가장 많은 쪽). 타일(팀 로고·약칭·시청자)을 누르면 플레이어에 더하고 빼며(`toggleLive`), 관심 팀 타일은 테두리 강조·앞쪽, '관심 팀 화면 같이 보기'는 맵 화면 + 관심 팀 3개까지 멀티뷰. 방송 갱신 때는 목록(`#povBody`)만 다시 그려 재생 중인 화면이 끊기지 않는다. 배포 워크플로 로그 '동작 확인'에 켜진 개인화면 채널과 Twitch 검색(algs1_·algs2_) 결과가 찍힌다.
 4. 공식 팀 화면: Twitch `algs1_team1`…`algs4_team20`, `algsN_map` (`config/season.json` 의 `povChannels`). 대회 때만 켜지고 제목 맨 앞이 팀 이름("Team Falcons | ALGS …")이라, 그 이름으로 팀을 찾는다(`povTeam`). algs2~4 는 이름 규칙으로 미리 넣은 것이라 실제로 쓰이는지는 대회 때 확인 필요.
 5. 로스터 변경으로 팀을 나간 사람은 방송 목록에서 자동 제외(예: Re9zq).
 6. Twitch 다시보기는 운영자 요청으로 제거했다. 최근 영상은 YouTube 영상·쇼츠만(쇼츠는 따로).
