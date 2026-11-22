@@ -227,6 +227,20 @@ async function loadGames(x) {
     if (before !== JSON.stringify(g.by) || g.settled) render();
   } finally { g.loading = false; }
 }
+// 공식 규정 부록 C7.1 동점 기준: ① 단일 게임 점수(가장 높은 게임부터 차례로) ② 단일 게임 순위(가장 좋은 게임부터) ③ 단일 게임 킬.
+//   게임별 기록(GAMES)이 있는 끝난 게임만 본다. sa·sb: 각 팀이 뛴 시리즈 목록, ida·idb: 팀 ID. 가릴 수 없으면 0
+function gameTie(sa, ida, sb, idb) {
+  const vals = (ss, id) => { const p = [], pl = [], k = []; for (const s of ss) for (const g of Object.values(GAMES[s?.id]?.by || {})) { const t = g.st === 'completed' && g.t?.[id]; if (t) { p.push(t[0]); pl.push(t[2] || 99); k.push(t[1]); } }
+    return [p.sort((x, y) => y - x), pl.sort((x, y) => x - y), k.sort((x, y) => y - x)]; };
+  const a = vals(sa, ida), b = vals(sb, idb);
+  for (let j = 0; j < 3; j++) for (let i = 0; i < Math.min(a[j].length, b[j].length); i++) { const d = j === 1 ? a[j][i] - b[j][i] : b[j][i] - a[j][i]; if (d) return d; }
+  return 0;
+}
+// 동점을 가르려고 게임별 기록이 필요할 때만 받는다(끝난 시리즈는 브라우저에 저장돼 다시 받지 않는다). 받으면 화면을 다시 그린다
+function gamesNeed(ss) {
+  if (FROZEN) return;
+  for (const x of ss) if (x?.id && x.status === 'completed' && !GAMES[x.id] && !gamesStored(x.id)) { GAMES[x.id] = { by: {}, settled: false }; setTimeout(() => loadGames(x).catch(() => {}), 50); }
+}
 (function gamesLoop() { setTimeout(() => { Promise.all([...GWATCH.values()].map((x) => (GAMES[x.id]?.settled ? null : loadGames(x)))).catch(() => {}).finally(gamesLoop); }, (C.livePollMs || 10000) + Math.random() * 3000); })();
 // x: 시리즈, final: 결승이면 true. 열 정의 { n, th, td(short) } 또는 null(좁은 화면·아직 받지 못함·시작 전)
 function gameCols(x, final) {
@@ -1846,7 +1860,7 @@ function stageGrid(B, st, limit = 0, mini = false) {
     const gx = !mini && r.short && r.pos && gamesOk(x), open = gx && gxOpen(x, r.short);
     return `${skip}<tr class="${r.short ? rowCls(r) : 'slot'} ${cutHere && !open ? 'cut' : ''}${gx ? ' gx' : ''}"${gx ? gxAttr(x, r.short) : ''}><td class="rank">${r.pos ?? '–'}${gx ? '<i class="gx-chev" aria-hidden="true"></i>' : ''}</td><td class="team">${r.short ? `${krDot(null, r.short)}${teamLink(r.short)}` : '<span class="muted">미정</span>'}${r.label ? `<small>${esc(r.label)}</small>` : ''}</td>${mini ? `<td class="r num"><b>${ptsOf(r.pts, r.kills).tp ?? '–'}</b></td>` : ptsTd(r.pts, r.kills)}${G && r.short && r.pos ? G.td(r.short) : G ? `<td class="gc" colspan="${G.n}"></td>` : ''}${hasDest ? `<td class="r small dest">${dest(r)}</td>` : ''}</tr>${gx ? gxRow(B, x, G, r.short, open, `${rowCls(r)} ${cutHere ? 'cut' : ''}`) : ''}${cutHere ? `<tr class="cut-label"><td colspan="${(hasDest ? 6 : 5) - (mini ? 2 : 0) + (G ? G.n : 0)}">여기까지 ${esc(st.up)}, 아래는 ${esc(st.down)}</td></tr>` : ''}`;
   }).join('');
-  const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다.' : '';
+  const cap = res && x.liveAt ? `${ago(x.liveAt)} 공식 API 확인` : st.computed ? '조별 리그 경기 결과를 사이트에서 합산한 순위입니다. 점수가 같으면 공식 규정 C7.1(단일 게임 점수 → 순위 → 킬)로 가립니다.' : '';
   const table = `<div class="tbl-wrap${G ? ' gtab' : ''}"><table class="tbl lcq-grid${mini ? ' mini' : ''}"><thead><tr><th>#</th><th>팀</th>${mini ? '<th class="r pts-h" title="종합 점수" data-tr="종합 점수 칸">종합</th>' : PTS_TH}${G ? G.th : ''}${hasDest ? `<th class="r dest">${st.status === 'completed' ? '결과' : '다음'}</th>` : ''}</tr></thead><tbody>${body}</tbody></table></div>`;
   return `${limit || mini ? '' : jumpBar(rows)}${mini ? table : gview(x, G, table)}${cap && !mini ? `<p class="caption">${esc(cap)}</p>` : ''}`;
 }
@@ -2091,18 +2105,23 @@ const REGION_S = { 'apac-n': 'APN', 'apac-s': 'APS', emea: 'EMEA', americas: 'AM
 function lcqQualifiers() {
   return lcqEvents().map((e) => {
     const B = lcqBracket(e);
-    const top = B.done ? (B.f.s?.results || []).filter((r) => r.pos <= 2).map((r) => r.short) : [];
-    return { region: e.region, done: B.done && top.length === 2, teams: top };
+    const top = B.done ? (B.f.s?.results || []).filter((r) => r.pos <= 2) : [];
+    return { region: e.region, done: B.done && top.length === 2, teams: top.map((r) => r.short), pts: top.map((r) => r.pts ?? 0), fin: B.f.s || null };
   });
 }
+// LCQ 결승 단일 게임 점수로 가르기: 실제로 필요할 때만 두 팀의 결승 게임 기록을 받는다
+const lcqGameTie = (a, b) => { gamesNeed([a.fin, b.fin]); return gameTie([a.fin], gid0(a), [b.fin], gid0(b)); };
+const gid0 = (t) => xteam(t.short)?.id || t.id;
 function champsSeeds() {
   const cp = cpStanding();
   const direct = cp.filter((r) => r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ ...r, via: 'cp' }));
   const Q = lcqQualifiers();
   const allDone = Q.length === 4 && Q.every((x) => x.done);
   const cpOf = (sh) => cp.find((r) => r.short === sh);
-  const lcq = allDone ? Q.flatMap((x) => x.teams.map((sh, i) => ({ id: cpOf(sh)?.id, short: sh, name: xteam(sh)?.name || sh, region: x.region, total: cpOf(sh)?.total || 0, rank: cpOf(sh)?.rank ?? null, lcqPos: i + 1, via: 'lcq' })))
-    .sort((a, b) => b.total - a.total || cpTie(a, b) || a.lcqPos - b.lcqPos) : Array.from({ length: A.season.lcqSlots }, () => ({ via: 'lcq', tbd: true }));
+  // 규정 3.8.1: CP(같으면 C7.3, 단 CP 0점끼리는 동점으로 보지 않음) → LCQ 최종 순위 → LCQ 결승 Round Score → LCQ 결승 단일 게임 점수(C7.1 순) → 추첨(사이트는 지역 순서)
+  const gid = (sh) => xteam(sh)?.id || cpOf(sh)?.id || null;
+  const lcq = allDone ? Q.flatMap((x) => x.teams.map((sh, i) => ({ id: cpOf(sh)?.id || gid(sh), short: sh, name: xteam(sh)?.name || sh, region: x.region, total: cpOf(sh)?.total || 0, rank: cpOf(sh)?.rank ?? null, lcqPos: i + 1, lcqPts: x.pts[i], fin: x.fin, via: 'lcq' })))
+    .sort((a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || a.lcqPos - b.lcqPos || b.lcqPts - a.lcqPts || lcqGameTie(a, b)) : Array.from({ length: A.season.lcqSlots }, () => ({ via: 'lcq', tbd: true }));
   return { seeds: [...direct, ...lcq].map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone };
 }
 /* ---------- 챔피언십: 조 편성 · 조별 리그 · 브래킷 · 결승 (LCQ와 같은 탭 형식) ---------- */
@@ -2154,7 +2173,11 @@ function champsBracket() {
   if (!rows && played.length) {
     const sum = new Map(seeds.filter((t) => !t.tbd).map((t) => [t.short, { short: t.short, pts: 0, kills: 0 }]));
     for (const st of played) for (const r of st.s.results) { const o = sum.get(r.short) || { short: r.short, pts: 0, kills: 0 }; o.pts += r.pts; o.kills += r.kills; sum.set(r.short, o); }
-    rows = [...sum.values()].sort((a, b) => b.pts - a.pts || b.kills - a.kills || (seed(a.short)?.n ?? 999) - (seed(b.short)?.n ?? 999)).map((o, i) => ({ ...o, pos: i + 1, kr: krOf(o.short) }));
+    // 점수가 같으면 규정 부록 C7.1(단일 게임 점수 → 단일 게임 순위 → 단일 게임 킬). 게임별 기록은 동점이 있을 때만 받고, 받기 전에는 킬 합 → 시드로 임시 정렬
+    const ser = played.map((st) => st.s), gid = (sh) => xteam(sh)?.id || bySh.get(sh)?.id || null;
+    const vals = [...sum.values()];
+    if (vals.some((o) => vals.some((x) => x !== o && x.pts === o.pts))) gamesNeed(ser);
+    rows = vals.sort((a, b) => b.pts - a.pts || gameTie(ser, gid(a.short), ser, gid(b.short)) || b.kills - a.kills || (seed(a.short)?.n ?? 999) - (seed(b.short)?.n ?? 999)).map((o, i) => ({ ...o, pos: i + 1, kr: krOf(o.short) }));
     computed = true;
   }
   const gsDone = gsl.length > 0 && gsl.every((st) => st.status === 'completed');
@@ -2500,7 +2523,7 @@ function settleRows(ST) {
 }
 
 // CP 동률 (공식 규정 부록 C7.3): (A) Split 2 플레이오프 최종 순위가 좋은 팀 → (B) 프로리그 Split 2 최종 순위가 좋은 팀
-// → 그래도 같으면 C7.2(프로리그 Split 2 안의 세부 기준). C7.2는 프로리그 Split 2 정규 시즌 포인트 → 킬 순으로 근사하고, 마지막은 공식 순위.
+// → 그래도 같으면 C7.2(프로리그 Split 2만 놓고 세부 기준: 게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수, 아래 c72), 마지막은 공식 순위.
 // (A)는 대회 최종 순위, 진행 중이면 정산표의 확정·결승 실시간 순위. 플레이오프 미출전은 출전 팀보다 뒤
 let POIX = null;
 function poPos(r) {
@@ -2512,7 +2535,9 @@ function plS2(r) {
   if (!PLIX || PLIX.src !== A.pl) { const m = new Map(); for (const p of Object.values(A.pl || {})) if (p.split === lastSplit()) for (const x of p.rows) m.set(x.id, x); PLIX = { src: A.pl, m }; }
   return PLIX.m.get(r.id);
 }
-const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || (pb?.rs ?? 0) - (pa?.rs ?? 0) || (pb?.kills ?? 0) - (pa?.kills ?? 0); };
+// C7.2 (Split 2만): 게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수 (빌드가 공식 시리즈 결과로 tb 를 싣는다). 자료가 없으면 프로리그 포인트 → 킬로 근사. scripts/build-data.mjs 의 c72 와 같은 규칙
+const c72 = (a, b) => (a?.tb && b?.tb ? b.tb[0] - a.tb[0] || b.tb[1] - a.tb[1] || b.tb[2] - a.tb[2] : (b?.rs ?? 0) - (a?.rs ?? 0) || (b?.kills ?? 0) - (a?.kills ?? 0));
+const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || c72(pa, pb); };
 // 직행 확정(빌드가 meta.cpLock으로 알려 줌, 규정 3.6.3): 확정된 32팀은 항상 직행권 안, 나머지는 항상 밖. 그 안에서만 CP 순으로 줄을 세운다
 let LOCKIX = null;
 const cpLock = () => { const ids = A.meta?.cpLock; if (!ids?.length) return null; if (!LOCKIX || LOCKIX.src !== ids) LOCKIX = { src: ids, set: new Set(ids) }; return LOCKIX.set; };
@@ -2609,8 +2634,8 @@ const tieNote = (rows, i, k) => {
   const p = poPos(r), pl = plS2(r);
   const byPo = new Set(tied.map(poPos)).size === tied.length;
   const samePl = tied.filter((x) => poPos(x) === p && plS2(x)?.pos === pl?.pos).length > 1;
-  const why = p < 999 && (byPo || tied.filter((x) => poPos(x) === p).length === 1) ? `S${tieN()} PO ${p}위` : `PL S${lastSplit()} ${pl?.pos ?? '–'}위${samePl ? ` · ${pl?.rs ?? 0}점` : ''}`;
-  return `<small class="tie" title="동률 기준: S${tieN()} 플레이오프 순위 → 프로리그 S${lastSplit()} 순위 → 프로리그 S${lastSplit()} 포인트">동률 · ${why}</small>`;
+  const why = p < 999 && (byPo || tied.filter((x) => poPos(x) === p).length === 1) ? `S${tieN()} PO ${p}위` : `PL S${lastSplit()} ${pl?.pos ?? '–'}위${samePl ? (pl?.tb ? ` · 게임 점수 ${pl.tb[0]}` : ` · ${pl?.rs ?? 0}점`) : ''}`;
+  return `<small class="tie" title="동률 기준: S${tieN()} 플레이오프 순위 → 프로리그 S${lastSplit()} 순위 → 프로리그 S${lastSplit()} 게임 점수 합 → 시리즈 1위 횟수">동률 · ${why}</small>`;
 };
 const qualTag = (direct) => direct ? '<span class="tag ok">직행권</span>' : '<span class="tag lcq">LCQ</span>';
 const QUAL_REGIONS = ['apac-n', 'apac-s', 'emea', 'americas'];

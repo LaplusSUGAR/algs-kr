@@ -147,7 +147,7 @@
     ['챔피언십 결과', 'チャンピオンシップ結果', 'Championship results'], ['챔피언십 경기', 'チャンピオンシップの試合', 'Championship matches'], ['시각', '時刻', 'Time'],
     ['조별 리그 {w}조 vs {w}조', 'グループステージ {1} vs {2}', 'Group stage: {1} vs {2}'], ['{w}조 {n}팀 + {w}조 {n}팀', 'グループ{1} {2}チーム + グループ{3} {4}チーム', 'Group {1} ({2}) + Group {3} ({4})'],
     ['{n}팀 (조별 리그 {n}경기 합산)', '{1}チーム（グループステージ{2}シリーズ合計）', '{1} teams (total of {2} group series)'],
-    ['{x} 시각 미정', '{1} 時刻未定', '{1}, time TBD'], ['조별 리그 경기 결과를 사이트에서 합산한 순위입니다.', 'グループステージの結果をサイトで合計した順位です。', 'Standings summed by this site from the group stage results.'],
+    ['{x} 시각 미정', '{1} 時刻未定', '{1}, time TBD'], ['조별 리그 경기 결과를 사이트에서 합산한 순위입니다.', 'グループステージの結果をサイトで合計した順位です。', 'Standings summed by this site from the group stage results.'], ['조별 리그 경기 결과를 사이트에서 합산한 순위입니다. 점수가 같으면 공식 규정 C7.1(단일 게임 점수 → 순위 → 킬)로 가립니다.', 'グループステージの結果をサイトで合計した順位です。同点の場合は公式規定C7.1（1試合の最高スコア → 順位 → キル）で決めます。', 'Standings summed by this site from the group stage results. Ties use official rule C7.1 (best single-game score → placement → kills).'],
     ['공식 조 배정입니다.', '公式のグループ分けです。', 'Official groups.'], ['조별 순위 {n}~{n}위', 'グループ順位 {1}～{2}位', 'Group stage {1o}–{2o}'], ['승자 라운드 {n}위', 'ウィナーズラウンド {1}位', 'Winners Round {1o}'], ['승자 라운드 {n}~{n}위', 'ウィナーズラウンド {1}～{2}位', 'Winners Round {1o}–{2o}'],
     // LCQ 탭·점수표
     ['조 편성', 'グループ分け', 'Groups'], ['LCQ 경기', 'LCQの試合', 'LCQ matches'], ['시드', 'シード', 'Seed'], ['합계', '合計', 'Total'], ['챔피언십 진출', 'チャンピオンシップ進出', 'To Championship'], ['공식 결과', '公式結果', 'Official results'], ['출전:', '出場:', 'Teams:'],
@@ -399,7 +399,7 @@
     ['Split {n} · {t}. 시리즈(하루 {n}게임) 순위마다 프로리그 포인트를 받고, {n}개 시리즈 합으로 정규 시즌 순위를 정합니다. 진출 컷은 정규 시즌 순위 기준이고, 오른쪽 최종 순위는 리전 결승까지 반영한 값(챔피언십 포인트 기준)입니다.', 'Split {1} · {2}。シリーズ（1日{3}試合）の順位ごとにプロリーグポイントを得て、{4}シリーズの合計でレギュラーシーズン順位を決めます。進出ラインはレギュラーシーズン順位基準で、右の最終順位はリージョナルファイナルまで反映した値（チャンピオンシップポイント基準）です。', 'Split {1} · {2}. Each series ({3} games a day) awards Pro League points; {4} series make the regular season. Cut lines use the regular season; the final rank on the right includes the Regional Finals (Championship Points basis).'],
     ['순위 점수 + 킬당 {n}점 ({x})', '順位点 + 1キル{1}点（{2}）', 'Placement + {1} per kill ({2})'], ['시리즈 순위별 {x}', 'シリーズ順位別 {1}', 'By series rank {1}'], ['{n}위 {n}', '{1}位 {2}', '{1o}: {2}'], ['{n}위 {n} …', '{1}位 {2} …', '{1o}: {2} …'], ['{x} ★', '{1} ★', '{1} ★'],
     ['{t}. 빠진 선수는 이번 대회 CP를 받지 않고, 대체 선수의 CP는 원래 소속팀 합계에 들어갑니다.', '{1}。欠場した選手は今回の大会のCPを受け取らず、代替選手のCPは元の所属チームの合計に入ります。', '{1}. Absent players get no CP for this event; substitutes’ CP counts for their own teams.'], ['{t} … {n}위 {n}', '{1} … {2}位 {3}', '{1} … {2o}: {3}'],
-    ['동률 기준: S{n} 플레이오프 순위 → 프로리그 S{n} 순위 → 프로리그 S{n} 포인트', '同点時: S{1}プレイオフ順位 → プロリーグS{2}順位 → プロリーグS{3}ポイント', 'Tiebreak: S{1} Playoffs rank → Pro League S{2} rank → Pro League S{3} points'],
+    ['동률 기준: S{n} 플레이오프 순위 → 프로리그 S{n} 순위 → 프로리그 S{n} 게임 점수 합 → 시리즈 1위 횟수', '同点時: S{1}プレイオフ順位 → プロリーグS{2}順位 → プロリーグS{3}の試合スコア合計 → シリーズ1位回数', 'Tiebreak: S{1} Playoffs rank → Pro League S{2} rank → Pro League S{3} total match score → series wins'],
     ['챔피언십 포인트 순위에서 한국 팀 위치', 'チャンピオンシップポイント順位での韓国チームの位置', 'Korean teams in the Championship Points standings'],
     ['챔피언십 포인트 {n}팀 중 {x} 위치, {n}위까지 직행', 'チャンピオンシップポイント{1}チーム中の{2}の位置、{3}位まで直行', '{2} among {1} teams; top {3} qualify directly'],
     ['내역 없음', '内訳なし', 'No records'], ['대회별 CP 데이터가 아직 없습니다.', '大会別CPデータはまだありません。', 'No CP data by event yet.'], ['이 지역·스플릿 데이터가 아직 없습니다.', 'この地域・スプリットのデータはまだありません。', 'No data for this region/split yet.'],

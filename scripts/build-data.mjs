@@ -200,16 +200,23 @@ for (const t of Object.values(teams)) {
   if (o) Object.assign(t, o);
 }
 
+// 규정 부록 C7.2 (프로리그 순위 동점): 게임 점수 합 → 시리즈 1위 횟수 → (게임 1위 횟수: 자료 없음) → 단일 시리즈 최고 점수.
+//   두 팀 모두 자료(tb)가 있을 때만 쓰고, 없으면 프로리그 포인트 → 킬로 근사한다. 화면 app.js 의 c72 와 같은 규칙
+const c72 = (a, b) => {
+  if (a?.tb && b?.tb) return b.tb[0] - a.tb[0] || b.tb[1] - a.tb[1] || b.tb[2] - a.tb[2];
+  return (b?.rs ?? 0) - (a?.rs ?? 0) || (b?.kills ?? 0) - (a?.kills ?? 0);
+};
 // ---------- 챔피언십 포인트 (공식 값) ----------
 const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => ({ rank, id, short, name, region: normRegion(region), total, players }));
 // CP 동률 (공식 규정 부록 C7.3, 화면의 정산 순위와 같은 규칙):
 //   (A) Split 2 플레이오프 최종 순위 (미출전은 뒤) → (B) 프로리그 Split 2 최종 순위
-//   → C7.2(프로리그 Split 2 세부 기준)는 정규 시즌 포인트 → 킬 순으로 근사 → 마지막은 공식 순위
+//   → (C) Split 2만 놓고 C7.2: 게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수(plTie, 공식 시리즈 결과 합산)
+//   → 자료가 없으면 프로리그 포인트 → 킬로 근사 → 마지막은 공식 순위
 {
   const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === tieSlug)?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
-  const pl2 = new Map(Object.entries(algs.pl).filter(([k]) => k.startsWith(`s${lastSplit}:`)).flatMap(([, rows]) => rows.map((r) => [r[3], { pos: r[0], rs: r[6] ?? 0, kills: r[8] ?? 0 }])));
+  const pl2 = new Map(Object.entries(algs.pl).filter(([k]) => k.startsWith(`s${lastSplit}:`)).flatMap(([, rows]) => rows.map((r) => [r[3], { pos: r[0], rs: r[6] ?? 0, kills: r[8] ?? 0, tb: algs.plTie?.[r[3]] }])));
   cpRows.sort((a, b) => b.total - a.total || (po.get(a.id) ?? 999) - (po.get(b.id) ?? 999)
-    || (pl2.get(a.id)?.pos ?? 99) - (pl2.get(b.id)?.pos ?? 99) || (pl2.get(b.id)?.rs ?? 0) - (pl2.get(a.id)?.rs ?? 0) || (pl2.get(b.id)?.kills ?? 0) - (pl2.get(a.id)?.kills ?? 0) || a.rank - b.rank);
+    || (pl2.get(a.id)?.pos ?? 99) - (pl2.get(b.id)?.pos ?? 99) || c72(pl2.get(a.id), pl2.get(b.id)) || a.rank - b.rank);
   cpRows.forEach((r, i) => (r.rank = i + 1));
 }
 // 챔피언십 직행 확정 (규정 3.6.3·C6.5): 직행 32팀은 Split 2 플레이오프가 끝난 시점의 CP로 정해지고,
@@ -269,7 +276,9 @@ for (const [key, rows] of Object.entries(algs.pl)) {
     const lpPos = lp?.get(nameKey(name)) ?? lp?.get(nameKey(teams[id]?.name));
     if (lpPos && lpPos !== pos) { conflicts.push({ what: `${key} 최종 순위`, team: name, lp: lpPos, algs: pos }); finalPos = lpPos; src = 'lp'; }
     else if (lpPos) src = 'lp+algs';
-    return { pos: finalPos, short: teams[id]?.short || short, name, id, cpPP, cpTeam: cpPP * 3, qualified: !!qualified, rs, group, kills, sp, src, kr: teams[id]?.krLevel || 'none' };
+    // tb: 동점 기준(C7.2) 자료 [게임 점수 합, 시리즈 1위 횟수, 단일 시리즈 최고 점수]. 최신 Split만 (CP 동점 C7.3 셋째 단계용)
+    const tb = Number(s.slice(1)) === lastSplit ? algs.plTie?.[id] : null;
+    return { pos: finalPos, short: teams[id]?.short || short, name, id, cpPP, cpTeam: cpPP * 3, qualified: !!qualified, rs, group, kills, sp, src, kr: teams[id]?.krLevel || 'none', ...(tb ? { tb } : {}) };
   }).sort((a, b) => a.pos - b.pos);
   const nr = normRegion(region);
   // 공식 팀 이름이 바뀐 팀(예: O2esports → SLEEPY): 가장 최근 Split 프로리그 순위표의 이름을 '구 이름'으로 남긴다
