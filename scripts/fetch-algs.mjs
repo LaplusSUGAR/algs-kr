@@ -175,6 +175,23 @@ async function collect(season, prev) {
     series.push([s.id, s.event?.id, s.phase?.name, s.name, s.status, s.startsAt, s.region?.name || '', s.isMatchPointFormat ? 1 : 0, (s.matches || []).length, res]);
   }
 
+  // 최신 Split 프로리그 동점 기준 자료 (규정 부록 C7.2, CP 동점 C7.3 셋째 단계가 'Split 2만 놓고 C7.2'):
+  //   plTie: { teamId: [게임 점수 합(= 시리즈 Round Score 합), 시리즈 1위 횟수, 단일 시리즈 최고 Round Score] }
+  //   (C7.2의 게임 1위 횟수·단일 게임 최고 점수는 게임별 기록이 필요해 싣지 않는다)
+  //   끝난 시리즈 결과는 바뀌지 않으므로 plTieSeries(시리즈 ID → [[팀 ID, 점수, 순위]])에 두고 다시 받지 않는다
+  const plTieSeries = { ...(prev?.plTieSeries || {}) };
+  const plSer = allSeries.filter((s) => s.status === 'completed' && (s.event?.slug || '').startsWith(`split-${latestSplit}-pro-league-`));
+  for (const k of Object.keys(plTieSeries)) if (!plSer.some((s) => s.id === k)) delete plTieSeries[k];
+  const plNew = plSer.filter((s) => !plTieSeries[s.id]);
+  const plSt = await pmap(plNew, (s) => get(`/stats/series/${s.id}`).catch(() => null));
+  for (const [k, s] of plNew.entries()) {
+    const rows = (plSt[k]?.teams || []).filter((t) => (t.teamId || t.id) && t.points != null).map((t) => [t.teamId || t.id, t.points, t.position]);
+    if (rows.length) plTieSeries[s.id] = rows;
+  }
+  const plTie = {};
+  for (const rows of Object.values(plTieSeries)) for (const [id, pts, pos] of rows) { const o = (plTie[id] ||= [0, 0, 0]); o[0] += pts; if (pos === 1) o[1]++; o[2] = Math.max(o[2], pts); }
+  if (plNew.length) console.log(`[algs] 프로리그 Split ${latestSplit} 동점 자료: 시리즈 ${Object.keys(plTieSeries).length}/${plSer.length}개 (새로 ${plNew.length}개)`);
+
   // 가장 최근 국제전(Playoffs/Championship)의 첫 단계 누적 순위
   const intlEvent = season.tournaments.flatMap((t) => t.events).filter((e) => /playoffs|champs/.test(e.slug) && e.phases.length)
     .sort((a, b) => b.startDate.localeCompare(a.startDate)).find((e) => new Date(e.startDate) <= new Date());
@@ -349,7 +366,7 @@ async function collect(season, prev) {
     for (const v of tvRes[k]?.versions || []) addLogo(id, v.logoLight, v.logoDark);
   }
 
-  return { events, cp, cpEventIds, cpEvents, poRosters, pl, rosters, logos, lineups, series, poGroup, poGroups, lcq, lcqShortFix: dupShort, lcqShortFixNames: dupName, krStreams, allStreams, partnerStreams,
+  return { events, cp, cpEventIds, cpEvents, poRosters, pl, plTie, plTieSeries, rosters, logos, lineups, series, poGroup, poGroups, lcq, lcqShortFix: dupShort, lcqShortFixNames: dupName, krStreams, allStreams, partnerStreams,
     officialStreams: prev.officialStreams || [['Main Broadcast', 'twitch', 'playapex']] };
 }
 

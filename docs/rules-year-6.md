@@ -26,15 +26,15 @@
 | CP는 12게임 이상 뛴 선수만 | C6.5, 3.2.2 | `championshipPoints.minMatches` | 출전 경기 수 집계(`raw/algs/matchcounts.json`) | 반영됨 |
 | 팀 CP = 로스터 상위 3인 합 | 3.6.3 | `championshipPoints.teamTotal` | CP 순위, 로스터 변경 뒤 재계산 | 반영됨 |
 | 직행 32팀은 Split 2 플레이오프 종료 시점에 확정 | 3.6.3, C6.5 | `championship.directDecidedAt` | `meta.cpLock`: 공식 상위 32팀을 고정, 이후 로스터 변경은 시드에만 반영 | 2026-11-11 반영 (그 전에는 이적생 CP로 직행선이 바뀌어 보였음) |
-| CP 동률 | C7.3 | `tiebreakers.championshipPoints` | Split 2 플레이오프 순위 → 프로리그 Split 2 순위 → 프로리그 포인트·킬 | 3단계(C7.2 세부 기준)는 포인트·킬로 근사 |
+| CP 동률 | C7.3 | `tiebreakers.championshipPoints` | Split 2 플레이오프 순위 → 프로리그 Split 2 순위 → Split 2만 놓고 C7.2(게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수) | 2026-11-22: 3단계를 공식 시리즈 결과 합산(`fetch-algs.mjs` `plTie`)으로 계산. C7.2의 게임 1위 횟수·단일 게임 최고 점수는 자료가 없어 뺌. 자료가 없을 때만 프로리그 포인트·킬로 근사 |
 | 프로리그 동률 | C7.2 | `tiebreakers.proLeague` | 공식 순위를 그대로 씀 | 사이트가 다시 계산하지 않음 |
-| 시리즈 동률 | C7.1 | `tiebreakers.series` | 공식 순위를 그대로 씀 | 사이트가 다시 계산하지 않음 |
+| 시리즈 동률 | C7.1 | `tiebreakers.series` | 공식 순위를 그대로 씀. 공식 누적표가 없어 사이트가 챔피언십 조별 리그를 합산할 때만 C7.1(단일 게임 점수 → 순위 → 킬)로 가림(`gameTie`, 게임별 기록은 동점이 있을 때만 받음) | 2026-11-22 반영 |
 | 매치 포인트 50점 | C5 | `matchPoint.threshold` | 결승 화면의 MP 표시, 규칙 탭 | 화면 코드에 50으로 적혀 있음 |
 | LCQ 출전 팀 | 3.2.5, 3.3.3(B) | `lcq.entry` | 직행권 밖 프로리그 팀 + 2부 우승팀·포인트 상위 팀(Liquipedia), 공식 명단이 나오면 공식 값 | 반영됨 |
 | LCQ 시드 | 3.7.1 | `lcq.seeding`, `lcq.seedNote` | 로스터 변경을 반영한 CP 순, 그다음 2부 포인트 순. 두 로비에 지그재그. 확정 조 편성이 나오면 `overrides.json` 의 `lcqSeeds` 로 고정 | 2026-11-14: 주최 측 확정본이 영입으로 오른 CP와 2부 팀의 챌린저 시리즈 포인트를 반영해, '변경 전 CP' 규칙을 되돌림 |
 | LCQ·챔피언십 진행 방식(단계·진출 팀 수·진행 그림) | C4, 3.7, 3.8 | `brackets.lcq`, `brackets.championship`, `brackets.playoffs` | 화면의 탭·점수표 칸·다음 경기 배정·진행 그림 | 규칙 파일에서 읽음. `check-rules`가 `lcq`·`championship` 숫자와 맞는지 검사 |
 | LCQ 일정(지역 현지 시각) | D1, D4 | `lcq.schedule`, `regions.*.tz` | 공식 API 값이 태평양 시간 임시값이거나 순서가 어긋나면 규정 시각으로 표시 | 2026-11-11 반영 |
-| 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 직행 32팀을 CP 순으로 1~32번, LCQ 8팀을 CP 순(같으면 LCQ 결승 순위)으로 33~40번에 놓고 지그재그(A→B→C→D→D→C→B→A). 공식 명단이 나오면 공식 조 | 근사. 규정은 40팀 전체를 CP 순으로 세우므로, LCQ 팀의 CP가 직행 팀보다 높으면 예상 조 편성이 공식과 다를 수 있음 |
+| 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 직행 32팀을 CP 순으로 1~32번, LCQ 8팀을 CP 순(같으면 C7.3, CP 0점끼리는 동점 아님) → LCQ 순위 → LCQ 결승 점수 → 결승 단일 게임 점수(C7.1 순, 2026-11-22 추가)로 33~40번에 놓고 지그재그(A→B→C→D→D→C→B→A). 공식 명단이 나오면 공식 조 | 근사. 규정은 40팀 전체를 CP 순으로 세우므로, LCQ 팀의 CP가 직행 팀보다 높으면 예상 조 편성이 공식과 다를 수 있음 |
 | 챔피언십 진행 방식 | C2, C4, D7 | `championship.bracket` | 챔피언십 단계 목록, `CH_FLOW` | 화면 코드에 적혀 있음, 규칙 파일과 같음 |
 | 이적 기간·로스터 잠금 | 2.3.2 | `proLeague.transferWindows`, `rosterLocks` | 로스터 변경 기록 | 참고용. 사이트가 날짜로 막지는 않음 |
 | 상금 | E | `prizes` | 아직 화면에 없음 | 자료만 저장 |
