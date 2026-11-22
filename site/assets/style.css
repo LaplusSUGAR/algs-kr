@@ -1265,7 +1265,7 @@ a.tag.live { text-decoration: none; }
 .lv-tbar { display: flex; align-items: center; gap: 6px 10px; padding: 6px 10px; background: var(--card); font-size: var(--fs-sm); min-width: 0; }
 .lv-tbar b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .lv-tbar b small { font-weight: 500; color: var(--steel); margin-left: 4px; }
 .lv-tbar .more { margin-left: auto; white-space: nowrap; }
-.lv-tbar b small.lv-vt { color: var(--apex); font-weight: 700; } /* 같은 채널의 여러 방송: 로비 A·B 등 (멀티뷰에서도 보이게) */
+.lv-tbar .lv-vt { flex: none; white-space: nowrap; color: var(--apex); font-weight: 700; font-size: 12px; } /* 같은 채널의 여러 방송: 로비 A·B 등 (멀티뷰에서도 보이게) */
 .lv-x { border: 0; background: none; color: inherit; font-size: 20px; line-height: 1; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none; }
 .lv-x:hover { background: var(--paper); }
 .lv-tile .yt-frame { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 72vh; border: 0; }
@@ -2093,7 +2093,8 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .lv-plat i.twitch { background: #9146FF; } .lv-plat i.youtube { background: #FF0033; }
 /* 동시에 보기 · 맵 화면과 같이 보기 (playMany) */
 .lv-plat .lv-many { min-height: 30px; padding: 4px 12px; font-size: 12.5px; }
-.lv-plat .lv-many::before { content: '⊞'; margin-right: 6px; font-weight: 400; }
+.lv-plat .lv-many { display: inline-flex; align-items: center; gap: 6px; }
+.lv-plat .lv-many .lv-ic { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; }
 .lv-plat + .lv-plat { padding-top: 0; }
 @media (max-width: 520px) { .lv-plat { padding: 0 10px 10px; } }
 

@@ -3159,17 +3159,24 @@ const inFocus = (short) => !!team(short) && isF(short);
 //   한국 관련·내 응원 팀 보기는 영어·일본어 공식 중계. APAC South 중계는 응원 팀(대표 팀)이 APAC South 팀일 때만 함께 (그 밖에는 '그 밖의 방송'으로)
 const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:aps'] };
 // 대회 기간: 조건에 맞는 경기가 있는 대회마다 첫 경기 시작 pre 밀리초 전부터 마지막 경기 시작 12시간 뒤까지
-function eventOn(test, pre = 0) {
+//   방송 카드 정렬·표시에서 여러 번 부르므로 같은 데이터·같은 30초 안에서는 결과를 다시 쓴다(EV_MEMO)
+let EV_MEMO = { src: null, t: 0, m: new Map() };
+function eventOn(test, pre = 0, key = '') {
+  const t30 = Math.floor(now() / 3e4);
+  if (key) { if (EV_MEMO.src !== A || EV_MEMO.t !== t30) EV_MEMO = { src: A, t: t30, m: new Map() }; if (EV_MEMO.m.has(key)) return EV_MEMO.m.get(key); }
+  const v = eventOn0(test, pre); if (key) EV_MEMO.m.set(key, v); return v;
+}
+function eventOn0(test, pre) {
   const by = new Map();
   for (const s of A.series) if (s.start && test(s)) { const g = by.get(s.event); by.set(s.event, g ? [s.start < g[0] ? s.start : g[0], s.start > g[1] ? s.start : g[1]] : [s.start, s.start]); }
   const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) - pre && t <= Date.parse(b) + 432e5);
 }
 // 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회 기간
-const regionEventOn = (region) => eventOn((s) => s.region === region);
+const regionEventOn = (region) => eventOn((s) => s.region === region, 0, `r:${region}`);
 // 본 대회(국제전: 플레이오프·챔피언십)와 Americas LCQ. 사전 방송을 생각해 첫 경기 2시간 전부터 친다
-const mainEventOn = () => eventOn((s) => s.region === 'global', 72e5);
+const mainEventOn = () => eventOn((s) => s.region === 'global', 72e5, 'main');
 const evKind = (s) => { const t = `${s.event || ''} ${s.eventSlug || ''}`; return /last chance|\blcq\b/i.test(t) ? 'lcq' : /pro.?league/i.test(t) ? 'pro' : ''; };
-const kindOn = (kind, region) => eventOn((s) => s.region === region && evKind(s) === kind, 72e5); // 그 지역의 LCQ·프로리그 기간
+const kindOn = (kind, region) => eventOn((s) => s.region === region && evKind(s) === kind, 72e5, `${kind}:${region}`); // 그 지역의 LCQ·프로리그 기간
 // 공식 파트너 중 공동 중계로 공식 중계 바로 다음에 세우는 채널 (운영자 확정 11-22, 규칙은 config/season.json 의 coStreams)
 //   NiceWigg: 국제전 + Americas LCQ·프로리그 / Greek: 국제전
 //   지역 대회 때는 그 지역 보기, 그리고 영어 중계가 보이는 한국 관련·내 응원 팀 보기에서만. 그 밖의 때는 다른 파트너처럼 '그 밖의 방송'에만
@@ -3367,7 +3374,7 @@ function playLive(id) {
   if (!mvOn) tiles.innerHTML = '';
   else if (tiles.children.length >= MV_MAX) tiles.firstElementChild.remove(); // 꽉 찼으면 가장 먼저 연 화면을 뺀다
   const tile = document.createElement('div'); tile.className = 'lv-tile'; tile.dataset.id = id;
-  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}${tag ? ` <small class="lv-vt">${tag}</small>` : ''}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg><span>크게 보기</span></button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
+  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}</b>${tag ? `<small class="lv-vt">${tag}</small>` : ''}<span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg><span>크게 보기</span></button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
     <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed, tiles.children.length > 0))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   tile.querySelector('.lv-x').addEventListener('click', () => { tile.remove(); lvSync(); });
   tile.querySelector('.lv-big').addEventListener('click', lvBig);
@@ -3396,9 +3403,9 @@ function liveCard(l, i, asLink) {
       const sim = simulSet(l.alts), one = new Set(l.alts.map((y) => y.platform)).size === 1;
       const btn = (x) => { const tag = altTag(x, l.alts), label = `<i class="${esc(x.platform)}" aria-hidden="true"></i>${!tag ? PLAT[x.platform] : one ? tag : `${PLAT[x.platform]} ${tag}`}`, tt = x.title ? ` title="${esc(liveTitle(x))}"` : '';
         return sim?.includes(x) ? `<button type="button" data-lvalt="${esc(liveId(x))}" aria-pressed="false"${tt}>${label}</button>` : `<button type="button" data-bckey="${esc(l.key)}" data-bcplat="${esc(liveVar(x))}" aria-pressed="${liveVar(x) === liveVar(l)}"${tt}>${label}</button>`; };
-      rows.push(`<div class="lv-plat"><small>${new Set(l.alts.map((x) => x.platform)).size === l.alts.length ? (l.alts.length === 2 ? '두 곳에서 방송 중' : `${l.alts.length}곳에서 방송 중`) : `방송 ${l.alts.length}개 동시 진행`}</small><div class="seg" role="group" aria-label="${sim ? '함께 볼 방송 고르기' : '방송 볼 곳 고르기'}">${l.alts.map(btn).join('')}</div>${sim ? `<button class="lv-btn lv-many" type="button" data-lvmany="${esc(sim.slice(0, MV_MAX).map(liveId).join(','))}" aria-pressed="false">동시에 보기</button>` : ''}</div>`);
+      rows.push(`<div class="lv-plat"><small>${new Set(l.alts.map((x) => x.platform)).size === l.alts.length ? (l.alts.length === 2 ? '두 곳에서 방송 중' : `${l.alts.length}곳에서 방송 중`) : `방송 ${l.alts.length}개 동시 진행`}</small><div class="seg" role="group" aria-label="${sim ? '함께 볼 방송 고르기' : '방송 볼 곳 고르기'}">${l.alts.map(btn).join('')}</div>${sim ? `<button class="lv-btn lv-many" type="button" data-lvmany="${esc(sim.slice(0, MV_MAX).map(liveId).join(','))}" aria-pressed="false"><svg class="lv-ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="5.5" height="5" rx="1"/><rect x="9" y="2.5" width="5.5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1"/><rect x="9" y="9.5" width="5.5" height="5" rx="1"/></svg><span>동시에 보기</span></button>` : ''}</div>`);
     }
-    if (maps.length) rows.push(`<div class="lv-plat"><small>공식 맵 화면 방송 중</small><button class="lv-btn lv-many" type="button" data-lvmany="${esc([liveId(l), ...maps.map(liveId)].slice(0, MV_MAX).join(','))}" aria-pressed="false">맵 화면과 같이 보기</button></div>`);
+    if (maps.length) rows.push(`<div class="lv-plat"><small>공식 맵 화면 방송 중</small><button class="lv-btn lv-many" type="button" data-lvmany="${esc([liveId(l), ...maps.map(liveId)].slice(0, MV_MAX).join(','))}" aria-pressed="false"><svg class="lv-ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="5.5" height="5" rx="1"/><rect x="9" y="2.5" width="5.5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1"/><rect x="9" y="9.5" width="5.5" height="5" rx="1"/></svg><span>맵 화면과 같이 보기</span></button></div>`);
     return `<div class="lv-pick"><button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>${rows.join('')}</div>`;
   }
   return l.embed
