@@ -1701,7 +1701,509 @@
       "name": "Match Point Finals",
       "draft": "01M794KSSR9EV9EHGD5204K0Q7",
       "date": "2026-11-22T04:10:00.000Z",
-      "checked": 83116
+      "completedAt": "2026-11-22T04:24:28.168Z",
+      "done": true,
+      "checked": 83116,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KTSJN9QA20EHN1JZT6EKQ2DQ",
+              "DURAGS",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              7,
+              "01KHPREX931TTBJDXH1AN6D121",
+              "FFS",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              8,
+              "01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+              "Zesty Besties",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              9,
+              "01KHPREXBTGD37GD3ZJ25R7ABW",
+              "EBOYS",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              10,
+              "01KHPREX1EC5Z0DQ4472BPDS5H",
+              "Buckle Boys",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              12,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              20,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              22,
+              "01M6ZJMRM1YGNAPJSS88W6QMJP",
+              "Niche",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              24,
+              "01KTSJN92PKS2AX6XM17PG7KS0",
+              "Undecided",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              25,
+              "01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+              "VexX Gaming",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              26,
+              "01KHPREYRD48P80Q2ME3FWEX57",
+              "Nice Guys",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              31,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              33,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              34,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              36,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              37,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              43,
+              "01KHPREWJ40HYNJSHV1D5GWDGY",
+              "World Wide",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              55,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "FRAGMENT",
+              67.3,
+              44.2
+            ],
+            [
+              58,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ],
+            [
+              59,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "THE DOME",
+              72.3,
+              92.2
+            ]
+          ]
+        },
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              2,
+              "01M6ZJMRM1YGNAPJSS88W6QMJP",
+              "Niche",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              3,
+              "01KHPREWJ40HYNJSHV1D5GWDGY",
+              "World Wide",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              4,
+              "01KTSJN92PKS2AX6XM17PG7KS0",
+              "Undecided",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              5,
+              "01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+              "VexX Gaming",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              6,
+              "01KHPREYRD48P80Q2ME3FWEX57",
+              "Nice Guys",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              11,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              15,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              16,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              17,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              21,
+              "01KTSJN9QA20EHN1JZT6EKQ2DQ",
+              "DURAGS",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              28,
+              "01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+              "Zesty Besties",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              29,
+              "01KHPREXBTGD37GD3ZJ25R7ABW",
+              "EBOYS",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              30,
+              "01KHPREX1EC5Z0DQ4472BPDS5H",
+              "Buckle Boys",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              32,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              38,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              39,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              47,
+              "01KHPREX931TTBJDXH1AN6D121",
+              "FFS",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              53,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              54,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              60,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "Mountain Lift",
+              60,
+              47
+            ]
+          ]
+        },
+        {
+          "map": "E-District",
+          "base": "poi/base/e-district.webp",
+          "picks": [
+            [
+              13,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Energy Bank",
+              53,
+              42
+            ],
+            [
+              14,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "City Hall",
+              33,
+              41
+            ],
+            [
+              18,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "Draft Point",
+              43,
+              68
+            ],
+            [
+              19,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "Heights",
+              81,
+              36
+            ],
+            [
+              23,
+              "01KHPREWJ40HYNJSHV1D5GWDGY",
+              "World Wide",
+              "Uptown",
+              71,
+              50
+            ],
+            [
+              27,
+              "01KHPREX931TTBJDXH1AN6D121",
+              "FFS",
+              "Boardwalk",
+              15,
+              36
+            ],
+            [
+              35,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "Viaduct",
+              34,
+              78
+            ],
+            [
+              40,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "Street Market",
+              22,
+              72
+            ],
+            [
+              41,
+              "01KTSJN9QA20EHN1JZT6EKQ2DQ",
+              "DURAGS",
+              "Galleria",
+              64,
+              36
+            ],
+            [
+              42,
+              "01M6ZJMRM1YGNAPJSS88W6QMJP",
+              "Niche",
+              "Canal Plaza",
+              50,
+              33
+            ],
+            [
+              44,
+              "01KTSJN92PKS2AX6XM17PG7KS0",
+              "Undecided",
+              "Electro Dam",
+              67,
+              20
+            ],
+            [
+              45,
+              "01KHPREZCQZ8Z8DHDM6AR3ZT5N",
+              "VexX Gaming",
+              "Stadium",
+              79,
+              59
+            ],
+            [
+              46,
+              "01KHPREYRD48P80Q2ME3FWEX57",
+              "Nice Guys",
+              "The Lotus",
+              44,
+              16
+            ],
+            [
+              48,
+              "01M6ZJMSJTJ6J4RXQNHYM3P8SY",
+              "Zesty Besties",
+              "Neon Square",
+              26,
+              54
+            ],
+            [
+              49,
+              "01KHPREXBTGD37GD3ZJ25R7ABW",
+              "EBOYS",
+              "Resort",
+              19,
+              19
+            ],
+            [
+              50,
+              "01KHPREX1EC5Z0DQ4472BPDS5H",
+              "Buckle Boys",
+              "Blossom Drive",
+              12,
+              53
+            ],
+            [
+              51,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "Humbert Labs",
+              70,
+              79
+            ],
+            [
+              52,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "Shipyard Arcade",
+              45,
+              91
+            ],
+            [
+              56,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "Settlement",
+              65,
+              63
+            ],
+            [
+              57,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "Old Town",
+              64,
+              90
+            ]
+          ]
+        }
+      ]
     },
     "01M3AW1TSX8DG9TT3W1FK0PAFQ": {
       "region": "apac-n",
