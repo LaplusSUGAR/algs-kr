@@ -818,7 +818,7 @@ function nextCard(upcoming) {
   const big = live ? 'LIVE' : days <= 0 ? '오늘' : `D-${days}`;
   const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}${s.live ? ` ${gameNow(s)}` : ''}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
   return `<section class="nx${live ? ' live' : ''}" aria-labelledby="h-nx">
-    <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn() : ''}</div>
+    <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn(first.region) : ''}</div>
     <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : `${esc(hhmm(first.start))} <small class="nx-tz">${esc(TZL)}</small>`}</b>${live || first.timeTbd ? '' : `<small class="nx-rel">${rt(first.start, 'rel')}</small>`}</span></div>
     <ul class="nx-list">${rows}</ul>
     <div class="nx-act"><a class="nx-go" href="#/schedule">경기 일정 보기</a>${live || set.every((s) => s.timeTbd) ? '' : `<button type="button" class="nx-ics" data-ics="${esc(set.filter((s) => !s.timeTbd).map((s) => s.id).join(','))}" data-day="${esc(dayKey(first.start))}">캘린더에 추가</button>`}</div>
@@ -1385,7 +1385,7 @@ function matchItem(s, o = {}) {
   const state = o.cd ? '' : seriesState(s);
   // 경기 탭(o.cd): 이름이 '매치 포인트 결승'이면 '매치 포인트' 표, 관심 팀 줄이 있으면 '한국' 표는 겹쳐서 뺀다
   const nm = ko(s.name, PHASE_KO), krLine = o.cd && !s.results?.length && krIn(s.lineup || []).length;
-  const tags = [s.mp && !(o.cd && /매치 포인트/.test(nm)) ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn()}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) && !krLine ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
+  const tags = [s.mp && !(o.cd && /매치 포인트/.test(nm)) ? '<span class="tag mp">매치 포인트</span>' : '', s.live ? `<span class="tag live">LIVE</span> ${gameNow(s)}${watchBtn(s.region)}` : '', s.liveFinal ? '<span class="tag">공식 결과 반영</span>' : '', isKrSeries(s) && !krLine ? `<span class="tag kr">${ML().tag}</span>` : ''].join(' ');
   let res = '';
   if (s.results?.length) {
     const top = s.results[0];
@@ -1856,7 +1856,7 @@ const stTab = (st) => (st.tabText != null ? st.tabText : st.start && !st.tbd ? `
 // 경기 탭 머리 (LCQ·챔피언십 공통): 이름·상태·시각, 출전과 진출 규칙 한 줄, 점수표
 function stageMatch(B, st) {
   const x = st.s;
-  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
+  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn(x?.region)}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
   const flow = B.FLOW[st.key];
   const from = st.from || (flow ? flow.map(([k, a, b]) => `<span>${esc(`${B[k].tab} ${a}~${b}위`)}</span>`).join(' + ') : '');
   const rule = st.key === 'f' ? `매치 포인트 ${x?.mpThreshold || 50}점 도달 후 게임 1위를 하면 우승${st.top ? ` · 상위 ${st.top}팀 챔피언십 진출` : ''}` : st.cut ? `1~${st.cut}위 → ${st.up} · ${st.cut + 1}~${st.n}위 → ${st.down}` : '';
@@ -2291,7 +2291,7 @@ function groupTable(ev) {
 // 브래킷 한 단계: 결과가 있으면 점수표, 없으면 출전 명단(확정 또는 예상)
 function stageTable(st) {
   const x = st.s;
-  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn()}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
+  const tag = (st.status === 'live' ? `<span class="tag live">LIVE</span>${watchBtn(x?.region)}` : st.status === 'completed' ? '<span class="tag">종료</span>' : `<span class="tag">${esc(stageState(st))}</span>`) + ` ${gameCount(x, st.key === 'f')} ${gameNow(x)}`;
   const top = `<div class="bk-stage-h"><h3 class="h3">${x ? olink(officialUrl(x), esc(st.ko)) : esc(st.ko)}</h3> ${tag}${x?.mp ? ' <span class="tag mp">매치 포인트</span>' : ''}<span class="when">${st.start ? dateTime(st.start) + ' ' + TZL : ''}</span></div>`;
   const res = x?.results;
   let body;
@@ -3154,19 +3154,35 @@ function povTeam(l) { // 공식 팀 화면의 제목 속 팀 이름 → 팀 약�
 }
 const liveTeam = (l) => (l.kind === 'pov' ? povTeam(l) : l.team);
 const inFocus = (short) => !!team(short) && isF(short);
-// 공식 중계 카드: 지역 보기는 그 지역 중계(APAC North 는 일본어, APAC South 는 영어 + Battlegrounds HQ, 나머지는 영어)
+// 공식 중계 카드: 지역 보기는 그 지역 중계(APAC North 는 일본어, APAC South 는 Battlegrounds HQ, 나머지는 영어)
+//   영어 공식 중계는 APAC South 지역 경기를 맡지 않으므로(운영자 확인 11-22) APAC South 보기에서는 국제전 기간에만 영어 중계를 함께 보인다
 //   한국 관련·내 응원 팀 보기는 영어·일본어 공식 중계. APAC South 중계는 응원 팀(대표 팀)이 APAC South 팀일 때만 함께 (그 밖에는 '그 밖의 방송'으로)
-const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:en', 'o:aps'] };
-// 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회마다 첫 경기 시작 시각부터 마지막 경기 12시간 뒤까지
-function regionEventOn(region) {
+const OFFICIAL_BY_REGION = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:aps'] };
+// 대회 기간: 조건에 맞는 경기가 있는 대회마다 첫 경기 시작 pre 밀리초 전부터 마지막 경기 시작 12시간 뒤까지
+function eventOn(test, pre = 0) {
   const by = new Map();
-  for (const s of A.series) if (s.region === region && s.start) { const g = by.get(s.event); by.set(s.event, g ? [s.start < g[0] ? s.start : g[0], s.start > g[1] ? s.start : g[1]] : [s.start, s.start]); }
-  const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) && t <= Date.parse(b) + 432e5);
+  for (const s of A.series) if (s.start && test(s)) { const g = by.get(s.event); by.set(s.event, g ? [s.start < g[0] ? s.start : g[0], s.start > g[1] ? s.start : g[1]] : [s.start, s.start]); }
+  const t = now(); return [...by.values()].some(([a, b]) => t >= Date.parse(a) - pre && t <= Date.parse(b) + 432e5);
 }
+// 대회 기간에만 보이는 채널(broadcasts 의 when: 지역): 그 지역 경기가 있는 대회 기간
+const regionEventOn = (region) => eventOn((s) => s.region === region);
+// 본 대회(국제전: 플레이오프·챔피언십)와 Americas LCQ. 사전 방송을 생각해 첫 경기 2시간 전부터 친다
+const mainEventOn = () => eventOn((s) => s.region === 'global', 72e5);
+const amerLcqOn = () => eventOn((s) => s.region === 'americas' && /last chance|\blcq\b/i.test(`${s.event || ''} ${s.eventSlug || ''}`), 72e5);
+// 공식 파트너 중 공동 중계로 공식 중계 바로 다음에 세우는 채널 (운영자 확정 11-22)
+//   NiceWigg: Americas LCQ 기간에는 공식 중계와 같은 급, 본 대회(국제전) 기간에도 공식 중계 다음
+//   Greek   : 본 대회(국제전) 기간에 공식 중계 다음
+//   그 밖의 때는 다른 공식 파트너처럼 '그 밖의 방송'에만 나온다
+const STAR_PARTNERS = { 'x:nicewigg': () => amerLcqOn() || mainEventOn(), 'x:greek': () => mainEventOn() };
+const starPartner = (l) => l.kind === 'partner' && !!STAR_PARTNERS[l.key]?.();
+// 공식 맵 화면(algsN_map): 공식 중계와 함께 보도록 늘 카드로. 여러 로비가 켜지면 algs 번호를 붙인다
+const isMapPov = (l) => l.kind === 'pov' && !!l.map;
+const mapPovs = () => (ST?.live || []).filter((x) => isMapPov(x) && x.embed);
 const bcOn = (b) => !b.when || regionEventOn(b.when);
 const bcOffKeys = () => new Set((A.streams.broadcasts || []).filter((b) => !bcOn(b)).map((b) => `o:${b.key}`));
 function officialShown(key) {
   const r = ML().region;
+  if (r === 'apac-s' && key === 'o:en') return mainEventOn();
   if (r) return (OFFICIAL_BY_REGION[r] || ['o:en']).includes(key);
   if (key !== 'o:aps') return true;
   return opt.mode === 'custom' ? Object.values(A.teams).some((t) => opt.fav.includes(t.id) && t.region === 'apac-s') : mainTeam()?.region === 'apac-s';
@@ -3215,16 +3231,48 @@ function pickPlat(key, plat) {
   if (parseHash().q.get('play') === oid) history.replaceState(null, '', `#/streams?play=${encodeURIComponent(nid)}`);
   if (!patchLive()) render();
 }
+// 같은 채널의 서로 다른 방송(같은 플랫폼에서 둘 이상: ESCL 로비 A·B 등)은 고르기만 하지 않고 동시에 본다(멀티뷰).
+//   플랫폼만 다른 같은 방송(Twitch·YouTube 동시 송출)은 내용이 같으므로 예전처럼 볼 곳만 고른다
+function simulSet(alts) {
+  const by = new Map(); for (const x of alts || []) if (x.embed) by.set(x.platform, [...(by.get(x.platform) || []), x]);
+  const best = [...by.values()].sort((a, b) => b.length - a.length)[0];
+  return best && best.length > 1 ? best : null;
+}
+// 여러 방송을 한 번에 연다(멀티뷰를 켜고, 자리가 모자라면 함께 볼 방송이 아닌 화면부터 뺀다)
+function playMany(ids) {
+  const L = ST?.live || [];
+  ids = [...new Set(ids)].filter((id) => L.some((x) => x.embed && liveId(x) === id)).slice(0, MV_MAX);
+  if (!ids.length) return;
+  if (ids.length === 1) { if (!lvIds().includes(ids[0])) playLive(ids[0]); return; }
+  const need = ids.filter((id) => !lvIds().includes(id)).length;
+  const tiles = lvBox()?.querySelector('.lv-tiles');
+  if (tiles) for (const t of [...tiles.children]) { if (tiles.children.length + need <= MV_MAX) break; if (!ids.includes(t.dataset.id)) t.remove(); }
+  mvOn = true;
+  for (const id of ids) if (!lvIds().includes(id)) playLive(id);
+  lvSync();
+}
+// 동시에 볼 방송 하나를 지금 화면에 더하거나 뺀다
+function toggleLive(id) {
+  const ids = lvIds();
+  if (ids.includes(id)) { [...(lvBox()?.querySelectorAll('.lv-tile') || [])].find((t) => t.dataset.id === id)?.remove(); lvSync(); return; }
+  const mv = mvOn; mvOn = ids.length > 0; playLive(id); mvOn = mv || lvIds().length > 1; lvSync();
+}
+const playWant = () => String(parseHash().q.get('play') || '').split(',').filter(Boolean); // #/streams?play=a,b (여러 방송을 함께 열기)
 function liveShown(l) {
-  if (liveId(l) === parseHash().q.get('play')) return true;
+  if (playWant().includes(liveId(l))) return true;
   if (l.kind === 'official') return officialShown(l.key);
-  if (l.kind === 'pov') return !l.map && inFocus(povTeam(l));
+  if (isMapPov(l)) return true;
+  if (l.kind === 'pov') return inFocus(povTeam(l));
+  if (l.kind === 'partner') return starPartner(l) && (officialShown('o:en') || ML().region === 'americas');
   if (l.kind === 'creator') return !ML().region && opt.mode !== 'custom';
   if (l.kind === 'player') return ML().region || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
   return false; // 공식 파트너 등
 }
-const liveRank = (l) => ({ official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4); // 공식 중계 → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
-const liveList = () => liveAll().filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (b.viewers ?? 0) - (a.viewers ?? 0));
+// 공식 중계 → 공식 맵 화면 → 공동 중계(NiceWigg·Greek, 기간 한정) → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
+const liveRank = (l) => (isMapPov(l) ? 0.2 : starPartner(l) ? 0.5 : { official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4);
+const liveList = () => liveAll().filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (a.kind === 'official' && b.kind === 'official' ? officialOrder(a.key) - officialOrder(b.key) : 0) || (b.viewers ?? 0) - (a.viewers ?? 0) || String(a.key).localeCompare(String(b.key)));
+// 공식 중계끼리는 지금 보기의 주 중계가 앞(APAC North 일본어, APAC South Battlegrounds HQ, 그 밖에는 영어 → 일본어)
+const officialOrder = (key) => { const L = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:aps', 'o:en'] }[ML().region] || ['o:en', 'o:ja']; const i = L.indexOf(key); return i < 0 ? 9 : i; };
 const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
 const playHref = (l) => (l.embed ? `#/streams?play=${encodeURIComponent(liveId(l))}` : esc(l.url));
 // 이름 옆 LIVE 표시: 누르면 그 방송으로
@@ -3232,11 +3280,13 @@ const liveTag = (name, short) => { const l = liveOf(name, short); return l ? ` <
 // 팀·선수 화면 맨 위: 그 팀(선수)이 방송 중이면 카드로
 const liveFor = (pick) => { const L = (ST?.live || []).filter((l) => (l.kind === 'player' && pick(l)) || (l.kind === 'pov' && !l.map && pick({ ...l, team: povTeam(l), who: '' }))).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0)); return L.length ? `<section class="sec lv lv-home"><h2 class="h2">지금 방송 중 <small class="muted">${L.length}</small></h2><div class="lv-grid">${L.slice(0, 6).map((l, i) => liveCard(l, i, true)).join('')}</div></section>` : ''; };
 // 진행 중인 경기 옆 '중계 보기': 공식 중계가 켜져 있으면 그 방송을 방송 탭에서 바로 열고, 켜진 중계를 못 찾으면 공식 중계 채널 목록으로
-const officialLive = () => { const L = liveAll().filter((l) => l.kind === 'official'); const pref = I.lang === 'ja' ? 'o:ja' : 'o:en'; return L.find((l) => l.key === pref && l.embed) || L.find((l) => l.embed) || L[0] || null; };
-const watchBtn = () => { if (!C.streamsUrl) return ''; const l = officialLive(); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
+//   그 경기 지역의 중계를 먼저: APAC South 는 Battlegrounds HQ, APAC North 는 일본어, 그 밖에는 화면 언어(일본어면 일본어, 아니면 영어)
+const officialLive = (region) => { const L = liveAll().filter((l) => l.kind === 'official'); const pref = [...({ 'apac-s': ['o:aps'], 'apac-n': ['o:ja', 'o:escl'] }[region] || []), I.lang === 'ja' ? 'o:ja' : 'o:en']; for (const k of pref) { const l = L.find((x) => x.key === k && x.embed); if (l) return l; } return region === 'apac-s' ? L.find((l) => l.key !== 'o:en' && l.embed) || L.find((l) => l.embed) || L[0] || null : L.find((l) => l.embed) || L[0] || null; };
+const watchBtn = (region) => { if (!C.streamsUrl) return ''; const l = officialLive(region); return l ? ` <a class="watch" href="${playHref(l)}"${l.embed ? '' : ' target="_blank" rel="noopener"'}>중계 보기</a>` : ' <a class="watch off" href="#/streams?s=official">중계 채널</a>'; };
 const newVideos = () => (ST?.videos || []).filter((v) => !v.short && v.platform !== 'twitch' && vidSeen0 && Date.parse(v.published) > vidSeen0);
 const sinceTxt = (iso) => { if (!iso) return ''; const m = Math.max(0, Math.round((now() - new Date(iso)) / 60000)); return m < 60 ? `${m}분째` : `${Math.floor(m / 60)}시간 ${m % 60}분째`; };
-const liveWho = (l) => (l.kind === 'pov' ? `${esc(xteam(povTeam(l))?.name || l.who)} <small>팀 화면</small>` : l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
+const mapNo = (l) => { const M = mapPovs(); return M.length > 1 ? ` ${(/algs(\d+)_map/i.exec(l.key) || [])[1] || M.indexOf(l) + 1}` : ''; };
+const liveWho = (l) => (isMapPov(l) ? `<span>공식 맵 화면</span>${mapNo(l)}` : starPartner(l) ? `${esc(l.who)} <small>공동 중계</small>` : l.kind === 'pov' ? `${esc(xteam(povTeam(l))?.name || l.who)} <small>팀 화면</small>` : l.kind === 'player' && team(l.team) ? `${esc(l.who)} <small>${esc(l.team)}</small>` : esc(l.who));
 const livePlayerSrc = (e, muted) => (e.type === 'twitch' ? `https://player.twitch.tv/?channel=${encodeURIComponent(e.channel)}&parent=${encodeURIComponent(location.hostname)}&autoplay=true${muted ? '&muted=true' : ''}` : `https://www.youtube-nocookie.com/embed/${encodeURIComponent(e.id)}?autoplay=1&rel=0${muted ? '&mute=1' : ''}`); // 두 번째 화면부터는 소리를 끄고 시작한다(소리가 겹치지 않게)
 const liveId = (l) => `${l.key}|${liveVar(l)}`;
 // ── 사이트 안 플레이어 ──
@@ -3253,6 +3303,8 @@ function lvSync() {
   if (!ids.length) { lvIO?.disconnect(); lvIO = null; lvCinema(false); box.innerHTML = ''; box.hidden = true; mvOn = false; if (parseHash().q.has('play')) history.replaceState(null, '', '#/streams'); } // 닫은 뒤 새로고침 때 다시 열리지 않게
   else { box.querySelector('.lv-tiles').dataset.n = ids.length; box.querySelector('[data-mv]').setAttribute('aria-pressed', String(mvOn)); box.classList.toggle('multi', ids.length > 1); }
   document.querySelectorAll('#app button.lv-card, #app button.lv-add').forEach((c) => c.classList.toggle('on', ids.includes(c.dataset.lvid)));
+  document.querySelectorAll('#app [data-lvalt]').forEach((b) => b.setAttribute('aria-pressed', String(ids.includes(b.dataset.lvalt))));
+  document.querySelectorAll('#app [data-lvmany]').forEach((b) => { const w = b.dataset.lvmany.split(','); b.setAttribute('aria-pressed', String(w.every((x) => ids.includes(x)))); });
 }
 function lvCinema(on) {
   const box = lvBox(); if (!box) return;
@@ -3303,7 +3355,7 @@ function playLive(id) {
   if (!mvOn) tiles.innerHTML = '';
   else if (tiles.children.length >= MV_MAX) tiles.firstElementChild.remove(); // 꽉 찼으면 가장 먼저 연 화면을 뺀다
   const tile = document.createElement('div'); tile.className = 'lv-tile'; tile.dataset.id = id;
-  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}${tag ? ` · ${tag}` : ''}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg><span>크게 보기</span></button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
+  tile.innerHTML = `<div class="lv-tbar"><b>${liveWho(l)}${tag ? ` <small class="lv-vt">${tag}</small>` : ''}</b><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span><a class="more" href="${esc(l.url)}" target="_blank" rel="noopener">${PLAT[l.platform]}에서 보기</a><button class="lv-big" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg><span>크게 보기</span></button><button class="lv-x" type="button" aria-label="${esc(l.who)} 화면 닫기">×</button></div>
     <iframe class="yt-frame" src="${esc(livePlayerSrc(l.embed, tiles.children.length > 0))}" title="${esc(l.who)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   tile.querySelector('.lv-x').addEventListener('click', () => { tile.remove(); lvSync(); });
   tile.querySelector('.lv-big').addEventListener('click', lvBig);
@@ -3322,9 +3374,21 @@ function liveCard(l, i, asLink) {
     <span class="lv-meta"><b>${liveWho(l)}${l.embed ? '' : `<span class="lv-extn">${PLAT[l.platform]} ↗</span>`}</b><span class="lv-title"${!hide && liveTitle(l) !== (l.title || '') ? ` title="${esc(l.title)}"` : ''}>${hide ? '<span>결과 가리기 중에는 방송 제목을 숨깁니다.</span>' : esc(liveTitle(l))}</span>
     <span class="lv-sub"><span class="chip ${l.platform} mini"><i></i>${PLAT[l.platform]}</span>${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></span>`;
   if (asLink && l.embed) return `<a class="lv-card" href="${playHref(l)}" aria-label="${esc(l.who)} 방송 재생">${inner}</a>`;
-  // 여러 방송 고르기: 플랫폼이 다르면 플랫폼 이름, 같은 플랫폼이 둘 이상이면 구분 이름(로비 A …)을 붙이고, 모두 같은 플랫폼이면 플랫폼 이름은 뺀다(카드에 이미 있다)
-  if (l.alts && l.embed) return `<div class="lv-pick"><button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>
-    <div class="lv-plat"><small>${new Set(l.alts.map((x) => x.platform)).size === l.alts.length ? (l.alts.length === 2 ? '두 곳에서 방송 중' : `${l.alts.length}곳에서 방송 중`) : `방송 ${l.alts.length}개 동시 진행`}</small><div class="seg" role="group" aria-label="방송 볼 곳 고르기">${l.alts.map((x) => { const tag = altTag(x, l.alts), one = new Set(l.alts.map((y) => y.platform)).size === 1; return `<button type="button" data-bckey="${esc(l.key)}" data-bcplat="${esc(liveVar(x))}" aria-pressed="${liveVar(x) === liveVar(l)}"${x.title ? ` title="${esc(liveTitle(x))}"` : ''}><i class="${esc(x.platform)}" aria-hidden="true"></i>${!tag ? PLAT[x.platform] : one ? tag : `${PLAT[x.platform]} ${tag}`}</button>`; }).join('')}</div></div></div>`;
+  // 여러 방송: 플랫폼이 다르면 플랫폼 이름, 같은 플랫폼이 둘 이상이면 구분 이름(로비 A …)을 붙이고, 모두 같은 플랫폼이면 플랫폼 이름은 뺀다(카드에 이미 있다)
+  //   같은 플랫폼의 서로 다른 방송(simulSet)은 버튼을 누를 때마다 화면에 더하고 빼며, '동시에 보기'로 한 번에 연다. 플랫폼만 다른 쪽은 볼 곳 고르기
+  //   공식 중계 카드에는 공식 맵 화면이 켜져 있을 때 '맵 화면과 같이 보기'
+  const maps = !asLink && ['o:en', 'o:ja', 'o:aps'].includes(l.key) && l.embed ? mapPovs() : []; // ESCL 은 따로 송출하는 방송이라 뺀다
+  if (!asLink && l.embed && (l.alts || maps.length)) {
+    const rows = [];
+    if (l.alts) {
+      const sim = simulSet(l.alts), one = new Set(l.alts.map((y) => y.platform)).size === 1;
+      const btn = (x) => { const tag = altTag(x, l.alts), label = `<i class="${esc(x.platform)}" aria-hidden="true"></i>${!tag ? PLAT[x.platform] : one ? tag : `${PLAT[x.platform]} ${tag}`}`, tt = x.title ? ` title="${esc(liveTitle(x))}"` : '';
+        return sim?.includes(x) ? `<button type="button" data-lvalt="${esc(liveId(x))}" aria-pressed="false"${tt}>${label}</button>` : `<button type="button" data-bckey="${esc(l.key)}" data-bcplat="${esc(liveVar(x))}" aria-pressed="${liveVar(x) === liveVar(l)}"${tt}>${label}</button>`; };
+      rows.push(`<div class="lv-plat"><small>${new Set(l.alts.map((x) => x.platform)).size === l.alts.length ? (l.alts.length === 2 ? '두 곳에서 방송 중' : `${l.alts.length}곳에서 방송 중`) : `방송 ${l.alts.length}개 동시 진행`}</small><div class="seg" role="group" aria-label="${sim ? '함께 볼 방송 고르기' : '방송 볼 곳 고르기'}">${l.alts.map(btn).join('')}</div>${sim ? `<button class="lv-btn lv-many" type="button" data-lvmany="${esc(sim.slice(0, MV_MAX).map(liveId).join(','))}" aria-pressed="false">동시에 보기</button>` : ''}</div>`);
+    }
+    if (maps.length) rows.push(`<div class="lv-plat"><small>공식 맵 화면 방송 중</small><button class="lv-btn lv-many" type="button" data-lvmany="${esc([liveId(l), ...maps.map(liveId)].slice(0, MV_MAX).join(','))}" aria-pressed="false">맵 화면과 같이 보기</button></div>`);
+    return `<div class="lv-pick"><button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>${rows.join('')}</div>`;
+  }
   return l.embed
     ? `<button class="lv-card" type="button" data-lv="${i}" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생">${inner}</button>`
     : `<a class="lv-card" href="${esc(l.url)}" target="_blank" rel="noopener">${inner}<span class="lv-ext">${PLAT[l.platform]}에서 보기</span></a>`;
@@ -3371,6 +3435,8 @@ function patchLive() {
 function bindLive(root) {
   root.querySelectorAll('button.lv-card, button.lv-add').forEach((b) => b.addEventListener('click', () => playLive(b.dataset.lvid))); // 접힌 '그 밖의 방송' 목록도 같은 플레이어(멀티뷰)로
   root.querySelectorAll('[data-bcplat]').forEach((b) => b.addEventListener('click', () => pickPlat(b.dataset.bckey, b.dataset.bcplat)));
+  root.querySelectorAll('[data-lvalt]').forEach((b) => b.addEventListener('click', () => toggleLive(b.dataset.lvalt)));
+  root.querySelectorAll('[data-lvmany]').forEach((b) => b.addEventListener('click', () => playMany(b.dataset.lvmany.split(','))));
   root.querySelectorAll('[data-st-retry]').forEach((b) => b.addEventListener('click', () => { b.disabled = true; pollStreams(true); }));
 }
 // 최근 영상: 영상(YouTube 긴 영상) / 쇼츠. 쇼츠는 기본 목록에서 빼고 따로 모은다
@@ -3399,7 +3465,7 @@ function videoSection(q) {
 }
 // 홈: 선수 개인 방송이나 대회 공식 중계가 켜져 있으면 맨 위에 카드로 보여 준다 (공식 파트너는 방송 탭에서만). 누르면 방송 탭에서 그 방송이 열린다
 function liveStrip() {
-  const L = liveList().filter((l) => l.kind !== 'partner');
+  const L = liveList().filter((l) => l.kind !== 'partner' || starPartner(l));
   if (!L.length) {
     // 대회 중(경기 중이거나 앞뒤 1시간)인데 방송 중인 채널이 없으면 공식 중계 채널로 가는 길만 한 줄
     const on = ST && C.streamsUrl && A.series.some((s) => s.live || (s.status !== 'completed' && Math.abs(new Date(s.start) - now()) < 3.6e6));
@@ -3525,8 +3591,9 @@ function bind() {
   app.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.reveal, b)));
   bindLive(app);
   { // 홈에서 넘어온 경우(#/streams?play=…): 그 방송을 바로 연다
-    const want = parseHash().q.get('play'), box = document.getElementById('lvPlayer');
-    if (want && box && !box.querySelector('iframe')) [...app.querySelectorAll('button.lv-card')].find((b) => b.dataset.lvid === want)?.click();
+    const want = playWant(), box = document.getElementById('lvPlayer');
+    if (want.length > 1 && box && !box.querySelector('iframe')) playMany(want);
+    else if (want.length && box && !box.querySelector('iframe')) [...app.querySelectorAll('button.lv-card')].find((b) => b.dataset.lvid === want[0])?.click();
   }
   app.querySelectorAll('button.yt').forEach((b) => b.addEventListener('click', () => {
     const f = document.createElement('iframe');

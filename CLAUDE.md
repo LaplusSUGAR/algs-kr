@@ -62,7 +62,11 @@ JSON 을 고친 뒤에는 꼭 문법을 확인한다(운영자가 따옴표 없�
    - 한국 관련: 한국 선수·코치(한국 국적·한국계) + 한국 스트리머·전 프로. 대회 때는 영어·일본어 공식 중계 + 한국 관련 팀의 공식 팀 화면
    - APAC North: APAC North 팀 선수. 대회 때는 일본어 공식 중계 + APAC North 팀의 공식 팀 화면
    - 내 응원 팀: 고른 팀 선수. 대회 때는 영어·일본어 공식 중계 + 고른 팀의 공식 팀 화면
-3. 순서: 공식 중계 → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로. 홈 "지금 방송 중"은 3칸.
+3. 순서: 공식 중계 → 공식 맵 화면 → 공동 중계(NiceWigg·Greek, 기간 한정) → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로. 홈 "지금 방송 중"은 3칸.
+   - (11-22) 영어 공식 중계는 APAC South 를 맡지 않는다: APAC South 보기는 Battlegrounds HQ(`o:aps`)만, 영어 중계는 국제전 기간에만 함께. 경기 옆 '중계 보기'도 그 경기 지역 중계 먼저(`officialLive(region)`).
+   - (11-22) 공식 파트너 `x:nicewigg`·`x:greek`(공식 API partnerStreams 의 Twitch 채널)은 `STAR_PARTNERS`: NiceWigg 는 Americas LCQ 기간(`amerLcqOn`)과 국제전 기간(`mainEventOn`, 지역 global 대회), Greek 는 국제전 기간에만 '공동 중계' 카드로 공식 중계 바로 다음. 영어 중계가 보이는 보기(+ Americas 보기)에서. 그 밖에는 '그 밖의 방송'.
+   - (11-22) 공식 맵 화면(`algsN_map`)은 늘 카드로 보이고, 영어·일본어·APAC South 공식 중계 카드에 '맵 화면과 같이 보기'(멀티뷰로 둘 다 연다).
+   - (11-22) 같은 채널의 서로 다른 방송(같은 플랫폼에 둘 이상, 예: ESCL 로비 A·B, `simulSet`)은 버튼을 누를 때마다 플레이어에 더하고 빼며 '동시에 보기'로 한 번에 연다(`playMany`·`toggleLive`). 플랫폼만 다른 같은 방송(Twitch·YouTube 동시 송출)은 예전처럼 볼 곳 고르기. 주소 `#/streams?play=a,b` 로 여러 방송을 함께 열 수 있다.
 4. 공식 팀 화면: Twitch `algs1_team1`…`algs4_team20`, `algsN_map` (`config/season.json` 의 `povChannels`). 대회 때만 켜지고 제목 맨 앞이 팀 이름("Team Falcons | ALGS …")이라, 그 이름으로 팀을 찾는다(`povTeam`). algs2~4 는 이름 규칙으로 미리 넣은 것이라 실제로 쓰이는지는 대회 때 확인 필요.
 5. 로스터 변경으로 팀을 나간 사람은 방송 목록에서 자동 제외(예: Re9zq).
 6. Twitch 다시보기는 운영자 요청으로 제거했다. 최근 영상은 YouTube 영상·쇼츠만(쇼츠는 따로).
