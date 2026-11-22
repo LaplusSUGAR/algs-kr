@@ -2333,3 +2333,15 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .csd-gs small { color: var(--steel); font-size: 12px; }
 .csd-row.nt { grid-template-columns: minmax(0, 1fr) auto; }
 .csd-wait { margin-left: auto; font-style: normal; font-size: 12px; font-weight: 600; color: var(--steel); }
+
+/* 챔피언십 경기 탭 줄: 옆으로 밀지 않고 줄을 바꿔 모든 탭이 한 번에 보이게 (운영자 요청 11-22) */
+.lcq-tabs.wrap { overflow: visible; }
+.lcq-tabs.wrap .seg, .st-stick .lcq-tabs.wrap .seg { flex-wrap: wrap; white-space: normal; width: auto; max-width: none; -webkit-mask-image: none; mask-image: none; row-gap: 2px; }
+.lcq-tabs.wrap .seg a { white-space: nowrap; }
+@media (max-width: 720px) {
+  .lcq-tabs.wrap .seg a { padding: 5px 8px; font-size: 12.5px; }
+  .lcq-tabs.wrap small { font-size: 10px; }
+}
+@media (min-width: 721px) { .lcq-tabs.wrap .seg a { padding: 6px 9px; } }
+/* 휴대폰은 줄을 바꾸면 3~5줄이 되어 붙어 따라오면 화면을 너무 가린다: 맨 위에만 두고 따라오지 않게 */
+@media (max-width: 720px) { .st-stick:has(> .lcq-tabs.wrap) { position: static; } }
