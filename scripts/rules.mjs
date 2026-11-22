@@ -53,5 +53,10 @@ export const rulesBrief = (r) => ({
   champ: { teams: r.championship.teams, direct: r.championship.direct, lcq: r.championship.fromLcq, per: r.championship.lcqPerRegion },
   lcq: { teams: r.lcq.teamsPerRegion, adv: r.lcq.advance },
   cpMin: r.championshipPoints.minMatches,
+  // 규칙 탭 진행 그림의 단계별 게임 수 (키는 brackets 단계 key)
+  games: {
+    lcq: { a: r.lcq.bracket.winners1.matches, b: r.lcq.bracket.winners1.matches, wr2: r.lcq.bracket.winners2.matches, er1: r.lcq.bracket.elimination1.matches, er2: r.lcq.bracket.elimination2.matches },
+    champ: { wr: r.championship.bracket.winners.matches, er1: r.championship.bracket.elimination1.matches, er2: r.championship.bracket.elimination2.matches },
+  },
   prize: { champs: [r.prizes.championship.pool, ...r.prizes.championship.byRank.slice(0, 3)], po: [r.prizes['split-2-playoffs'].pool, r.prizes['split-2-playoffs'].byRank[0]], pl: r.prizes.proLeaguePerSplit.pool },
 });
