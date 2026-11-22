@@ -3196,7 +3196,8 @@ function coShown(l) {
 }
 // 공식 맵 화면(algsN_map): 공식 중계와 함께 보도록 늘 카드로. 여러 로비가 켜지면 algs 번호를 붙인다
 const isMapPov = (l) => l.kind === 'pov' && !!l.map;
-const mapPovs = () => (ST?.live || []).filter((x) => isMapPov(x) && x.embed);
+let MAP_SRC, MAP_L = [];
+const mapPovs = () => { if (MAP_SRC !== ST?.live) { MAP_SRC = ST?.live; MAP_L = (MAP_SRC || []).filter((x) => isMapPov(x) && x.embed); } return MAP_L; };
 const bcOn = (b) => !b.when || regionEventOn(b.when);
 const bcOffKeys = () => new Set((A.streams.broadcasts || []).filter((b) => !bcOn(b)).map((b) => `o:${b.key}`));
 function officialShown(key) {
@@ -3228,7 +3229,16 @@ function altTag(l, g) {
   }
   return String(same.indexOf(l) + 1);
 }
-function liveAll() {
+// 방송 목록 계산 메모: 한 화면을 그리는 동안 머리·본문·홈 카드·메뉴 배지·경기마다의 '중계 보기'가 같은 목록을 여러 번 쓴다.
+//   방송 응답·데이터·보기·응원 팀·볼 곳 선택·재생 주소·30초 단위 시각이 같으면 다시 계산하지 않는다 (돌려준 배열은 고치지 말 것)
+let LV_MEMO = null;
+function lvMemo(name, fn) {
+  const k = [JSON.stringify(store.get('bcPlat', {})), opt.mode, opt.main, opt.fav.join(','), parseHash().q.get('play') || '', I.lang, Math.floor(now() / 3e4)].join('|');
+  if (!LV_MEMO || LV_MEMO.st !== ST?.live || LV_MEMO.a !== A || LV_MEMO.k !== k) LV_MEMO = { st: ST?.live, a: A, k, m: {} };
+  return LV_MEMO.m[name] ??= fn();
+}
+const liveAll = () => lvMemo('all', liveAll0);
+function liveAll0() {
   const off = bcOffKeys(), L = (ST?.live || []).filter((l) => !(l.kind === 'official' && off.has(l.key))), G = new Map();
   for (const l of L) if (l.kind === 'official' && l.embed) G.set(l.key, [...(G.get(l.key) || []), l]);
   const out = [];
@@ -3289,7 +3299,7 @@ function liveShown(l) {
 }
 // 공식 중계 → 공식 맵 화면 → 공동 중계(NiceWigg·Greek, 기간 한정) → 공식 팀 화면 → 선수·코치 → 스트리머·전 프로
 const liveRank = (l) => (isMapPov(l) ? 0.2 : starPartner(l) ? 0.5 : { official: 0, pov: 1, player: 2, creator: 3 }[l.kind] ?? 4);
-const liveList = () => liveAll().filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (a.kind === 'official' && b.kind === 'official' ? officialOrder(a.key) - officialOrder(b.key) : 0) || (b.viewers ?? 0) - (a.viewers ?? 0) || String(a.key).localeCompare(String(b.key)));
+const liveList = () => lvMemo('list', () => liveAll().filter(liveShown).sort((a, b) => liveRank(a) - liveRank(b) || (a.kind === 'official' && b.kind === 'official' ? officialOrder(a.key) - officialOrder(b.key) : 0) || (b.viewers ?? 0) - (a.viewers ?? 0) || String(a.key).localeCompare(String(b.key))));
 // 공식 중계끼리는 지금 보기의 주 중계가 앞(APAC North 일본어, APAC South Battlegrounds HQ, 그 밖에는 영어 → 일본어)
 const officialOrder = (key) => { const L = { 'apac-n': ['o:ja', 'o:escl'], 'apac-s': ['o:aps', 'o:en'] }[ML().region] || ['o:en', 'o:ja']; const i = L.indexOf(key); return i < 0 ? 9 : i; };
 const liveOf = (name, short) => (ST?.live || []).find((l) => l.kind === 'player' && l.who.toLowerCase() === String(name).toLowerCase() && (!short || !l.team || l.team === short));
