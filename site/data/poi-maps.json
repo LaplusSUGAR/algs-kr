@@ -1358,14 +1358,350 @@
       "name": "Elimination Round 2",
       "draft": "01M794J92AKHVC7VX2GETKTGYN",
       "date": "2026-11-21T23:50:00.000Z",
-      "checked": 83115
+      "completedAt": "2026-11-21T23:59:39.266Z",
+      "done": true,
+      "checked": 83116,
+      "maps": [
+        {
+          "map": "World's Edge",
+          "base": "poi/base/worlds-edge.webp",
+          "picks": [
+            [
+              1,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "SKYHOOK WEST",
+              25.1,
+              24.8
+            ],
+            [
+              2,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "BIG MAUDE",
+              34.5,
+              45.7
+            ],
+            [
+              5,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "MONUMENT",
+              51,
+              41.9
+            ],
+            [
+              6,
+              "01M6ZJMR2KZAGVE05RJ6PFMJ3P",
+              "Above All",
+              "War Camp",
+              56,
+              20
+            ],
+            [
+              8,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "TREE SETTLEMENT",
+              40.8,
+              82.3
+            ],
+            [
+              9,
+              "01M6ZJMQV7ABV0CBXGS2MKC2JV",
+              "RIQON Gaming",
+              "HARVESTER",
+              43.9,
+              65.4
+            ],
+            [
+              10,
+              "01M6ZJMRFTHWS4Q1A7HWBCER32",
+              "Happy Birthday",
+              "SORTING FACTORY",
+              57.4,
+              75.5
+            ],
+            [
+              14,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "THERMAL STATION",
+              24.4,
+              75
+            ],
+            [
+              16,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "COUNTDOWN",
+              29,
+              37.2
+            ],
+            [
+              18,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "EAST VILLAGE",
+              75.2,
+              17.3
+            ],
+            [
+              23,
+              "01KMF09WG9A551ZCYGZWWKPCXZ",
+              "Full XI",
+              "MIRAGE A TROIS",
+              18.7,
+              52.2
+            ],
+            [
+              24,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "OVERLOOK",
+              82,
+              39
+            ],
+            [
+              27,
+              "01M5TTC7HMZXNATARTFS45T9J2",
+              "Legion Gaming",
+              "STACKS",
+              79.4,
+              79.3
+            ],
+            [
+              31,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "LAVA FISSURE",
+              17.7,
+              39.9
+            ],
+            [
+              32,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "LAUNCH SITE",
+              54.6,
+              89.1
+            ],
+            [
+              33,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "STAGING",
+              31.1,
+              60.1
+            ],
+            [
+              35,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "THE DOME",
+              72.3,
+              92.2
+            ],
+            [
+              37,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "THE GEYSER",
+              75.9,
+              60.5
+            ],
+            [
+              39,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "SKYHOOK EAST",
+              41.9,
+              17.6
+            ],
+            [
+              40,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "THE EPICENTER",
+              66.2,
+              28.6
+            ]
+          ]
+        },
+        {
+          "map": "Storm Point",
+          "base": "poi/base/storm-point.webp",
+          "picks": [
+            [
+              3,
+              "01KMF09WG9A551ZCYGZWWKPCXZ",
+              "Full XI",
+              "Cascade Falls",
+              51,
+              38
+            ],
+            [
+              4,
+              "01KTSJN9NNNMNFHY2H1EMVSD27",
+              "SLG",
+              "Lightning Rod",
+              81,
+              23
+            ],
+            [
+              7,
+              "01M5TTC7HMZXNATARTFS45T9J2",
+              "Legion Gaming",
+              "Barometer",
+              36,
+              73
+            ],
+            [
+              11,
+              "01KTSJN918EBK3C0ZF95Y79R47",
+              "W Press",
+              "Ceto Station",
+              38,
+              50
+            ],
+            [
+              12,
+              "01KHPREX4AXTSY2BEERS3NN8GQ",
+              "Connections",
+              "The Pylon",
+              59,
+              67
+            ],
+            [
+              13,
+              "01M6ZJMRSQ9G0EGPMMMJ5PPMVP",
+              "Project Heavener",
+              "Forbidden Zone",
+              49,
+              58
+            ],
+            [
+              15,
+              "01M6ZJMR0X4D1YWZV5GXQ7B99Y",
+              "Aura",
+              "Storm Catcher",
+              76,
+              37
+            ],
+            [
+              17,
+              "01M5TTC7HK8BB2CH9JAGEE7TH7",
+              "RUNNING LATE",
+              "Launch Pad",
+              75,
+              63
+            ],
+            [
+              19,
+              "01KTSJN99S5QCPQBZDYKH7A37X",
+              "Sesame oil",
+              "Zeus Station",
+              79,
+              8
+            ],
+            [
+              20,
+              "01M5TTC7HJYQ027D3W7BRR682K",
+              "The Cooks",
+              "Command Center",
+              69,
+              33
+            ],
+            [
+              21,
+              "01KHPRETPJ9HJ2RJYZKCJJDMGS",
+              "Twerkaholics",
+              "The Mill",
+              13,
+              48
+            ],
+            [
+              22,
+              "01M6ZJMQJXKRJTD6BC105CC7HK",
+              "Grace",
+              "Checkpoint",
+              32,
+              29
+            ],
+            [
+              25,
+              "01KHPREYST26ZBGYJRQ03Z93B6",
+              "STRONGFISH",
+              "Downed Beast",
+              16,
+              29
+            ],
+            [
+              26,
+              "01M6ZJMR2KZAGVE05RJ6PFMJ3P",
+              "Above All",
+              "The Wall",
+              55,
+              15
+            ],
+            [
+              28,
+              "01KTSJN9R8X0TEGNTZCV5V57NT",
+              "Tired",
+              "Cenote Cave",
+              21,
+              69
+            ],
+            [
+              29,
+              "01M6ZJMQV7ABV0CBXGS2MKC2JV",
+              "RIQON Gaming",
+              "Devastated Coast",
+              82,
+              73
+            ],
+            [
+              30,
+              "01M6ZJMRFTHWS4Q1A7HWBCER32",
+              "Happy Birthday",
+              "Echo HQ",
+              66,
+              83
+            ],
+            [
+              34,
+              "01M762GJ9TP7M1F8VTFGG3KZHG",
+              "DGAP",
+              "Coastal Camp",
+              52,
+              84
+            ],
+            [
+              36,
+              "01M6ZJMQFWK606NZJSXB0F5YF7",
+              "Asianbanger",
+              "North Pad",
+              24,
+              13
+            ],
+            [
+              38,
+              "01KTSJN9CEF1CC5V6WNR2NSHXX",
+              "Zest Fest",
+              "Outpost North",
+              39,
+              22
+            ]
+          ]
+        }
+      ]
     },
     "01M3AVSHN0QD8GRH2RV8WPC6BN": {
       "region": "americas",
       "name": "Match Point Finals",
       "draft": "01M794KSSR9EV9EHGD5204K0Q7",
       "date": "2026-11-22T05:00:00.000Z",
-      "checked": 83115
+      "checked": 83116
     },
     "01M3AW1TSX8DG9TT3W1FK0PAFQ": {
       "region": "apac-n",
