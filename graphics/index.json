@@ -8,10 +8,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "0472a977a88d",
-   "made": "2026-11-22T04:29:43.484Z",
+   "hash": "e2e716684bb4",
+   "made": "2026-11-22T18:34:34.784Z",
    "series": [
-    "~l8"
+    "~l9"
    ]
   },
   "year-6/lcq/apac-n/20261120-1700-wr1a-results.png": {
@@ -20,10 +20,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "승자 1라운드 로비 A 결과",
-   "hash": "0bf661f4d6db",
-   "made": "2026-11-21T11:24:12.630Z",
+   "hash": "04d61b857c88",
+   "made": "2026-11-22T18:34:32.164Z",
    "series": [
-    "~l8"
+    "~l9"
    ]
   },
   "year-6/lcq/apac-n/20261120-1700-wr1b-poi.png": {
@@ -32,10 +32,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "f16f88be0c30",
-   "made": "2026-11-22T04:29:45.989Z",
+   "hash": "975ec317a9ee",
+   "made": "2026-11-22T18:34:38.728Z",
    "series": [
-    "~l9"
+    "~la"
    ]
   },
   "year-6/lcq/apac-n/20261120-1700-wr1b-results.png": {
@@ -44,10 +44,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-20T08:00:00.000Z",
    "title": "승자 1라운드 로비 B 결과",
-   "hash": "b7e6aa7efe47",
-   "made": "2026-11-21T11:24:18.306Z",
+   "hash": "ff0bd7d3cf6b",
+   "made": "2026-11-22T18:34:36.078Z",
    "series": [
-    "~l9"
+    "~la"
    ]
   },
   "year-6/lcq/apac-n/20261121-1200-er1-poi.png": {
@@ -56,10 +56,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "388893dc35a1",
-   "made": "2026-11-22T04:29:51.237Z",
+   "hash": "29c729863569",
+   "made": "2026-11-22T18:34:46.836Z",
    "series": [
-    "~lb"
+    "~lc"
    ]
   },
   "year-6/lcq/apac-n/20261121-1200-er1-results.png": {
@@ -68,10 +68,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "패자부활 1라운드 결과",
-   "hash": "4a18b5fd7615",
-   "made": "2026-11-21T11:24:29.056Z",
+   "hash": "6d7cab4cf004",
+   "made": "2026-11-22T18:34:44.070Z",
    "series": [
-    "~lb"
+    "~lc"
    ]
   },
   "year-6/lcq/apac-n/20261121-1200-wr2-poi.png": {
@@ -80,10 +80,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "4b6b1ed95192",
-   "made": "2026-11-22T04:29:48.561Z",
+   "hash": "7d9465f21dc9",
+   "made": "2026-11-22T18:34:42.797Z",
    "series": [
-    "~la"
+    "~lb"
    ]
   },
   "year-6/lcq/apac-n/20261121-1200-wr2-results.png": {
@@ -92,10 +92,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T03:00:00.000Z",
    "title": "승자 2라운드 결과",
-   "hash": "549493ed4bfb",
-   "made": "2026-11-21T11:24:23.796Z",
+   "hash": "8026bbc42bb4",
+   "made": "2026-11-22T18:34:40.029Z",
    "series": [
-    "~la"
+    "~lb"
    ]
   },
   "year-6/lcq/apac-n/20261121-1700-er2-poi.png": {
@@ -104,10 +104,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "0c8739533083",
-   "made": "2026-11-22T04:29:53.859Z",
+   "hash": "6f183b07773f",
+   "made": "2026-11-22T18:34:50.871Z",
    "series": [
-    "~lc"
+    "~ld"
    ]
   },
   "year-6/lcq/apac-n/20261121-1700-er2-results.png": {
@@ -116,10 +116,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-21T08:00:00.000Z",
    "title": "패자부활 2라운드 결과",
-   "hash": "c5d8e715c3b5",
-   "made": "2026-11-21T11:24:34.051Z",
+   "hash": "25e9d2893688",
+   "made": "2026-11-22T18:34:48.162Z",
    "series": [
-    "~lc"
+    "~ld"
    ]
   },
   "year-6/lcq/apac-n/20261122-1700-f-poi.png": {
@@ -128,10 +128,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-22T08:00:00.000Z",
    "title": "POI 드래프트",
-   "hash": "ead02a941f1f",
-   "made": "2026-11-22T04:29:57.348Z",
+   "hash": "12f85469f758",
+   "made": "2026-11-22T18:34:55.826Z",
    "series": [
-    "~ld"
+    "~le"
    ]
   },
   "year-6/lcq/apac-n/20261122-1700-f-results.png": {
@@ -140,10 +140,10 @@
    "event": "last-chance-qualifier-apac-north",
    "start": "2026-11-22T08:00:00.000Z",
    "title": "매치 포인트 결승 결과",
-   "hash": "5486fe620678",
-   "made": "2026-11-22T13:26:53.161Z",
+   "hash": "8cb0aa85b95a",
+   "made": "2026-11-22T18:34:51.916Z",
    "series": [
-    "~ld"
+    "~le"
    ]
   }
  }
