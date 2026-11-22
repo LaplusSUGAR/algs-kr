@@ -2297,3 +2297,39 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 /* 챔피언십 조 편성: 끝난 지역의 LCQ 진출 팀을 미리 넣은 예상 자리 */
 .tag.prov { border-style: dashed; border-color: var(--steel); color: var(--steel); }
 .cg-row.prov .cg-seed { opacity: .6; }
+
+/* ---------- 챔피언십 전체 일정 (일정 탭, champsSched) ---------- */
+.csd-jump { margin: 4px 0 18px; }
+.csd { display: grid; gap: 12px; container-type: inline-size; }
+@media (min-width: 900px) { .csd { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); align-items: start; } }
+.csd-day { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-md, 6px); padding: 10px 12px 6px; min-width: 0; }
+.csd-day.live { border-color: var(--apex); }
+.csd-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 0 0 6px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.csd-h b { font: 800 11px/1 var(--display, Inter), sans-serif; letter-spacing: .16em; color: var(--up); }
+.csd-h > span { font-weight: 800; }
+.csd-h small { flex-basis: 100%; color: var(--steel); font-weight: 600; font-size: 12px; }
+.csd-day.done .csd-h b { color: var(--steel); }
+.csd-list { list-style: none; margin: 0; padding: 0; }
+.csd-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 2px 10px; align-items: start; padding: 8px 0; border-top: 1px dashed var(--rule); }
+.csd-row:first-child { border-top: 0; }
+.csd-row.done { opacity: .8; }
+.csd-row.live .csd-n { color: var(--apex); }
+.csd-t { font-weight: 800; font-size: 14px; padding-top: 1px; }
+.csd-t small { display: block; font-size: 10.5px; font-weight: 600; color: var(--steel); line-height: 1.25; }
+.csd-b { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.csd-n { font-weight: 700; color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule); align-self: flex-start; line-height: 1.35; }
+.csd-n:hover { border-color: var(--apex); }
+.csd-from { color: var(--steel); font-size: 12px; line-height: 1.35; }
+.csd-mine, .csd-top { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.csd-mine .tag { font-size: 10.5px; padding: 1px 5px; }
+.csd-mine small { color: var(--steel); font-size: 11px; }
+.csd-top { font-size: 12px; font-weight: 700; gap: 2px 10px; }
+.csd-top i { font-style: normal; color: var(--steel); font-weight: 600; margin-right: 3px; }
+.csd-top span:nth-child(1) i { color: var(--gold, #c9a227); }
+.csd-s { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+.csd-until { color: var(--steel); font-size: 11.5px; white-space: nowrap; }
+.csd-gs { display: flex; flex-direction: column; gap: 2px; margin: 2px 0 6px; padding: 8px 10px; border-left: 2px solid var(--up); background: color-mix(in srgb, var(--up) 7%, transparent); border-radius: 0 4px 4px 0; }
+.csd-gs a { font-weight: 700; color: inherit; font-size: 13.5px; }
+.csd-gs small { color: var(--steel); font-size: 12px; }
+.csd-row.nt { grid-template-columns: minmax(0, 1fr) auto; }
+.csd-wait { margin-left: auto; font-style: normal; font-size: 12px; font-weight: 600; color: var(--steel); }
