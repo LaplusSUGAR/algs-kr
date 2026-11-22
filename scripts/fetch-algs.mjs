@@ -176,9 +176,11 @@ async function collect(season, prev) {
   }
 
   // 최신 Split 프로리그 동점 기준 자료 (규정 부록 C7.2, CP 동점 C7.3 셋째 단계가 'Split 2만 놓고 C7.2'):
-  //   plTie: { teamId: [게임 점수 합(= 시리즈 Round Score 합), 시리즈 1위 횟수, 단일 시리즈 최고 Round Score] }
-  //   (C7.2의 게임 1위 횟수·단일 게임 최고 점수는 게임별 기록이 필요해 싣지 않는다)
-  //   끝난 시리즈 결과는 바뀌지 않으므로 plTieSeries(시리즈 ID → [[팀 ID, 점수, 순위]])에 두고 다시 받지 않는다
+  //   plTie: { teamId: [(A) 게임 점수 합, (B) 시리즈 1위 횟수, (C) 게임 1위 횟수, (D) 단일 시리즈 최고 Round Score, (E) 단일 게임 최고 점수] }
+  //   (C)(E)는 게임별 기록이 필요해, 모든 시리즈의 게임 기록을 받은 뒤에만 채운다(그 전에는 null: 화면·빌드가 건너뛴다)
+  //   끝난 시리즈 결과는 바뀌지 않으므로 plTieSeries(시리즈 ID → [[팀 ID, 점수, 순위, 게임 1위 수, 최고 게임 점수]])에 두고 다시 받지 않는다
+  //   게임 기록은 시리즈마다 /matches + 게임 수만큼 받아야 해서, 한 번 실행에 PL_GAME_BUDGET 개 시리즈씩 나눠 채운다
+  const PL_GAME_BUDGET = Number(process.env.ALGS_PL_GAME_BUDGET) || 12;
   const plTieSeries = { ...(prev?.plTieSeries || {}) };
   const plSer = allSeries.filter((s) => s.status === 'completed' && (s.event?.slug || '').startsWith(`split-${latestSplit}-pro-league-`));
   for (const k of Object.keys(plTieSeries)) if (!plSer.some((s) => s.id === k)) delete plTieSeries[k];
@@ -188,9 +190,32 @@ async function collect(season, prev) {
     const rows = (plSt[k]?.teams || []).filter((t) => (t.teamId || t.id) && t.points != null).map((t) => [t.teamId || t.id, t.points, t.position]);
     if (rows.length) plTieSeries[s.id] = rows;
   }
+  // 게임 기록이 아직 없는 시리즈(행 길이 3)를 예산만큼 채운다
+  const plNoGames = plSer.filter((s) => plTieSeries[s.id]?.[0]?.length === 3).slice(0, PL_GAME_BUDGET);
+  const plGames = await pmap(plNoGames, async (s) => {
+    const m = await get(`/series/${s.id}/matches`).catch(() => null);
+    const nums = (m?.matches || []).filter((y) => y.status === 'completed').map((y) => y.matchNumber);
+    if (!nums.length) return null;
+    const gs = [];
+    for (const n of nums) { const j = await get(`/stats/series/${s.id}/match/number/${n}`).catch(() => null); if (!j?.teams?.length) return null; gs.push(j.teams); }
+    return gs;
+  }, 2);
+  for (const [k, s] of plNoGames.entries()) {
+    const gs = plGames[k];
+    if (!gs) continue;
+    const by = {};
+    for (const teamsOfGame of gs) for (const t of teamsOfGame) { const id = t.teamId || t.id; if (!id) continue; const o = (by[id] ||= [0, 0]); if (t.placement === 1) o[0]++; o[1] = Math.max(o[1], t.points ?? 0); }
+    plTieSeries[s.id] = plTieSeries[s.id].map(([id, pts, pos]) => [id, pts, pos, by[id]?.[0] ?? 0, by[id]?.[1] ?? 0]);
+  }
+  const plFull = plSer.length > 0 && plSer.every((s) => plTieSeries[s.id]?.[0]?.length === 5);
   const plTie = {};
-  for (const rows of Object.values(plTieSeries)) for (const [id, pts, pos] of rows) { const o = (plTie[id] ||= [0, 0, 0]); o[0] += pts; if (pos === 1) o[1]++; o[2] = Math.max(o[2], pts); }
-  if (plNew.length) console.log(`[algs] 프로리그 Split ${latestSplit} 동점 자료: 시리즈 ${Object.keys(plTieSeries).length}/${plSer.length}개 (새로 ${plNew.length}개)`);
+  for (const rows of Object.values(plTieSeries)) for (const [id, pts, pos, mw, bm] of rows) {
+    const o = (plTie[id] ||= [0, 0, plFull ? 0 : null, 0, plFull ? 0 : null]);
+    o[0] += pts; if (pos === 1) o[1]++; o[3] = Math.max(o[3], pts);
+    if (plFull) { o[2] += mw; o[4] = Math.max(o[4], bm); }
+  }
+  const plWithGames = plSer.filter((s) => plTieSeries[s.id]?.[0]?.length === 5).length;
+  if (plNew.length || plNoGames.length) console.log(`[algs] 프로리그 Split ${latestSplit} 동점 자료: 시리즈 ${Object.keys(plTieSeries).length}/${plSer.length}개 (새로 ${plNew.length}개), 게임 기록 ${plWithGames}/${plSer.length}개`);
 
   // 가장 최근 국제전(Playoffs/Championship)의 첫 단계 누적 순위
   const intlEvent = season.tournaments.flatMap((t) => t.events).filter((e) => /playoffs|champs/.test(e.slug) && e.phases.length)

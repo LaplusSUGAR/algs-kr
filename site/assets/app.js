@@ -20,11 +20,11 @@ function unpack(d) {
 let A = unpack(window.ALGS);
 // 대진 구조(단계·진출 규칙·진행 그림)는 규칙 파일(config/rules/<시즌>.json 의 brackets)에서 온다. 진행 방식이 바뀌면 그 파일만 고친다
 //   LCQ_STAGES·CH_BK: 단계 표 / LCQ_FLOW·CH_FLOW: 단계 ← [앞 단계, 몇 위부터, 몇 위까지] (다음 경기 점수표 칸) / *_FLOW_L: 진행 그림 / CH_GS: 조별 리그 대진 / PO_FLOW_L: 플레이오프 그림
-let LCQ_STAGES, LCQ_FLOW, LCQ_FLOW_L, CH_GS, CH_BK, CH_FLOW, CH_FLOW_L, PO_FLOW_L;
+let LCQ_STAGES, LCQ_FLOW, LCQ_FLOW_L, CH_GS, CH_GS_DAYS, CH_BK, CH_FLOW, CH_FLOW_L, PO_FLOW_L;
 function loadBrackets() {
   const K = A.season?.brackets || {}, L = K.lcq || {}, H = K.championship || {};
   LCQ_STAGES = L.stages || []; LCQ_FLOW = L.feeds || {}; LCQ_FLOW_L = L.flow || { h: 0, nodes: {}, edges: [] };
-  CH_GS = H.groupMatches || []; CH_BK = H.stages || []; CH_FLOW = H.feeds || {}; CH_FLOW_L = H.flow || { h: 0, nodes: {}, edges: [] };
+  CH_GS = H.groupMatches || []; CH_GS_DAYS = H.groupDays || null; CH_BK = H.stages || []; CH_FLOW = H.feeds || {}; CH_FLOW_L = H.flow || { h: 0, nodes: {}, edges: [] };
   PO_FLOW_L = K.playoffs?.flow || { nodes: {}, edges: [] };
 }
 loadBrackets();
@@ -2126,12 +2126,14 @@ function champsSeeds() {
 }
 /* ---------- 챔피언십: 조 편성 · 조별 리그 · 브래킷 · 결승 (LCQ와 같은 탭 형식) ---------- */
 // 공식 시리즈가 나오기 전 기본 일정: Split 2 플레이오프와 같은 형식·순서
-//   1일차 조별 리그 A-B · C-D · B-D, 2일차 A-C · B-C · A-D (각 6게임, 조마다 다른 세 조와 한 번씩)
+//   1일차 조별 리그 A-B · C-D · B-D · A-C, 2일차 B-C · A-D (각 6게임, 조마다 다른 세 조와 한 번씩, 부록 D7·규칙 파일 groupDays)
 //   조별 리그 누적 1~20위 → 승자 라운드, 21~40위 → 패자부활 1라운드
 //   3일차 브래킷: 패자부활 1R(상위 10 → 패자 2R) · 승자 라운드(상위 10 → 결승, 하위 10 → 패자 2R) · 패자부활 2R(상위 10 → 결승)
 //   4일차 매치 포인트 결승 20팀
 // 공식 시리즈(Group X vs Y, Winners Round …)가 생기면 공식 이름·순서·시각·결과를 쓴다
 // 조별 리그 대진(CH_GS)·단계(CH_BK)·진출 규칙(CH_FLOW)은 규칙 파일 brackets.championship 에 있다
+// 조별 리그 i번째(0부터) 시리즈가 며칠째인가(0부터): 규칙 파일 groupDays(날마다 시리즈 수, 챔피언십은 부록 D7의 [4, 2]). 없으면 반반
+const gsDay = (i, n) => { const D = CH_GS_DAYS; if (!D?.length) return i < n / 2 ? 0 : 1; let k = 0; for (let d = 0; d < D.length; d++) { k += D[d]; if (i < k) return d; } return D.length - 1; };
 const addDay = (ymd, n) => { const d = new Date(ymd + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const champsSeries = () => A.series.filter((s) => (s.eventSlug || '').startsWith('champs'));
 const champsNow = () => intlCurrent() && /champs/.test(A.intl?.slug || '');
@@ -2161,7 +2163,7 @@ function champsBracket() {
   const stOf = (S, x) => ({ ...S, s: x, start: x?.start, tbd: !!x?.timeTbd, status: !x ? 'none' : x.status === 'completed' ? 'completed' : x.live || x.status === 'live' ? 'live' : 'pending' });
   const pairs = offGs.length ? offGs.map((x) => x.name.match(/^Group ([A-D]) vs ([A-D])$/).slice(1)) : CH_GS;
   const gsl = pairs.map(([g1, g2], i) => {
-    const st = stOf({ key: `g${i + 1}`, ko: `조별 리그 ${g1}조 vs ${g2}조`, tab: `${g1} vs ${g2}`, n: 20, date: day(i < pairs.length / 2 ? 0 : 1) }, offGs[i]);
+    const st = stOf({ key: `g${i + 1}`, ko: `조별 리그 ${g1}조 vs ${g2}조`, tab: `${g1} vs ${g2}`, n: 20, date: day(gsDay(i, pairs.length)) }, offGs[i]);
     st.slots = seeds.filter((t) => t.group === g1 || t.group === g2).map(slotOfSeed);
     st.from = `<span>${g1}조 10팀 + ${g2}조 10팀</span>`;
     return st;
@@ -2536,8 +2538,8 @@ function plS2(r) {
   if (!PLIX || PLIX.src !== A.pl) { const m = new Map(); for (const p of Object.values(A.pl || {})) if (p.split === lastSplit()) for (const x of p.rows) m.set(x.id, x); PLIX = { src: A.pl, m }; }
   return PLIX.m.get(r.id);
 }
-// C7.2 (Split 2만): 게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수 (빌드가 공식 시리즈 결과로 tb 를 싣는다). 자료가 없으면 프로리그 포인트 → 킬로 근사. scripts/build-data.mjs 의 c72 와 같은 규칙
-const c72 = (a, b) => (a?.tb && b?.tb ? b.tb[0] - a.tb[0] || b.tb[1] - a.tb[1] || b.tb[2] - a.tb[2] : (b?.rs ?? 0) - (a?.rs ?? 0) || (b?.kills ?? 0) - (a?.kills ?? 0));
+// C7.2 (Split 2만): 게임 점수 합 → 시리즈 1위 횟수 → 게임 1위 횟수 → 단일 시리즈 최고 점수 → 단일 게임 최고 점수 (빌드가 공식 결과로 tb 를 싣는다, 게임 기록 전에는 셋째·다섯째가 null). 자료가 없으면 프로리그 포인트 → 킬로 근사. scripts/build-data.mjs 의 c72 와 같은 규칙
+const c72 = (a, b) => { const x = a?.tb, y = b?.tb; if (x && y) { for (const i of [0, 1, 2, 3, 4]) if (x[i] != null && y[i] != null && x[i] !== y[i]) return y[i] - x[i]; return 0; } return (b?.rs ?? 0) - (a?.rs ?? 0) || (b?.kills ?? 0) - (a?.kills ?? 0); };
 const cpTie = (a, b) => { const d = poPos(a) - poPos(b); if (d) return d; const pa = plS2(a), pb = plS2(b); return (pa?.pos ?? 99) - (pb?.pos ?? 99) || c72(pa, pb); };
 // 직행 확정(빌드가 meta.cpLock으로 알려 줌, 규정 3.6.3): 확정된 32팀은 항상 직행권 안, 나머지는 항상 밖. 그 안에서만 CP 순으로 줄을 세운다
 let LOCKIX = null;

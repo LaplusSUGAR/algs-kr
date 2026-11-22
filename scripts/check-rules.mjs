@@ -87,6 +87,7 @@ if (!mine) warn.push(`규칙 파일이 ${rules.season} 것(${file})입니다. ${
     const gm = B.championship.groupMatches, cnt = {};
     for (const [x, y] of gm) { cnt[x] = (cnt[x] || 0) + 1; cnt[y] = (cnt[y] || 0) + 1; }
     if (Object.keys(cnt).length !== C.groups || Object.values(cnt).some((v) => v !== C.groups - 1)) bad.push('챔피언십 조별 리그 대진이 조마다 다른 조와 한 번씩이 아님');
+    if (B.championship.groupDays && B.championship.groupDays.reduce((a, b) => a + b, 0) !== gm.length) bad.push('챔피언십 groupDays 합 ≠ 조별 리그 시리즈 수');
     if (B.championship.feeds.wr?.[0]?.[2] !== C.groupStage.toWinners) bad.push('챔피언십 승자 라운드 진출 수 ≠ championship.groupStage.toWinners');
   }
   check('대진 구조 표 = 규정 숫자', bad);

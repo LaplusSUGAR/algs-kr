@@ -200,17 +200,19 @@ for (const t of Object.values(teams)) {
   if (o) Object.assign(t, o);
 }
 
-// 규정 부록 C7.2 (프로리그 순위 동점): 게임 점수 합 → 시리즈 1위 횟수 → (게임 1위 횟수: 자료 없음) → 단일 시리즈 최고 점수.
-//   두 팀 모두 자료(tb)가 있을 때만 쓰고, 없으면 프로리그 포인트 → 킬로 근사한다. 화면 app.js 의 c72 와 같은 규칙
+// 규정 부록 C7.2 (프로리그 순위 동점): (A) 게임 점수 합 → (B) 시리즈 1위 횟수 → (C) 게임 1위 횟수 → (D) 단일 시리즈 최고 점수 → (E) 단일 게임 최고 점수.
+//   tb = fetch-algs 의 plTie [A, B, C|null, D, E|null]. (C)(E)는 게임 기록을 다 받기 전에는 null 이라 건너뛴다.
+//   두 팀 모두 자료가 있을 때만 쓰고, 없으면 프로리그 포인트 → 킬로 근사한다. 화면 app.js 의 c72 와 같은 규칙
 const c72 = (a, b) => {
-  if (a?.tb && b?.tb) return b.tb[0] - a.tb[0] || b.tb[1] - a.tb[1] || b.tb[2] - a.tb[2];
+  const x = a?.tb, y = b?.tb;
+  if (x && y) { for (const i of [0, 1, 2, 3, 4]) if (x[i] != null && y[i] != null && x[i] !== y[i]) return y[i] - x[i]; return 0; }
   return (b?.rs ?? 0) - (a?.rs ?? 0) || (b?.kills ?? 0) - (a?.kills ?? 0);
 };
 // ---------- 챔피언십 포인트 (공식 값) ----------
 const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => ({ rank, id, short, name, region: normRegion(region), total, players }));
 // CP 동률 (공식 규정 부록 C7.3, 화면의 정산 순위와 같은 규칙):
 //   (A) Split 2 플레이오프 최종 순위 (미출전은 뒤) → (B) 프로리그 Split 2 최종 순위
-//   → (C) Split 2만 놓고 C7.2: 게임 점수 합 → 시리즈 1위 횟수 → 단일 시리즈 최고 점수(plTie, 공식 시리즈 결과 합산)
+//   → (C) Split 2만 놓고 C7.2: 게임 점수 합 → 시리즈 1위 횟수 → 게임 1위 횟수 → 단일 시리즈 최고 점수 → 단일 게임 최고 점수(plTie, 공식 결과 합산)
 //   → 자료가 없으면 프로리그 포인트 → 킬로 근사 → 마지막은 공식 순위
 {
   const po = new Map(((algs.cpEvents || []).find(([, slug]) => slug === tieSlug)?.[2] || []).filter((r) => r[2]).map((r) => [r[2], r[0]]));
@@ -276,7 +278,7 @@ for (const [key, rows] of Object.entries(algs.pl)) {
     const lpPos = lp?.get(nameKey(name)) ?? lp?.get(nameKey(teams[id]?.name));
     if (lpPos && lpPos !== pos) { conflicts.push({ what: `${key} 최종 순위`, team: name, lp: lpPos, algs: pos }); finalPos = lpPos; src = 'lp'; }
     else if (lpPos) src = 'lp+algs';
-    // tb: 동점 기준(C7.2) 자료 [게임 점수 합, 시리즈 1위 횟수, 단일 시리즈 최고 점수]. 최신 Split만 (CP 동점 C7.3 셋째 단계용)
+    // tb: 동점 기준(C7.2) 자료 [게임 점수 합, 시리즈 1위 횟수, 게임 1위 횟수|null, 단일 시리즈 최고 점수, 단일 게임 최고 점수|null]. 최신 Split만 (CP 동점 C7.3 셋째 단계용)
     const tb = Number(s.slice(1)) === lastSplit ? algs.plTie?.[id] : null;
     return { pos: finalPos, short: teams[id]?.short || short, name, id, cpPP, cpTeam: cpPP * 3, qualified: !!qualified, rs, group, kills, sp, src, kr: teams[id]?.krLevel || 'none', ...(tb ? { tb } : {}) };
   }).sort((a, b) => a.pos - b.pos);
