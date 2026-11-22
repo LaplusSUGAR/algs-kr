@@ -92,5 +92,37 @@ if (!mine) warn.push(`규칙 파일이 ${rules.season} 것(${file})입니다. ${
   }
   check('대진 구조 표 = 규정 숫자', bad);
 }
+// 7) 게임 점수(C6.1): 끝난 시리즈에서 (팀 점수 − 킬) = 순위 점수 합.
+//    결과 표에 팀이 다 있으면(19팀 이상) 모든 팀의 순위 점수 합 = 게임 수 × 한 게임 순위 점수 총합(지금 규정 54점)이어야 한다.
+//    팀 하나는 0 이상, 게임 수 × 1위 점수 이하. 점수표가 바뀌었거나(새 시즌), 공식 값에 다시 치른 게임·벌점이 섞이면 여기서 드러난다
+{
+  const bad = [];
+  const P = rules.match.placement, top = P[0]?.[1] || 0, perGame = P.reduce((a, [, v]) => a + v, 0);
+  const lobby = rules.match.teamsPerLobby || 20;
+  for (const r of snap.series || []) {
+    const [, , , name, status, , region, , games, res] = r;
+    if (status !== 'completed' || !res?.length || !games) continue;
+    const tag = `${region} ${name}`;
+    for (const [, short, pts, kills] of res) { const pp = pts - kills; if (pp < 0 || pp > games * top) bad.push(`${tag} ${short} 순위 점수 ${pp}`); }
+    if (res.length >= lobby - 1) { const sum = res.reduce((a, x) => a + x[2] - x[3], 0); if (sum !== games * perGame) bad.push(`${tag} 순위 점수 합 ${sum} (게임 ${games}개 × ${perGame} = ${games * perGame})`); }
+  }
+  check(`게임 점수 = 규정 C6.1 (순위 점수 + 킬)`, bad);
+}
+// 8) 매치 포인트(C5): MP 표시 팀은 결승 점수가 기준(50점) 이상, 우승 표시는 한 팀이고 1위. 매치 포인트 방식이 아닌 시리즈에는 표시가 없어야 한다
+{
+  const bad = [], mp = rules.matchPoint.threshold;
+  for (const r of snap.series || []) {
+    const [, , , name, status, , region, isMp, , res] = r;
+    if (!res?.length) continue;
+    const tag = `${region} ${name}`;
+    const won = res.filter((x) => x[4] === 2);
+    if (!isMp) { if (res.some((x) => x[4])) bad.push(`${tag}: 매치 포인트 방식이 아닌데 MP 표시`); continue; }
+    for (const x of res) if (x[4] && x[2] < mp) bad.push(`${tag} ${x[1]} ${x[2]}점인데 MP 표시`);
+    if (won.length > 1) bad.push(`${tag}: 우승 표시 ${won.length}팀`);
+    if (won.length && won[0][0] !== 1) bad.push(`${tag}: 우승 팀 ${won[0][1]} 이 ${won[0][0]}위`);
+    if (status === 'completed' && !won.length) bad.push(`${tag}: 끝났는데 우승 표시 없음`);
+  }
+  check(`매치 포인트 ${mp}점 = 규정 C5`, bad);
+}
 for (const w of warn) console.log(`[rules] 경고 ${w}`);
 console.log(`[rules] ${rules.season} 규칙 ${rules.source?.edition || ''}: 확인 ${ok.length}항목${warn.length ? `, 경고 ${warn.length}건` : ''} (${ok.join(' · ')})`);
