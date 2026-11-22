@@ -2229,9 +2229,24 @@ function champsView(q, base) {
     ? `<li class="cg-row tbd"><span class="cg-seed">${t.seed}</span><span class="cg-team"><span class="tag lcq">LCQ</span></span><small class="cg-reg">미정</small><span class="cg-cp"></span></li>`
     : `<li class="cg-row ${rowCls(t)}"><span class="cg-seed">${t.seed}</span><span class="cg-team">${krDot(null, t.short)}${teamLink(t.short, team(t.short) ? t.short : undefined)}${t.via === 'lcq' ? ' <span class="tag lcq">LCQ</span>' : ''}</span><small class="cg-reg">${esc(REGION_S[t.region] || '')}</small><span class="cg-cp num">${t.total ? fmt(t.total) : '–'}</span></li>`;
   const groupsHtml = `<div class="cg-grid">${GROUPS.map((g) => { const ts = seeds.filter((t) => t.group === g); const nF = ts.filter((t) => !t.tbd && isF(t.short)).length; return `<section class="cg" aria-label="${g}조"><h3 class="cg-h"><b>${g}조</b><small>${ts.filter((t) => !t.tbd).length}팀 확정${ts.some((t) => t.tbd) ? ` · LCQ ${ts.filter((t) => t.tbd).length}자리` : ''}${nF ? ` · ${esc(ML().tag)} ${nF}` : ''}</small></h3><ol class="cg-list">${ts.map(row).join('')}</ol></section>`; }).join('')}</div>`;
+  // LCQ 진출 팀: 시드 근거(규정 3.8.1)가 읽히게 팀마다 결승 순위 · 결승 점수 · 지금 CP, 네 지역이 끝나면 시드 번호
+  const cpNow = new Map(cpStanding().map((r) => [r.short, r.total || 0]));
+  const seedOf = new Map(seeds.filter((t) => t.via === 'lcq' && !t.tbd).map((t) => [t.short, t.seed]));
+  const qTeam = (x, sh, i) => {
+    const c = cpNow.get(sh) || 0, sd = seedOf.get(sh);
+    return `<div class="cq-t"><div class="cq-n"><b class="cq-pos">결승 ${i + 1}위</b>${teamLink(sh)}</div><small class="cq-m"><span>결승 ${fmt(x.pts[i] ?? 0)}점</span><span>CP ${c ? fmt(c) : '0'}</span>${sd ? `<span class="cq-sd">${sd}번 시드</span>` : ''}</small></div>`;
+  };
+  const qState = (x) => { const e = lcqEvents().find((y) => y.region === x.region); return e && lcqBracket(e).started ? 'LCQ 진행 중' : 'LCQ 전'; };
   const qBox = `<section class="sec" aria-labelledby="h-cq"><h2 class="h2" id="h-cq">LCQ 진출 팀 <small class="muted">지역별 2팀</small></h2>
-    <div class="cq-grid">${Q.map((x) => `<div class="cq"><b>${esc(REGION[x.region])}</b>${x.done ? x.teams.map((sh) => `<span>${teamLink(sh)}</span>`).join('') : `<span class="muted">${lcqEvents().find((e) => e.region === x.region) && lcqBracket(lcqEvents().find((e) => e.region === x.region)).started ? 'LCQ 진행 중' : 'LCQ 전'}</span>`}</div>`).join('')}</div>
-    <p class="caption">${allDone ? 'LCQ 진출 8팀을 CP 순서대로 33~40번 자리에 넣었습니다. CP가 같으면 LCQ 결승 순위가 높은 팀이 앞입니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</p></section>`;
+    <div class="cq-grid">${Q.map((x) => `<div class="cq"><b>${esc(REGION[x.region])}</b>${x.done ? x.teams.map((sh, i) => qTeam(x, sh, i)).join('') : `<span class="muted">${qState(x)}</span>`}</div>`).join('')}</div>
+    <p class="caption"><span>${allDone ? 'LCQ 진출 8팀을 CP 순서대로 33~40번 자리에 넣었습니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</span> <span>CP는 지금 챔피언십 포인트입니다.</span></p>
+    <div class="cq-how"><b>LCQ 진출 팀 시드 순서 <small>규정 3.8.1</small></b><ol>
+      <li>CP가 높은 팀이 앞</li>
+      <li>CP가 같으면 LCQ 결승 순위가 높은 팀</li>
+      <li>그래도 같으면 LCQ 결승 점수가 높은 팀</li>
+      <li>그래도 같으면 결승 한 게임 최고 점수가 높은 팀</li>
+      <li>그래도 같으면 추첨</li>
+    </ol></div></section>`;
   const how = `<section class="sec" aria-labelledby="h-ch-how"><h2 class="h2" id="h-ch-how">진행 방식</h2>${stageFlow(B, CH_FLOW_L, (k) => qsLink(base, q, { m: k }), '챔피언십 진행 방식')}</section>`;
   const groupsTab = `${how}${schedTable(B)}
     <section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.official ? '공식 조 배정입니다.' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}</p>${groupsHtml}</section>${qBox}`;
