@@ -2262,7 +2262,11 @@ function champsView(q, base) {
   const def = live?.key || (B.started ? (nextUp || B.list.filter((st) => st.status === 'completed').at(-1))?.key : null) || 'groups';
   const m = ['groups', 'sched'].includes(q.get('m')) || B.list.some((st) => st.key === q.get('m')) ? q.get('m') : def;
   const tabs = [['groups', '조 편성', null], ['sched', '일정', null], ...B.list.map((st) => [st.key, st.tab, st])];
-  const tabBar = `<nav class="lcq-tabs wrap" aria-label="챔피언십 경기"><div class="seg">${tabs.map(([k, n, st]) => `<a href="${qsLink(base, q, { m: k })}" aria-current="${k === m}">${esc(n)}${st?.status === 'live' ? ' <span class="tab-live" aria-label="LIVE"></span>' : st?.status === 'completed' ? ' <small class="tab-done">종료</small>' : st && stTab(st) ? ` <small class="tab-when">${esc(stTab(st))}</small>` : ''}</a>`).join('')}</div></nav>`;
+  // 탭 줄 두 줄: 윗줄 조별 리그(조 편성 · 조별 경기 · 조별 순위), 아랫줄 나머지(일정 · 브래킷 · 결승). 줄마다 한 줄이고 넘치면 그 줄만 옆으로 민다
+  const tabA = (k, n, st) => `<a href="${qsLink(base, q, { m: k })}" aria-current="${k === m}">${esc(n)}${st?.status === 'live' ? ' <span class="tab-live" aria-label="LIVE"></span>' : st?.status === 'completed' ? ' <small class="tab-done">종료</small>' : st && stTab(st) ? ` <small class="tab-when">${esc(stTab(st))}</small>` : ''}</a>`;
+  const isGs = (k) => k === 'groups' || k === 'gs' || /^g\d/.test(k);
+  const tabRow = (lab, list) => `<div class="seg" role="group" aria-label="${esc(lab)}"><span class="seg-lab" aria-hidden="true">${esc(lab)}</span>${list.map(([k, n, st]) => tabA(k, n, st)).join('')}</div>`;
+  const tabBar = `<nav class="lcq-tabs rows" aria-label="챔피언십 경기">${tabRow('조별 리그', tabs.filter(([k]) => isGs(k)))}${tabRow('브래킷 · 결승', tabs.filter(([k]) => !isGs(k)))}</nav>`;
   const row = (t) => t.tbd
     ? `<li class="cg-row tbd"><span class="cg-seed">${t.seed}</span><span class="cg-team"><span class="tag lcq">LCQ</span></span><small class="cg-reg">미정</small><span class="cg-cp"></span></li>`
     : `<li class="cg-row ${rowCls(t)}${t.prov ? ' prov' : ''}"><span class="cg-seed">${t.seed}</span><span class="cg-team">${krDot(null, t.short)}${teamLink(t.short, team(t.short) ? t.short : undefined)}${t.via === 'lcq' ? ' <span class="tag lcq">LCQ</span>' : ''}${t.prov ? ' <span class="tag prov">예상</span>' : ''}</span><small class="cg-reg">${esc(REGION_S[t.region] || '')}</small><span class="cg-cp num">${t.total ? fmt(t.total) : '–'}</span></li>`;
