@@ -2334,14 +2334,17 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .csd-row.nt { grid-template-columns: minmax(0, 1fr) auto; }
 .csd-wait { margin-left: auto; font-style: normal; font-size: 12px; font-weight: 600; color: var(--steel); }
 
-/* 챔피언십 경기 탭 줄: 옆으로 밀지 않고 줄을 바꿔 모든 탭이 한 번에 보이게 (운영자 요청 11-22) */
-.lcq-tabs.wrap { overflow: visible; }
-.lcq-tabs.wrap .seg, .st-stick .lcq-tabs.wrap .seg { flex-wrap: wrap; white-space: normal; width: auto; max-width: none; -webkit-mask-image: none; mask-image: none; row-gap: 2px; }
-.lcq-tabs.wrap .seg a { white-space: nowrap; }
+/* 챔피언십 경기 탭 줄: 윗줄 조별 리그, 아랫줄 일정·브래킷·결승 (운영자 요청 11-22). 줄마다 한 줄, 넘치면 그 줄만 옆으로 */
+.lcq-tabs.rows { overflow: visible; display: grid; gap: 0; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-md, 6px); padding: 2px 3px; }
+.lcq-tabs.rows .seg, .st-stick .lcq-tabs.rows .seg { background: transparent; border: 0; border-radius: 0; box-shadow: none; padding: 2px 0; }
+.lcq-tabs.rows .seg + .seg { border-top: 1px dashed var(--rule); }
+.lcq-tabs.rows .seg { display: flex; width: auto; max-width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; align-items: center; }
+.lcq-tabs.rows .seg::-webkit-scrollbar { display: none; }
+.lcq-tabs.rows .seg a { flex: none; }
+.seg-lab { flex: none; align-self: stretch; display: flex; align-items: center; padding: 0 10px 0 8px; margin-right: 2px; border-right: 1px solid var(--rule); font: 800 10px/1 var(--display, Inter), sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--steel); white-space: nowrap; }
+.seg-lab { min-width: 136px; box-sizing: border-box; }
 @media (max-width: 720px) {
-  .lcq-tabs.wrap .seg a { padding: 5px 8px; font-size: 12.5px; }
-  .lcq-tabs.wrap small { font-size: 10px; }
+  .seg-lab { display: none; }
+  .lcq-tabs.rows .seg a { padding: 5px 8px; font-size: 12.5px; }
+  .lcq-tabs.rows small { font-size: 10px; }
 }
-@media (min-width: 721px) { .lcq-tabs.wrap .seg a { padding: 6px 9px; } }
-/* 휴대폰은 줄을 바꾸면 3~5줄이 되어 붙어 따라오면 화면을 너무 가린다: 맨 위에만 두고 따라오지 않게 */
-@media (max-width: 720px) { .st-stick:has(> .lcq-tabs.wrap) { position: static; } }
