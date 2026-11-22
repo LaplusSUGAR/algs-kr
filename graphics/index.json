@@ -133,6 +133,18 @@
    "series": [
     "~ld"
    ]
+  },
+  "year-6/lcq/apac-n/20261122-1700-f-results.png": {
+   "kind": "results",
+   "region": "apac-n",
+   "event": "last-chance-qualifier-apac-north",
+   "start": "2026-11-22T08:00:00.000Z",
+   "title": "매치 포인트 결승 결과",
+   "hash": "5486fe620678",
+   "made": "2026-11-22T13:26:53.161Z",
+   "series": [
+    "~ld"
+   ]
   }
  }
 }
