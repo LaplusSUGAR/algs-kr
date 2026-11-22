@@ -2280,3 +2280,20 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .lv-player.multi .lv-x:focus-visible, .lv-player.multi .lv-big:focus-visible { outline: 2px solid #00E5FF; outline-offset: -2px; }
 .lv-player.multi .lv-tiles[data-n='3'] .lv-tbar, .lv-player.multi .lv-tiles[data-n='4'] .lv-tbar { padding: 0 0 0 6px; font-size: 11px; }
 .lv-player.multi .lv-tiles[data-n='3'] .lv-x, .lv-player.multi .lv-tiles[data-n='4'] .lv-x { width: 24px; height: 22px; font-size: 15px; }
+
+/* LCQ 진출 팀: 팀마다 결승 순위 · 결승 점수 · CP (시드 근거, 규정 3.8.1) */
+.cq { gap: 8px; }
+.cq-t { display: grid; gap: 2px; min-width: 0; }
+.cq-t + .cq-t { padding-top: 8px; border-top: 1px solid var(--rule); }
+.cq-n { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-weight: 700; }
+.cq-n a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cq-pos { flex: none; font-size: 11px; color: var(--steel); font-weight: 700; letter-spacing: .02em; }
+.cq-m { display: flex; flex-wrap: wrap; gap: 2px 8px; font-size: 12px; color: var(--steel); font-variant-numeric: tabular-nums; }
+.cq-m .cq-sd { color: var(--ink); font-weight: 700; }
+.cq-how { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: var(--r-sm); font-size: 13px; }
+.cq-how b { display: block; margin-bottom: 4px; font-size: 13px; }
+.cq-how b small { margin-left: 6px; font-weight: 500; color: var(--steel); }
+.cq-how ol { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+/* 챔피언십 조 편성: 끝난 지역의 LCQ 진출 팀을 미리 넣은 예상 자리 */
+.tag.prov { border-style: dashed; border-color: var(--steel); color: var(--steel); }
+.cg-row.prov .cg-seed { opacity: .6; }
