@@ -183,6 +183,10 @@
     ['그래도 같으면 추첨', 'それでも同じなら抽選', 'Still tied: random draw'],
     ['CP는 지금 챔피언십 포인트입니다.', 'CPは現在のチャンピオンシップポイントです。', 'CP is current Championship Points.'],
     ['결승 {n}점', '決勝{1}点', 'Finals {1} pts'],
+    ['끝난 지역의 LCQ 진출 팀을 지금 CP 순서대로 {n}번부터 미리 넣었습니다(예상). 남은 지역이 끝나면 시드와 조가 바뀔 수 있습니다.', '終わった地域のLCQ通過チームを現在のCP順に{1}番から先に入れています（予想）。残りの地域が終わるとシードとグループが変わることがあります。', 'Qualifiers from finished regions are placed from seed {1} by current CP (projected). Seeds and groups may change when the other regions finish.'],
+    ['예상 {n}번 시드 · {t}조', '予想シード{1} · {2}組', 'Projected seed {1} · Group {2}'], ['{n}번 시드 · {t}조', 'シード{1} · {2}組', 'Seed {1} · Group {2}'],
+    ['예상', '予想', 'Projected'],
+    ['‘예상’ 표시 팀은 LCQ 진출이 확정된 팀입니다. 남은 지역 LCQ 결과에 따라 시드와 조가 바뀔 수 있습니다.', '「予想」のチームはLCQ通過が決まったチームです。残りの地域のLCQ結果によってシードとグループが変わることがあります。', 'Teams marked “Projected” have qualified through the LCQ; their seed and group may change once the other regions finish.'],
     ['LCQ 진출 {n}팀을 CP 순서대로 {n}~{n}번 자리에 넣었습니다. CP가 같으면 LCQ 결승 순위가 높은 팀이 앞입니다.', 'LCQ通過{1}チームをCP順に{2}〜{3}番に入れました。CPが同じ場合はLCQ決勝の順位が上のチームが先です。', 'The {1} LCQ qualifiers fill seeds {2}–{3} by CP; ties go to the better LCQ Finals placing.'],
     ['챔피언십 조 편성', 'チャンピオンシップのグループ分け', 'Championship groups'],
     // 이전 결과

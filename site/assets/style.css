@@ -2294,3 +2294,6 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .cq-how b { display: block; margin-bottom: 4px; font-size: 13px; }
 .cq-how b small { margin-left: 6px; font-weight: 500; color: var(--steel); }
 .cq-how ol { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+/* 챔피언십 조 편성: 끝난 지역의 LCQ 진출 팀을 미리 넣은 예상 자리 */
+.tag.prov { border-style: dashed; border-color: var(--steel); color: var(--steel); }
+.cg-row.prov .cg-seed { opacity: .6; }
