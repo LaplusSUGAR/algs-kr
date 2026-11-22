@@ -533,6 +533,10 @@
     cache.set(s, r);
     return r;
   }
+  // 일본어: 가타카나 합성어(エリミネーション+ラウンド 등) 사이에 줄바꿈 자리(폭 없는 공백)를 넣는다. 화면 글자에만 (속성·문서 제목에는 넣지 않음)
+  //   경기 이름 같은 짧은 이름표는 CSS(:lang(ja) … word-break: keep-all)로 이 자리와 띄어쓰기에서만 줄을 바꾼다
+  const JA_SPLIT = /(ウィナーズ|ルーザーズ|エリミネーション|グループ|リージョナル|マッチ|サバイバル|サバイバー|レギュラー|ブラケット)(?=[ァ-ヺ])/g;
+  const jaBreak = (x) => (lang === 'ja' ? x.replace(JA_SPLIT, '$1\u200b') : x);
   const ATTRS = ['title', 'aria-label', 'placeholder', 'alt'];
   function tree(root) {
     if (lang === 'ko' || !root) return;
@@ -540,7 +544,7 @@
     const nodes = [];
     let n;
     while ((n = w.nextNode())) if (HANGUL.test(n.nodeValue)) nodes.push(n);
-    for (const x of nodes) { if (x.parentElement && x.parentElement.closest('script,style,[data-no-tr]')) continue; x.nodeValue = t(x.nodeValue); }
+    for (const x of nodes) { if (x.parentElement && x.parentElement.closest('script,style,[data-no-tr]')) continue; x.nodeValue = jaBreak(t(x.nodeValue)); }
     // data-tr="사전 키": 같은 한국어가 자리마다 다른 뜻일 때 (예: 점수표 '순위' = 순위 점수)
     if (root.querySelectorAll) for (const el of root.querySelectorAll('[data-tr]')) el.textContent = t(el.dataset.tr);
     const els = root.querySelectorAll ? [root, ...root.querySelectorAll('[title],[aria-label],[placeholder],[alt]')] : [];
