@@ -539,6 +539,8 @@
     },
     "championship": {
       "groupMatches": [["A", "B"], ["C", "D"], ["B", "D"], ["A", "C"], ["B", "C"], ["A", "D"]],
+      "groupDays": [4, 2],
+      "_groupDays": "조별 리그 날마다 치르는 시리즈 수 (부록 D7: 1일차 1~4, 2일차 5~6). 공식 시각이 나오기 전 임시 날짜에 쓴다",
       "stages": [
         {"key": "er1", "name": "Elimination Round 1", "ko": "패자부활 1라운드", "tab": "패자 1R", "n": 20, "cut": 10, "up": "패자 2R", "down": "탈락", "day": 2},
         {"key": "wr", "name": "Winners Round", "ko": "승자 라운드", "tab": "승자 라운드", "n": 20, "cut": 10, "up": "결승", "down": "패자 2R", "day": 2},
