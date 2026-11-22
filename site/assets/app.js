@@ -581,7 +581,7 @@ function subtabs(tab, parts, q) {
       : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
     teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].filter((r) => r !== ML().region).map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
-    streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live'], ['개인화면', '#/streams?s=pov', sv === 'pov']] : []), ['ALGS 멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수·코치', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
+    streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live'], ...(povOn() || sv === 'pov' ? [['개인화면', '#/streams?s=pov', sv === 'pov']] : [])] : []), ['ALGS 멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수·코치', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
     rules: [['전체', '#/rules', sv === 'all'], ['영상', '#/rules?s=video', sv === 'video'], ['대회 방식', '#/rules?s=format', sv === 'format'], ['점수·포인트', '#/rules?s=points', sv === 'points']],
   }[tab];
   if (!SUB) return { html: '', cur: '' };
@@ -3207,6 +3207,8 @@ const regionsNow = () => lvMemo('lregs', () => {
   for (const s of A.series) { if (s.live || s.status === 'live') live.add(s.region); else if (nearSeries(s, t)) near.add(s.region); }
   return live.size ? [...live] : [...near];
 });
+// 대회 중(진행 중 경기, 또는 끝나지 않은 경기의 시작 30분 전 ~ 시작 8시간 뒤)에만 공식 개인화면(팀 시점·맵 화면)을 보인다 (운영자 요청 11-22)
+const povOn = () => !FROZEN && regionsNow().length > 0;
 function mapRegion(l) {
   const g = +((/algs(\d+)_map/i.exec(l.key) || [])[1] || 0);
   const G = povGroups().find((x) => x.g === g);
@@ -3319,7 +3321,7 @@ function liveShown(l) {
   if (playWant().includes(liveId(l))) return true;
   if (l.kind === 'official') return officialShown(l.key);
   if (isMapPov(l)) return mapShown(l);
-  if (l.kind === 'pov') return inFocus(povTeam(l));
+  if (l.kind === 'pov') return povOn() && inFocus(povTeam(l));
   if (l.kind === 'partner') return coShown(l);
   if (l.kind === 'creator') return !ML().region && opt.mode !== 'custom';
   if (l.kind === 'player') return ML().region || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
@@ -3457,6 +3459,7 @@ function liveCard(l, i, asLink) {
 function povGroups() {
   return lvMemo('pov', () => {
     const G = new Map();
+    if (!povOn()) return [];
     for (const l of ST?.live || []) {
       if (l.kind !== 'pov' || !l.embed) continue;
       const m = /^v:algs(\d+)_(?:team(\d+)|map)$/i.exec(l.key) || [];
@@ -3480,7 +3483,7 @@ const povCount = (rel) => (ST ? povGroups() : []).reduce((a, x) => a + (rel && !
 const povHeadTxt = () => { const n = povCount(); return `공식 개인화면${n ? ` <small class="muted">${n}</small>` : ''}`; };
 function povInner(page) {
   const groups = ST ? povGroups() : [];
-  if (!groups.length) return page ? `<div class="lv-empty"><b>${ST ? '지금 켜진 공식 개인화면이 없습니다.' : '방송 상태를 확인하는 중입니다.'}</b><p>대회 중에는 팀마다 공식 개인화면(Twitch algs1_team1 … algs1_team20, 맵 화면 algs1_map)이 켜집니다. 켜지면 여기에 팀별로 모여, 눌러서 바로 보거나 여러 화면을 함께 볼 수 있습니다.</p></div>` : '';
+  if (!groups.length) return page ? `<div class="lv-empty"><b>${!povOn() ? '공식 개인화면은 대회 중에만 보입니다.' : ST ? '지금 켜진 공식 개인화면이 없습니다.' : '방송 상태를 확인하는 중입니다.'}</b><p>대회 중에는 팀마다 공식 개인화면(Twitch algs1_team1 … algs1_team20, 맵 화면 algs1_map)이 켜집니다. 켜지면 여기에 팀별로 모여, 눌러서 바로 보거나 여러 화면을 함께 볼 수 있습니다.</p></div>` : '';
   const tile = (it) => {
     const { l } = it, t = it.short && xteam(it.short);
     const name = isMapPov(l) ? '<span>맵 화면</span>' : t ? esc(t.short) : esc(l.pov || l.who);
@@ -3524,7 +3527,7 @@ function liveBody() {
     : '<p class="lead">방송 상태를 확인하는 중입니다.</p>';
   const L = liveList(), teamPov = (l) => l.kind === 'pov' && !isMapPov(l) && !!l.embed; // 팀 시점은 카드 대신 개인화면 타일로
   const off = L.filter((l) => l.kind === 'official' || isMapPov(l) || starPartner(l)), ppl = L.filter((l) => !off.includes(l) && !teamPov(l));
-  const rest = liveAll().filter((l) => !liveShown(l) && !teamPov(l)).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
+  const rest = liveAll().filter((l) => !liveShown(l) && !teamPov(l) && (l.kind !== 'pov' || povOn())).sort((a, b) => (b.viewers ?? 0) - (a.viewers ?? 0));
   const pov = povGroups().length ? povInner(false) : '';
   const others = rest.length ? `<details class="lv-rest"><summary>그 밖의 방송 <small class="muted">${rest.length}</small></summary><p class="caption">위 카드에는 지금 고른 보기(한국 관련 / 지역 / 내 응원 팀)에 맞는 방송만 나옵니다. 여기서 고른 방송도 같은 플레이어와 멀티뷰로 볼 수 있습니다.</p>
     <ul>${rest.map((l) => `<li>${l.embed ? `<button class="lv-add" type="button" data-lvid="${esc(liveId(l))}" aria-label="${esc(l.who)} 방송 재생"><b>${liveWho(l)}</b></button>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.who)}</b></a>`}${l.kind === 'player' && team(l.team) ? ` <small>${teamLink(l.team)}</small>` : ''}<span class="lv-sub">${l.viewers != null ? `<span>시청자 ${fmt(l.viewers)}명</span>` : ''}${l.started ? `<span>${sinceTxt(l.started)}</span>` : ''}</span></li>`).join('')}</ul></details>` : '';
