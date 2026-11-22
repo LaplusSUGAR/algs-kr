@@ -167,6 +167,11 @@
     ]
   ],
   "_broadcasts": "공식 중계 채널. when: 지역(예 apac-n)이면 그 지역 대회 기간(첫 경기 시작 시각 ~ 마지막 경기 12시간 뒤)에만 방송 탭·홈에 보인다. apexOnly: true면 여러 게임을 다루는 채널이라 Apex 방송·영상만 방송 탭과 홈에 보인다(Twitch는 게임 이름, YouTube는 제목·태그에 Apex·ALGS가 있을 때).",
+  "_coStreams": "공식 파트너 중 공동 중계로 공식 중계 바로 다음에 세우는 채널(key 는 방송 목록의 x:이름, 공식 API partnerStreams 에서 온다). global: true 면 국제전(플레이오프·챔피언십) 기간, lcq·pro 는 그 지역(americas·emea·apac-n·apac-s)의 LCQ·프로리그 기간에만. 지역 대회 때는 그 지역 보기와 영어 중계가 보이는 한국 관련·내 응원 팀 보기에서만 카드로, 그 밖에는 '그 밖의 방송'.",
+  "coStreams": [
+    { "key": "x:nicewigg", "who": "NiceWigg", "global": true, "lcq": ["americas"], "pro": ["americas"] },
+    { "key": "x:greek", "who": "Greek", "global": true, "lcq": [], "pro": [] }
+  ],
   "_povChannels": "ALGS 공식 '팀 화면' Twitch 채널(algs1_team1 … algsN_team20, algsN_map). 대회 때만 켜지고, 방송 제목 맨 앞이 그 화면의 팀 이름이다(예: 'Team Falcons | ALGS Year 6 …'). prefixes × 1~teams 번 + map 채널을 방송 서버가 확인한다. 평소에는 꺼져 있어 아무것도 안 보인다.",
   "povChannels": {
     "prefixes": [

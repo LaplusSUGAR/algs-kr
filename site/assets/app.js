@@ -1398,9 +1398,9 @@ function matchItem(s, o = {}) {
   const mt = mainTeam(), mine = !!mt && ((s.lineup || []).includes(mt.short) || (s.results || []).some((r) => r.short === mt.short));
   return `<article class="match${mine ? ' mine' : ''}">
     <time datetime="${s.start}"${s.timeTbd ? ' class="tbd"' : ''}>${sTime(s)}${o.cd ? schCd(s) : ''}</time>
-    <div><div class="what">${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${gameCount(s)} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
+    <div><div class="what">${o.cd && SCH_REG[s.region] && s.region !== 'global' ? `<span class="sreg r-${esc(s.region)}">${esc(SCH_REG[s.region])}</span>` : ''}${olink(officialUrl(s), esc(ko(s.name, PHASE_KO)))} ${gameCount(s)} ${mine ? '<span class="tag mine-tag">내 팀</span>' : ''}${tags}</div>
       <div class="meta">${o.cd
-        ? `${REGION[s.region] ? `<span class="mreg r-${esc(s.region)}">${esc(REGION[s.region])}</span>` : ''}${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' || /Bracket Stage|Match Point Finals/.test(s.phase || '') ? '' : ko(s.phase, PHASE_KO)].filter(Boolean).join(' · '))}` // 지역을 맨 앞 작은 표로, 이름과 겹치는 단계(브래킷·매치 포인트 결승)는 뺀다
+        ? `${REGION[s.region] && s.region === 'global' ? `<span class="mreg r-${esc(s.region)}">${esc(REGION[s.region])}</span>` : ''}${esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' || /Bracket Stage|Match Point Finals/.test(s.phase || '') ? '' : ko(s.phase, PHASE_KO)].filter(Boolean).join(' · '))}` // 지역을 맨 앞 작은 표로, 이름과 겹치는 단계(브래킷·매치 포인트 결승)는 뺀다
         : esc([ko(s.event, EVENT_KO), s.name === 'Regional Finals' ? '' : ko(s.phase, PHASE_KO), REGION[s.region], s.status !== 'completed' ? state : ''].filter(Boolean).join(', '))}</div>
       ${res || lineupLine(s, !!o.cd)}</div>
   </article>`;
@@ -3168,13 +3168,25 @@ function eventOn(test, pre = 0) {
 const regionEventOn = (region) => eventOn((s) => s.region === region);
 // 본 대회(국제전: 플레이오프·챔피언십)와 Americas LCQ. 사전 방송을 생각해 첫 경기 2시간 전부터 친다
 const mainEventOn = () => eventOn((s) => s.region === 'global', 72e5);
-const amerLcqOn = () => eventOn((s) => s.region === 'americas' && /last chance|\blcq\b/i.test(`${s.event || ''} ${s.eventSlug || ''}`), 72e5);
-// 공식 파트너 중 공동 중계로 공식 중계 바로 다음에 세우는 채널 (운영자 확정 11-22)
-//   NiceWigg: Americas LCQ 기간에는 공식 중계와 같은 급, 본 대회(국제전) 기간에도 공식 중계 다음
-//   Greek   : 본 대회(국제전) 기간에 공식 중계 다음
-//   그 밖의 때는 다른 공식 파트너처럼 '그 밖의 방송'에만 나온다
-const STAR_PARTNERS = { 'x:nicewigg': () => amerLcqOn() || mainEventOn(), 'x:greek': () => mainEventOn() };
-const starPartner = (l) => l.kind === 'partner' && !!STAR_PARTNERS[l.key]?.();
+const evKind = (s) => { const t = `${s.event || ''} ${s.eventSlug || ''}`; return /last chance|\blcq\b/i.test(t) ? 'lcq' : /pro.?league/i.test(t) ? 'pro' : ''; };
+const kindOn = (kind, region) => eventOn((s) => s.region === region && evKind(s) === kind, 72e5); // 그 지역의 LCQ·프로리그 기간
+// 공식 파트너 중 공동 중계로 공식 중계 바로 다음에 세우는 채널 (운영자 확정 11-22, 규칙은 config/season.json 의 coStreams)
+//   NiceWigg: 국제전 + Americas LCQ·프로리그 / Greek: 국제전
+//   지역 대회 때는 그 지역 보기, 그리고 영어 중계가 보이는 한국 관련·내 응원 팀 보기에서만. 그 밖의 때는 다른 파트너처럼 '그 밖의 방송'에만
+const coRule = (l) => (l.kind === 'partner' && (A.streams.coStreams || []).find((c) => c.key === l.key)) || null;
+function coOn(l) { // 지금 켜진 까닭: 'global' | 지역 이름 | null
+  const c = coRule(l); if (!c) return null;
+  if (c.global && mainEventOn()) return 'global';
+  for (const k of ['lcq', 'pro']) for (const r of c[k] || []) if (kindOn(k, r)) return r;
+  return null;
+}
+const starPartner = (l) => !!coOn(l);
+function coShown(l) {
+  const on = coOn(l); if (!on) return false;
+  const r = ML().region;
+  if (on === 'global') return officialShown('o:en') || !!r;
+  return r ? r === on : officialShown('o:en');
+}
 // 공식 맵 화면(algsN_map): 공식 중계와 함께 보도록 늘 카드로. 여러 로비가 켜지면 algs 번호를 붙인다
 const isMapPov = (l) => l.kind === 'pov' && !!l.map;
 const mapPovs = () => (ST?.live || []).filter((x) => isMapPov(x) && x.embed);
@@ -3263,7 +3275,7 @@ function liveShown(l) {
   if (l.kind === 'official') return officialShown(l.key);
   if (isMapPov(l)) return true;
   if (l.kind === 'pov') return inFocus(povTeam(l));
-  if (l.kind === 'partner') return starPartner(l) && (officialShown('o:en') || ML().region === 'americas');
+  if (l.kind === 'partner') return coShown(l);
   if (l.kind === 'creator') return !ML().region && opt.mode !== 'custom';
   if (l.kind === 'player') return ML().region || opt.mode === 'custom' || (l.team && team(l.team)?.id === mainId()) ? inFocus(l.team) : !l.intl;
   return false; // 공식 파트너 등
