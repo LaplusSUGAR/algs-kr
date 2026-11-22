@@ -2249,3 +2249,17 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .pov-tile[aria-pressed='true'] { border-color: var(--apex); background: var(--apex); color: #fff; }
 .pov-tile[aria-pressed='true'] small { color: rgba(255, 255, 255, .85); }
 @media (max-width: 380px) { .pov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pov-tile { grid-template-columns: 24px minmax(0, 1fr); } .pov-tile small { display: none; } .pov-logo { width: 24px; height: 24px; } }
+
+/* 방송 탭 개편(11-22): '지금 방송 중'을 공식 중계(중계·맵 화면·공동 중계) → 공식 개인화면(타일) → 선수·스트리머 묶음으로 나눈다.
+   팀 시점은 큰 카드 대신 타일로만, 다른 지역 개인화면은 접어 둔다(.lv-far) */
+.lv-grp { margin-top: 18px; }
+.lv-grp:first-child { margin-top: 10px; }
+.lv-gh { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.lv-gh h3 { margin: 0; display: flex; align-items: baseline; gap: 6px; font-size: var(--fs-sm); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.lv-gh h3::before { content: '//'; color: var(--apex); font-weight: 800; letter-spacing: 0; }
+.lv-gh .more { font-size: var(--fs-xs); }
+.lv-grp .lv-grid { margin-top: 10px; }
+.lv-grp.pov .pov-group:first-of-type { margin-top: 10px; }
+.lv-far { margin-top: 10px; }
+.lv-far summary { cursor: pointer; font-weight: 700; font-size: var(--fs-sm); padding: 6px 0; }
+.lv-far summary small { font-weight: 500; }

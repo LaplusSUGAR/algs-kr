@@ -274,7 +274,7 @@
     ['방송 보기', '配信を見る', 'Watch'],
     ['외 {n}', 'ほか{1}', '+{1} more'],
     ['방송 중·영상', '配信中・動画', 'Live & videos'],
-    ['개인화면', '個人画面', 'POV'], ['공식 개인화면', '公式個人画面', 'Official POVs'], ['개인화면만 보기', '個人画面だけ見る', 'POVs only'], ['맵 화면', 'マップ画面', 'Map view'], ['관심 팀 화면 같이 보기', '注目チームの画面を一緒に見る', 'Watch my teams together'], ['{n}팀', '{1}チーム', '{1} teams'],
+    ['개인화면', '個人画面', 'POV'], ['공식 개인화면', '公式個人画面', 'Official POVs'], ['개인화면만 보기', '個人画面だけ見る', 'POVs only'], ['맵 화면', 'マップ画面', 'Map view'], ['관심 팀 화면 같이 보기', '注目チームの画面を一緒に見る', 'Watch my teams together'], ['선수·스트리머', '選手・配信者', 'Players & streamers'], ['다른 지역 개인화면', '他地域の個人画面', 'POVs from other regions'], ['{n}팀', '{1}チーム', '{1} teams'],
     ['지금 켜진 공식 개인화면이 없습니다.', '現在配信中の公式個人画面はありません。', 'No official POVs are live right now.'],
     ['대회 중에는 팀마다 공식 개인화면(Twitch algs1_team1 … algs1_team20, 맵 화면 algs1_map)이 켜집니다. 켜지면 여기에 팀별로 모여, 눌러서 바로 보거나 여러 화면을 함께 볼 수 있습니다.', '大会中はチームごとに公式個人画面（Twitch algs1_team1 … algs1_team20、マップ画面 algs1_map）が配信されます。配信が始まるとここにチーム別に並び、押してすぐ見たり、複数の画面を一緒に見たりできます。', 'During events each team gets an official POV (Twitch algs1_team1 … algs1_team20, map view algs1_map). When they go live they appear here by team; tap to watch, or watch several at once.'],
     ['대회 중 켜지는 ALGS 공식 팀 시점(Twitch algs 채널)입니다. 누르면 플레이어에 더해지고, 다시 누르면 빠집니다(최대 4화면).', '大会中に配信されるALGS公式のチーム視点（Twitch algsチャンネル）です。押すとプレイヤーに追加され、もう一度押すと外れます（最大4画面）。', 'Official ALGS team POVs (Twitch algs channels), live during events. Tap to add to the player, tap again to remove (up to 4 screens).'],
