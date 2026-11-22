@@ -1265,6 +1265,7 @@ a.tag.live { text-decoration: none; }
 .lv-tbar { display: flex; align-items: center; gap: 6px 10px; padding: 6px 10px; background: var(--card); font-size: var(--fs-sm); min-width: 0; }
 .lv-tbar b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .lv-tbar b small { font-weight: 500; color: var(--steel); margin-left: 4px; }
 .lv-tbar .more { margin-left: auto; white-space: nowrap; }
+.lv-tbar .lv-vt { flex: none; white-space: nowrap; color: var(--apex); font-weight: 700; font-size: 12px; } /* 같은 채널의 여러 방송: 로비 A·B 등 (멀티뷰에서도 보이게) */
 .lv-x { border: 0; background: none; color: inherit; font-size: 20px; line-height: 1; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none; }
 .lv-x:hover { background: var(--paper); }
 .lv-tile .yt-frame { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 72vh; border: 0; }
@@ -2081,7 +2082,7 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 }
 
 /* 공식 중계가 Twitch·YouTube 에서 함께 켜졌을 때: 카드 하나 + 아래 볼 곳 고르기 (liveCard → .lv-pick) */
-.lv-pick { display: grid; grid-template-rows: 1fr auto; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden; min-width: 0; }
+.lv-pick { display: grid; grid-template-rows: 1fr; grid-auto-rows: auto; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden; min-width: 0; }
 .lv-pick > .lv-card { border: 0; border-radius: 0; background: none; }
 .lv-pick > .lv-card.on { box-shadow: none; }
 .lv-pick:has(> .lv-card.on) { border-color: var(--apex); box-shadow: var(--glow); }
@@ -2090,6 +2091,10 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .lv-plat .seg button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12.5px; }
 .lv-plat i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 .lv-plat i.twitch { background: #9146FF; } .lv-plat i.youtube { background: #FF0033; }
+/* 동시에 보기 · 맵 화면과 같이 보기 (playMany) */
+.lv-plat .lv-many { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 12px; font-size: 12.5px; }
+.lv-plat .lv-many .lv-ic { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.lv-plat + .lv-plat { padding-top: 0; }
 @media (max-width: 520px) { .lv-plat { padding: 0 10px 10px; } }
 
 /* ===== 2026-11 화면 전환·애니메이션 (docs/transitions-plan.md) =====
@@ -2207,6 +2212,11 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 
 /* 경기 탭 개편(11-21): 지역을 설명 줄 맨 앞 작은 표로, PC는 날짜를 위에서 아래로 한 줄씩(날짜 안에서 카드 두 칸) 읽게 */
 .mreg { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--rule); font-size: 11px; font-weight: 800; letter-spacing: .02em; color: var(--ink); line-height: 18px; vertical-align: 1px; }
+/* 경기 탭(11-22): LCQ·프로리그처럼 지역별로 따로 열리는 경기는 이름 앞에 지역 색 표 (국제전은 설명 줄의 작은 표 그대로) */
+.sreg { display: inline-block; margin-right: 6px; padding: 0 7px; border-radius: 4px; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; line-height: 20px; vertical-align: 1px; color: #fff; background: var(--steel); white-space: nowrap; }
+.sreg.r-apac-n { background: #4F46E5; } .sreg.r-apac-s { background: #0F8A7E; } .sreg.r-emea { background: #9333EA; } .sreg.r-americas { background: #1D6FD8; }
+:root[data-theme='dark'] .sreg.r-apac-n { background: #6366F1; } :root[data-theme='dark'] .sreg.r-apac-s { background: #14A394; } :root[data-theme='dark'] .sreg.r-emea { background: #A855F7; } :root[data-theme='dark'] .sreg.r-americas { background: #3B82F6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .sreg.r-apac-n { background: #6366F1; } :root:not([data-theme='light']) .sreg.r-apac-s { background: #14A394; } :root:not([data-theme='light']) .sreg.r-emea { background: #A855F7; } :root:not([data-theme='light']) .sreg.r-americas { background: #3B82F6; } }
 @media (min-width: 900px) {
   .days.sch-days { grid-template-columns: minmax(0, 1fr); }
   .sch-days .day { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); column-gap: 10px; align-items: start; }
@@ -2216,3 +2226,7 @@ table.rl tr.rl-day th { text-align: left; padding: 14px 2px 6px; font: 800 12px/
 .cp-clip.clip tr.more, .cp-clip.clip tr.more + tr.detail { display: none; }
 /* 팀 탭 개편(11-21): 팀 상세 경기 결과는 최근 5개만 먼저 */
 .td-res-sec.clip .td-res > li:nth-child(n+6) { display: none; }
+
+/* 일본어(11-22): 경기·단계 이름이 가타카나 단어 중간(エリミネーションラウ/ンド)에서 끊기지 않게. i18n.js 가 합성어 사이에 줄바꿈 자리를 넣고,
+   짧은 이름표만 그 자리와 띄어쓰기에서 줄을 바꾼다. 그래도 한 줄에 안 들어가면 어디서든 끊어 화면 밖으로 넘치지 않게 한다 */
+:lang(ja) :is(.match .what a, .seg a, .seg button, .subtabs a, .h2, .title, .tag, .day-h, .lv-meta b) { word-break: keep-all; overflow-wrap: anywhere; }

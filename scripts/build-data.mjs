@@ -507,6 +507,7 @@ const playerStreams = algs.krStreams.map(([team, name, role, provider, ch]) => {
 const streams = {
   official: algs.officialStreams.map(([name, provider, ch]) => ({ name, provider, ch, url: streamUrl(provider, ch) })),
   broadcasts: season.broadcasts || [],
+  coStreams: season.coStreams || [], // 공식 중계 다음에 세우는 공동 중계(공식 파트너) 규칙
   partners: (algs.partnerStreams || []).map(([name, provider, ch]) => ({ name, provider, url: streamUrl(provider, ch) })),
   players: playerStreams.concat(ov.streams || []),
   // 대회 선수가 아닌 한국 스트리머·전 프로 (config/players.json 의 creators)

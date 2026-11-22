@@ -418,7 +418,7 @@
     ['한 번에 최대 {n}개 시점을 띄우고, 로비 {n}팀 누구든 고를 수 있습니다.', '一度に最大{1}視点を表示でき、ロビーの{2}チームから自由に選べます。', 'Up to {1} views at once, from any of the {2} teams in the lobby.'],
     ['팀 무전을 그대로 들을 수 있습니다.', 'チームのボイスもそのまま聞けます。', 'Hear team comms.'], ['맵 시점, 게임 중 실시간 순위와 스탯이 함께 나옵니다.', 'マップ視点、試合中のリアルタイム順位とスタッツも表示されます。', 'Map view plus live standings and stats.'], ['경기가 끝난 뒤에도 다시보기로 모든 시점을 볼 수 있습니다.', '試合後もリプレイですべての視点が見られます。', 'All views are available as replays afterwards.'], ['Twitch 계정으로 로그인하면 시청 보상(드롭)도 받을 수 있습니다.', 'Twitchアカウントでログインすると視聴報酬（ドロップ）も受け取れます。', 'Log in with Twitch to earn drops.'],
     ['멀티뷰 열기 (algs.ea.com)', 'マルチビューを開く（algs.ea.com）', 'Open Multiview (algs.ea.com)'], ['멀티뷰 화면 예시: 메인 중계, 팀 시점 {n}개, 맵 시점, 실시간 순위가 한 화면에 배치된 모습', 'マルチビュー画面の例: メイン配信、チーム視点{1}つ、マップ視点、リアルタイム順位を1画面に配置', 'Multiview example: main broadcast, {1} team POVs, map view and live standings on one screen'],
-    ['영어 공식 중계', '英語公式配信', 'English broadcast'], ['국제전과 Americas·EMEA·APAC South 프로리그', '国際大会とAmericas・EMEA・APAC Southのプロリーグ', 'International events and the Americas, EMEA and APAC South Pro Leagues'], ['일본어 공식 중계 (RAGE)', '日本語公式配信（RAGE）', 'Japanese broadcast (RAGE)'], ['APAC South 공식 중계', 'APAC South公式配信', 'APAC South broadcast'], ['APAC South 지역 공식 방송 (Battlegrounds HQ)', 'APAC South地域の公式配信（Battlegrounds HQ）', 'Official APAC South regional broadcast (Battlegrounds HQ)'], ['두 곳에서 방송 중', '2か所で配信中', 'Live on two platforms'], ['{n}곳에서 방송 중', '{1}か所で配信中', 'Live on {1} platforms'], ['방송 {n}개 동시 진행', '{1}つの配信を同時進行中', '{1} streams live at once'], ['그룹', 'グループ', 'Group'], ['ESCL 일본어 중계', 'ESCL 日本語配信', 'ESCL (Japanese)'], ['일본어 스크림과 2부 리그 방송. APAC North 대회 기간에만 보입니다', '日本語のスクリムと2部リーグの配信。APAC Northの大会期間中のみ表示されます', 'Japanese scrims and second-tier league broadcasts. Shown only during APAC North events'], ['방송 볼 곳 고르기', '視聴する配信先を選ぶ', 'Choose where to watch'], ['APAC North 프로리그와 국제전 일본어 방송', 'APAC Northプロリーグと国際大会の日本語配信', 'Japanese coverage of the APAC North Pro League and international events'],
+    ['영어 공식 중계', '英語公式配信', 'English broadcast'], ['국제전과 Americas·EMEA 프로리그', '国際大会とAmericas・EMEAのプロリーグ', 'International events and the Americas and EMEA Pro Leagues'], ['일본어 공식 중계 (RAGE)', '日本語公式配信（RAGE）', 'Japanese broadcast (RAGE)'], ['APAC South 공식 중계', 'APAC South公式配信', 'APAC South broadcast'], ['APAC South 지역 공식 방송 (Battlegrounds HQ)', 'APAC South地域の公式配信（Battlegrounds HQ）', 'Official APAC South regional broadcast (Battlegrounds HQ)'], ['두 곳에서 방송 중', '2か所で配信中', 'Live on two platforms'], ['{n}곳에서 방송 중', '{1}か所で配信中', 'Live on {1} platforms'], ['방송 {n}개 동시 진행', '{1}つの配信を同時進行中', '{1} streams live at once'], ['그룹', 'グループ', 'Group'], ['ESCL 일본어 중계', 'ESCL 日本語配信', 'ESCL (Japanese)'], ['일본어 스크림과 2부 리그 방송. APAC North 대회 기간에만 보입니다', '日本語のスクリムと2部リーグの配信。APAC Northの大会期間中のみ表示されます', 'Japanese scrims and second-tier league broadcasts. Shown only during APAC North events'], ['방송 볼 곳 고르기', '視聴する配信先を選ぶ', 'Choose where to watch'], ['함께 볼 방송 고르기', '一緒に見る配信を選ぶ', 'Choose streams to watch together'], ['동시에 보기', '同時に見る', 'Watch together'], ['공식 맵 화면 방송 중', '公式マップ画面を配信中', 'Official map view is live'], ['맵 화면과 같이 보기', 'マップ画面と一緒に見る', 'Watch with map view'], ['공식 맵 화면', '公式マップ画面', 'Official map view'], ['공동 중계', 'コストリーム', 'Co-stream'], ['APAC North 프로리그와 국제전 일본어 방송', 'APAC Northプロリーグと国際大会の日本語配信', 'Japanese coverage of the APAC North Pro League and international events'],
     ['공식 파트너 워치 파티', '公式パートナーのウォッチパーティ', 'Official partner watch parties'], ['공식 일정에 파트너로 등록된 채널입니다.', '公式スケジュールにパートナーとして登録されたチャンネルです。', 'Channels registered as partners on the official schedule.'],
     ['한국 선수 개인 방송', '韓国人選手の個人配信', 'Korean player streams'], ['선수 CHZZK·YouTube 채널 제보하기', '選手のCHZZK・YouTubeチャンネルを知らせる', 'Share a player’s CHZZK/YouTube channel'], ['방송 채널 제보하기', '配信チャンネルを知らせる', 'Share a channel'],
     ['채움 칩은 확인된 채널(공식 API, Liquipedia 선수 페이지, 운영자 입력), 점선 칩은 확인된 채널이 없어 해당 플랫폼에서 이름으로 검색하는 링크입니다. 선수 개인 방송은 대회 규정상 지연이 걸려 있어, 이 사이트의 점수가 방송보다 먼저 바뀔 수 있습니다.', '塗りのチップは確認済みのチャンネル（公式API、Liquipedia選手ページ、運営者入力）、点線のチップは確認済みチャンネルがないため各プラットフォームで名前を検索するリンクです。選手の個人配信は大会規定で遅延があるため、このサイトのスコアが配信より先に変わることがあります。', 'Solid chips are verified channels (official API, Liquipedia, maintainer); dashed chips search the platform by name. Player streams are delayed by tournament rules, so scores here may update before the stream.'],
@@ -533,6 +533,10 @@
     cache.set(s, r);
     return r;
   }
+  // 일본어: 가타카나 합성어(エリミネーション+ラウンド 등) 사이에 줄바꿈 자리(폭 없는 공백)를 넣는다. 화면 글자에만 (속성·문서 제목에는 넣지 않음)
+  //   경기 이름 같은 짧은 이름표는 CSS(:lang(ja) … word-break: keep-all)로 이 자리와 띄어쓰기에서만 줄을 바꾼다
+  const JA_SPLIT = /(ウィナーズ|ルーザーズ|エリミネーション|グループ|リージョナル|マッチ|サバイバル|サバイバー|レギュラー|ブラケット)(?=[ァ-ヺ])/g;
+  const jaBreak = (x) => (lang === 'ja' ? x.replace(JA_SPLIT, '$1\u200b') : x);
   const ATTRS = ['title', 'aria-label', 'placeholder', 'alt'];
   function tree(root) {
     if (lang === 'ko' || !root) return;
@@ -540,7 +544,7 @@
     const nodes = [];
     let n;
     while ((n = w.nextNode())) if (HANGUL.test(n.nodeValue)) nodes.push(n);
-    for (const x of nodes) { if (x.parentElement && x.parentElement.closest('script,style,[data-no-tr]')) continue; x.nodeValue = t(x.nodeValue); }
+    for (const x of nodes) { if (x.parentElement && x.parentElement.closest('script,style,[data-no-tr]')) continue; x.nodeValue = jaBreak(t(x.nodeValue)); }
     // data-tr="사전 키": 같은 한국어가 자리마다 다른 뜻일 때 (예: 점수표 '순위' = 순위 점수)
     if (root.querySelectorAll) for (const el of root.querySelectorAll('[data-tr]')) el.textContent = t(el.dataset.tr);
     const els = root.querySelectorAll ? [root, ...root.querySelectorAll('[title],[aria-label],[placeholder],[alt]')] : [];
