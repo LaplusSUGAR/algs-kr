@@ -2389,9 +2389,9 @@ function cpBreak(pid, name, total, curShort) {
   const counted = countedEvents(base, total);
   const sum = base.reduce((a, x) => a + x.r.cp, 0);
   const items = h.map((x) => {
-    const { e, r } = x, pend = x === pendItem, nPlayed = played(e.id, pid), excl = nPlayed != null ? nPlayed < MIN_MATCHES : counted && !pend && !counted.has(x);
+    const { e, r } = x, pend = x === pendItem, nPlayed = played(e.id, pid), excl = nPlayed != null ? nPlayed < minMatches() : counted && !pend && !counted.has(x);
     const other = curShort && r.short && r.short !== curShort;
-    const tip = `${e.label} · ${r.name || r.short} ${r.pos}위${nPlayed != null ? ` · ${nPlayed}경기 출전` : ''}${pend ? ' · 공식 합계에 아직 반영 안 됨' : ''}${excl ? ` · CP 없음 (${MIN_MATCHES}경기 미만 출전)` : ''}${other ? ' · 다른 팀 소속 때 받은 CP (선수에게 귀속)' : ''}`;
+    const tip = `${e.label} · ${r.name || r.short} ${r.pos}위${nPlayed != null ? ` · ${nPlayed}경기 출전` : ''}${pend ? ' · 공식 합계에 아직 반영 안 됨' : ''}${excl ? ` · CP 없음 (${minMatches()}경기 미만 출전)` : ''}${other ? ' · 다른 팀 소속 때 받은 CP (선수에게 귀속)' : ''}`;
     return `<span class="cpb-i ${e.kind}${pend ? ' pend' : ''}${excl ? ' excl' : ''}" title="${esc(tip)}"><i>${esc(e.short)}${other ? ` · ${esc(r.short)}` : ''}</i> ${r.pos}위 <b>${pend ? '+' : ''}${fmt(r.cp)}</b>${pend ? ' <small>반영 대기</small>' : excl ? ` <small>${nPlayed != null ? nPlayed + '경기 · 제외' : '합산 제외'}</small>` : ''}</span>`;
   });
   if (total != null && !counted && total - sum > 0) items.push(`<span class="cpb-i etc" title="이 사이트가 모으지 않은 대회"><i>기타</i> <b>${fmt(total - sum)}</b></span>`);
@@ -2411,9 +2411,10 @@ function settle() {
 // 기본으로 보여줄 챔피언십 포인트 순위: 진행 중 국제전을 최소 보장으로 정산한 값.
 // state: live(대회 진행 중) · pending(대회 끝, 공식 합계 반영 대기) · confirmed(공식 합계와 대조 일치 → 공식 값으로 확정)
 // 그 대회에서 선수가 뛴 경기 수 (공식 게임 기록에서 셈). 기록이 없으면 null
-const MIN_MATCHES = 12;
+// CP를 받는 최소 출전 게임 수 (규정 C6.5). 규칙 파일 championshipPoints.minMatches → brief.cpMin
+const minMatches = () => A.season?.brief?.cpMin || 12;
 const played = (eventId, pid) => { const t = A.mc?.[eventId]; return t ? t[pid] || 0 : null; };
-const eligible = (eventId, pid) => { const n = played(eventId, pid); return n == null || n >= MIN_MATCHES; };
+const eligible = (eventId, pid) => { const n = played(eventId, pid); return n == null || n >= minMatches(); };
 
 // 결승(매치 포인트 결승)이 시작됐으면 지금 순위 { 팀 약칭 → 순위 }, 아니면 null
 function finalsLivePos() {
@@ -2428,7 +2429,7 @@ const finalsSig = () => { const m = finalsLivePos(); return m ? [...m].map((x) =
 function splitGames(pid, short) {
   const sp = Math.max(...(A.cpEvents || []).filter((e) => e.kind === 'pl').map((e) => e.split));
   let n = 0;
-  for (const e of A.cpEvents || []) if (e.kind === 'pl' && e.split === sp) for (const r of e.rows) if (r.short === short && r.players.some(([id]) => id === pid)) n += played(e.id, pid) ?? MIN_MATCHES;
+  for (const e of A.cpEvents || []) if (e.kind === 'pl' && e.split === sp) for (const r of e.rows) if (r.short === short && r.players.some(([id]) => id === pid)) n += played(e.id, pid) ?? minMatches();
   return n;
 }
 
@@ -2493,7 +2494,7 @@ function settleRows(ST) {
       if (p.r === 'k') continue;
       const pid = pidOf(p.n);
       // 공식 팀 CP 규정: 이번 스플릿 프로리그에서 이 팀으로 12경기 이상 뛴 선수만 팀 CP에 들어감 (결장 선수도 같은 기준)
-      if (pid && splitGames(pid, r.short) < MIN_MATCHES) continue;
+      if (pid && splitGames(pid, r.short) < minMatches()) continue;
       if (pid && !cands.has(pid) && !subIn.has(pid)) cands.set(pid, { n: p.n, off: null, hist: true });
     }
     // 이 팀 소속으로 이번 대회 CP를 받은 선수(정규 로스터가 그대로 출전) + 다른 팀에 대체로 나간 소속 선수
@@ -2575,7 +2576,7 @@ function applyCpRoster() {
       if (cand.has(k) || outK.has(k)) continue;
       const pid = pidOf(n);
       const g = pid ? curSplitGames(pid) : null;
-      const v = pid && (g == null || g >= MIN_MATCHES) ? playerCp(pid) : 0;
+      const v = pid && (g == null || g >= minMatches()) ? playerCp(pid) : 0;
       cand.set(k, [n, v, pid, (add[short] || []).includes(n) ? 'add' : 'roster', g]);
     }
     const all = [...cand.values()].sort((a, b) => b[1] - a[1]);
@@ -2731,7 +2732,7 @@ function cpView(q) {
     <section class="sec"><div class="controls">${viewSeg}${view === 'min' ? '' : modeSeg}${regionSeg}</div>${table}</section></div>`, cpKey, '챔피언십 포인트 순위')}
     <div class="explain"><b>선수 1명이 받는 CP</b> (최종 순위별)
       <table><tr><td>프로리그</td><td>${A.season.scoring.cpProLeague.slice(0, 10).join(', ')} … (30위 ${A.season.scoring.cpProLeague.at(-1)})</td></tr>
-      <tr><td>플레이오프</td><td>${A.season.scoring.cpPlayoffs.slice(0, 10).join(', ')} … (40위 100)</td></tr></table>
+      <tr><td>플레이오프</td><td>${A.season.scoring.cpPlayoffs.slice(0, 10).join(', ')} … (${A.season.scoring.cpPlayoffs.length}위 ${A.season.scoring.cpPlayoffs.at(-1)})</td></tr></table>
       <p style="margin:6px 0 0">팀이나 선수 줄을 누르면 대회별로 받은 CP가 펼쳐집니다. 진행 중인 플레이오프는 순위가 정해진 팀부터 공식 합계에 바로 들어갑니다.</p></div>`;
 }
 
@@ -2779,9 +2780,9 @@ function plView(q) {
       ${rows.map((r) => `<tr class="${rowCls(r)}"><td class="rank">${r.pos ?? '–'}</td><td class="team">${krDot(r.kr, r.short)}${teamLink(r.short, r.name)}${r.qualified ? ' <span class="tag ok po-tag">PO</span><span class="po-dot" title="플레이오프 진출" aria-label="플레이오프 진출"></span>' : ''}</td><td class="c opt">${esc(r.group)}</td><td class="r num">${r.rs ?? '–'}</td><td class="r opt">${r.kills ?? '–'}</td><td class="r opt2">${fmt(r.cpPP)}</td></tr>`).join('')}
     </tbody></table></div></section>
     <div class="explain"><b>점수 계산</b>
-      <table><tr><td>게임</td><td>순위 점수 + 킬당 1점 (1위 12, 2위 9, 3위 7, 4위 5, 5위 4 …)</td></tr>
-      <tr><td>정규 시즌</td><td>시리즈 순위별 ${A.season.scoring.plRegular.slice(0, 5).join(', ')} … 20위 0</td></tr>
-      <tr><td>리전 결승</td><td>${A.season.scoring.plFinals.slice(0, 5).join(', ')} … 20위 0</td></tr></table></div>`;
+      <table><tr><td>게임</td><td>순위 점수 + 킬당 ${A.season.brief?.kill ?? 1}점 (${(A.season.scoring.game || []).slice(0, 5).map(([r, v]) => `${r}위 ${v}`).join(', ')} …)</td></tr>
+      <tr><td>정규 시즌</td><td>시리즈 순위별 ${A.season.scoring.plRegular.slice(0, 5).join(', ')} … ${A.season.scoring.plRegular.length}위 ${A.season.scoring.plRegular.at(-1)}</td></tr>
+      <tr><td>리전 결승</td><td>${A.season.scoring.plFinals.slice(0, 5).join(', ')} … ${A.season.scoring.plFinals.length}위 ${A.season.scoring.plFinals.at(-1)}</td></tr></table></div>`;
 }
 
 /* ---------- 팀 ---------- */
@@ -2996,29 +2997,36 @@ function rules(parts, q) {
   const arr = (d, label, lx, ly, cls = '', anchor = 'middle') => `<path d="${d}" class="rf-e ${cls}" marker-end="url(#rfA)"/>${label ? `<text x="${lx}" y="${ly}" text-anchor="${anchor}" class="rf-l ${cls}">${label}</text>` : ''}`;
   const legend = '<p class="rf-legend"><span class="up">▲ 다음 라운드</span><span class="down">▼ 패자부활</span><span class="out">✕ 탈락</span><span class="goal">★ 챔피언십</span></p>';
   const svg = (h, label, body) => `<svg class="rf" viewBox="0 0 360 ${h}" role="img" aria-label="${label}"><defs><marker id="rfA" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L8 4 L0 8 z" class="rf-ah"/></marker></defs>${body}</svg>`;
+  // 그림 속 숫자(팀 수·게임 수·진출 팀 수)는 규칙 파일 brackets.*.stages(n·cut)·feeds 와 brief.games 에서 읽는다. 상자 배치만 그림에 고정
+  const BK = S.brackets || {}, GM = B.games || {};
+  const stg = (b, key) => (BK[b]?.stages || []).find((x) => x.key === key) || {};
+  const fed = (b, to, from) => { const f = (BK[b]?.feeds?.[to] || []).find((x) => x[0] === from); return f ? f[2] - f[1] + 1 : null; };
+  const nsub = (st, g) => `${st.n ?? 20}팀 · ${g ?? 6}게임`, cut = (st) => st.cut ?? 10, drop = (st) => (st.n ?? 20) - (st.cut ?? 10);
+  const CB = BK.championship ? 'championship' : 'playoffs', cw = stg(CB, 'wr'), c1 = stg(CB, 'er1'), c2 = stg(CB, 'er2'), cf = stg(CB, 'f'), cg = GM.champ || {};
   const bracketFig = svg(372, '플레이오프와 챔피언십 진행 방식', `
     ${box(70, 8, 220, 48, '조별 리그', `${PO.teams}팀 · ${PO.groups}개 조`)}
-    ${arr('M130 56 L92 102', '상위 20', 104, 84, 'up', 'end')}${arr('M230 56 L268 102', '하위 20', 258, 84, 'down', 'start')}
-    ${box(10, 104, 160, 48, '승자 라운드', '20팀 · 6게임')}
-    ${box(190, 104, 160, 62, '패자부활 1라운드', '20팀 · 6게임', '하위 10팀 탈락')}
-    ${arr('M270 166 V204', '상위 10', 302, 190, 'up')}
-    ${arr('M140 152 C140 186 214 172 222 204', '하위 10', 152, 190, 'down')}
-    ${box(190, 206, 160, 62, '패자부활 2라운드', '20팀 · 6게임', '하위 10팀 탈락')}
-    ${arr('M56 152 C56 250 104 250 108 304', '상위 10', 50, 240, 'up')}
-    ${arr('M270 268 L246 304', '상위 10', 292, 292, 'up')}
-    ${box(70, 306, 220, 56, '결승', '20팀 · 매치 포인트', '', 'final')}`);
+    ${arr('M130 56 L92 102', `상위 ${fed(CB, 'wr', 'gs') ?? 20}`, 104, 84, 'up', 'end')}${arr('M230 56 L268 102', `하위 ${fed(CB, 'er1', 'gs') ?? 20}`, 258, 84, 'down', 'start')}
+    ${box(10, 104, 160, 48, '승자 라운드', nsub(cw, cg.wr))}
+    ${box(190, 104, 160, 62, '패자부활 1라운드', nsub(c1, cg.er1), `하위 ${drop(c1)}팀 탈락`)}
+    ${arr('M270 166 V204', `상위 ${cut(c1)}`, 302, 190, 'up')}
+    ${arr('M140 152 C140 186 214 172 222 204', `하위 ${drop(cw)}`, 152, 190, 'down')}
+    ${box(190, 206, 160, 62, '패자부활 2라운드', nsub(c2, cg.er2), `하위 ${drop(c2)}팀 탈락`)}
+    ${arr('M56 152 C56 250 104 250 108 304', `상위 ${cut(cw)}`, 50, 240, 'up')}
+    ${arr('M270 268 L246 304', `상위 ${cut(c2)}`, 292, 292, 'up')}
+    ${box(70, 306, 220, 56, '결승', `${cf.n ?? 20}팀 · 매치 포인트`, '', 'final')}`);
+  const la = stg('lcq', 'a'), lb = stg('lcq', 'b'), l2 = stg('lcq', 'wr2'), l1 = stg('lcq', 'er1'), le2 = stg('lcq', 'er2'), lf = stg('lcq', 'f'), lg = GM.lcq || {};
   const lcqFig = svg(470, 'LCQ 진행 방식', `
-    ${box(10, 8, 160, 48, '승자 1라운드 A', '20팀 · 6게임')}${box(190, 8, 160, 48, '승자 1라운드 B', '20팀 · 6게임')}
-    ${arr('M76 56 V108', '상위 10씩', 68, 88, 'up', 'end')}${arr('M230 56 C230 86 132 80 128 108', '', 0, 0, 'up')}
-    ${arr('M130 56 C130 86 228 80 232 108', '', 0, 0, 'down')}${arr('M284 56 V108', '하위 10씩', 292, 88, 'down', 'start')}
-    ${box(10, 110, 160, 48, '승자 2라운드', '20팀 · 6게임')}
-    ${box(190, 110, 160, 62, '패자부활 1라운드', '20팀 · 6게임', '하위 10팀 탈락')}
-    ${arr('M270 172 V214', '상위 10', 302, 198, 'up')}
-    ${arr('M140 158 C140 194 214 182 222 214', '하위 10', 152, 198, 'down')}
-    ${box(190, 216, 160, 62, '패자부활 2라운드', '20팀 · 6게임', '하위 10팀 탈락')}
-    ${arr('M56 158 C56 262 104 262 108 318', '상위 10', 50, 250, 'up')}
-    ${arr('M270 278 L246 318', '상위 10', 292, 304, 'up')}
-    ${box(70, 320, 220, 56, '결승', '20팀 · 매치 포인트', '', 'final')}
+    ${box(10, 8, 160, 48, '승자 1라운드 A', nsub(la, lg.a))}${box(190, 8, 160, 48, '승자 1라운드 B', nsub(lb, lg.b))}
+    ${arr('M76 56 V108', `상위 ${cut(la)}씩`, 68, 88, 'up', 'end')}${arr('M230 56 C230 86 132 80 128 108', '', 0, 0, 'up')}
+    ${arr('M130 56 C130 86 228 80 232 108', '', 0, 0, 'down')}${arr('M284 56 V108', `하위 ${drop(la)}씩`, 292, 88, 'down', 'start')}
+    ${box(10, 110, 160, 48, '승자 2라운드', nsub(l2, lg.wr2))}
+    ${box(190, 110, 160, 62, '패자부활 1라운드', nsub(l1, lg.er1), `하위 ${drop(l1)}팀 탈락`)}
+    ${arr('M270 172 V214', `상위 ${cut(l1)}`, 302, 198, 'up')}
+    ${arr('M140 158 C140 194 214 182 222 214', `하위 ${drop(l2)}`, 152, 198, 'down')}
+    ${box(190, 216, 160, 62, '패자부활 2라운드', nsub(le2, lg.er2), `하위 ${drop(le2)}팀 탈락`)}
+    ${arr('M56 158 C56 262 104 262 108 318', `상위 ${cut(l2)}`, 50, 250, 'up')}
+    ${arr('M270 278 L246 318', `상위 ${cut(le2)}`, 292, 304, 'up')}
+    ${box(70, 320, 220, 56, '결승', `${lf.n ?? 20}팀 · 매치 포인트`, '', 'final')}
     ${arr('M180 376 V418', `상위 ${LQ.adv}팀`, 190, 402, 'up', 'start')}
     <g class="rf-node goal"><rect x="90" y="420" width="180" height="40" rx="9"/><text x="180" y="445" text-anchor="middle" class="rf-t"><tspan>★ </tspan><tspan>챔피언십 진출</tspan></text></g>`);
 
@@ -3083,7 +3091,7 @@ function rules(parts, q) {
       </div>${mpFig}</div>`, 'wide')}
     ${card('format', '프로리그', `
       <div class="rc-2"><div>
-      <div class="grp" role="img" aria-label="프로리그 조 구성">${['A', 'B', 'C'].slice(0, PL.groups).map((g) => `<span class="grp-g"><b>${g}조</b><em>${PL.size}팀</em></span>`).join('<i>×</i>')}<i>→</i><span class="grp-g rf-go"><b>리전 결승</b><em>상위 ${PL.rf}팀</em></span></div>
+      <div class="grp" role="img" aria-label="프로리그 조 구성">${GROUPS.slice(0, PL.groups).map((g) => `<span class="grp-g"><b>${g}조</b><em>${PL.size}팀</em></span>`).join('<i>×</i>')}<i>→</i><span class="grp-g rf-go"><b>리전 결승</b><em>상위 ${PL.rf}팀</em></span></div>
       <p>지역마다 ${PL.teams}팀이 ${PL.groups}개 조로 나뉩니다. 두 조씩 만나 ${PL.games}게임 시리즈를 치르고, 팀마다 시리즈를 ${PL.series}번 뜁니다.</p>
       <p>시리즈 순위마다 프로리그 포인트를 받고, 상위 ${PL.rf}팀이 매치 포인트 방식의 리전 결승에 나갑니다.</p>
       <p class="caption"><span>시리즈에서 1위가 2위보다 50점 이상 앞서면 +1, 게임의 절반 이상에서 1위를 하면 +1(그 위로 1승마다 +1) 보너스가 붙습니다.</span> <span>그래서 공식 순위표 포인트가 표의 합과 다를 수 있습니다.</span></p>
