@@ -35,7 +35,7 @@
 | LCQ 시드 | 3.7.1 | `lcq.seeding`, `lcq.seedNote` | 로스터 변경을 반영한 CP 순, 그다음 2부 포인트 순. 두 로비에 지그재그. 확정 조 편성이 나오면 `overrides.json` 의 `lcqSeeds` 로 고정 | 2026-11-14: 주최 측 확정본이 영입으로 오른 CP와 2부 팀의 챌린저 시리즈 포인트를 반영해, '변경 전 CP' 규칙을 되돌림 |
 | LCQ·챔피언십 진행 방식(단계·진출 팀 수·진행 그림) | C4, 3.7, 3.8 | `brackets.lcq`, `brackets.championship`, `brackets.playoffs` | 화면의 탭·점수표 칸·다음 경기 배정·진행 그림 | 규칙 파일에서 읽음. `check-rules`가 `lcq`·`championship` 숫자와 맞는지 검사 |
 | LCQ 일정(지역 현지 시각) | D1, D4 | `lcq.schedule`, `regions.*.tz` | 공식 API 값이 태평양 시간 임시값이거나 순서가 어긋나면 규정 시각으로 표시 | 2026-11-11 반영 |
-| 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 직행 32팀을 CP 순으로 1~32번, LCQ 8팀을 CP 순(같으면 C7.3, CP 0점끼리는 동점 아님) → LCQ 순위 → LCQ 결승 점수 → 결승 단일 게임 점수(C7.1 순, 2026-11-22 추가)로 33~40번에 놓고 지그재그(A→B→C→D→D→C→B→A). 공식 명단이 나오면 공식 조 | 근사. 규정은 40팀 전체를 CP 순으로 세우므로, LCQ 팀의 CP가 직행 팀보다 높으면 예상 조 편성이 공식과 다를 수 있음 |
+| 챔피언십 시드·조 편성 | 3.8.1 | `championship.seeding` | 네 지역 LCQ가 모두 끝나면 진출 40팀 전체를 CP 순(같으면 C7.3, CP 0점끼리는 동점 아님 → 직행 팀 먼저 → LCQ 팀끼리는 LCQ 순위 → LCQ 결승 점수 → 결승 단일 게임 점수)으로 1~40번 시드를 매기고 지그재그(A→B→C→D→D→C→B→A). LCQ가 끝나기 전에는 직행 32팀 1~32번, LCQ 자리 33~40번(예상). 공식 명단(조별 리그 시리즈 출전 팀)이 나오면 공식 조 | 2026-11-23: 40팀 전체 CP 순으로 바꿈(전에는 LCQ 8팀을 늘 33~40번에 둬서, CP가 높은 FFS가 33번으로 밀려 있었음). 공식 조는 `fetch-algs.mjs` 가 LCQ 종료 뒤 매시 한 번 조별 리그 6경기의 출전 명단으로 확인 |
 | 챔피언십 진행 방식 | C2, C4, D7 | `championship.bracket`, `brackets.championship.groupDays` | 챔피언십 단계 목록, `CH_FLOW`, 공식 시각 전 임시 날짜(조별 리그 1일차 4경기·2일차 2경기) | 규칙 파일에서 읽음 (`check-rules` 가 groupDays 합 검사) |
 | 이적 기간·로스터 잠금 | 2.3.2 | `proLeague.transferWindows`, `rosterLocks` | 로스터 변경 기록 | 참고용. 사이트가 날짜로 막지는 않음 |
 | 상금 | E | `prizes` | 아직 화면에 없음 | 자료만 저장 |

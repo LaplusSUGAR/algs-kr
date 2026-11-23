@@ -59,7 +59,7 @@ const season = {
   ...(cfgMine ? {} : { rulesLinks: [['ALGS 대회 구성 안내 (algs.ea.com)', 'https://algs.ea.com/en/competition-overview'], [`Liquipedia ${lpSeasonPage(seasonSlug).replace('/', ' ')}`, lpSeasonUrl]] }),
 };
 const meta = { slug: seasonSlug, year: lpYear(seasonSlug), lpSeason: lpSeasonUrl, splits, lastSplit, tieSlug, cfgMine: cfgMine && rulesMine, rules: { season: rules.season, edition: rules.source?.edition || null } };
-const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'lcqSeeds', 'lcqCcAlias', 'ccRenames', 'schedExtra'];
+const SEASON_KEYS = ['rosterMoves', 'rosterAutoIgnore', 'cpSubs', 'cpRosterAdd', 'lcqSchedule', 'lcqSeeds', 'champsSeeds', 'lcqCcAlias', 'ccRenames', 'schedExtra'];
 const ovRaw = readJson('config/overrides.json', {});
 const ovMine = !ovRaw.season || ovRaw.season === seasonSlug;
 const ov = ovMine ? ovRaw : Object.fromEntries(Object.entries(ovRaw).filter(([k]) => !SEASON_KEYS.includes(k)));
@@ -590,6 +590,8 @@ const data = {
   // 국제전 실제 출전 로스터(팀 약칭 → [[선수ID, 이름, 역할]])와 운영자가 확인한 대체 출전
   poRosters: Object.fromEntries(Object.entries(algs.poRosters || {}).map(([id, ps]) => [teams[id]?.short || id, ps])),
   cpSubs: ov.cpSubs || {},
+  // 챔피언십 확정 시드 (운영자 확정, 1번부터 약칭). 화면이 이 순서로 조를 확정 표시한다
+  champsSeeds: Array.isArray(ov.champsSeeds) && ov.champsSeeds.length ? ov.champsSeeds : null,
   poi,
   // 약칭을 바꾼 팀 (팀 ID → 사이트 약칭, fetch-algs의 lcqShortFix). 화면이 공식 API를 직접 받을 때도 같은 약칭을 쓰게 한다 (app.js apiShort)
   shortFix: algs.lcqShortFix || {},
