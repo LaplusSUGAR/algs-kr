@@ -19,6 +19,11 @@ window.ALGS_CONFIG = {
 
   siteName: 'EASY ALGS KR',
 
+  // 방문자 통계 (Cloudflare Web Analytics, 쿠키 없음). Cloudflare 대시보드 > Analytics & Logs > Web Analytics 에서
+  // 사이트를 추가하고 받은 스니펫의 token 값을 넣는다. 비워 두면 통계 스크립트를 넣지 않는다.
+  // 이 값은 페이지에 그대로 실리는 공개 값이다(비밀키 아님).
+  cfBeaconToken: '',
+
   // 문의·피드백을 받을 곳.
   //   'github' : GitHub 이슈 작성 화면으로 보냄 (제목·내용 미리 채움, GitHub 계정 필요)
   //   구글 폼 주소를 넣으면 그 폼으로 보냄 (로그인 필요 없음) — 지금 쓰는 방식

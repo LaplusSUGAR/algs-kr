@@ -4063,6 +4063,12 @@ addEventListener('resize', measureStick);
 footer();
 loadStreamsCache();
 if (C.streamsUrl) pollStreams(); // 화면을 그리기 전에 요청부터 보낸다
+if (C.cfBeaconToken) { // 방문자 통계: 토큰이 있을 때만. spa: 화면(#/…)을 바꿀 때도 페이지뷰로 센다
+  const b = document.createElement('script');
+  b.defer = true; b.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  b.setAttribute('data-cf-beacon', JSON.stringify({ token: C.cfBeaconToken, spa: true }));
+  document.head.appendChild(b);
+}
 render();
 watchHeader();
 liveBadge();
