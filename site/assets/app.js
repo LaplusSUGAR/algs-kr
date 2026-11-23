@@ -362,8 +362,10 @@ function until(iso) {
   const ms = new Date(iso) - now();
   if (ms <= 0) return null;
   const h = Math.floor(ms / 3.6e6), m = Math.floor((ms % 3.6e6) / 6e4);
-  return h >= 48 ? `${Math.floor(h / 24)}일 후` : h ? `${h}시간 ${m}분 후` : `${m}분 후`;
+  return h >= 48 ? `${calDays(iso)}일 후` : h ? `${h}시간 ${m}분 후` : `${m}분 후`;
 }
+// 달력 날짜 차이 (홈 '다음 경기' 카드의 D-n 과 같은 기준: 이틀 넘게 남았으면 'n일 후'도 이 값)
+const calDays = (iso) => Math.round((Date.parse(dayKey(iso)) - Date.parse(dayKey(new Date(now()).toISOString()))) / 864e5);
 // 공식 API에 없는 일정 (config/overrides.json schedExtra → A.extras): POI 드래프트 등. 시작 3시간 뒤 '예정'에서 빠진다
 const XKIND = { 'poi-draft': ['POI 드래프트', '낙하 지점(POI) 선택 시작'] };
 const XEVENT = { lcq: 'LCQ', playoffs: '플레이오프', champs: '챔피언십' };
@@ -451,6 +453,8 @@ let lastHtml = '', lastHash = null, lastHashPrev = null;
 //   틀 안에서 ${lazy(() => html)} 를 속성 자리에 쓰면 data-lazy 번호가 붙고, 펼칠 때 fillLazy 가 채운다
 let LAZY = [], lazyNext = [];
 let RGEN = 0; // 그리기 번호 (render 마다 1씩): 한 번 그리는 동안만 쓰는 계산 저장용
+// 한 번 그리는 동안 같은 값을 여러 번 묻는 무거운 계산(LCQ 대진, 챔피언십 시드)을 그리기마다 한 번만 한다. 데이터를 통째로 바꾸면(A) 다시 계산
+const perRender = (f, keyOf = () => '') => { const m = new Map(); let g = -1, a = null; return (...xs) => { if (g !== RGEN || a !== A) { m.clear(); g = RGEN; a = A; } const k = keyOf(...xs); if (!m.has(k)) m.set(k, f(...xs)); return m.get(k); }; };
 const lazy = (make) => ` data-lazy="${lazyNext.push(make) - 1}"`;
 // 접힌 <details class="lz"> 는 펼칠 때 채운다 (toggle 은 거품이 안 올라와 잡기 단계에서 받는다)
 app.addEventListener('toggle', (e) => { if (e.target.open && e.target.matches?.('details.lz')) fillLazy(e.target); }, true);
@@ -588,7 +592,7 @@ function subtabs(tab, parts, q) {
   const SUB = {
     schedule: [['예정 경기', '#/schedule', parts[1] !== 'replay' && q.get('view') !== 'results'], ['지난 결과', '#/schedule?view=results', parts[1] !== 'replay' && q.get('view') === 'results'], ['게임 다시보기', '#/schedule/replay', parts[1] === 'replay']],
     standings: champsMain()
-      ? [['챔피언십', '#/standings', parts[1] !== 'past'], ['이전 결과', '#/standings/past', parts[1] === 'past']]
+      ? (() => { const past = parts[1] === 'past' || (champsWait() && !parts[1] && lcqEvents().some((e) => e.region === q.get('r'))); return [['챔피언십', '#/standings', !past], ['이전 결과', '#/standings/past', past]]; })()
       : intlCurrent()
       ? [['결승', '#/standings/finals', parts[1] === 'finals'], ['브래킷', '#/standings/bracket', parts[1] === 'bracket' || (!parts[1] && !finalsFirstTab())], ['조별 리그', '#/standings/group', parts[1] === 'group'],
         ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']]
@@ -742,7 +746,7 @@ function eventHome() {
   const C = champsTimeline() ? champsBracket() : null;
   if (C?.started && recent(C, C.tl.end)) {
     B = C; base = champsMain() ? '/standings' : '/standings/champs'; q = new URLSearchParams(); title = '챔피언십'; L = CH_FLOW_L; key = `ev:${C.ss[0].eventId}`;
-  } else if (lcqEvents().length && !intlCurrent()) {
+  } else if (lcqEvents().length && !intlCurrent() && !champsMain()) {
     const ev = lcqEvents().find((e) => e.region === lcqRegionDefault()) || lcqEvents()[0];
     const X = lcqBracket(ev);
     if (!X.started || !recent(X, ev.end)) return '';
@@ -828,9 +832,11 @@ function nextCard(upcoming) {
   if (!first) return '';
   const set = upcoming.filter((s) => s.eventId === first.eventId && s.region === first.region && (s.start === first.start || (s.live && first.live))).slice(0, 3);
   const live = set.some((s) => s.live);
-  const days = Math.round((Date.parse(dayKey(first.start)) - Date.parse(dayKey(new Date(now()).toISOString()))) / 864e5);
+  const days = calDays(first.start);
   const big = live ? 'LIVE' : days <= 0 ? '오늘' : `D-${days}`;
-  const rows = set.map((s) => { const fs = (s.lineup || []).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}${s.live ? ` ${gameNow(s)}` : ''}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
+  // 공식 출전 명단이 나오기 전의 챔피언십 조별 리그는 사이트 계산 조로 관심 팀을 보여 준다
+  const proj = (s) => (!s.lineup?.length && /^champs/.test(s.eventSlug || '') && champsWait() ? champsBracketR().list.find((st) => st.s?.id === s.id)?.teams || [] : []);
+  const rows = set.map((s) => { const fs = (s.lineup?.length ? s.lineup : proj(s)).filter(isF); return `<li><b>${esc(ko(s.name, PHASE_KO))}${s.live ? ` ${gameNow(s)}` : ''}</b>${fs.length ? `<span class="nx-teams">${fs.slice(0, 4).map((sh) => `<a class="nx-chip ${CAT[krOf(sh)] || ''}" href="#/teams/${encodeURIComponent(sh)}">${esc(sh)}</a>`).join('')}${fs.length > 4 ? `<small>+${fs.length - 4}</small>` : ''}</span>` : ''}</li>`; }).join('');
   return `<section class="nx${live ? ' live' : ''}" aria-labelledby="h-nx">
     <div class="nx-top"><h2 id="h-nx"><span>${live ? '진행 중' : '다음 경기'}</span> · <span>${esc(ko(first.event, EVENT_KO))}</span> <span>${esc(REGION[first.region] || '')}</span></h2>${live ? watchBtn(first.region) : ''}</div>
     <div class="nx-when"><strong>${big}</strong><span><b>${esc(dayLabel(dayKey(first.start)))}</b><b${first.timeTbd ? ' class="tbd"' : ''}>${first.timeTbd ? '시간 미정' : `${esc(hhmm(first.start))} <small class="nx-tz">${esc(TZL)}</small>`}</b>${live || first.timeTbd ? '' : `<small class="nx-rel">${rt(first.start, 'rel')}</small>`}</span></div>
@@ -853,7 +859,7 @@ function evPick() {
   if (cur) return { e: cur, st: 'now' };
   const nx = tl.find((e) => tlState(e) === 'next');
   const last = tl.filter((e) => tlState(e) === 'done').at(-1);
-  if (last && last.key !== 'champs' && (!nx || evDays(nx.start) > 7) && now() - kstDay(last.end) < 4 * 864e5) return { e: last, st: 'done' };
+  if (last && last.key !== 'champs' && !(last.key === 'lcq' && champsWait()) && (!nx || evDays(nx.start) > 7) && now() - kstDay(last.end) < 4 * 864e5) return { e: last, st: 'done' };
   return nx ? { e: nx, st: 'next' } : null; // 챔피언십이 끝난 뒤에는 시즌 결과(seasonEnd)가 대신한다
 }
 // 지금 보기의 지역: 한국 팀 → APAC North, 지역 보기 → 그 지역, 내 응원 팀 → 대표 팀 지역부터 고른 팀들의 지역
@@ -927,7 +933,8 @@ function evGlobalBody(e, state) {
   let chips = [];
   if (e.key === 'champs' && !B?.started) {
     const S = champsSeeds();
-    chips = S.seeds.filter((t) => !t.tbd && isF(t.short)).map((t) => evChip(t.short, t.via === 'cp' ? '직행' : 'LCQ 진출'));
+    chips = S.seeds.filter((t) => !t.tbd && isF(t.short)).map((t) => evChip(t.short, S.allDone ? `${(B?.seeds || []).find((x) => x.short === t.short)?.group || t.group}조` : t.via === 'cp' ? '직행' : 'LCQ 진출'));
+    if (S.allDone) lines.push(['진출 팀', `<b>${S.seeds.length}팀 확정</b> <small>${B?.official ? '공식 조 편성' : '조는 공식 발표 전 예상'}</small>`]);
     if (!S.allDone) { const lt = (A.season.timeline || []).find((x) => x.key === 'lcq'); lines.push(['남은 자리', `<b>LCQ ${A.season.lcqSlots}팀</b>${lt ? ` <small>${esc(dayLabel(lt.end))} 결정</small>` : ''}`]); }
   } else if (B && A.intl?.rows?.length) chips = A.intl.rows.filter((r) => isF(r.short)).map((r) => evChip(r.short, B.started ? stageShort(r.short) : '출전'));
   lines.splice(1, 0, ['관심 팀', chips.length ? `<span class="evr-t">${chips.length > 6 ? `${chips.slice(0, 5).join('')}<small>+${chips.length - 5}팀</small>` : chips.join('')}</span>` : `<small>${esc(ML().none)}</small>`]);
@@ -994,6 +1001,7 @@ document.addEventListener('click', (e) => {
 // 한국 선수·코치 팀: 홈에서는 작은 칩으로만, 자세한 내용은 팀 탭 '한국 관련'
 const STAGE_SHORT = { gs: '조별', wr: '승자R', er1: '패자1R', er2: '패자2R', f: '결승' };
 function stageShort(short) {
+  if (champsWait()) { const t = champsSeedOf(short); if (t) return `챔피언십 ${t.group}조`; }
   if (!intlCurrent()) {
     const l = lcqState(short);
     if (l) return l;
@@ -1186,12 +1194,18 @@ function teamUpcoming(short) {
 }
 // 대표 팀 카드 맨 위 한 줄: 챔피언십으로 가는 길 (직행권 / LCQ). 챔피언십이 시작되면 대회 성적이 대신한다
 function heroState(short) {
-  if (champsMain()) return '';
+  if (champsNow() || champsDone()) return '';
+  const box = (cls, icon, title, sub) => `<div class="hero-state ${cls}"><i aria-hidden="true">${icon}</i><span><b>${esc(title)}</b><small>${esc(sub)}</small></span></div>`;
+  if (champsWait()) { // 진출 40팀 확정: 진출 팀은 시드·조, LCQ에서 떨어진 팀은 LCQ 성적
+    const t = champsSeedOf(short), off = champsBracketR().official;
+    if (t) return box('direct', '★', t.via === 'lcq' ? 'LCQ 통과 · 챔피언십 진출' : '챔피언십 직행 확정', `${t.group}조 · ${t.seed}번 시드${off ? '' : ' (조 예상)'} · CP ${fmt(t.total || 0)}`);
+    const l = lcqState(short);
+    return l ? box('lcq', '▲', l, '챔피언십 진출 실패') : '';
+  }
   const c = cpStanding().find((r) => r.short === short);
   if (!c) return '';
   const locked = (A.season.timeline || []).filter((e) => /^s\dp[lo]$/.test(e.key)).every((e) => tlState(e) === 'done'); // CP가 걸린 대회가 모두 끝났는가
   const cut = A.season.cpDirectSlots;
-  const box = (cls, icon, title, sub) => `<div class="hero-state ${cls}"><i aria-hidden="true">${icon}</i><span><b>${esc(title)}</b><small>${esc(sub)}</small></span></div>`;
   if (c.direct) return box('direct', '★', locked ? '챔피언십 직행 확정' : '챔피언십 직행권', `CP ${c.rank}위 · ${cut}위까지 직행${locked ? '' : ' · 지금 기준'}`);
   const l = lcqEvents().length ? lcqState(short) : null;
   if (l) return box('lcq', '▲', l, `CP ${c.rank}위 · 지역마다 상위 2팀이 챔피언십으로`);
@@ -1567,6 +1581,8 @@ function finalsFirstTab() { const B = A.intl ? bracket() : null; return !!B?.f?.
 function intlCurrent() { if (!A.intl?.eventId) return false; return bracket()?.f?.status !== 'completed'; }
 function standings(parts, q) {
   if (parts[1] === 'past') return pastView(q);
+  // 대기 중 예전 LCQ 주소(…/standings?r=emea&m=f, 공유 링크 포함)는 이전 결과의 LCQ 로
+  if (champsWait() && !parts[1] && lcqEvents().some((e) => e.region === q.get('r'))) { const q2 = new URLSearchParams(q); q2.set('e', 'lcq'); return pastView(q2); }
   if (parts[1] === 'champs' && champsTab()) return `<h1 class="title">순위</h1>${champsView(q, '/standings/champs')}`;
   if (champsMain()) return `<h1 class="title">순위</h1>${champsView(q, '/standings')}`;
   if (intlCurrent()) {
@@ -1663,7 +1679,8 @@ function lcqEntrants(ev) {
 const ccLabel = (c) => (c.win > 0 ? `CC #${c.win} 우승` : c.win ? 'CC 우승' : `CC 종합 ${c.rank}위`);
 const seedLabel = (t) => (t.seed ? `${t.seed}번 시드` : t.cp ? `CP ${t.cp.rank}위` : t.cc ? ccLabel(t.cc) : '2부');
 // 단계별 상태와 출전 팀: 결과 > 공식 출전 명단 > 앞 경기 결과로 계산한 배정(LCQ_FLOW) / 그룹은 시드 배정
-function lcqBracket(ev) {
+const lcqBracket = perRender(lcqBracket0, (ev) => ev.eventId);
+function lcqBracket0(ev) {
   const ss = A.series.filter((s) => s.eventId === ev.eventId);
   const E = lcqEntrants(ev);
   const bySh = new Map(E.list.map((t) => [t.short, t]));
@@ -2062,14 +2079,18 @@ function lcqBody(q, base) {
 }
 
 /* ---------- 챔피언십 조 편성 (사이트 계산) ---------- */
-// 직행 32팀을 CP 순위대로 A→B→C→D→D→C→B→A→A→B… 지그재그로 4개 조(10팀씩)에 넣는다.
-// 33~40번 자리는 LCQ 8팀(지역별 2팀). 네 지역 LCQ가 모두 끝나면 그 8팀을 CP 순서대로 같은 방식으로 이어 넣는다.
+// 규정 3.8.1: 진출 40팀(직행 32 + LCQ 8)을 CP 순으로 1~40번 시드를 매기고 A→B→C→D→D→C→B→A→A→B… 지그재그로 4개 조(10팀씩)에 넣는다.
+// LCQ가 끝나기 전에는 직행 32팀이 1~32번, LCQ 자리(끝난 지역 팀은 예상)가 33~40번. 네 지역이 끝나면 40팀 전체를 다시 CP 순으로 세운다.
 const champsTimeline = () => A.season.timeline.find((t) => t.key === 'champs');
 // 챔피언십 탭: 시작되기 전까지 (시작하면 순위 탭의 기본 화면이 된다). CP 순위가 아직 없는 시즌 초에는 감춘다
 const champsTab = () => !!champsTimeline() && !champsMain() && A.cp.length > 0;
 // 챔피언십이 끝났는가 (시즌 종료). 끝난 뒤에도 순위 탭 기본 화면과 홈의 시즌 결과로 계속 남는다
 const champsDone = () => !!champsTimeline() && champsSeries().some((x) => x.phase === 'Match Point Finals' && x.status === 'completed');
-const champsMain = () => champsNow() || champsDone();
+// LCQ가 네 지역 모두 끝났는가: 지역마다 매치 포인트 결승이 공식 '종료' (대진 계산 없이 시리즈 상태만 본다)
+const lcqOver = () => { const L = lcqEvents(); return L.length > 0 && L.every((e) => A.series.some((s) => s.eventId === e.eventId && s.phase === 'Match Point Finals' && s.status === 'completed')); };
+// 챔피언십 대기: LCQ가 끝나 진출 40팀이 정해졌고 챔피언십은 아직 시작 전. 순위 탭 기본 화면이 챔피언십(조 편성)이 되고 LCQ는 '이전 결과'로 간다
+const champsWait = () => !!champsTimeline() && !champsNow() && !champsDone() && A.cp.length > 0 && lcqOver();
+const champsMain = () => champsNow() || champsDone() || champsWait();
 // 시즌 일정표 한 줄의 상태(끝남·진행 중·예정)와 사이트 안에서 그 단계를 보는 곳
 //   공식 경기가 있으면 시각 기준: 첫 경기 시작 시각부터 마지막 경기 시작 12시간 뒤까지(공식 중계 표시 기간 regionEventOn 과 같은 규칙).
 //   모든 경기가 끝났으면 그때 끝. 마지막 날 경기가 아직 공식에 없을 수 있어, 끝은 마지막 날(미국 서부 날짜)이 시작되기 전으로는 당기지 않는다.
@@ -2092,7 +2113,7 @@ function stageHref(e) {
     const ev = (A.past || []).find((x) => new RegExp(`^split-${m[1]}-playoffs`).test(x.slug || ''));
     return ev ? `#/standings/past?e=${ev.eventId}` : null;
   }
-  if (e.key === 'lcq') return !lcqEvents().length ? null : intlCurrent() || champsDone() ? '#/standings/past?e=lcq' : '#/standings';
+  if (e.key === 'lcq') return !lcqEvents().length ? null : intlCurrent() || champsDone() || champsWait() ? '#/standings/past?e=lcq' : '#/standings';
   if (e.key === 'champs') return champsMain() ? '#/standings' : champsTab() ? '#/standings/champs' : null;
   return null;
 }
@@ -2112,7 +2133,11 @@ function lcqQualifiers() {
 // LCQ 결승 단일 게임 점수로 가르기: 실제로 필요할 때만 두 팀의 결승 게임 기록을 받는다
 const lcqGameTie = (a, b) => { gamesNeed([a.fin, b.fin]); return gameTie([a.fin], gid0(a), [b.fin], gid0(b)); };
 const gid0 = (t) => xteam(t.short)?.id || t.id;
-function champsSeeds() {
+const champsSeeds = perRender(champsSeeds0);
+// 챔피언십 진출 팀의 시드·조 (공식 조가 나오면 공식 조). 진출하지 못했거나 아직 모르면 null
+const champsSeedOf = (sh) => { if (!champsTimeline()) return null; const B = champsBracketR(); return B.seeds.find((t) => !t.tbd && t.short === sh) || null; };
+const champsBracketR = perRender(() => champsBracket());
+function champsSeeds0() {
   const cp = cpStanding();
   const direct = cp.filter((r) => r.direct).sort((a, b) => a.rank - b.rank).map((r) => ({ ...r, via: 'cp' }));
   const Q = lcqQualifiers();
@@ -2121,8 +2146,16 @@ function champsSeeds() {
   // 규정 3.8.1: CP(같으면 C7.3, 단 CP 0점끼리는 동점으로 보지 않음) → LCQ 최종 순위 → LCQ 결승 Round Score → LCQ 결승 단일 게임 점수(C7.1 순) → 추첨(사이트는 지역 순서)
   const gid = (sh) => xteam(sh)?.id || cpOf(sh)?.id || null;
   // 끝난 지역의 진출 팀은 네 지역이 다 끝나기 전에도 미리 넣는다(prov: 남은 지역 결과에 따라 시드·조가 바뀔 수 있는 예상 자리), 남은 자리는 미정
+  const lcqCmp = (a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || a.lcqPos - b.lcqPos || b.lcqPts - a.lcqPts || lcqGameTie(a, b);
   const got = Q.filter((x) => x.done).flatMap((x) => x.teams.map((sh, i) => ({ id: cpOf(sh)?.id || gid(sh), short: sh, name: xteam(sh)?.name || sh, region: x.region, total: cpOf(sh)?.total || 0, rank: cpOf(sh)?.rank ?? null, lcqPos: i + 1, lcqPts: x.pts[i], fin: x.fin, via: 'lcq', ...(allDone ? {} : { prov: true }) })))
-    .sort((a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || a.lcqPos - b.lcqPos || b.lcqPts - a.lcqPts || lcqGameTie(a, b));
+    .sort(lcqCmp);
+  // 네 지역이 모두 끝나면 규정 3.8.1대로 40팀 전체를 CP 순으로 다시 세운다(LCQ 팀이 직행 팀보다 CP가 높으면 그 앞으로).
+  //   같은 CP: C7.3(직행·LCQ 공통), 그래도 같으면 직행 팀 먼저, LCQ 팀끼리는 LCQ 순위 → 결승 점수 → 결승 단일 게임 점수
+  //   끝나기 전에는 남은 자리를 알 수 없어 LCQ 팀을 33번부터 이어 넣는다(예상)
+  if (allDone) {
+    const all = [...direct, ...got].sort((a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || (a.via === b.via ? (a.via === 'lcq' ? lcqCmp(a, b) : a.rank - b.rank) : a.via === 'cp' ? -1 : 1));
+    return { seeds: all.map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone };
+  }
   const lcq = [...got, ...Array.from({ length: Math.max(0, A.season.lcqSlots - got.length) }, () => ({ via: 'lcq', tbd: true }))];
   return { seeds: [...direct, ...lcq].map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone };
 }
@@ -2234,7 +2267,7 @@ function champsView(q, base) {
   const row = (t) => t.tbd
     ? `<li class="cg-row tbd"><span class="cg-seed">${t.seed}</span><span class="cg-team"><span class="tag lcq">LCQ</span></span><small class="cg-reg">미정</small><span class="cg-cp"></span></li>`
     : `<li class="cg-row ${rowCls(t)}${t.prov ? ' prov' : ''}"><span class="cg-seed">${t.seed}</span><span class="cg-team">${krDot(null, t.short)}${teamLink(t.short, team(t.short) ? t.short : undefined)}${t.via === 'lcq' ? ' <span class="tag lcq">LCQ</span>' : ''}${t.prov ? ' <span class="tag prov">예상</span>' : ''}</span><small class="cg-reg">${esc(REGION_S[t.region] || '')}</small><span class="cg-cp num">${t.total ? fmt(t.total) : '–'}</span></li>`;
-  const groupsHtml = `<div class="cg-grid">${GROUPS.map((g) => { const ts = seeds.filter((t) => t.group === g); const nF = ts.filter((t) => !t.tbd && isF(t.short)).length; return `<section class="cg" aria-label="${g}조"><h3 class="cg-h"><b>${g}조</b><small>${ts.filter((t) => !t.tbd && !t.prov).length}팀 확정${ts.some((t) => t.tbd || t.prov) ? ` · LCQ ${ts.filter((t) => t.tbd || t.prov).length}자리` : ''}${nF ? ` · ${esc(ML().tag)} ${nF}` : ''}</small></h3><ol class="cg-list">${ts.map(row).join('')}</ol></section>`; }).join('')}</div>`;
+  const groupsHtml = `<div class="cg-grid">${GROUPS.map((g) => { const ts = seeds.filter((t) => t.group === g); const nF = ts.filter((t) => !t.tbd && isF(t.short)).length; return `<section class="cg" aria-label="${g}조"><h3 class="cg-h"><b>${g}조</b><small>${allDone ? `${ts.length}팀${B.official ? '' : ' · <span class="cg-prov">예상</span>'}` : `${ts.filter((t) => !t.tbd && !t.prov).length}팀 확정`}${ts.some((t) => t.tbd || t.prov) ? ` · LCQ ${ts.filter((t) => t.tbd || t.prov).length}자리` : ''}${nF ? ` · ${esc(ML().tag)} ${nF}` : ''}</small></h3><ol class="cg-list">${ts.map(row).join('')}</ol></section>`; }).join('')}</div>`;
   // LCQ 진출 팀: 시드 근거(규정 3.8.1)가 읽히게 팀마다 결승 순위 · 결승 점수 · 지금 CP, 네 지역이 끝나면 시드 번호
   const cpNow = new Map(cpStanding().map((r) => [r.short, r.total || 0]));
   const seedOf = new Map(seeds.filter((t) => t.via === 'lcq' && !t.tbd).map((t) => [t.short, t]));
@@ -2245,17 +2278,19 @@ function champsView(q, base) {
   const qState = (x) => { const e = lcqEvents().find((y) => y.region === x.region); return e && lcqBracket(e).started ? 'LCQ 진행 중' : 'LCQ 전'; };
   const qBox = `<section class="sec" aria-labelledby="h-cq"><h2 class="h2" id="h-cq">LCQ 진출 팀 <small class="muted">지역별 2팀</small></h2>
     <div class="cq-grid">${Q.map((x) => `<div class="cq"><b>${esc(REGION[x.region])}</b>${x.done ? x.teams.map((sh, i) => qTeam(x, sh, i)).join('') : `<span class="muted">${qState(x)}</span>`}</div>`).join('')}</div>
-    <p class="caption"><span>${allDone ? 'LCQ 진출 8팀을 CP 순서대로 33~40번 자리에 넣었습니다.' : Q.some((x) => x.done) ? '끝난 지역의 LCQ 진출 팀을 지금 CP 순서대로 33번부터 미리 넣었습니다(예상). 남은 지역이 끝나면 시드와 조가 바뀔 수 있습니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</span> <span>CP는 지금 챔피언십 포인트입니다.</span></p>
-    <div class="cq-how"><b>LCQ 진출 팀 시드 순서 <small>규정 3.8.1</small></b><ol>
-      <li>CP가 높은 팀이 앞</li>
-      <li>CP가 같으면 LCQ 결승 순위가 높은 팀</li>
+    <p class="caption"><span>${allDone ? '진출 40팀이 모두 정해져 LCQ 진출 팀도 직행 팀과 함께 CP 순으로 시드를 받았습니다(규정 3.8.1).' : Q.some((x) => x.done) ? '끝난 지역의 LCQ 진출 팀을 지금 CP 순서대로 33번부터 미리 넣었습니다(예상). 남은 지역이 끝나면 시드와 조가 바뀔 수 있습니다.' : '네 지역 LCQ가 모두 끝나면 진출 8팀을 CP 순서대로 33~40번 자리에 넣습니다.'}</span> <span>CP는 지금 챔피언십 포인트입니다.</span></p>
+    <div class="cq-how"><b>챔피언십 시드 순서 <small>규정 3.8.1</small></b><ol>
+      <li>40팀 모두 CP가 높은 팀이 앞</li>
+      <li>CP가 같으면 동점 기준(부록 C7.3)</li>
+      <li>LCQ 팀끼리 그래도 같으면 LCQ 결승 순위가 높은 팀</li>
       <li>그래도 같으면 LCQ 결승 점수가 높은 팀</li>
       <li>그래도 같으면 결승 한 게임 최고 점수가 높은 팀</li>
       <li>그래도 같으면 추첨</li>
     </ol></div></section>`;
   const how = `<section class="sec" aria-labelledby="h-ch-how"><h2 class="h2" id="h-ch-how">진행 방식</h2>${stageFlow(B, CH_FLOW_L, (k) => qsLink(base, q, { m: k }), '챔피언십 진행 방식')}</section>`;
-  const groupsTab = `${how}${schedTable(B)}
-    <section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.official ? '공식 조 배정입니다.' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}${seeds.some((t) => t.prov) ? ' <span>‘예상’ 표시 팀은 LCQ 진출이 확정된 팀입니다. 남은 지역 LCQ 결과에 따라 시드와 조가 바뀔 수 있습니다.</span>' : ''}</p>${groupsHtml}</section>${qBox}`;
+  const groupsSec = `<section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.official ? '공식 조 배정입니다.' : allDone ? '진출 40팀은 확정입니다. 조는 40팀을 CP 순으로 1~40번 시드를 매겨 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 사이트 계산이라, 공식 발표 전까지는 예상입니다(규정 3.8.1).' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}${seeds.some((t) => t.prov) ? ' <span>‘예상’ 표시 팀은 LCQ 진출이 확정된 팀입니다. 남은 지역 LCQ 결과에 따라 시드와 조가 바뀔 수 있습니다.</span>' : ''}</p>${groupsHtml}</section>`;
+  // 시작 전(챔피언십 대기)에는 조 편성이 가장 궁금하므로 맨 위에, 시작하면 진행 방식·일정이 먼저
+  const groupsTab = B.started ? `${how}${schedTable(B)}${groupsSec}${qBox}` : `${groupsSec}${qBox}${how}${schedTable(B)}`;
   return `<section class="sec past-ev"><h2 class="h2">챔피언십</h2><p class="lead">${tl ? `${esc(tl.start.slice(0, 4))}.${esc(tl.start.slice(5).replace('-', '.'))} – ${esc(tl.end.slice(5).replace('-', '.'))} · ${esc(tl.where)}` : ''}</p></section>
     ${B.started && !B.done ? refreshNote() : ''}
     ${stickNav(tabBar)}
@@ -2266,7 +2301,7 @@ function champsView(q, base) {
 function pastEvents() {
   const list = (A.past || []).filter((e) => !(intlCurrent() && e.eventId === A.intl.eventId) && !(champsMain() && /^champs/.test(e.slug || '')));
   // 다음 국제전이 진행 중이거나 챔피언십이 끝났으면 LCQ도 이전 결과로 간다
-  if ((intlCurrent() || champsDone()) && lcqEvents().some((e) => A.series.some((s) => s.eventId === e.eventId && s.results))) list.unshift({ eventId: 'lcq', kind: 'lcq', name: 'Last Chance Qualifier', start: lcqEvents()[0].start, end: lcqEvents()[0].end });
+  if ((intlCurrent() || champsDone() || champsWait()) && lcqEvents().some((e) => A.series.some((s) => s.eventId === e.eventId && s.results))) list.unshift({ eventId: 'lcq', kind: 'lcq', name: 'Last Chance Qualifier', start: lcqEvents()[0].start, end: lcqEvents()[0].end });
   return list;
 }
 const evPlace = (ev) => A.season.timeline.find((t) => ev.start.slice(0, 10) <= t.end && ev.end.slice(0, 10) >= t.start);
@@ -2846,7 +2881,11 @@ function rosterLogView(q) {
 //   lcqBracket 은 대회마다 한 번만 만들고 팀별로 찾는다 (팀 120개마다 다시 만들지 않게)
 function teamStatusMap() {
   const m = new Map();
-  if (!intlCurrent()) {
+  if (champsWait()) {
+    const Bs = lcqEvents().map(lcqBracket);
+    for (const t of champsBracketR().seeds) if (!t.tbd) m.set(t.short, { k: 'direct', text: `챔피언십 ${t.group}조` });
+    for (const sh of Object.keys(A.teams)) { if (m.has(sh)) continue; const l = lcqState(sh, Bs); if (l) m.set(sh, { k: 'out', text: l }); }
+  } else if (!intlCurrent()) {
     const Bs = lcqEvents().map(lcqBracket);
     for (const sh of Object.keys(A.teams)) { const l = lcqState(sh, Bs); if (l) m.set(sh, { k: / LIVE/.test(l) ? 'live' : /탈락/.test(l) ? 'out' : 'lcq', text: l.replace(/ · CP \d+위$/, '') }); }
     if (lcqEvents().length) for (const c of cpStanding()) if (c.direct && !m.has(c.short)) m.set(c.short, { k: 'direct', text: '챔피언십 직행' });
@@ -2861,6 +2900,10 @@ function teamNext(short) {
     let st = null;
     for (const x of B.list) if (x.teams?.includes(short) && x.status !== 'completed') { st = x; break; }
     if (st) return { name: `${REGION[e.region] || ''} LCQ · ${st.ko}`, when: stWhen(st), live: st.status === 'live', href: qsLink('/standings', new URLSearchParams({ r: e.region }), { m: st.key }), s: st.s };
+  }
+  if (champsWait()) { // 시작 전 챔피언십: 사이트가 계산한(또는 공식) 조로 그 팀의 첫 조별 리그 경기
+    const C = champsBracketR(), st = C.list.find((x) => x.key !== 'gs' && x.status !== 'completed' && (x.teams || []).includes(short));
+    if (st) return { name: `챔피언십 · ${st.ko}${C.official ? '' : ' (조 예상)'}`, when: stWhen(st), live: false, href: qsLink('/standings', new URLSearchParams(), { m: st.key }), s: st.s };
   }
   const s = A.series.filter((x) => x.status !== 'completed' && (x.lineup || []).includes(short)).sort((a, b) => a.start.localeCompare(b.start))[0];
   return s ? { name: `${ko(s.event, EVENT_KO)} · ${ko(s.name, PHASE_KO)}`, when: `${dateTime(s.start)} ${TZL}`, live: !!s.live, href: officialUrl(s), ext: true, s } : null;
@@ -4073,10 +4116,14 @@ render();
 watchHeader();
 liveBadge();
 pollVer();
-setInterval(pollVer, C.verPollMs || 30000);
+// 새 데이터 확인 주기: 경기가 진행 중이거나 6시간 안에 시작하면 verPollMs(30초), 그 밖(챔피언십 대기 같은 경기 없는 기간)에는 4배.
+//   빌드는 5분마다라 경기가 없을 때 30초마다 물을 필요가 없다. 탭을 다시 보면(visibilitychange) 바로 한 번 확인한다
+const quietNow = () => !A.series.some((s) => s.status !== 'completed' && (s.live || Math.abs(new Date(s.start) - now()) < 6 * 3600e3));
+(function verLoop() { setTimeout(() => { pollVer(); verLoop(); }, (C.verPollMs || 30000) * (quietNow() ? 4 : 1)); })();
 if (C.streamsUrl) setInterval(pollStreams, C.streamsPollMs || 60000);
 if (LIVE.mode === 'worker' && C.liveUrl) { pollLive(); setInterval(pollLive, C.livePollMs || 10000); }
 else if (LIVE.mode === 'direct') { pollDirect(); refreshOfficial(); }
 updatePill();
-setInterval(() => { if (!document.hidden) updatePill(); }, 1000);
+// 머리 표시: 실시간 확인 중에는 1초마다('n초 전'), 경기가 없으면 30초마다
+{ let pn = 0; setInterval(() => { if (document.hidden || (!LIVE.active.length && !LIVE.lastAt && ++pn % 30)) return; updatePill(); }, 1000); }
 setInterval(homeTick, 60000); // 홈 카운트다운: 시각 글자만 바꾸고, 날짜·시가 바뀔 때만 다시 그린다

@@ -297,6 +297,21 @@ async function collect(season, prev) {
       if (shorts.length) lineups[s.id] = shorts; else if (prev.lineups?.[s.id]) lineups[s.id] = prev.lineups[s.id];
     }
   }
+  // 챔피언십 대기(7일보다 먼저): 공식 조 배정이 나오면 바로 쓰도록 조별 리그 시리즈(6개) 출전 명단만 매시 한 번 확인한다.
+  //   네 지역 LCQ 결승이 모두 끝난 뒤부터. 명단이 다 나오면 화면이 그 명단으로 조를 읽는다(app.js champsBracket 의 lineG)
+  const chEv = season.tournaments.flatMap((t) => t.events).find((e) => /^champs/.test(e.slug) && new Date(e.startDate) > new Date());
+  const lcqEvIds = new Set(season.tournaments.flatMap((t) => t.events).filter((x) => /^last-chance-qualifier/.test(x.slug)).map((x) => x.id));
+  const lcqOver = lcqEvIds.size > 0 && [...lcqEvIds].every((id) => allSeries.some((x) => x.event?.id === id && x.phase?.name === 'Match Point Finals' && x.status === 'completed'));
+  if (chEv && chEv !== upEvent && lcqOver) {
+    const gs = allSeries.filter((x) => x.event?.id === chEv.id && /^Group [A-D] vs [A-D]$/.test(x.name || ''));
+    const res = await pmap(gs, (s) => (FULL ? peek(`/series/${s.id}/teams`) : null));
+    let n = 0;
+    for (const [k, s] of gs.entries()) {
+      const shorts = (res[k]?.teams || []).map((t) => String(t.shortName || '').trim()).filter(Boolean);
+      if (shorts.length) { lineups[s.id] = shorts; n++; } else if (prev.lineups?.[s.id]) lineups[s.id] = prev.lineups[s.id];
+    }
+    if (FULL) console.log(`[algs] 챔피언십 공식 조 확인: 조별 리그 ${gs.length}경기 중 출전 명단 ${n}경기${n ? '' : ' (아직 발표 전)'}`);
+  }
   if (intlEvent) {
     const left = allSeries.filter((x) => x.event?.id === intlEvent.id && x.status !== 'completed');
     const res = await pmap(left, (s) => get(`/series/${s.id}/teams`));
