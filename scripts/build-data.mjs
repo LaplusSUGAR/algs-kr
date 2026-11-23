@@ -70,6 +70,10 @@ const lpLcq = lpMine(readJson('raw/lp/lcq.json', null));
 const lpTeamsSrc = lpMine(readJson('raw/lp/teams-src.json', null)) || { pages: {} };
 
 const conflicts = [];
+// 시간으로 정하는 값(진행 중 국제전, 이전 결과, 직행 확정)의 기준 시각: 실제 지금.
+//   예전에는 공식 스냅샷이 마지막으로 바뀐 시각(fetchedAt)을 써서, 데이터가 며칠 그대로면 대회 시작·끝이 늦게 반영됐다.
+//   시험할 때는 BUILD_NOW=2027-01-28T09:00:00Z 처럼 시각을 정할 수 있다
+const NOW = process.env.BUILD_NOW ? Date.parse(process.env.BUILD_NOW) : Date.now();
 const evByIdEarly = Object.fromEntries(algs.events.map(([id, , , , start]) => [id, { start }]));
 const CP_DIRECT = season.cpDirectSlots; // 32
 
@@ -226,7 +230,7 @@ const cpRows = algs.cp.map(([rank, id, name, short, region, total, players]) => 
 //   그래서 마지막 플레이오프가 끝나면 공식 순위의 상위 32팀을 고정해 두고, 화면의 로스터 반영(팀 CP 재계산)은 이 선을 넘나들지 못하게 한다
 {
   const lockEv = algs.events.find((e) => e[1] === (rules.championship.directDecidedAt || '') || (e[1] || '').startsWith(`${rules.championship.directDecidedAt}-`));
-  const decided = lockEv && new Date(lockEv[5]) < new Date(algs.fetchedAt) && (algs.cpEvents || []).some(([id, , rows]) => id === lockEv[0] && rows.length && rows.every((r) => r[2]));
+  const decided = lockEv && Date.parse(lockEv[5]) < NOW && (algs.cpEvents || []).some(([id, , rows]) => id === lockEv[0] && rows.length && rows.every((r) => r[2]));
   meta.cpLock = rulesMine && decided && cpRows.length > CP_DIRECT ? cpRows.filter((r) => r.rank <= CP_DIRECT).map((r) => r.id) : null;
 }
 const cp32 = cpRows.find((r) => r.rank === CP_DIRECT)?.total ?? 0;
@@ -339,7 +343,7 @@ const poi = Object.fromEntries(Object.entries(poiMan.series || {})
 series.sort((a, b) => a.start.localeCompare(b.start));
 
 // ---------- 진행 중 국제전 단계 순위 ----------
-const intlEv = Object.values(evById).find((e) => /playoffs|champs/.test(e.slug) && algs.poGroup.length && new Date(e.start) <= new Date(algs.fetchedAt) && new Date(e.end) >= new Date(new Date(algs.fetchedAt) - 3 * 864e5));
+const intlEv = Object.values(evById).find((e) => /playoffs|champs/.test(e.slug) && algs.poGroup.length && Date.parse(e.start) <= NOW && Date.parse(e.end) >= NOW - 3 * 864e5);
 const intl = intlEv && algs.poGroup.length ? {
   eventId: intlEv.id, name: intlEv.name, slug: intlEv.slug, start: intlEv.start, end: intlEv.end, phase: 'Group Stage', winnersCut: 20,
   rows: algs.poGroup.map(([pos, short, name, id, group, pts, kills, region]) => ({
@@ -352,9 +356,9 @@ const intl = intlEv && algs.poGroup.length ? {
 // format 'bracket' (Split 2·챔피언십): 조별 리그 → 승자 라운드/패자부활 1·2R → 결승
 // format 'stages'  (Split 1 EWC): 조별 리그 상위 N팀 결승 직행, 다음 M팀 서바이벌 스테이지(상위 K팀 결승), 나머지 탈락
 //   직행·서바이벌 인원은 실제 결과에서 계산하고, 결과가 없으면 공식 단계의 진출 기준(0부터 센 값)을 쓴다
-const latestIntlId = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt) && algs.events.find((x) => x[0] === e.id)?.[6]?.length)
+const latestIntlId = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && Date.parse(e.start) <= NOW && algs.events.find((x) => x[0] === e.id)?.[6]?.length)
   .sort((a, b) => b.start.localeCompare(a.start))[0]?.id;
-const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && new Date(e.start) <= new Date(algs.fetchedAt))
+const past = Object.values(evById).filter((e) => /playoffs|champs/.test(e.slug) && Date.parse(e.start) <= NOW)
   .sort((a, b) => b.start.localeCompare(a.start)).map((e) => {
     const ss = series.filter((x) => x.eventId === e.id);
     const bracketFmt = ss.some((x) => x.name === 'Winners Round');
@@ -473,7 +477,6 @@ const lcq = Object.values(evById).filter((e) => e.slug.startsWith('last-chance-q
 }).sort((a, b) => ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(a.region) - ['apac-n', 'apac-s', 'emea', 'americas'].indexOf(b.region));
 
 // ---------- 한국 팀 요약 ----------
-const now = new Date(algs.fetchedAt);
 const plKr = pl[`s${lastSplit}:apac-n`];
 const kr = Object.values(teams).filter((t) => t.krLevel !== 'none' && (t.cp || plKr?.rows.some((r) => r.id === t.id) || !cpRows.length))
   .map((t) => {

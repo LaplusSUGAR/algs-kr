@@ -400,7 +400,7 @@ function setPageTitle(parts, q) {
   let head = '';
   if ((tab === 'teams' || tab === 'players') && parts[1]) head = app.querySelector('h1')?.textContent.trim() || '';
   else head = app.querySelector('.subtabs [aria-current="page"]')?.textContent.trim() || '';
-  if (head && tab === 'standings' && lcqEvents().length && !champsMain() && !intlCurrent() && !['past', 'champs'].includes(parts[1])) { // LCQ는 지역까지
+  if (head && tab === 'standings' && standingsMain() === 'lcq' && !['past', 'champs'].includes(parts[1])) { // LCQ는 지역까지
     const r = lcqEvents().some((e) => e.region === q.get('r')) ? q.get('r') : lcqRegionDefault();
     head = `${head} ${I.t(REGION[r] || '')}`.trim();
   }
@@ -596,7 +596,7 @@ function subtabs(tab, parts, q) {
       : intlCurrent()
       ? [['결승', '#/standings/finals', parts[1] === 'finals'], ['브래킷', '#/standings/bracket', parts[1] === 'bracket' || (!parts[1] && !finalsFirstTab())], ['조별 리그', '#/standings/group', parts[1] === 'group'],
         ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']]
-      : [[lcqEvents().length ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
+      : [[standingsMain() === 'lcq' ? 'LCQ' : '진행 중', '#/standings', !['past', 'champs'].includes(parts[1])], ...(champsTab() ? [['챔피언십', '#/standings/champs', parts[1] === 'champs']] : []), ['이전 결과', '#/standings/past', parts[1] === 'past']],
     points: [['챔피언십 포인트', '#/points/cp', !['pl', 'events'].includes(parts[1])], ['대회별 CP 내역', '#/points/events', parts[1] === 'events'], ['프로리그 포인트', '#/points/pl', parts[1] === 'pl']],
     teams: [['전체', '#/teams', !parts[1] && g === 'all'], [ML().group, '#/teams?g=kr', g === 'kr'], ...['apac-n', 'apac-s', 'emea', 'americas'].filter((r) => r !== ML().region).map((r) => [REGION[r], `#/teams?g=${r}`, g === r]), ['로스터 변경', '#/teams?g=moves', g === 'moves']],
     streams: [['전체', '#/streams', sv === 'all'], ...(C.streamsUrl ? [['방송 중·영상', '#/streams?s=live', sv === 'live'], ...(povOn() || sv === 'pov' ? [['개인화면', '#/streams?s=pov', sv === 'pov']] : [])] : []), ['ALGS 멀티뷰', '#/streams?s=mv', sv === 'mv'], ['공식 중계', '#/streams?s=official', sv === 'official'], ['선수·코치', '#/streams?s=players', sv === 'players'], ...(A.streams.creators?.length ? [['스트리머', '#/streams?s=creators', sv === 'creators']] : [])],
@@ -1589,7 +1589,7 @@ function standings(parts, q) {
     const view = ['finals', 'bracket', 'group'].includes(parts[1]) ? parts[1] : finalsFirstTab() ? 'finals' : 'bracket';
     return `<h1 class="title">순위</h1>${intlBody(A.intl, view, (v) => `#/standings/${v}`, intlKey())}`;
   }
-  if (lcqEvents().length) return `<h1 class="title">순위</h1>${lcqBody(q, '/standings')}`;
+  if (standingsMain() === 'lcq') return `<h1 class="title">순위</h1>${lcqBody(q, '/standings')}`;
   return `<h1 class="title">순위</h1><p class="empty">진행 중인 대회가 없습니다. ${(A.past || []).length ? '<a href="#/standings/past">이전 결과</a>에서 지난 대회를 볼 수 있습니다.' : '<span>이번 시즌 국제전이 열리면 여기에 표시됩니다.</span>'}</p>${pastSeasons()}`;
 }
 
@@ -2091,6 +2091,16 @@ const lcqOver = () => { const L = lcqEvents(); return L.length > 0 && L.every((e
 // 챔피언십 대기: LCQ가 끝나 진출 40팀이 정해졌고 챔피언십은 아직 시작 전. 순위 탭 기본 화면이 챔피언십(조 편성)이 되고 LCQ는 '이전 결과'로 간다
 const champsWait = () => !!champsTimeline() && !champsNow() && !champsDone() && A.cp.length > 0 && lcqOver();
 const champsMain = () => champsNow() || champsDone() || champsWait();
+// 시즌 시계: 순위 탭이 기본으로 보여 줄 대회 하나. 탭 이름·페이지 제목·일정표 링크도 모두 이 값을 따른다
+//   챔피언십(진행·대기·끝) → 진행 중 국제전 → LCQ → 없음
+//   LCQ는 진행 중·끝났거나, 시즌 일정표에서 LCQ 앞 대회가 모두 끝난 '바로 다음 대회'일 때만.
+//   (공식 사이트는 LCQ 대회를 몇 달 일찍 등록한다: Year 6 Americas LCQ는 6월 등록. 프로리그 중에 빈 LCQ 대진표가 기본 화면이 되지 않게)
+const lcqDue = () => {
+  const tl = A.season.timeline || [], L = tl.find((e) => e.key === 'lcq');
+  if (!L || tlState(L) !== 'next') return true;
+  return tl.filter((e) => e !== L && e.start < L.start).every((e) => tlState(e) === 'done');
+};
+const standingsMain = perRender(() => (champsMain() ? 'champs' : intlCurrent() ? 'intl' : lcqEvents().length && lcqDue() ? 'lcq' : null));
 // 시즌 일정표 한 줄의 상태(끝남·진행 중·예정)와 사이트 안에서 그 단계를 보는 곳
 //   공식 경기가 있으면 시각 기준: 첫 경기 시작 시각부터 마지막 경기 시작 12시간 뒤까지(공식 중계 표시 기간 regionEventOn 과 같은 규칙).
 //   모든 경기가 끝났으면 그때 끝. 마지막 날 경기가 아직 공식에 없을 수 있어, 끝은 마지막 날(미국 서부 날짜)이 시작되기 전으로는 당기지 않는다.
@@ -2113,7 +2123,7 @@ function stageHref(e) {
     const ev = (A.past || []).find((x) => new RegExp(`^split-${m[1]}-playoffs`).test(x.slug || ''));
     return ev ? `#/standings/past?e=${ev.eventId}` : null;
   }
-  if (e.key === 'lcq') return !lcqEvents().length ? null : intlCurrent() || champsDone() || champsWait() ? '#/standings/past?e=lcq' : '#/standings';
+  if (e.key === 'lcq') return !lcqEvents().length ? null : intlCurrent() || champsDone() || champsWait() ? '#/standings/past?e=lcq' : standingsMain() === 'lcq' ? '#/standings' : null;
   if (e.key === 'champs') return champsMain() ? '#/standings' : champsTab() ? '#/standings/champs' : null;
   return null;
 }
