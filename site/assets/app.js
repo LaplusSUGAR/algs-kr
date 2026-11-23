@@ -741,7 +741,8 @@ function bracketFlow(B) {
 /* ---------- 홈 ---------- */
 // LCQ·챔피언십이 시작되면 홈 맨 위에 진행 방식 그림과 지금 경기 점수표 (끝나고 3일까지)
 function eventHome() {
-  const recent = (B, end) => !B.done || now() - new Date(B.f.start || end) < 3 * 864e5;
+  // 대회 묶음이 끝나면(결승 종료) 바로 내린다: 홈은 다음 대회 대기 화면으로 (운영자 요청 11-23)
+  const recent = (B) => !B.done;
   let B, base, q, title, L, key;
   const C = champsTimeline() ? champsBracket() : null;
   if (C?.started && recent(C, C.tl.end)) {
@@ -858,8 +859,7 @@ function evPick() {
   const cur = tl.find((e) => tlState(e) === 'now');
   if (cur) return { e: cur, st: 'now' };
   const nx = tl.find((e) => tlState(e) === 'next');
-  const last = tl.filter((e) => tlState(e) === 'done').at(-1);
-  if (last && last.key !== 'champs' && !(last.key === 'lcq' && champsWait()) && (!nx || evDays(nx.start) > 7) && now() - kstDay(last.end) < 4 * 864e5) return { e: last, st: 'done' };
+  // 대회가 끝나면 '지난 대회 결과'로 머물지 않고 바로 다음 대회(D-n)를 보여 준다 (운영자 요청 11-23). 끝난 결과는 순위 탭 '이전 결과'
   return nx ? { e: nx, st: 'next' } : null; // 챔피언십이 끝난 뒤에는 시즌 결과(seasonEnd)가 대신한다
 }
 // 지금 보기의 지역: 한국 팀 → APAC North, 지역 보기 → 그 지역, 내 응원 팀 → 대표 팀 지역부터 고른 팀들의 지역
@@ -934,7 +934,7 @@ function evGlobalBody(e, state) {
   if (e.key === 'champs' && !B?.started) {
     const S = champsSeeds();
     chips = S.seeds.filter((t) => !t.tbd && isF(t.short)).map((t) => evChip(t.short, S.allDone ? `${(B?.seeds || []).find((x) => x.short === t.short)?.group || t.group}조` : t.via === 'cp' ? '직행' : 'LCQ 진출'));
-    if (S.allDone) lines.push(['진출 팀', `<b>${S.seeds.length}팀 확정</b> <small>${B?.official ? '공식 조 편성' : '조는 공식 발표 전 예상'}</small>`]);
+    if (S.allDone) lines.push(['진출 팀', `<b>${S.seeds.length}팀 확정</b> <small>${B?.fixed ? '조 편성 확정' : B?.official ? '공식 조 편성' : '조는 공식 발표 전 예상'}</small>`]);
     if (!S.allDone) { const lt = (A.season.timeline || []).find((x) => x.key === 'lcq'); lines.push(['남은 자리', `<b>LCQ ${A.season.lcqSlots}팀</b>${lt ? ` <small>${esc(dayLabel(lt.end))} 결정</small>` : ''}`]); }
   } else if (B && A.intl?.rows?.length) chips = A.intl.rows.filter((r) => isF(r.short)).map((r) => evChip(r.short, B.started ? stageShort(r.short) : '출전'));
   lines.splice(1, 0, ['관심 팀', chips.length ? `<span class="evr-t">${chips.length > 6 ? `${chips.slice(0, 5).join('')}<small>+${chips.length - 5}팀</small>` : chips.join('')}</span>` : `<small>${esc(ML().none)}</small>`]);
@@ -1139,7 +1139,7 @@ function lastLeague(short) {
 }
 // 진행 중 대회에서 팀의 성적. 없으면 null
 function eventNow(short) {
-  const recent = (B, end) => B.started && (!B.done || now() - new Date(B.f?.start || end) < 3 * 864e5);
+  const recent = (B) => B.started && !B.done; // 끝난 대회 성적은 바로 내리고 다음 대회를 기다린다
   const stage = (B, title, key, base, q) => {
     const sts = B.list.filter((x) => (x.teams || []).includes(short));
     if (!sts.length) return null;
@@ -2153,8 +2153,12 @@ function champsSeeds0() {
   //   같은 CP: C7.3(직행·LCQ 공통), 그래도 같으면 직행 팀 먼저, LCQ 팀끼리는 LCQ 순위 → 결승 점수 → 결승 단일 게임 점수
   //   끝나기 전에는 남은 자리를 알 수 없어 LCQ 팀을 33번부터 이어 넣는다(예상)
   if (allDone) {
-    const all = [...direct, ...got].sort((a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || (a.via === b.via ? (a.via === 'lcq' ? lcqCmp(a, b) : a.rank - b.rank) : a.via === 'cp' ? -1 : 1));
-    return { seeds: all.map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone };
+    let all = [...direct, ...got].sort((a, b) => b.total - a.total || (a.total ? cpTie(a, b) : 0) || (a.via === b.via ? (a.via === 'lcq' ? lcqCmp(a, b) : a.rank - b.rank) : a.via === 'cp' ? -1 : 1));
+    // 운영자가 확정을 알린 시드(config/overrides.json champsSeeds → A.champsSeeds)가 있고 40팀이 모두 맞으면 그 순서로 고정한다
+    const F = A.champsSeeds, fixed = F?.length === all.length && F.every((sh) => all.some((t) => t.short === sh));
+    if (fixed) all = F.map((sh) => all.find((t) => t.short === sh));
+    else if (F?.length) console.warn('[champs] champsSeeds 를 쓰지 않음: 진출 팀과 맞지 않음', F.filter((sh) => !all.some((t) => t.short === sh)));
+    return { seeds: all.map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone, fixed };
   }
   const lcq = [...got, ...Array.from({ length: Math.max(0, A.season.lcqSlots - got.length) }, () => ({ via: 'lcq', tbd: true }))];
   return { seeds: [...direct, ...lcq].map((t, i) => ({ ...t, seed: i + 1, group: snakeGroup(i) })), Q, allDone };
@@ -2178,7 +2182,7 @@ function champsBracket() {
   // 공식 조별 리그 누적 (공식 조 배정 포함): 진행 중에는 실시간 값, 끝난 뒤에는 보관된 값
   const pastCh = (A.past || []).find((e) => /^champs/.test(e.slug || ''));
   const off = champsNow() ? A.intl.rows : pastCh?.rows?.length ? pastCh.rows : null;
-  const { seeds: raw, Q, allDone } = champsSeeds();
+  const { seeds: raw, Q, allDone, fixed } = champsSeeds();
   // 조별 리그 시리즈 (공식 일정이 나왔으면 공식 이름·순서)
   const offGs = ss.filter((x) => /^Group [A-D] vs [A-D]$/.test(x.name)).sort((a, b) => a.start.localeCompare(b.start));
   // 시작 전: 조별 리그 시리즈마다 공식 출전 명단이 나와 있으면 거기서 조를 읽는다 (A조 팀 = 'A vs …' 경기에만 나오는 팀)
@@ -2193,7 +2197,7 @@ function champsBracket() {
   const bySh = new Map(seeds.filter((t) => !t.tbd).map((t) => [t.short, t]));
   const seed = (sh) => { const t = bySh.get(sh), g = offG(sh) || t?.group; return t ? { n: t.seed, label: `${g}조 · ${t.seed}번 시드` } : g ? { n: 999, label: `${g}조` } : null; };
   const slotOfSeed = (t) => ({ short: t.tbd ? null : t.short, label: t.tbd ? `${t.group}조 · LCQ 진출 팀` : `${t.group}조 · ${t.seed}번 시드` });
-  const B = { kind: 'champs', FLOW: CH_FLOW, seed, seeds, Q, allDone, tl, ss, official: !!off || !!lineG };
+  const B = { kind: 'champs', FLOW: CH_FLOW, seed, seeds, Q, allDone, tl, ss, official: !!off || !!lineG || !!fixed, fixed: !!fixed && !off && !lineG };
   const day = (i) => (tl ? addDay(tl.start, i) : null);
   const stOf = (S, x) => ({ ...S, s: x, start: x?.start, tbd: !!x?.timeTbd, status: !x ? 'none' : x.status === 'completed' ? 'completed' : x.live || x.status === 'live' ? 'live' : 'pending' });
   const pairs = offGs.length ? offGs.map((x) => x.name.match(/^Group ([A-D]) vs ([A-D])$/).slice(1)) : CH_GS;
@@ -2288,7 +2292,7 @@ function champsView(q, base) {
       <li>그래도 같으면 추첨</li>
     </ol></div></section>`;
   const how = `<section class="sec" aria-labelledby="h-ch-how"><h2 class="h2" id="h-ch-how">진행 방식</h2>${stageFlow(B, CH_FLOW_L, (k) => qsLink(base, q, { m: k }), '챔피언십 진행 방식')}</section>`;
-  const groupsSec = `<section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.official ? '공식 조 배정입니다.' : allDone ? '진출 40팀은 확정입니다. 조는 40팀을 CP 순으로 1~40번 시드를 매겨 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 사이트 계산이라, 공식 발표 전까지는 예상입니다(규정 3.8.1).' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}${seeds.some((t) => t.prov) ? ' <span>‘예상’ 표시 팀은 LCQ 진출이 확정된 팀입니다. 남은 지역 LCQ 결과에 따라 시드와 조가 바뀔 수 있습니다.</span>' : ''}</p>${groupsHtml}</section>`;
+  const groupsSec = `<section class="sec"><h2 class="h2">조 편성</h2><p class="caption">${B.fixed ? '확정된 조 편성입니다. 진출 40팀을 CP 순으로 1~40번 시드를 매겨 A→B→C→D→D→C→B→A 순서로 지그재그 배정했습니다(규정 3.8.1).' : B.official ? '공식 조 배정입니다.' : allDone ? '진출 40팀은 확정입니다. 조는 40팀을 CP 순으로 1~40번 시드를 매겨 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 사이트 계산이라, 공식 발표 전까지는 예상입니다(규정 3.8.1).' : `챔피언십 포인트 직행 ${A.season.cpDirectSlots}팀을 순위대로 A→B→C→D→D→C→B→A 순서로 지그재그 배정한 조 편성입니다 (${basis} 기준, 사이트 계산이라 공식 발표와 다를 수 있습니다).`}${seeds.some((t) => t.prov) ? ' <span>‘예상’ 표시 팀은 LCQ 진출이 확정된 팀입니다. 남은 지역 LCQ 결과에 따라 시드와 조가 바뀔 수 있습니다.</span>' : ''}</p>${groupsHtml}</section>`;
   // 시작 전(챔피언십 대기)에는 조 편성이 가장 궁금하므로 맨 위에, 시작하면 진행 방식·일정이 먼저
   const groupsTab = B.started ? `${how}${schedTable(B)}${groupsSec}${qBox}` : `${groupsSec}${qBox}${how}${schedTable(B)}`;
   return `<section class="sec past-ev"><h2 class="h2">챔피언십</h2><p class="lead">${tl ? `${esc(tl.start.slice(0, 4))}.${esc(tl.start.slice(5).replace('-', '.'))} – ${esc(tl.end.slice(5).replace('-', '.'))} · ${esc(tl.where)}` : ''}</p></section>
